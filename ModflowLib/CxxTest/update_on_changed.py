@@ -1,3 +1,4 @@
+import os
 import re
 import subprocess
 import sys
@@ -17,10 +18,13 @@ def shell(command):
         raise StandardError("Error running shell command. Error: " + str(result))
 
 if len(sys.argv) == 3:
-    new = slurp_file(sys.argv[1])
-    old = slurp_file(sys.argv[2])
-    if new != old:
+    changed = True
+    if os.path.isfile(sys.argv[2]):
+        new = slurp_file(sys.argv[1])
+        old = slurp_file(sys.argv[2])
+        changed = new != old
+    if changed:
         print 'Updating runner.cpp'
-        shell('copy ' + '"' + sys.argv[1] + '" "' + sys.argv[2] + '" > NUL')
+        shell('copy /y ' + '"' + sys.argv[1] + '" "' + sys.argv[2] + '" > NUL')
 
 exit(0)
