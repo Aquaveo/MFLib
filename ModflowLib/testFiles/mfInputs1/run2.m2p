@@ -1,0 +1,68 @@
+* modflow control
+MODNAMFILE "run2.mfn"
+P1MODNAMFILE "run2.mfn_1"
+P2MODNAMFILE "run2.mfn_2"
+IMDERCALC 0
+STMP1FILE "run2.tpl_1"
+STMP2FILE "run2.tpl_2"
+SEN1FILE "run2.snn_1"
+SEN2FILE "run2.snn_2"
+MOD1RESFILE "run2.in_1"
+MOD2RESFILE "run2.in_2"
+MOD1FILE "run2_bat1.bat"
+MOD2FILE "run2_bat2.bat"
+MODDERFILE "run2.der"
+MODINSFILE "run2.ins"
+MODFLOWCOM "C:\quick\GMS\Models\Copy of mf2k1_16_00\bin\mf2k1_16_00.exe"
+ASPINFILE1 "run2.asp_1"
+ASPINFILE2 "run2.asp_2"
+
+* pest control
+RSTFLE restart
+PESTMODE regularisation
+PRECIS single
+DPOINT point
+RLAMBDA1 10.0
+RLAMFAC 2.0
+PHIRATSUF 0.3
+PHIREDLAM 0.03
+NUMLAM 10
+RELPARMAX 2.5
+FACPARMAX 2.5
+FACORIG 0.001
+PHIREDSWH 0.1 noaui
+NOPTMAX 20
+PHIREDSTP 0.005
+NPHISTP 3
+NPHINORED 3
+RELPARSTP 0.005
+NRELPAR 3
+ICOV 1
+ICOR 1
+IEIG 1
+JACFILE 1
+MESSFILE 0
+NUMCOM 1
+
+* modflow parameters
+
+* general
+PESTCTLFILE "run2.pst"
+DRNCOVFILE "run2.cov_drn"
+RIVCOVFILE "run2.cov_riv"
+GHBCOVFILE "run2.cov_ghb"
+STRCOVFILE "run2.cov_str"
+CHDCOVFILE "run2.cov_chd"
+ADVCOVFILE "run2.cov_adv"
+PICOVFILE "run2.cov_pi"
+
+* regularisation
+PHIMLIM 0.001
+PHIMACCEPT 0.0011
+FRACPHIM 0.25
+WFINIT 0.1
+WFMIN 1.0e-006
+WFMAX 1000000.0
+WFFAC 1.3
+WFTOL 0.01
+REGPRIORFILE "run2.rpf"

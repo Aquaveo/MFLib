@@ -1,0 +1,4 @@
+#GMS_HDF5_01
+5 740 AUX GHBDENS AUX IFACE AUX CONDFACT AUX CELLGRP AUX GHBELEV
+         5         0         0
+GMS_HDF5_01 "wrongOrderedAux.h5" "General Head" 1

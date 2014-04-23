@@ -1,0 +1,16 @@
+# MF2K NAME file
+#
+# MODFLOW USG
+# Output Files
+LIST               702  str.out
+DATA(BINARY)       730  str.hed
+#
+# Global Input Files
+DISU               719  str.disu
+#
+# Flow Process Input Files
+BAS6               703  str.ba6
+BCF6               704  str.bc6
+OC                 715  str.oc
+STR                717  str.str
+SMS                714  str.sms

@@ -1,0 +1,9 @@
+40 90.0 0 0.0 0 0
+0100
+Internal 1.0 (free) -1
+1.0 1.0 
+HDF5 1.0 -1 "mnw1.h5" "Arrays/SF1_1" 1 0 294
+HDF5 1.0 -1 "mnw1.h5" "Arrays/HYCOND_1" 1 0 294
+HDF5 1.0 -1 "mnw1.h5" "Arrays/LEAK_1" 1 0 294
+HDF5 1.0 -1 "mnw1.h5" "Arrays/SF1_2" 1 0 294
+HDF5 1.0 -1 "mnw1.h5" "Arrays/TRAN_2" 1 0 294

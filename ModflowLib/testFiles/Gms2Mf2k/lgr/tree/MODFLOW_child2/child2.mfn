@@ -1,0 +1,12 @@
+LIST 36 child2.out
+BAS6 35 child2.ba6
+LPF 37 child2.lpf
+WEL 32 child2.wel
+GMG 33 child2.gmg
+OC 34 child2.oc
+DATA 90 child2.
+DATA 91 child2._UNIT_91
+DATA(BINARY) 66 child2._UNIT_66
+DATA(BINARY) 68 child2._UNIT_68
+DIS 30 child2.dis
+ZONE 38 child2.zon

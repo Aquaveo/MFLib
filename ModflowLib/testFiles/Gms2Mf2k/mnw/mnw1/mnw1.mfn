@@ -1,0 +1,12 @@
+LIST 7 mnw1.out
+DIS 8 mnw1.dis
+BAS6 9 mnw1.ba6
+BCF6 10 mnw1.bc6
+MNW1 75 mnw1.mnw1
+DRN 77 mnw1.drn
+RCH 72 mnw1.rch
+PCG 74 mnw1.pcg
+CHD 76 mnw1.chd
+OC 71 mnw1.oc
+DATA(BINARY) 89 mnw1.ufh
+DATA(BINARY) 90 mnw1.cbc

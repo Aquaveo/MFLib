@@ -1,0 +1,23 @@
+# MF2K NAME file
+#
+# Output Files
+GLOBAL             701  noSeawatAux.glo
+LIST               702  noSeawatAux.out
+DATA(BINARY)       730  noSeawatAux.hed
+DATA(BINARY)       740  noSeawatAux.ccf
+LMT6               718  noSeawatAux.lmt
+#ASP                771  noSeawatAux.asp
+#
+# Global Input Files
+DIS                719  noSeawatAux.dis
+#
+# Flow Process Input Files
+BAS6               703  noSeawatAux.ba6
+LPF                704  noSeawatAux.lpf
+OC                 715  noSeawatAux.oc
+RIV                708  noSeawatAux.riv
+WEL                709  noSeawatAux.wel
+DRN                710  noSeawatAux.drn
+GHB                711  noSeawatAux.ghb
+CHD                713  noSeawatAux.chd
+PCG                714  noSeawatAux.pcg

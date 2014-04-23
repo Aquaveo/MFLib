@@ -1,0 +1,4 @@
+#GMS_HDF5_01
+5 AUX SHEADFACT AUX EHEADFACT AUX CHDDENSOPT AUX CHDDEN
+         5         0         0
+GMS_HDF5_01 "withSeawatAux.h5" "Specified Head" 1

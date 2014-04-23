@@ -1,0 +1,4 @@
+#GMS_HDF5_01
+3 40 AUX IFACE AUX CONDFACT AUX CELLGRP
+         3         0         0
+GMS_HDF5_01 "smallGrid_65.h5" "River" 1

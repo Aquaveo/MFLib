@@ -1,0 +1,4 @@
+#GMS_HDF5_01
+201 40 AUX IFACE AUX CONDFACT AUX CELLGRP
+       201         0         0
+GMS_HDF5_01 "run2.h5" "Drain" 1

@@ -1,0 +1,4 @@
+#GMS_HDF5_01
+2 740 AUX RIVDEN AUX IFACE AUX CONDFACT AUX CELLGRP AUX RBDTHK
+         2         0         0
+GMS_HDF5_01 "wrongOrderedAux.h5" "River" 1

@@ -1,0 +1,25 @@
+LGR                                     #  1.   LGR
+3                                       #  2.   NGRIDS
+parent.mfn                              #  3.   NAME FILE
+PARENTONLY                              #  4.   GRIDSTATUS
+70 71                                   #  5.   IUPBHSV IUPBFSV
+..\MODFLOW_child1\child1.mfn            #  6.   NAME FILE
+CHILDONLY                               #  7.   GRIDSTATUS
+1 -59 80 81                             #  8.   ISHFLG IBFLG IUCBHSV IUCBFSV
+15 -1                                   #  9.   MXLGRITER IOUTLGR
+0.5 0.5                                 # 10.   RELAXH RELAXF
+1.0e-005 1.0e-005                       # 11.   HCLOSELGR FCLOSELGR
+1 20 22                                 # 12.   NPLBEG NPRBEG NPCBEG
+1 31 39                                 # 13.   NPLEND NPREND NPCEND
+9                                       # 14.   NCPP
+1                                       # 15.   NCPPL
+..\MODFLOW_child2\child2.mfn            #  6.   NAME FILE
+CHILDONLY                               #  7.   GRIDSTATUS
+1 -39 90 91                             #  8.   ISHFLG IBFLG IUCBHSV IUCBFSV
+15 -1                                   #  9.   MXLGRITER IOUTLGR
+0.5 0.5                                 # 10.   RELAXH RELAXF
+1.0e-005 1.0e-005                       # 11.   HCLOSELGR FCLOSELGR
+1 20 70                                 # 12.   NPLBEG NPRBEG NPCBEG
+1 31 87                                 # 13.   NPLEND NPREND NPCEND
+9                                       # 14.   NCPP
+1                                       # 15.   NCPPL

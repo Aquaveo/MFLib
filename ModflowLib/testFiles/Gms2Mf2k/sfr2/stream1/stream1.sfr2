@@ -1,0 +1,5 @@
+#GMS_HDF5_01
+5 1 0 0 128390.4 0.0001 40 0
+GMS_HDF5_SFR2_REACH "stream1.h5" "SFR2"
+         1         0         0
+GMS_HDF5_01 "stream1.h5" "SFR2" 1

@@ -1,0 +1,16 @@
+40 -888.0 0 0
+1 1 
+0 0 
+-1.0 -1.0 
+1 1 
+0 0 
+HDF5 1.0 -1 "smallGrid_Trans_Str1_65.h5" "Arrays/HK1" 1 0 30
+HDF5 1.0 -1 "smallGrid_Trans_Str1_65.h5" "Arrays/HANI1" 1 0 30
+HDF5 1.0 -1 "smallGrid_Trans_Str1_65.h5" "Arrays/VANI1" 1 0 30
+HDF5 1.0 -1 "smallGrid_Trans_Str1_65.h5" "Arrays/SS1" 1 0 30
+HDF5 1.0 -1 "smallGrid_Trans_Str1_65.h5" "Arrays/SY1" 1 0 30
+HDF5 1.0 -1 "smallGrid_Trans_Str1_65.h5" "Arrays/HK2" 1 0 30
+HDF5 1.0 -1 "smallGrid_Trans_Str1_65.h5" "Arrays/HANI2" 1 0 30
+HDF5 1.0 -1 "smallGrid_Trans_Str1_65.h5" "Arrays/VANI2" 1 0 30
+HDF5 1.0 -1 "smallGrid_Trans_Str1_65.h5" "Arrays/SS2" 1 0 30
+HDF5 1.0 -1 "smallGrid_Trans_Str1_65.h5" "Arrays/SY2" 1 0 30

@@ -1,0 +1,28 @@
+#           CoverageGUID ObjectType ID X Y Time OBNAME
+#GMSCOMMENT bcadec99-ae20-4ba3-b9ef-b578cac035a0 ARC 1 44.995 30.275 ts_0 no_ghbf0
+#GMSCOMMENT bcadec99-ae20-4ba3-b9ef-b578cac035a0 ARC 1 44.995 30.275 ts_1 no_ghbf1
+#GMSCOMMENT bcadec99-ae20-4ba3-b9ef-b578cac035a0 ARC 1 44.995 30.275 ts_2 no_ghbf2
+#GMSCOMMENT bcadec99-ae20-4ba3-b9ef-b578cac035a0 ARC 1 44.995 30.275 ts_3 no_ghbf3
+#GMSCOMMENT bcadec99-ae20-4ba3-b9ef-b578cac035a0 ARC 1 44.995 30.275 ts_4 no_ghbf4
+#GMSCOMMENT bcadec99-ae20-4ba3-b9ef-b578cac035a0 ARC 1 44.995 30.275 ts_5 no_ghbf5
+1 12 6
+1.0 1.0 0
+6 12
+no_ghbf0 1 2.5 1.0 1.0e+019 1 1
+no_ghbf1 2 0.0 1.0 1.0e+019 1 1
+no_ghbf2 2 2.5 1.0 1.0e+019 1 1
+no_ghbf3 3 0.0 1.0 1.0e+019 1 1
+no_ghbf4 3 2.5 1.0 1.0e+019 1 1
+no_ghbf5 3 5.0 1.0 1.0e+019 1 1
+1 6 5 1.0
+2 6 5 1.0
+1 5 5 1.0
+2 5 5 1.0
+1 4 5 1.0
+2 4 5 1.0
+1 3 5 1.0
+2 3 5 1.0
+1 2 5 1.0
+2 2 5 1.0
+1 1 5 1.0
+2 1 5 1.0

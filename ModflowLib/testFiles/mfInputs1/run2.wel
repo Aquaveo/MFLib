@@ -1,0 +1,4 @@
+#GMS_HDF5_01
+1202 40 AUX IFACE AUX CONDFACT AUX CELLGRP
+      1202         0         0
+GMS_HDF5_01 "run2.h5" "Well" 1

@@ -1,0 +1,76 @@
+#GMS_HDF5_01
+# comment line 1
+# comment line 2 that is over 200 characters .........................................................................................................................................................!2
+# AML made this file to test various types of MNW input. It works with the GMS MODFLOW grid approach tutorial.
+13 740 2 AUX 'ID' AUX 'ID1'                       # 1.   MNWMAX,IMNWCB,MNWPRNT,[OPTION]
+'Well-A' -2                                       # 2a.  WELLID,NNODES
+SKIN 0 1 0 0                                      # 2b.  LOSSTYPE,PUMPLOC,QLIMIT,PPFLAG,PUMPCAP
+0.1333 1.79471628 12.5                            # 2c.  Rw,Rskin,Kskin
+-45.0 -60.0 6 12                                  # 2d2. Ztop,Zbotm,ROW,COL
+-75.0 -120.0 6 12                                 # 2d2. Ztop,Zbotm,ROW,COL
+-100.0 -1 0.1 0.15                                # 2f.  Hlim,QCUT,Qfrcmn,Qfrcmx
+'Well-B' 1                                        # 2a.  WELLID,NNODES
+NONE 0 0 0 0                                      # 2b.  LOSSTYPE,PUMPLOC,QLIMIT,PPFLAG,PUMPCAP
+2 4 6                                             # 2d1. LAY,ROW,COL
+'PUMPLOC_-1' 2                                    # 2a.  WELLID,NNODES
+THIEM -1 0 0 0                                    # 2b.  LOSSTYPE,PUMPLOC,QLIMIT,PPFLAG,PUMPCAP
+-0.1333                                           # 2c.  Rw
+1 2 8 0.1333                                      # 2d1. LAY,ROW,COL,RwNode
+2 2 8 0.1345                                      # 2d1. LAY,ROW,COL,RwNode
+2.0                                               # 2e.  Zpump
+'PUMPLOC_1' 1                                     # 2a.  WELLID,NNODES
+GENERAL 1 0 0 0                                   # 2b.  LOSSTYPE,PUMPLOC,QLIMIT,PPFLAG,PUMPCAP
+0.13 -0.1 -0.1 -2.0                               # 2c.  Rw,B,C,P
+2 2 12 0.1 0.0 2.0                                # 2d1. LAY,ROW,COL,BNode,CNode,PNode
+2 2 12                                            # 2e.  PUMPLAY,PUMPROW,PUMPCOL
+'SPECIFYcwc' 1                                    # 2a.  WELLID,NNODES
+SPECIFYCWC 0 0 0 0                                # 2b.  LOSSTYPE,PUMPLOC,QLIMIT,PPFLAG,PUMPCAP
+50.13                                             # 2c.  CWC
+2 12 4                                            # 2d1. LAY,ROW,COL
+'SPECIFYcwc2' 1                                   # 2a.  WELLID,NNODES
+SPECIFYCWC 0 0 0 0                                # 2b.  LOSSTYPE,PUMPLOC,QLIMIT,PPFLAG,PUMPCAP
+-50.13                                            # 2c.  CWC
+2 12 4 50.13                                      # 2d1. LAY,ROW,COL,CWCNode
+'QLIMIT_-1' 1                                     # 2a.  WELLID,NNODES
+SKIN 0 -1 0 0                                     # 2b.  LOSSTYPE,PUMPLOC,QLIMIT,PPFLAG,PUMPCAP
+0.1333 -1.79471628 12.5                           # 2c.  Rw,Rskin,Kskin
+2 12 8 1.79471628                                 # 2d1. LAY,ROW,COL,RskinNode
+'PPFLAG_-1' 1                                     # 2a.  WELLID,NNODES
+SKIN 0 0 1 0                                      # 2b.  LOSSTYPE,PUMPLOC,QLIMIT,PPFLAG,PUMPCAP
+0.1333 1.79471628 -12.5                           # 2c.  Rw,Rskin,Kskin
+2 12 10 12.5 0.5                                  # 2d1. LAY,ROW,COL,KskinNode,PP
+'PPFLAG_1' 1                                      # 2a.  WELLID,NNODES
+SKIN 0 0 1 0                                      # 2b.  LOSSTYPE,PUMPLOC,QLIMIT,PPFLAG,PUMPCAP
+0.1333 1.79471628 12.5                            # 2c.  Rw,Rskin,Kskin
+2 12 10 0.6                                       # 2d1. LAY,ROW,COL,PP
+'PUMPCAP_1' 1                                     # 2a.  WELLID,NNODES
+SKIN 0 0 0 1                                      # 2b.  LOSSTYPE,PUMPLOC,QLIMIT,PPFLAG,PUMPCAP
+0.1333 1.79471628 12.5                            # 2c.  Rw,Rskin,Kskin
+1 2 7                                             # 2d1. LAY,ROW,COL
+60.0 30.0 10.0 0.1                                # 2g.  Hlift,LIFTq0,LIFTqmax,HWtol
+20.0 250.0                                        # 2h.  LIFTn,Qn
+'PUMPCAP_3' 1                                     # 2a.  WELLID,NNODES
+SKIN 0 0 0 3                                      # 2b.  LOSSTYPE,PUMPLOC,QLIMIT,PPFLAG,PUMPCAP
+0.1333 1.79471628 12.5                            # 2c.  Rw,Rskin,Kskin
+1 2 8                                             # 2d1. LAY,ROW,COL
+60.0 30.0 10.0 0.1                                # 2g.  Hlift,LIFTq0,LIFTqmax,HWtol
+25.0 100.0                                        # 2h.  LIFTn,Qn
+20.0 250.0                                        # 2h.  LIFTn,Qn
+15.0 400.0                                        # 2h.  LIFTn,Qn
+'Open Bore' -2                                    # 2a.  WELLID,NNODES
+SKIN 0 0 0 0                                      # 2b.  LOSSTYPE,PUMPLOC,QLIMIT,PPFLAG,PUMPCAP
+0.1333 1.79471628 12.5                            # 2c.  Rw,Rskin,Kskin
+0.0 -20.0 2 14                                    # 2d2. Ztop,Zbotm,ROW,COL
+-150.0 -175.0 2 14                                # 2d2. Ztop,Zbotm,ROW,COL
+'Open Bore2' -2                                   # 2a.  WELLID,NNODES
+SKIN 0 0 0 0                                      # 2b.  LOSSTYPE,PUMPLOC,QLIMIT,PPFLAG,PUMPCAP
+0.1333 1.79471628 12.5                            # 2c.  Rw,Rskin,Kskin
+0.0 -20.0 2 13                                    # 2d2. Ztop,Zbotm,ROW,COL
+-150.0 -175.0 2 13                                # 2d2. Ztop,Zbotm,ROW,COL
+7
+GMS_HDF5_01 "mnw2.h5" "MNW2" 1
+12
+GMS_HDF5_01 "mnw2.h5" "MNW2" 2
+-1
+5
+GMS_HDF5_01 "mnw2.h5" "MNW2" 4

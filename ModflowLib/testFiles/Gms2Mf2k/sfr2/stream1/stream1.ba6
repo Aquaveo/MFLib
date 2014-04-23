@@ -1,0 +1,6 @@
+#GMS MODFLOW Simulation
+#22 September 2008
+FREE
+HDF5 1.0 -1 "stream1.h5" "Arrays/ibound1" 1 0 100
+-999.000000
+HDF5 1.0 -1 "stream1.h5" "Arrays/StartHead1" 1 0 100

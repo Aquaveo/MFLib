@@ -1,0 +1,23 @@
+# MF2K NAME file
+#
+# Output Files
+GLOBAL       701 "mnw2.glo"
+LIST         702 "mnw2.out"
+DATA(BINARY) 730 "mnw2.hed"
+#
+# Global Input Files
+DIS          719 "mnw2.dis"
+#
+# Flow Process Input Files
+BAS6         703 "mnw2.ba6"
+LPF          704 "mnw2.lpf"
+OC           715 "mnw2.oc"
+MNW2         776 "mnw2.mnw2"
+MNWI         777 "mnw2.mnwi"
+PCG          714 "mnw2.pcg"
+DATA         772 "mnw2.wel1"
+DATA         774 "mnw2.qsum"
+DATA         773 "mnw2.bynd"
+DATA         45 "mnw2.Well-A"
+DATA         46 "mnw2.Well-B"
+DATA         47 "mnw2.PUMPLOC_1"

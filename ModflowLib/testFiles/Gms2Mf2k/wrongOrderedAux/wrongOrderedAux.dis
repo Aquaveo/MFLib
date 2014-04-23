@@ -1,0 +1,13 @@
+# MF2K DISCRETIZATION FILE
+#
+#
+# NLAY NROW NCOL NPER TIMEUNITS LENUNITS
+1 10 10 1 4 1
+0
+INTERNAL 1.0 (free) -1
+10.0 10.0 10.0 10.0 10.0 10.0 10.0 10.0 10.0 10.0
+INTERNAL 1.0 (free) -1
+10.0 10.0 10.0 10.0 10.0 10.0 10.0 10.0 10.0 10.0
+HDF5 1.0 -1 "wrongOrderedAux.h5" "Arrays/top1" 1 0 100
+HDF5 1.0 -1 "wrongOrderedAux.h5" "Arrays/bot1" 1 0 100
+1.0 1 1.0 SS

@@ -1,0 +1,8 @@
+#GMS MODFLOW Simulation
+#07 November 2006
+FREE
+HDF5 1.0 -1 "smallGrid_Trans_Str1_65.h5" "Arrays/ibound1" 1 0 30
+HDF5 1.0 -1 "smallGrid_Trans_Str1_65.h5" "Arrays/ibound2" 1 0 30
+-999.000000
+HDF5 1.0 -1 "smallGrid_Trans_Str1_65.h5" "Arrays/StartHead1" 1 0 30
+HDF5 1.0 -1 "smallGrid_Trans_Str1_65.h5" "Arrays/StartHead2" 1 0 30

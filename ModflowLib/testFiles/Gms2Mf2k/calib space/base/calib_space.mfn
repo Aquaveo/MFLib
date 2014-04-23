@@ -1,0 +1,28 @@
+# MF2K NAME file
+#
+# Output Files
+GLOBAL             1   calib_space.glo
+LIST               2   calib_space.out
+DATA(BINARY)       30  calib_space.hed
+DATA(BINARY)       40  calib_space.ccf
+LMT6               18  calib_space.lmt
+#
+# Obs-Sen-Pes Process Input Files
+OBS                50  calib_space.obs
+HOB                51  calib_space.hob
+RVOB               52  calib_space.rvob
+CHOB               55  calib_space.chob
+#ASP                71  calib_space.asp
+#
+# Global Input Files
+DIS                19  calib_space.dis
+#
+# Flow Process Input Files
+BAS6               3   calib_space.ba6
+LPF                4   calib_space.lpf
+OC                 15  calib_space.oc
+RCH                16  calib_space.rch
+RIV                8   calib_space.riv
+WEL                9   calib_space.wel
+CHD                13  calib_space.chd
+PCG                14  calib_space.pcg

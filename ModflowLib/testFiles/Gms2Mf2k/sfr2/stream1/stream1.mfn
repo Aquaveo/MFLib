@@ -1,0 +1,19 @@
+# MF2K NAME file
+#
+# Output Files
+GLOBAL        1 "stream1.glo"
+LIST          2 "stream1.out"
+DATA(BINARY) 30 "stream1.hed"
+DATA(BINARY) 40 "stream1.ccf"
+LMT6         18 "stream1.lmt"
+ASP          71 "stream1.asp"
+#
+# Global Input Files
+DIS          19 "stream1.dis"
+#
+# Flow Process Input Files
+BAS6          3 "stream1.ba6"
+LPF           4 "stream1.lpf"
+OC           15 "stream1.oc"
+SFR          19 "stream1.sfr2"
+PCG          14 "stream1.pcg"

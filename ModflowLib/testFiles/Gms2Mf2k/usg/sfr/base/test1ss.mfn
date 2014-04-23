@@ -1,0 +1,29 @@
+# MF2K NAME file
+#
+# MODFLOW USG
+# Output Files
+LIST               702  test1ss.out
+DATA(BINARY)       730  test1ss.hed
+DATA               83  test1ss_stream_gage_1.gag
+DATA               84  test1ss_stream_gage_2.gag
+DATA               85  test1ss_stream_gage_3.gag
+DATA               86  test1ss_stream_gage_4.gag
+DATA               87  test1ss_stream_gage_5.gag
+DATA               88  test1ss_stream_gage_6.gag
+DATA               89  test1ss_stream_gage_7.gag
+DATA               90  test1ss_stream_gage_8.gag
+DATA               91  test1ss_stream_gage_9.gag
+#
+# Global Input Files
+DISU               719  test1ss.disu
+#
+# Flow Process Input Files
+BAS6               703  test1ss.ba6
+LPF                704  test1ss.lpf
+OC                 715  test1ss.oc
+RCH                716  test1ss.rch
+GHB                711  test1ss.ghb
+EVT                712  test1ss.evt
+SFR                724  test1ss.sfr2
+GAGE               723  test1ss.gag
+SMS                714  test1ss.sms

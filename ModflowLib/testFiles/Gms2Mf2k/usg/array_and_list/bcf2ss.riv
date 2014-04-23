@@ -1,0 +1,5 @@
+#GMS_HDF5_01
+10 740 AUX IFACE AUX CONDFACT AUX CELLGRP
+        10         0         0
+GMS_HDF5_01 "bcf2ss.h5" "River" 1
+        -1         0         0

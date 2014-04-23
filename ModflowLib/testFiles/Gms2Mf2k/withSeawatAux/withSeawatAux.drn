@@ -1,0 +1,4 @@
+#GMS_HDF5_01
+2 740 AUX IFACE AUX CONDFACT AUX CELLGRP AUX DRNBELEV
+         2         0         0
+GMS_HDF5_01 "withSeawatAux.h5" "Drain" 1

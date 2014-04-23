@@ -1,0 +1,7 @@
+740 777.77 1 1.0 1 0 0
+ 1 0
+CONSTANT 1.0
+HDF5 1.0 -1 "bcf2ss.h5" "Arrays/HYCOND_1" 1 0 150
+HDF5 1.0 -1 "bcf2ss.h5" "Arrays/LEAK_1" 1 0 150
+HDF5 1.0 -1 "bcf2ss.h5" "Arrays/WET_1" 1 0 150
+HDF5 1.0 -1 "bcf2ss.h5" "Arrays/TRAN_2" 1 0 150

@@ -1,0 +1,23 @@
+# MF2K NAME file
+#
+# Output Files
+GLOBAL             701  wrongOrderedAux.glo
+LIST               702  wrongOrderedAux.out
+DATA(BINARY)       730  wrongOrderedAux.hed
+DATA(BINARY)       740  wrongOrderedAux.ccf
+LMT6               718  wrongOrderedAux.lmt
+#ASP                771  wrongOrderedAux.asp
+#
+# Global Input Files
+DIS                719  wrongOrderedAux.dis
+#
+# Flow Process Input Files
+BAS6               703  wrongOrderedAux.ba6
+LPF                704  wrongOrderedAux.lpf
+OC                 715  wrongOrderedAux.oc
+RIV                708  wrongOrderedAux.riv
+WEL                709  wrongOrderedAux.wel
+DRN                710  wrongOrderedAux.drn
+GHB                711  wrongOrderedAux.ghb
+CHD                713  wrongOrderedAux.chd
+PCG                714  wrongOrderedAux.pcg

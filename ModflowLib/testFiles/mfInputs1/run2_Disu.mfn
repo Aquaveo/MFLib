@@ -1,0 +1,29 @@
+# MF2K NAME file
+#
+# Output Files
+GLOBAL        1 "run2.glo"
+LIST          2 "run2.out"
+DATA(BINARY) 30 "run2.hed"
+DATA(BINARY) 40 "run2.ccf"
+LMT6         18 "run2.lmt"
+#
+# Obs-Sen-Pes Process Input Files
+OBS          50 "run2.obs"
+HOB          51 "run2.hob"
+DROB         54 "run2.drob"
+ASP          71 "run2.asp"
+#
+# Global Input Files
+DISU         19 "run2.disu"
+ZONE         20 "run2.zon"
+MULT         21 "run2.mlt"
+#
+# Flow Process Input Files
+BAS6          3 "run2.ba6"
+LPF           4 "run2.lpf"
+OC           15 "run2.oc"
+RCH          16 "run2.rch"
+HFB6          7 "run2.hfb"
+WEL           9 "run2.wel"
+DRN          10 "run2.drn"
+PCG          14 "run2.pcg"

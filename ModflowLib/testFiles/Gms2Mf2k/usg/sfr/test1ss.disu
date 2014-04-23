@@ -1,0 +1,15 @@
+# MF2K UNSTRUCTURED DISCRETIZATION FILE
+#
+#
+# NODES NLAY NJAG IVSD NPER ITMUNI LENUNI IDSYMRD
+116 1 522 -1 1 1 1 0
+0 
+HDF5 1.0 -1 "test1ss.h5" "Arrays/DISU_NODELAY" 1 0 1
+HDF5 1.0 -1 "test1ss.h5" "Arrays/top1" 1 0 116
+HDF5 1.0 -1 "test1ss.h5" "Arrays/bot1" 1 0 116
+HDF5 1.0 -1 "test1ss.h5" "Arrays/area1" 1 0 116
+HDF5 1.0 -1 "test1ss.h5" "Arrays/DISU_IAC" 1 0 116
+HDF5 1.0 -1 "test1ss.h5" "Arrays/DISU_JA" 1 0 522
+HDF5 1.0 -1 "test1ss.h5" "Arrays/DISU_CL12" 1 0 522
+HDF5 1.0 -1 "test1ss.h5" "Arrays/DISU_FAHL" 1 0 522
+1.0 1 1.0 SS

@@ -1,0 +1,18 @@
+# MF2K UNSTRUCTURED DISCRETIZATION FILE
+#
+#
+# NODES NLAY NJAG IVSD NPER ITMUNI LENUNI IDSYMRD
+300 2 1700 -1 2 4 1 0
+0 0 
+HDF5 1.0 -1 "bcf2ss.h5" "Arrays/DISU_NODELAY" 1 0 2
+HDF5 1.0 -1 "bcf2ss.h5" "Arrays/top1" 1 0 150
+HDF5 1.0 -1 "bcf2ss.h5" "Arrays/top2" 1 0 150
+HDF5 1.0 -1 "bcf2ss.h5" "Arrays/bot1" 1 0 150
+HDF5 1.0 -1 "bcf2ss.h5" "Arrays/bot2" 1 0 150
+HDF5 1.0 -1 "bcf2ss.h5" "Arrays/area1" 1 0 150
+HDF5 1.0 -1 "bcf2ss.h5" "Arrays/DISU_IAC" 1 0 300
+HDF5 1.0 -1 "bcf2ss.h5" "Arrays/DISU_JA" 1 0 1700
+HDF5 1.0 -1 "bcf2ss.h5" "Arrays/DISU_CL12" 1 0 1700
+HDF5 1.0 -1 "bcf2ss.h5" "Arrays/DISU_FAHL" 1 0 1700
+1.0 1 1.0 SS
+1.0 1 1.0 SS

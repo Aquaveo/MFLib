@@ -1,0 +1,29 @@
+# MF2K NAME file
+#
+# Output Files
+GLOBAL             1   smallGrid_Trans_Str1_65.glo
+LIST               2   smallGrid_Trans_Str1_65.out
+DATA(BINARY)       30  smallGrid_Trans_Str1_65.hed
+DATA(BINARY)       40  smallGrid_Trans_Str1_65.ccf
+#
+# Obs-Sen-Pes Process Input Files
+OBS                50  smallGrid_Trans_Str1_65.obs
+GBOB               53  smallGrid_Trans_Str1_65.gbob
+ASP                71  smallGrid_Trans_Str1_65.asp
+#
+# Global Input Files
+DIS                19  smallGrid_Trans_Str1_65.dis
+#
+# Flow Process Input Files
+BAS6               3   smallGrid_Trans_Str1_65.ba6
+LPF                4   smallGrid_Trans_Str1_65.lpf
+OC                 15  smallGrid_Trans_Str1_65.oc
+RCH                16  smallGrid_Trans_Str1_65.rch
+RIV                8   smallGrid_Trans_Str1_65.riv
+WEL                9   smallGrid_Trans_Str1_65.wel
+DRN                10  smallGrid_Trans_Str1_65.drn
+GHB                11  smallGrid_Trans_Str1_65.ghb
+EVT                12  smallGrid_Trans_Str1_65.evt
+STR                17  smallGrid_Trans_Str1_65.str
+CHD                13  smallGrid_Trans_Str1_65.chd
+PCG                14  smallGrid_Trans_Str1_65.pcg

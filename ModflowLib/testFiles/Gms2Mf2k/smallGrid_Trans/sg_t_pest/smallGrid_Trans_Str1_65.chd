@@ -1,0 +1,6 @@
+#GMS_HDF5_01
+12 40 AUX IFACE AUX CONDFACT AUX CELLGRP
+        12         0         0
+GMS_HDF5_01 "smallGrid_Trans_Str1_65.h5" "Specified Head" 1
+        -1         0         0
+        -1         0         0

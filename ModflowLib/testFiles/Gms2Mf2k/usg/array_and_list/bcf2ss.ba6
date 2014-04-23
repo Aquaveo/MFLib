@@ -1,0 +1,8 @@
+#
+#
+FREE
+HDF5 1.0 -1 "bcf2ss.h5" "Arrays/ibound1" 1 0 150
+HDF5 1.0 -1 "bcf2ss.h5" "Arrays/ibound2" 1 0 150
+999.99
+HDF5 1.0 -1 "bcf2ss.h5" "Arrays/StartHead1" 1 0 150
+HDF5 1.0 -1 "bcf2ss.h5" "Arrays/StartHead2" 1 0 150
