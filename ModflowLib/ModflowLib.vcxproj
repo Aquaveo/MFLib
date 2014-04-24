@@ -288,7 +288,7 @@
       <AdditionalOptions>/MP4
  %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\source;..\..\cxxtest-4.2.1;..\..\..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\source;..\..\external_libs\cxxtest-4.2.1;..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;DBLPREC;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -299,7 +299,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>..\..\..\..\external_libs\xmdf\library\lib\xmdf99.99d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\external_libs\xmdf\library\lib\xmdf99.99d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
     </Lib>
     <PostBuildEvent>
@@ -319,7 +319,7 @@
       <AdditionalOptions>/MP4
  %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\source;..\..\cxxtest-4.2.1;..\..\..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\source;..\..\external_libs\cxxtest-4.2.1;..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;DBLPREC;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -330,7 +330,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>..\..\..\..\external_libs\xmdf\library\lib\xmdf99.99dx64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\external_libs\xmdf\library\lib\xmdf99.99dx64.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
     </Lib>
     <PostBuildEvent>
@@ -348,7 +348,7 @@ build_test_runner.bat
       <AdditionalOptions>/MP4
  %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\;.\source;..\..\cxxtest-4.2.1;..\..\..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\source;..\..\external_libs\cxxtest-4.2.1;..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;CXX_TEST;CXXTEST_HAVE_EH;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -359,7 +359,7 @@ build_test_runner.bat
       <ErrorReporting>None</ErrorReporting>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shell32.lib;..\..\..\..\external_libs\xmdf\library\lib\xmdf99.99.lib</AdditionalDependencies>
+      <AdditionalDependencies>shell32.lib;..\..\external_libs\xmdf\library\lib\xmdf99.99.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -389,7 +389,7 @@ build_test_runner.bat
       <AdditionalOptions>/MP4
  %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\;.\source;..\..\cxxtest-4.2.1;..\..\..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\source;..\..\external_libs\cxxtest-4.2.1;..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;CXX_TEST;CXXTEST_HAVE_EH;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -400,7 +400,7 @@ build_test_runner.bat
       <ErrorReporting>None</ErrorReporting>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shell32.lib;..\..\..\..\external_libs\xmdf\library\lib\xmdf99.99x64.lib</AdditionalDependencies>
+      <AdditionalDependencies>shell32.lib;..\..\external_libs\xmdf\library\lib\xmdf99.99x64.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -427,7 +427,7 @@ build_test_runner.bat
       <AdditionalOptions>/MP4
  %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\;.\source;..\..\cxxtest-4.2.1;..\..\..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\source;..\..\external_libs\cxxtest-4.2.1;..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;CXX_TEST;CXXTEST_HAVE_EH;DBLPREC;_SECURE_SCL=0;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -438,7 +438,7 @@ build_test_runner.bat
       <ErrorReporting>None</ErrorReporting>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shell32.lib;..\..\..\..\external_libs\xmdf\library\lib\xmdf99.99.lib</AdditionalDependencies>
+      <AdditionalDependencies>shell32.lib;..\..\external_libs\xmdf\library\lib\xmdf99.99.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -468,7 +468,7 @@ build_test_runner.bat
       <AdditionalOptions>/MP4
  %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\;.\source;..\..\cxxtest-4.2.1;..\..\..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\source;..\..\external_libs\cxxtest-4.2.1;..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;CXX_TEST;CXXTEST_HAVE_EH;DBLPREC;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -479,7 +479,7 @@ build_test_runner.bat
       <ErrorReporting>None</ErrorReporting>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shell32.lib;..\..\..\..\external_libs\xmdf\library\lib\xmdf99.99x64.lib</AdditionalDependencies>
+      <AdditionalDependencies>shell32.lib;..\..\external_libs\xmdf\library\lib\xmdf99.99x64.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -506,7 +506,7 @@ build_test_runner.bat
       <AdditionalOptions>/MP4
  %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\source;.;..\..\cxxtest-4.2.1;..\..\..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\source;.;..\..\external_libs\cxxtest-4.2.1;..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRTDBG_MAP_ALLOC;CXX_TEST;CXXTEST_HAVE_EH;_SECURE_SCL=0;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -517,7 +517,7 @@ build_test_runner.bat
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shell32.lib;..\..\..\..\external_libs\xmdf\library\lib\xmdf99.99d.lib</AdditionalDependencies>
+      <AdditionalDependencies>shell32.lib;..\..\external_libs\xmdf\library\lib\xmdf99.99d.lib</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -545,7 +545,7 @@ build_test_runner.bat
       <AdditionalOptions>/MP4
  %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\source;.;..\..\cxxtest-4.2.1;..\..\..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\source;.;..\..\external_libs\cxxtest-4.2.1;..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;CXX_TEST;CXXTEST_HAVE_EH;_AFXDLL;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -556,7 +556,7 @@ build_test_runner.bat
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shell32.lib;..\..\..\..\external_libs\xmdf\library\lib\xmdf99.99dx64.lib</AdditionalDependencies>
+      <AdditionalDependencies>shell32.lib;..\..\external_libs\xmdf\library\lib\xmdf99.99dx64.lib</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
@@ -582,7 +582,7 @@ build_test_runner.bat
       <AdditionalOptions>/MP4
  %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\source;.;..\..\cxxtest-4.2.1;..\..\..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\source;.;..\..\external_libs\cxxtest-4.2.1;..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;CXX_TEST;CXXTEST_HAVE_EH;DBLPREC;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -593,7 +593,7 @@ build_test_runner.bat
       <ErrorReporting>None</ErrorReporting>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shell32.lib;..\..\..\..\external_libs\xmdf\library\lib\xmdf99.99.lib</AdditionalDependencies>
+      <AdditionalDependencies>shell32.lib;..\..\external_libs\xmdf\library\lib\xmdf99.99.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(Configuration).exe</OutputFile>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
@@ -624,7 +624,7 @@ build_test_runner.bat
       <AdditionalOptions>/MP4
  %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\source;.;..\..\cxxtest-4.2.1;..\..\..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\source;.;..\..\external_libs\cxxtest-4.2.1;..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;CXX_TEST;CXXTEST_HAVE_EH;DBLPREC;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -635,7 +635,7 @@ build_test_runner.bat
       <ErrorReporting>None</ErrorReporting>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shell32.lib;..\..\..\..\external_libs\xmdf\library\lib\xmdf99.99x64.lib</AdditionalDependencies>
+      <AdditionalDependencies>shell32.lib;..\..\external_libs\xmdf\library\lib\xmdf99.99x64.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(Configuration).exe</OutputFile>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
@@ -662,7 +662,7 @@ build_test_runner.bat
       <AdditionalOptions>/MP4
  %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\source;..\..\cxxtest-4.2.1;..\..\..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\source;..\..\external_libs\cxxtest-4.2.1;..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -673,7 +673,7 @@ build_test_runner.bat
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>..\..\..\..\external_libs\xmdf\library\lib\xmdf99.99d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\external_libs\xmdf\library\lib\xmdf99.99d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
     </Lib>
     <PostBuildEvent>
@@ -693,7 +693,7 @@ build_test_runner.bat
       <AdditionalOptions>/MP4
  %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\source;..\..\cxxtest-4.2.1;..\..\..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\source;..\..\external_libs\cxxtest-4.2.1;..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -704,7 +704,7 @@ build_test_runner.bat
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>..\..\..\..\external_libs\xmdf\library\lib\xmdf99.99dx64.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\..\external_libs\xmdf\library\lib\xmdf99.99dx64.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
@@ -723,7 +723,7 @@ build_test_runner.bat
       <AdditionalOptions>/MP4
  %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\source;..\..\cxxtest-4.2.1;..\..\..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\source;..\..\external_libs\cxxtest-4.2.1;..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -733,7 +733,7 @@ build_test_runner.bat
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>..\..\..\..\external_libs\xmdf\library\lib\xmdf99.99.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\external_libs\xmdf\library\lib\xmdf99.99.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
@@ -755,7 +755,7 @@ build_test_runner.bat
       <AdditionalOptions>/MP4
  %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\source;..\..\cxxtest-4.2.1;..\..\..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\source;..\..\external_libs\cxxtest-4.2.1;..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -765,7 +765,7 @@ build_test_runner.bat
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>..\..\..\..\external_libs\xmdf\library\lib\xmdf99.99x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\external_libs\xmdf\library\lib\xmdf99.99x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
     </Lib>
     <PostBuildEvent>
@@ -783,7 +783,7 @@ build_test_runner.bat
       <AdditionalOptions>/MP4
  %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\source;.;..\..\cxxtest-4.2.1;..\..\..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\source;.;..\..\external_libs\cxxtest-4.2.1;..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRTDBG_MAP_ALLOC;CXX_TEST;CXXTEST_HAVE_EH;DBLPREC;_SECURE_SCL=0;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -794,7 +794,7 @@ build_test_runner.bat
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shell32.lib;..\..\..\..\external_libs\xmdf\library\lib\xmdf99.99d.lib</AdditionalDependencies>
+      <AdditionalDependencies>shell32.lib;..\..\external_libs\xmdf\library\lib\xmdf99.99d.lib</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
@@ -823,7 +823,7 @@ build_test_runner.bat
       <AdditionalOptions>/MP4
  %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\source;.;..\..\cxxtest-4.2.1;..\..\..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\source;.;..\..\external_libs\cxxtest-4.2.1;..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;CXX_TEST;CXXTEST_HAVE_EH;DBLPREC;_AFXDLL;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -834,7 +834,7 @@ build_test_runner.bat
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shell32.lib;..\..\..\..\external_libs\xmdf\library\lib\xmdf99.99dx64.lib</AdditionalDependencies>
+      <AdditionalDependencies>shell32.lib;..\..\external_libs\xmdf\library\lib\xmdf99.99dx64.lib</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
@@ -859,7 +859,7 @@ build_test_runner.bat
       <AdditionalOptions>/MP4
  %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\source;..\..\cxxtest-4.2.1;..\..\..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\source;..\..\external_libs\cxxtest-4.2.1;..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;DBLPREC;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -870,7 +870,7 @@ build_test_runner.bat
       </DebugInformationFormat>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>..\..\..\..\external_libs\xmdf\library\lib\xmdf99.99.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\external_libs\xmdf\library\lib\xmdf99.99.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
     </Lib>
     <PostBuildEvent>
@@ -890,7 +890,7 @@ build_test_runner.bat
       <AdditionalOptions>/MP4
  %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\source;..\..\cxxtest-4.2.1;..\..\..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\source;..\..\external_libs\cxxtest-4.2.1;..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;DBLPREC;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -901,7 +901,7 @@ build_test_runner.bat
       </DebugInformationFormat>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>..\..\..\..\external_libs\xmdf\library\lib\xmdf99.99x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\external_libs\xmdf\library\lib\xmdf99.99x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
     </Lib>
     <PostBuildEvent>
