@@ -1,10 +1,31 @@
 //------------------------------------------------------------------------------
 // FILE      CToken.cpp
 // PURPOSE   
-//  (C) Copyright Aquaveo 2014. Distributed under the ModflowLib
-//  Software License, Version 1.0. (See accompanying file
-//  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
-//------------------------------------------------------------------------------
+// Token.cpp: implementation of the CToken class.
+//
+//	MFC Simple CString Tokenizer (Version 1)
+//	
+//	Written by Richard Case (case@dcs.kcl.ac.uk)
+//  Copyright (c) 1999
+//
+// This code may be used in compiled form in any way you desire. This
+// file may be redistributed unmodified by any means PROVIDING it is 
+// not sold for profit without the authors written consent, and 
+// providing that this notice and the authors name and all copyright 
+// notices remains intact. 
+//
+// This file is provided "as is" with no expressed or implied warranty.
+// The author accepts no liability for any damage/loss of business that
+// this product may cause.
+//
+// Expect bugs!
+// 
+// Please use and enjoy. Please let me know of any bugs/mods/improvements 
+// that you have found/implemented and I will fix/incorporate them into this
+// file. 
+//
+//
+//////////////////////////////////////////////////////////////////////
 #include <private\util\CToken.h>
 
 //-----------------------------------------------------------------------------
