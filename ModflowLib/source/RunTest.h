@@ -8,7 +8,6 @@ namespace testCxx
 int RunUnitTests(double a_maxTestTime = 10000.0);
 bool& TestsRunning();
 bool& RunAllTests();
-bool& PrintXML();
 }
 
 #endif
