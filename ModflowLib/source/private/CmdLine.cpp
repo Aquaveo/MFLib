@@ -158,7 +158,7 @@ void CmdLineT::testProcessCmdLine ()
   TS_ASSERT(ProcessCmdLine(strs, name, out, pause));
   TS_ASSERT(pause);
 
-  TS_FAIL("testProcessCmdLine");
+
 }
 
 #endif
