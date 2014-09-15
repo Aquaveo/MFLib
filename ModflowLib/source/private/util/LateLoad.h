@@ -136,6 +136,12 @@ protected:
 	*  Loads the dll.  
 	* 
 	*******************************************************************************/
+public:
+  BOOL dll_LoadLibraryFromName(LPCTSTR pszLibrary)
+  {
+    return dll_LoadLibrary(pszLibrary, true);
+  }
+
 protected:
 	BOOL dll_LoadLibrary(LPCTSTR pszLibrary, BOOL bDoItNow)
 	{
@@ -925,6 +931,103 @@ public: \
 		if( Is_##FuncName() ) \
 			m_pf##FuncName(p1,p2,p3,p4,p5,p6,p7,p8,p9); \
 	}
+
+//
+// Function Declaration, Nine Parameters, returns nothing 
+//
+// CallingConv, Calling convention of the function
+// FuncName,    Name of the function
+// ParamN       types of the function parameters
+//
+#define LATELOAD_FUNC_14_VOID(CallingConv,FuncName,ParamType1,ParamType2,ParamType3,ParamType4,ParamType5,ParamType6,ParamType7,ParamType8,ParamType9,ParamType10,ParamType11,ParamType12,ParamType13,ParamType14) \
+protected: \
+  typedef void(CallingConv * TYPE_##FuncName)(ParamType1,ParamType2,ParamType3,ParamType4,ParamType5,ParamType6,ParamType7,ParamType8,ParamType9,ParamType10,ParamType11,ParamType12,ParamType13,ParamType14); \
+  TYPE_##FuncName m_pf##FuncName; \
+  ImportedProcState m_ips##FuncName;\
+public: \
+  BOOL Is_##FuncName() \
+  { \
+  if(ipsUnknown == m_ips##FuncName) \
+  m_pf##FuncName = (TYPE_##FuncName)dll_GetProcAddress(#FuncName, m_ips##FuncName); \
+  return(ipsAvailable == m_ips##FuncName); \
+  } \
+  void FuncName(ParamType1 p1,ParamType2 p2,ParamType3 p3,ParamType4 p4,ParamType5 p5,ParamType6 p6,ParamType7 p7,ParamType8 p8,ParamType9 p9,ParamType10 p10,ParamType11 p11,ParamType12 p12,ParamType13 p13,ParamType14 p14) \
+  {\
+  if( Is_##FuncName() ) \
+  m_pf##FuncName(p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14); \
+  }
+//
+// Function Declaration, Nine Parameters, returns nothing 
+//
+// CallingConv, Calling convention of the function
+// FuncName,    Name of the function
+// ParamN       types of the function parameters
+//
+#define LATELOAD_FUNC_16_VOID(CallingConv,FuncName,ParamType1,ParamType2,ParamType3,ParamType4,ParamType5,ParamType6,ParamType7,ParamType8,ParamType9,ParamType10,ParamType11,ParamType12,ParamType13,ParamType14,ParamType15,ParamType16) \
+protected: \
+  typedef void(CallingConv * TYPE_##FuncName)(ParamType1,ParamType2,ParamType3,ParamType4,ParamType5,ParamType6,ParamType7,ParamType8,ParamType9,ParamType10,ParamType11,ParamType12,ParamType13,ParamType14,ParamType15,ParamType16); \
+  TYPE_##FuncName m_pf##FuncName; \
+  ImportedProcState m_ips##FuncName;\
+public: \
+  BOOL Is_##FuncName() \
+  { \
+  if(ipsUnknown == m_ips##FuncName) \
+  m_pf##FuncName = (TYPE_##FuncName)dll_GetProcAddress(#FuncName, m_ips##FuncName); \
+  return(ipsAvailable == m_ips##FuncName); \
+  } \
+  void FuncName(ParamType1 p1,ParamType2 p2,ParamType3 p3,ParamType4 p4,ParamType5 p5,ParamType6 p6,ParamType7 p7,ParamType8 p8,ParamType9 p9,ParamType10 p10,ParamType11 p11,ParamType12 p12,ParamType13 p13,ParamType14 p14,ParamType15 p15,ParamType16 p16) \
+  {\
+  if( Is_##FuncName() ) \
+  m_pf##FuncName(p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15,p16); \
+  }
+//
+// Function Declaration, Nine Parameters, returns nothing 
+//
+// CallingConv, Calling convention of the function
+// FuncName,    Name of the function
+// ParamN       types of the function parameters
+//
+#define LATELOAD_FUNC_21_VOID(CallingConv,FuncName,ParamType1,ParamType2,ParamType3,ParamType4,ParamType5,ParamType6,ParamType7,ParamType8,ParamType9,ParamType10,ParamType11,ParamType12,ParamType13,ParamType14,ParamType15,ParamType16,ParamType17,ParamType18,ParamType19,ParamType20,ParamType21) \
+protected: \
+  typedef void(CallingConv * TYPE_##FuncName)(ParamType1,ParamType2,ParamType3,ParamType4,ParamType5,ParamType6,ParamType7,ParamType8,ParamType9,ParamType10,ParamType11,ParamType12,ParamType13,ParamType14,ParamType15,ParamType16,ParamType17,ParamType18,ParamType19,ParamType20,ParamType21); \
+  TYPE_##FuncName m_pf##FuncName; \
+  ImportedProcState m_ips##FuncName;\
+public: \
+  BOOL Is_##FuncName() \
+  { \
+  if(ipsUnknown == m_ips##FuncName) \
+  m_pf##FuncName = (TYPE_##FuncName)dll_GetProcAddress(#FuncName, m_ips##FuncName); \
+  return(ipsAvailable == m_ips##FuncName); \
+  } \
+  void FuncName(ParamType1 p1,ParamType2 p2,ParamType3 p3,ParamType4 p4,ParamType5 p5,ParamType6 p6,ParamType7 p7,ParamType8 p8,ParamType9 p9,ParamType10 p10,ParamType11 p11,ParamType12 p12,ParamType13 p13,ParamType14 p14,ParamType15 p15,ParamType16 p16,ParamType17 p17,ParamType18 p18,ParamType19 p19,ParamType20 p20,ParamType21 p21) \
+  {\
+  if( Is_##FuncName() ) \
+  m_pf##FuncName(p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15,p16,p17,p18,p19,p20,p21); \
+  }
+//
+// Function Declaration, Nine Parameters, returns nothing 
+//
+// CallingConv, Calling convention of the function
+// FuncName,    Name of the function
+// ParamN       types of the function parameters
+//
+#define LATELOAD_FUNC_43_VOID(CallingConv,FuncName,ParamType1,ParamType2,ParamType3,ParamType4,ParamType5,ParamType6,ParamType7,ParamType8,ParamType9,ParamType10,ParamType11,ParamType12,ParamType13,ParamType14,ParamType15,ParamType16,ParamType17,ParamType18,ParamType19,ParamType20,ParamType21,ParamType22,ParamType23,ParamType24,ParamType25,ParamType26,ParamType27,ParamType28,ParamType29,ParamType30,ParamType31,ParamType32,ParamType33,ParamType34,ParamType35,ParamType36,ParamType37,ParamType38,ParamType39,ParamType40,ParamType41,ParamType42,ParamType43) \
+protected: \
+  typedef void(CallingConv * TYPE_##FuncName)(ParamType1,ParamType2,ParamType3,ParamType4,ParamType5,ParamType6,ParamType7,ParamType8,ParamType9,ParamType10,ParamType11,ParamType12,ParamType13,ParamType14,ParamType15,ParamType16,ParamType17,ParamType18,ParamType19,ParamType20,ParamType21,ParamType22,ParamType23,ParamType24,ParamType25,ParamType26,ParamType27,ParamType28,ParamType29,ParamType30,ParamType31,ParamType32,ParamType33,ParamType34,ParamType35,ParamType36,ParamType37,ParamType38,ParamType39,ParamType40,ParamType41,ParamType42,ParamType43); \
+  TYPE_##FuncName m_pf##FuncName; \
+  ImportedProcState m_ips##FuncName;\
+public: \
+  BOOL Is_##FuncName() \
+  { \
+  if(ipsUnknown == m_ips##FuncName) \
+  m_pf##FuncName = (TYPE_##FuncName)dll_GetProcAddress(#FuncName, m_ips##FuncName); \
+  return(ipsAvailable == m_ips##FuncName); \
+  } \
+  void FuncName(ParamType1 p1,ParamType2 p2,ParamType3 p3,ParamType4 p4,ParamType5 p5,ParamType6 p6,ParamType7 p7,ParamType8 p8,ParamType9 p9,ParamType10 p10,ParamType11 p11,ParamType12 p12,ParamType13 p13,ParamType14 p14,ParamType15 p15,ParamType16 p16,ParamType17 p17,ParamType18 p18,ParamType19 p19,ParamType20 p20,ParamType21 p21,ParamType22 p22,ParamType23 p23,ParamType24 p24,ParamType25 p25,ParamType26 p26,ParamType27 p27,ParamType28 p28,ParamType29 p29,ParamType30 p30,ParamType31 p31,ParamType32 p32,ParamType33 p33,ParamType34 p34,ParamType35 p35,ParamType36 p36,ParamType37 p37,ParamType38 p38,ParamType39 p39,ParamType40 p40,ParamType41 p41,ParamType42 p42,ParamType43 p43) \
+  {\
+  if( Is_##FuncName() ) \
+  m_pf##FuncName(p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15,p16,p17,p18,p19,p20,p21,p22,p23,p24,p25,p26,p27,p28,p29,p30,p31,p32,p33,p34,p35,p36,p37,p38,p39,p40,p41,p42,p43); \
+  }
 
 
 

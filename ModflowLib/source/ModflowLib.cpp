@@ -21,6 +21,7 @@
 #include <private\Parameters.h>
 #include <private\Sfr2Reader.h>
 #include <private\H5DataReader\H5DataSetReader.h>
+#include <private\samg\samg.h>
 #include <private\SQLite\CppSQLite3.h>
 
 
@@ -900,7 +901,89 @@ DLLEXPORT void MFLIB_SETSFRSEGSIZE (int *SZ)
   if (!SZ) return;
   MfData::Get().SetIntVar("SFR_SEG_SIZE", *SZ);
 } // MFLIB_SETSFRSEGSIZE
-
+//------------------------------------------------------------------------------
+/// \brief releases the license used by SAMG if SAMG was used in the model
+//------------------------------------------------------------------------------
+DLLEXPORT void MFLIB_SAMG_REL_LIC ()
+{
+  SamgReleaseLicense();
+} // MFLIB_SAMG_REL_LIC
+//------------------------------------------------------------------------------
+/// \brief calls the samg solver
+//------------------------------------------------------------------------------
+DLLEXPORT void MFLIB_SAMGUSG (double* A,
+                              double* RHS,
+                              double* HNEW,
+                              int*    IA,
+                              int*    JA,
+                              int*    NNA,
+                              int*    NNU,
+                              int*    KPER,
+                              int*    KSTP,
+                              int*    ncyc,
+                              int*    NCYC_DONE,
+                              double* EPSSAMG,
+                              int*    IBOUND,
+                              int*    SAMGLOG,
+                              int*    IERR,
+                              int*    aqLicense)
+{
+  samgUsg(A,RHS,HNEW,IA,JA,NNA,NNU,KPER,KSTP,ncyc,NCYC_DONE,EPSSAMG,IBOUND,
+          SAMGLOG,IERR,aqLicense);
+} // MFLIB_SAMGUSG
+//------------------------------------------------------------------------------
+/// \brief samg for mf2k
+//------------------------------------------------------------------------------
+DLLEXPORT void MFLIB_LMG1ALSAMG (
+  int* ISUM, int* ISUMI, int* LCA, int* LCIA, int* LCJA, int* LCU1, int* LCFRHS,
+  int* LCIG, int* ISIZ1, int* ISIZ2, int* ISIZ3, int* ISIZ4, int* ICG,
+  int* NCOL, int* NROW, int* NLAY, int* samg_logio, Real* stor1, Real* stor2,
+  Real* stor3, char* samg_logfile, int a_samg_logfile_len)
+{
+  CStr log = util::GetStr(samg_logfile, a_samg_logfile_len);
+  char mychar[500];
+  strcpy_s(mychar, log.c_str());
+  samgLMG1ALSAMG(ISUM,ISUMI,LCA,LCIA,LCJA,LCU1,LCFRHS,LCIG,ISIZ1,ISIZ2,ISIZ3,
+                 ISIZ4,ICG,NCOL,NROW,NLAY,samg_logio,stor1,stor2,stor3,
+                 mychar);
+} // MFLIB_LMG1ALSAMG
+//------------------------------------------------------------------------------
+/// \brief samg for mf2k
+//------------------------------------------------------------------------------
+DLLEXPORT void MFLIB_LMG1RPSAMG (
+  int* MXITER, int* MXCYC, Real* rcloselmg, Real* damplmg, Real* damplmgt,
+  int* ioutamg, int* ICG, int* IADAMPlmg, Real* DUPlmg, Real* DLOWlmg,
+  Real* HCLOSE, int* CONTROLlmg, int* samg_logio, char* SAMG_LOGFILE,
+  int a_SAMG_LOGFILE_len)
+{
+  CStr log = util::GetStr(SAMG_LOGFILE, a_SAMG_LOGFILE_len);
+  char mychar[500];
+  strcpy_s(mychar, log.c_str());
+  samgLMG1RPsamg(MXITER,MXCYC,rcloselmg,damplmg,damplmgt,ioutamg,ICG,IADAMPlmg,
+                 DUPlmg,DLOWlmg,HCLOSE,CONTROLlmg,samg_logio,mychar);
+} // MFLIB_LMG1RPsamg
+//------------------------------------------------------------------------------
+/// \brief samg for mf2k
+//------------------------------------------------------------------------------
+DLLEXPORT void MFLIB_LMG1APSAMG (
+  double* HNEW,int* IBOUND,Real* CR,Real* CC,Real* CV,Real* HCOF,Real* RHS,     //7
+  double* A,int* IA,int* JA,double* U,double* FRHS,int* IG,int* ISIZ1,          //7
+  int* ISIZ2,int* ISIZ3,int* ISIZ4,int* KITER,Real* BCLOSE,Real* DAMP,          //6
+  int* ICNVG,int* KSTP,int* KPER,int* MXITER,int* MXCYC,int* NCOL,int* NROW,    //7
+  int * NLAY,int* NODES,Real* HNOFLO,int* IOUTAMG,int* ICG,int* IADAMP,         //6
+  Real* DUP,Real* DLOW,int* samg_logio,int* IHCOFADD,Real* start_res,           //5
+  Real* end_res,int* iter_done,int* setup_done,int* iLicense,char* samg_logfile,//5
+  int a_samg_logfile_len)
+{
+  CStr log = util::GetStr(samg_logfile, a_samg_logfile_len);
+  char mychar[500];
+  strcpy_s(mychar, log.c_str());
+  samgLMG1APsamg(HNEW,IBOUND,CR,CC,CV,HCOF,RHS,A,IA,JA,U,FRHS,IG,ISIZ1,ISIZ2,
+                 ISIZ3,ISIZ4,KITER,BCLOSE,DAMP,ICNVG,KSTP,KPER,MXITER,MXCYC,
+                 NCOL,NROW,NLAY,NODES,HNOFLO,IOUTAMG,ICG,IADAMP,DUP,DLOW,
+                 samg_logio,IHCOFADD,start_res,end_res,iter_done,setup_done,
+                 iLicense, mychar);
+} // MFLIB_LMG1APSAMG
 
 ///////////////////////////////////////////////////////////////////////////////
 // TESTS

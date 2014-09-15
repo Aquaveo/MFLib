@@ -150,6 +150,120 @@ module mfLib
     SUBROUTINE mfLib_SetSfrSegSize(SZ)
       INTEGER          SZ   [REFERENCE]
     END SUBROUTINE mfLib_SetSfrSegSize
+!     ------------------------------------------------------------------
+!      Declare the C function
+    SUBROUTINE MFLIB_SAMG_REL_LIC()
+    END SUBROUTINE MFLIB_SAMG_REL_LIC
+!     ------------------------------------------------------------------
+!      Declare the C function
+    SUBROUTINE MFLIB_SAMGUSG(A,RHS,HNEW,IA,JA,NNA,NNU,KPER,KSTP,ncyc,NCYC_DONE,EPSSAMG,IBOUND,SAMGLOG,IERR,aqLicense)
+      DOUBLE PRECISION  A         (*)
+      DOUBLE PRECISION  RHS       (*)
+      DOUBLE PRECISION  HNEW      (*)
+      INTEGER           IA        [REFERENCE]
+      INTEGER           JA        [REFERENCE]
+      INTEGER           NNA       [REFERENCE]
+      INTEGER           NNU       [REFERENCE]
+      INTEGER           KPER      [REFERENCE]
+      INTEGER           KSTP      [REFERENCE]
+      INTEGER           ncyc      [REFERENCE]
+      INTEGER           NCYC_DONE [REFERENCE]
+      DOUBLE PRECISION  EPSSAMG   [REFERENCE]
+      INTEGER           IBOUND    (*)
+      INTEGER           SAMGLOG   [REFERENCE]
+      INTEGER           IERR      [REFERENCE]
+      INTEGER           aqLicense [REFERENCE]
+    END SUBROUTINE MFLIB_SAMGUSG
+!     ------------------------------------------------------------------
+!      Declare the C function
+    SUBROUTINE MFLIB_LMG1ALSAMG(ISUM,ISUMI,LCA,LCIA,LCJA,LCU1,LCFRHS,LCIG,ISIZ1,ISIZ2,ISIZ3,ISIZ4,ICG,NCOL,NROW,NLAY,samg_logio,stor1,stor2,stor3,samg_logfile)
+      INTEGER           ISUM [REFERENCE]
+      INTEGER           ISUMI [REFERENCE]
+      INTEGER           LCA [REFERENCE]
+      INTEGER           LCIA [REFERENCE]
+      INTEGER           LCJA [REFERENCE]
+      INTEGER           LCU1 [REFERENCE]
+      INTEGER           LCFRHS [REFERENCE]
+      INTEGER           LCIG [REFERENCE]
+      INTEGER           ISIZ1 [REFERENCE]
+      INTEGER           ISIZ2 [REFERENCE]
+      INTEGER           ISIZ3 [REFERENCE]
+      INTEGER           ISIZ4 [REFERENCE]
+      INTEGER           ICG [REFERENCE]
+      INTEGER           NCOL [REFERENCE]
+      INTEGER           NROW [REFERENCE]
+      INTEGER           NLAY [REFERENCE]
+      INTEGER           samg_logio [REFERENCE]
+      REAL              stor1 [REFERENCE]
+      REAL              stor2 [REFERENCE]
+      REAL              stor3 [REFERENCE]
+      character*300     samg_logfile [REFERENCE]
+    END SUBROUTINE MFLIB_LMG1ALSAMG
+!     ------------------------------------------------------------------
+!      Declare the C function
+    SUBROUTINE MFLIB_LMG1RPSAMG(MXITER,MXCYC,rcloselmg,damplmg,damplmgt,ioutamg,ICG,IADAMPlmg,DUPlmg,DLOWlmg,HCLOSE,CONTROLlmg,samg_logio,SAMG_LOGFILE)
+      INTEGER           MXITER [REFERENCE]
+      INTEGER           MXCYC [REFERENCE]
+      REAL              rcloselmg [REFERENCE]
+      REAL              damplmg [REFERENCE]
+      REAL              damplmgt [REFERENCE]
+      INTEGER           ioutamg [REFERENCE]
+      INTEGER           ICG [REFERENCE]
+      INTEGER           IADAMPlmg [REFERENCE]
+      REAL              DUPlmg [REFERENCE]
+      REAL              DLOWlmg [REFERENCE]
+      REAL              HCLOSE [REFERENCE]
+      INTEGER           CONTROLlmg [REFERENCE]
+      INTEGER           samg_logio [REFERENCE]
+      character*300     SAMG_LOGFILE [REFERENCE]
+    END SUBROUTINE MFLIB_LMG1RPSAMG
+!     ------------------------------------------------------------------
+!      Declare the C function
+    SUBROUTINE MFLIB_LMG1APSAMG(HNEW,IBOUND,CR,CC,CV,HCOF,RHS,A,IA,JA,U,FRHS,IG,ISIZ1,ISIZ2,ISIZ3,ISIZ4,KITER,BCLOSE,DAMP,ICNVG,KSTP,KPER,MXITER,MXCYC,NCOL,NROW,NLAY,NODES,HNOFLO,IOUTAMG,ICG,IADAMP,DUP,DLOW,samg_logio,IHCOFADD,start_res,end_res,iter_done,setup_done,iLicense,samg_logfile)
+      DOUBLE PRECISION  HNEW (*)
+      INTEGER           IBOUND (*)
+      REAL              CR (*)
+      REAL              CC (*)
+      REAL              CV (*)
+      REAL              HCOF (*)
+      REAL              RHS (*)
+      DOUBLE PRECISION  A (*)
+      INTEGER           IA (*)
+      INTEGER           JA (*)
+      DOUBLE PRECISION  U (*)
+      DOUBLE PRECISION  FRHS (*)
+      INTEGER           IG (*)
+      INTEGER           ISIZ1 [REFERENCE]
+      INTEGER           ISIZ2 [REFERENCE]
+      INTEGER           ISIZ3 [REFERENCE]
+      INTEGER           ISIZ4 [REFERENCE]
+      INTEGER           KITER [REFERENCE]
+      REAL              BCLOSE [REFERENCE]
+      REAL              DAMP [REFERENCE]
+      INTEGER           ICNVG [REFERENCE]
+      INTEGER           KSTP [REFERENCE]
+      INTEGER           KPER [REFERENCE]
+      INTEGER           MXITER [REFERENCE]
+      INTEGER           MXCYC [REFERENCE]
+      INTEGER           NCOL [REFERENCE]
+      INTEGER           NROW [REFERENCE]
+      INTEGER           NLAY [REFERENCE]
+      INTEGER           NODES [REFERENCE]
+      REAL              HNOFLO [REFERENCE]
+      INTEGER           IOUTAMG [REFERENCE]
+      INTEGER           ICG [REFERENCE]
+      INTEGER           IADAMP [REFERENCE]
+      REAL              DUP [REFERENCE]
+      REAL              DLOW [REFERENCE]
+      INTEGER           samg_logio [REFERENCE]
+      INTEGER           IHCOFADD [REFERENCE]
+      REAL              start_res [REFERENCE]
+      REAL              end_res [REFERENCE]
+      INTEGER           iter_done [REFERENCE]
+      INTEGER           setup_done [REFERENCE]
+      INTEGER           iLicense [REFERENCE]
+      character*300     samg_logfile [REFERENCE]
+    END SUBROUTINE MFLIB_LMG1APSAMG
 
 !     leave this below all the ! declarations
   END INTERFACE
@@ -172,7 +286,12 @@ module mfLib
                ,mfLibF_FillInParType &
                ,mfLibF_MNW2 &
                ,mfLibF_MNW2WELLID &
-               ,mfLibF_SetSfrSegSize
+               ,mfLibF_SetSfrSegSize &
+               ,mfLibF_SAMG_REL_LIC &
+               ,mfLibF_SAMG_USG &
+               ,mfLibF_LMG1ALsamg &
+               ,mfLibF_LMG1RPsamg &
+               ,mfLibF_LMG1APsamg
 
       contains
 !-----------------------------------------------------------------------
@@ -412,5 +531,73 @@ module mfLib
 
         call mfLib_SetSfrSegSize(SZ)
       end subroutine mfLibF_SetSfrSegSize
+!-----------------------------------------------------------------------
+      subroutine mfLibF_SAMG_REL_LIC ()
+        implicit none
+
+        call MFLIB_SAMG_REL_LIC()
+      end subroutine mfLibF_SAMG_REL_LIC
+!-----------------------------------------------------------------------
+      subroutine mfLibF_SAMG_USG (A,RHS,HNEW,IA,JA,NNA,NNU,KPER,KSTP,ncyc,&
+                                  NCYC_DONE,EPSSAMG,IBOUND,SAMGLOG,IERR,&
+                                  aqLicense)
+        implicit none
+        DOUBLE PRECISION, intent(inout) :: A(*),RHS(*),HNEW(*),EPSSAMG
+        INTEGER, intent(in)             :: IA,JA,NNA,NNU,KPER,KSTP,ncyc
+        INTEGER, intent(in)             :: NCYC_DONE,IBOUND(*),SAMGLOG,IERR
+        INTEGER, intent(in)             :: aqLicense
+
+        call MFLIB_SAMGUSG(A,RHS,HNEW,IA,JA,NNA,NNU,KPER,KSTP,ncyc,NCYC_DONE,&
+                           EPSSAMG,IBOUND,SAMGLOG,IERR,aqLicense)
+      end subroutine mfLibF_SAMG_USG
+!-----------------------------------------------------------------------
+      subroutine mfLibF_LMG1ALsamg (ISUM,ISUMI,LCA,LCIA,LCJA,LCU1,LCFRHS,LCIG,&
+                                    ISIZ1,ISIZ2,ISIZ3,ISIZ4,ICG,NCOL,NROW,NLAY,&
+                                    samg_logio,stor1,stor2,stor3,samg_logfile)
+        implicit none
+        INTEGER :: ISUM,ISUMI,LCA,LCIA,LCJA,LCU1,LCFRHS,LCIG,ISIZ1,ISIZ2,ISIZ3
+        INTEGER :: ISIZ4,ICG,NCOL,NROW,NLAY,samg_logio
+        REAL    :: stor1,stor2,stor3
+        CHARACTER*300 :: samg_logfile
+
+        call MFLIB_LMG1ALSAMG(ISUM,ISUMI,LCA,LCIA,LCJA,LCU1,LCFRHS,LCIG,ISIZ1,&
+                              ISIZ2,ISIZ3,ISIZ4,ICG,NCOL,NROW,NLAY,samg_logio,&
+                              stor1,stor2,stor3,samg_logfile)
+      end subroutine mfLibF_LMG1ALsamg
+!-----------------------------------------------------------------------
+      subroutine mfLibF_LMG1RPsamg (MXITER,MXCYC,rcloselmg,damplmg,damplmgt,ioutamg,ICG,IADAMPlmg,DUPlmg,DLOWlmg,HCLOSE,CONTROLlmg,samg_logio,SAMG_LOGFILE)
+        implicit none
+        INTEGER :: MXITER,MXCYC,ioutamg,ICG,IADAMPlmg,CONTROLlmg,samg_logio
+        REAL    :: rcloselmg,damplmg,damplmgt,DUPlmg,DLOWlmg,HCLOSE
+        CHARACTER*300 :: SAMG_LOGFILE
+
+        call MFLIB_LMG1RPSAMG(MXITER,MXCYC,rcloselmg,damplmg,damplmgt,ioutamg,ICG,IADAMPlmg,DUPlmg,DLOWlmg,HCLOSE,CONTROLlmg,samg_logio,SAMG_LOGFILE)
+      end subroutine mfLibF_LMG1RPsamg
+      
+!-----------------------------------------------------------------------
+      subroutine mfLibF_LMG1APsamg (&
+        HNEW,IBOUND,CR,CC,CV,HCOF,RHS,A,IA,JA,U,FRHS,IG,ISIZ1,ISIZ2,ISIZ3,&
+        ISIZ4,KITER,BCLOSE,DAMP,ICNVG,KSTP,KPER,MXITER,MXCYC,NCOL,NROW,NLAY,&
+        NODES,HNOFLO,IOUTAMG,ICG,IADAMP,DUP,DLOW,samg_logio,IHCOFADD,&
+        start_res,end_res,iter_done,setup_done,iLicense,samg_logfile)
+
+        implicit none
+        DOUBLE PRECISION :: HNEW(*),A(*),U(*),FRHS(*)
+        INTEGER          :: IBOUND(*),IA(*),JA(*),IG(*),ISIZ1,ISIZ2,ISIZ3,ISIZ4,&
+                            KITER,ICNVG,KSTP,KPER,MXITER,MXCYC,NCOL,NROW,NLAY,&
+                            NODES,IOUTAMG,ICG,IADAMP,samg_logio,IHCOFADD,&
+                            iter_done,setup_done,iLicense
+        REAL             :: CR(*),CC(*),CV(*),HCOF(*),RHS(*),BCLOSE,DAMP,&
+                            HNOFLO,DUP,DLOW,start_res,end_res
+        CHARACTER*300    :: samg_logfile
+        
+        call MFLIB_LMG1APSAMG(HNEW,IBOUND,CR,CC,CV,HCOF,RHS,A,IA,JA,U,FRHS,IG,&
+                              ISIZ1,ISIZ2,ISIZ3,ISIZ4,KITER,BCLOSE,DAMP,ICNVG,&
+                              KSTP,KPER,MXITER,MXCYC,NCOL,NROW,NLAY,NODES,&
+                              HNOFLO,IOUTAMG,ICG,IADAMP,DUP,DLOW,samg_logio,&
+                              IHCOFADD,start_res,end_res,iter_done,setup_done,&
+                              iLicense,samg_logfile)
+      end subroutine mfLibF_LMG1APsamg
+
 
 end module mfLib

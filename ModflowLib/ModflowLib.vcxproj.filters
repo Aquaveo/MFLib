@@ -292,6 +292,9 @@
     <ClCompile Include="source\RunTest.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="source\private\samg\samg.cpp">
+      <Filter>source\private\samg</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Export.h">
@@ -819,6 +822,9 @@
     <ClInclude Include="source\RunTest.h">
       <Filter>source</Filter>
     </ClInclude>
+    <ClInclude Include="source\private\samg\samg.h">
+      <Filter>source\private\samg</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="CxxTest">
@@ -877,6 +883,9 @@
     </Filter>
     <Filter Include="source\private\MfData\MfExport\private\Native">
       <UniqueIdentifier>{57607a96-22bd-4c11-8678-7ee0cbded456}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\private\samg">
+      <UniqueIdentifier>{1736618b-c7e7-4509-b5e7-1233714663b7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

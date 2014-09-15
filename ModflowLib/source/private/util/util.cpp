@@ -4,6 +4,7 @@
 #include <private/util/util.h>
 
 #include <math.h>
+#include <fstream>
 
 //#include <boost/filesystem.hpp>
 
@@ -423,6 +424,7 @@ void util::StripAllButExtension (const char *a_fWithPath,
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Deletes the directory that was passed in.
 ///////////////////////////////////////////////////////////////////////////////
+#ifndef STATICLIB
 bool util::DeleteDir (const char *a_)
 {
   int len;
@@ -441,9 +443,16 @@ bool util::DeleteDir (const char *a_)
   fileop.hNameMappings         = NULL;
   return(SHFileOperation(&fileop) == 0);
 } // util::DeleteDir
+#else
+bool util::DeleteDir (const char *)
+{
+  return false;
+} // util::DeleteDir
+#endif
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Copies the src dir that was passed in to the dest dir.
 ///////////////////////////////////////////////////////////////////////////////
+#ifndef STATICLIB
 bool util::CopyDir (const char *a_src,
                     const char *a_dest)
 {
@@ -478,13 +487,23 @@ bool util::CopyDir (const char *a_src,
   int result = SHFileOperation(&fileop);
   return(result == 0);
 } // util::CopyDir
+#else
+bool util::CopyDir (const char *,
+                    const char *)
+{
+  return false;
+} // util::CopyDir
+#endif
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Copies the src dir that was passed in to the dest dir.
 ///////////////////////////////////////////////////////////////////////////////
 bool util::FileCopy (const char *a_src,
                      const char *a_dest)
 {
-  return (util::CopyDir(a_src, a_dest));
+  std::ifstream src(a_src, std::ios::binary);
+  std::ofstream dst(a_dest, std::ios::binary);
+  dst << src.rdbuf();
+  return true;
 } // CopyFile
 //------------------------------------------------------------------------------
 /// \brief
