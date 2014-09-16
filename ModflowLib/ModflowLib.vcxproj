@@ -351,7 +351,7 @@ build_test_runner.bat
       <AdditionalIncludeDirectories>.\;.\source;..\..\external_libs\cxxtest-4.2.1;..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;CXX_TEST;CXXTEST_HAVE_EH;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
@@ -359,7 +359,7 @@ build_test_runner.bat
       <ErrorReporting>None</ErrorReporting>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shell32.lib;..\..\external_libs\xmdf\library\lib\xmdf99.99.lib</AdditionalDependencies>
+      <AdditionalDependencies>shell32.lib;..\..\external_libs\hdf5_1.8.1\bin\hdf5.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -370,7 +370,8 @@ build_test_runner.bat
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
-      <IgnoreSpecificDefaultLibraries>LIBCMT</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
       <Command>"$(TargetPath)" -launch_tests</Command>
@@ -392,7 +393,7 @@ build_test_runner.bat
       <AdditionalIncludeDirectories>.\;.\source;..\..\external_libs\cxxtest-4.2.1;..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;CXX_TEST;CXXTEST_HAVE_EH;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
@@ -400,7 +401,7 @@ build_test_runner.bat
       <ErrorReporting>None</ErrorReporting>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shell32.lib;..\..\external_libs\xmdf\library\lib\xmdf99.99x64.lib</AdditionalDependencies>
+      <AdditionalDependencies>shell32.lib;..\..\external_libs\hdf5_1.8.1\bin\hdf5x64.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -411,7 +412,8 @@ build_test_runner.bat
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX64</TargetMachine>
-      <IgnoreSpecificDefaultLibraries>LIBCMT</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
       <Command>"$(TargetPath)" -launch_tests</Command>
@@ -430,7 +432,7 @@ build_test_runner.bat
       <AdditionalIncludeDirectories>.\;.\source;..\..\external_libs\cxxtest-4.2.1;..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;CXX_TEST;CXXTEST_HAVE_EH;DBLPREC;_SECURE_SCL=0;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
@@ -438,7 +440,7 @@ build_test_runner.bat
       <ErrorReporting>None</ErrorReporting>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shell32.lib;..\..\external_libs\xmdf\library\lib\xmdf99.99.lib</AdditionalDependencies>
+      <AdditionalDependencies>shell32.lib;..\..\external_libs\hdf5_1.8.1\bin\hdf5.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -449,7 +451,8 @@ build_test_runner.bat
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
-      <IgnoreSpecificDefaultLibraries>LIBCMT</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
       <Command>"$(TargetPath)" -launch_tests</Command>
@@ -471,7 +474,7 @@ build_test_runner.bat
       <AdditionalIncludeDirectories>.\;.\source;..\..\external_libs\cxxtest-4.2.1;..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;CXX_TEST;CXXTEST_HAVE_EH;DBLPREC;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
@@ -479,7 +482,7 @@ build_test_runner.bat
       <ErrorReporting>None</ErrorReporting>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shell32.lib;..\..\external_libs\xmdf\library\lib\xmdf99.99x64.lib</AdditionalDependencies>
+      <AdditionalDependencies>shell32.lib;..\..\external_libs\hdf5_1.8.1\bin\hdf5x64.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -490,7 +493,8 @@ build_test_runner.bat
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX64</TargetMachine>
-      <IgnoreSpecificDefaultLibraries>LIBCMT</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
       <Command>"$(TargetPath)" -launch_tests</Command>
@@ -510,14 +514,14 @@ build_test_runner.bat
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRTDBG_MAP_ALLOC;CXX_TEST;CXXTEST_HAVE_EH;_SECURE_SCL=0;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shell32.lib;..\..\external_libs\xmdf\library\lib\xmdf99.99d.lib</AdditionalDependencies>
+      <AdditionalDependencies>shell32.lib;..\..\external_libs\hdf5_1.8.1\bin\hdf5d.lib</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -526,7 +530,8 @@ build_test_runner.bat
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
-      <IgnoreSpecificDefaultLibraries>LIBCMTD</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
       <Command>"$(TargetPath)" -launch_tests</Command>
@@ -549,14 +554,14 @@ build_test_runner.bat
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;CXX_TEST;CXXTEST_HAVE_EH;_AFXDLL;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shell32.lib;..\..\external_libs\xmdf\library\lib\xmdf99.99dx64.lib</AdditionalDependencies>
+      <AdditionalDependencies>shell32.lib;..\..\external_libs\hdf5_1.8.1\bin\hdf5dx64.lib</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
@@ -566,7 +571,8 @@ build_test_runner.bat
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX64</TargetMachine>
-      <IgnoreSpecificDefaultLibraries>LIBCMTD</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
       <Command>"$(TargetPath)" -launch_tests</Command>
@@ -585,7 +591,7 @@ build_test_runner.bat
       <AdditionalIncludeDirectories>.\source;.;..\..\external_libs\cxxtest-4.2.1;..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;CXX_TEST;CXXTEST_HAVE_EH;DBLPREC;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
@@ -593,7 +599,7 @@ build_test_runner.bat
       <ErrorReporting>None</ErrorReporting>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shell32.lib;..\..\external_libs\xmdf\library\lib\xmdf99.99.lib</AdditionalDependencies>
+      <AdditionalDependencies>shell32.lib;..\..\external_libs\hdf5_1.8.1\bin\hdf5.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(Configuration).exe</OutputFile>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
@@ -605,7 +611,8 @@ build_test_runner.bat
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
-      <IgnoreSpecificDefaultLibraries>LIBCMT</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
       <Command>"$(TargetPath)" -launch_tests</Command>
@@ -627,7 +634,7 @@ build_test_runner.bat
       <AdditionalIncludeDirectories>.\source;.;..\..\external_libs\cxxtest-4.2.1;..\..\external_libs\hdf5_1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;CXX_TEST;CXXTEST_HAVE_EH;DBLPREC;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
@@ -635,7 +642,7 @@ build_test_runner.bat
       <ErrorReporting>None</ErrorReporting>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shell32.lib;..\..\external_libs\xmdf\library\lib\xmdf99.99x64.lib</AdditionalDependencies>
+      <AdditionalDependencies>shell32.lib;..\..\external_libs\hdf5_1.8.1\bin\hdf5x64.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(Configuration).exe</OutputFile>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
@@ -647,7 +654,8 @@ build_test_runner.bat
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX64</TargetMachine>
-      <IgnoreSpecificDefaultLibraries>LIBCMT</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
       <Command>"$(TargetPath)" -launch_tests</Command>
@@ -787,14 +795,14 @@ build_test_runner.bat
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRTDBG_MAP_ALLOC;CXX_TEST;CXXTEST_HAVE_EH;DBLPREC;_SECURE_SCL=0;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shell32.lib;..\..\external_libs\xmdf\library\lib\xmdf99.99d.lib</AdditionalDependencies>
+      <AdditionalDependencies>shell32.lib;..\..\external_libs\hdf5_1.8.1\bin\hdf5d.lib</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
@@ -804,7 +812,8 @@ build_test_runner.bat
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
-      <IgnoreSpecificDefaultLibraries>LIBCMTD</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
       <Command>"$(TargetPath)" -launch_tests</Command>
@@ -827,14 +836,14 @@ build_test_runner.bat
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;CXX_TEST;CXXTEST_HAVE_EH;DBLPREC;_AFXDLL;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shell32.lib;..\..\external_libs\xmdf\library\lib\xmdf99.99dx64.lib</AdditionalDependencies>
+      <AdditionalDependencies>shell32.lib;..\..\external_libs\hdf5_1.8.1\bin\hdf5dx64.lib</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
@@ -844,7 +853,8 @@ build_test_runner.bat
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX64</TargetMachine>
-      <IgnoreSpecificDefaultLibraries>LIBCMTD</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
       <Command>"$(TargetPath)" -launch_tests</Command>
