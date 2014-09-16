@@ -57,14 +57,10 @@ def print_xml_tail():
     print '</testsuite>'
 
 errors = 0
-xmdf_diff = get_diff_files(r"..\..\..\external_libs\xmdf", r"..\external_libs\xmdf", ignore=["lib100md"])
-if xmdf_diff:
-    errors += 1
 hdf5_diff = get_diff_files(r"..\..\..\external_libs\hdf5_1.8.1", r"..\external_libs\hdf5_1.8.1", ignore=["lib"])
 if hdf5_diff:
     errors += 1
 
 print_xml_head(errors)
-print_test_xml(xmdf_diff, "testXmdfLibraryChanged")
 print_test_xml(hdf5_diff, "testHdf5LibraryChanged")
 print_xml_tail()
