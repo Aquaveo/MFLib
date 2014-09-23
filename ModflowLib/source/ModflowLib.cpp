@@ -657,7 +657,7 @@ DLLEXPORT void MFLIB_STR_AUX (int *a_NAUX,
       cnt = 0;
       CStr str = myChar;
       str.Trim();
-      if ("SEGID" == str)
+      if ("SEGID" == str || "CELLGRP" == str)
       {
         MfData::MfGlobal::Get().SetIntVar("AUX_SEGID_IDX", idx);
       }
