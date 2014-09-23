@@ -65,6 +65,7 @@
       integer, intent(out)  ::ISTRM(5,MXSTRM),ITRBAR(NSS,NTRIB),
      +                        IDIVAR(NSS)
       real, intent(out)     ::STRM(11,MXSTRM)
+      CHARACTER*16          :: STRAUX(20)
 C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
       INTEGER  :: II,IK,JK,I,J,K
@@ -72,7 +73,7 @@ C     ------------------------------------------------------------------
 C     Read the stream data
 C     ------------------------------------------------------------------
       call mfLibF90_Str(STRM,ISTRM,NSTREM,MXSTRM,IN,IOUT,ITRBAR,
-     +       NSS,NTRIB,IDIVAR,NCOL,NROW,NLAY)
+     +       NSS,NTRIB,IDIVAR,NCOL,NROW,NLAY,0,STRAUX)
 
 C     ------------------------------------------------------------------
 C     put zeros in these arrays if they are not being used
@@ -188,24 +189,24 @@ C      STREAM BED TO ZERO.
 !-----------------------------------------------------------------------
       SUBROUTINE mfLibF77_STRU(STRM,ISTRM,NSTREM,MXSTRM,IN,IOUT,ITRBAR,
      +       NDIV,NSS,NTRIB,IDIVAR,ICALC,IPTFLG,NCOL,NROW,NLAY,NPSTR,
-     +       ISTRPB,IRDFLG)
+     +       ISTRPB,IRDFLG,NAUX,STRAUX)
 
       use mfLib
       implicit none
       integer, intent(in)   ::NSTREM,MXSTRM,IN,IOUT,NDIV,NSS,NTRIB,
      +                        ICALC,IPTFLG,NCOL,NROW,NLAY,NPSTR,
-     +                        ISTRPB,IRDFLG
+     +                        ISTRPB,IRDFLG,NAUX
       integer, intent(out)  ::ISTRM(5,MXSTRM),ITRBAR(NSS,NTRIB),
      +                        IDIVAR(NSS)
-      real, intent(out)     ::STRM(11,MXSTRM)
+      real, intent(out)     ::STRM(11+NAUX,MXSTRM)
+      character, intent(in) ::STRAUX(*)
 C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
-      INTEGER  :: II,IK,JK,I,J,K
 C     ------------------------------------------------------------------
 C     Read the stream data
 C     ------------------------------------------------------------------
       call mfLibF90_Str(STRM,ISTRM,NSTREM,MXSTRM,IN,IOUT,ITRBAR,
-     +       NSS,NTRIB,IDIVAR,NCOL,NROW,NLAY)
+     +       NSS,NTRIB,IDIVAR,NCOL,NROW,NLAY,NAUX,STRAUX)
 
       END SUBROUTINE mfLibF77_STRU
 

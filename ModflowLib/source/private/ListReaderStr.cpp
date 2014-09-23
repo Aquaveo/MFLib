@@ -10,8 +10,9 @@
 
 #include <map>
 
-#include <private\ListReader\ListReaderParser.h>
 #include <private\H5DataReader\H5DataSetReader.h>
+#include <private\ListReader\ListReaderParser.h>
+#include <private\MfData\MfGlobal.h>
 
 #define STRSEGID  "08. Str reach segment ID"
 #define SEGID     "09. Segment ID"
@@ -39,7 +40,6 @@ static bool GetIdivar(const CStr &a_fileName,
                       int a_NSS,
                       int *a_IDIVAR);
 
-
 //------------------------------------------------------------------------------
 /// \brief Gets the data for the stream
 //------------------------------------------------------------------------------
@@ -54,6 +54,9 @@ bool ListReaderStr::GetDataStr (Real *a_STRM,
   try
   {
     {
+      int NSTRVL(11), auxSegIdIdx(-1);
+      MfData::MfGlobal::Get().GetIntVar("NSTRVL", NSTRVL);
+      MfData::MfGlobal::Get().GetIntVar("AUX_SEGID_IDX", auxSegIdIdx);
       std::vector<Real> vFlt, fact, vFlow;
       std::vector<int>   vReach, vSeg;
       int nRows(SetUp().m_nRows), nFields(SetUp().m_nFields);
@@ -63,7 +66,7 @@ bool ListReaderStr::GetDataStr (Real *a_STRM,
       {
         // init the arrays to zero
         int j;
-        for (j=0; j<nRows*11; j++)
+        for (j=0; j<nRows*NSTRVL; j++)
           a_STRM[j] = 0.0;
         for (j=0; j<nRows*5; j++)
           a_ISTRM[j] = 0;
@@ -93,14 +96,18 @@ bool ListReaderStr::GetDataStr (Real *a_STRM,
           a_ISTRM[i*5+4] = vReach.at(i); // Reach id
         }
 
-        a_STRM[i*11+0] = vFlow.at(i); // flow
-        a_STRM[i*11+1] = vFlt.at(i*nFields+3); // stage
-        a_STRM[i*11+2] = vFlt.at(i*nFields+4); // conductance
-        a_STRM[i*11+3] = vFlt.at(i*nFields+5); // bot. elev.
-        a_STRM[i*11+4] = vFlt.at(i*nFields+6); // top elev.
-        a_STRM[i*11+5] = vFlt.at(i*nFields+7); // width
-        a_STRM[i*11+6] = vFlt.at(i*nFields+8); // slope
-        a_STRM[i*11+7] = vFlt.at(i*nFields+9); // rough
+        a_STRM[i*NSTRVL+0] = vFlow.at(i); // flow
+        a_STRM[i*NSTRVL+1] = vFlt.at(i*nFields+3); // stage
+        a_STRM[i*NSTRVL+2] = vFlt.at(i*nFields+4); // conductance
+        a_STRM[i*NSTRVL+3] = vFlt.at(i*nFields+5); // bot. elev.
+        a_STRM[i*NSTRVL+4] = vFlt.at(i*nFields+6); // top elev.
+        a_STRM[i*NSTRVL+5] = vFlt.at(i*nFields+7); // width
+        a_STRM[i*NSTRVL+6] = vFlt.at(i*nFields+8); // slope
+        a_STRM[i*NSTRVL+7] = vFlt.at(i*nFields+9); // rough
+        if (NSTRVL>11 && auxSegIdIdx > -1)
+        {
+          a_STRM[i*NSTRVL+11+auxSegIdIdx] = (Real)a_ISTRM[i*5+3]; // segid
+        }
         //ASSERT(_CrtCheckMemory());
       }
     }

@@ -636,6 +636,36 @@ DLLEXPORT void MFLIB_ULSTRD_DBL (int *a_SUCCESS,
                  a_LINElen);
 } // MFLIB_ULSTRD_DBL
 //------------------------------------------------------------------------------
+/// \brief This is called from MODFLOW USG to set the array size of the a_STRM
+/// array listed below. By default the size is 11 but it could be bigger if
+/// the user has specified AUX variables
+//------------------------------------------------------------------------------
+DLLEXPORT void MFLIB_STR_AUX (int *a_NAUX,
+                              const char* a_STRAUX,
+                              int /*a_dummy*/)
+{
+  MfData::MfGlobal::Get().SetIntVar("NSTRVL", 11+*a_NAUX);
+  char myChar[17];
+  myChar[16] = '\0';
+  int cnt(0), idx(0);
+  for (int i=0; i<*a_NAUX*16; ++i)
+  {
+    myChar[cnt] = a_STRAUX[i];
+    cnt++;
+    if (cnt == 16)
+    {
+      cnt = 0;
+      CStr str = myChar;
+      str.Trim();
+      if ("SEGID" == str)
+      {
+        MfData::MfGlobal::Get().SetIntVar("AUX_SEGID_IDX", idx);
+      }
+      idx++;
+    }
+  }
+} // MFLIB_STR_NSTRVL
+//------------------------------------------------------------------------------
 /// \brief This is called from MODFLOWs SGWF1STR6R subroutine to read data from
 /// an HDF5 file. The 2 arrays STRM and ISTRM are filled in.
 /// \param a_NLIST number of rows in the list of data

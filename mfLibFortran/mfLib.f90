@@ -92,6 +92,12 @@ module mfLib
     END SUBROUTINE mfLib_Sfr
 !     ------------------------------------------------------------------
 !      Declare the C function
+  SUBROUTINE MFLIB_STR_AUX(NAUX,STRAUX)
+      INTEGER NAUX [REFERENCE]
+      CHARACTER STRAUX(*)
+    END SUBROUTINE MFLIB_STR_AUX
+!     ------------------------------------------------------------------
+!      Declare the C function
   SUBROUTINE mfLib_ReadSTR(SUCCESS,NSTREM,NSS,NTRIB,NCOL,NROW,STRM,ISTRM,ITRBAR,IDVIAR,LINE)
       INTEGER SUCCESS [REFERENCE]
       INTEGER NSTREM [REFERENCE]
@@ -468,12 +474,13 @@ module mfLib
         call mfLibF_DebugCheckMemory
       end subroutine mfLibF_Sfr
 !-----------------------------------------------------------------------
-      SUBROUTINE mfLibF90_STR(STRM,ISTRM,NSTREM,MXSTRM,IN,IOUT,ITRBAR,NSS,NTRIB,IDIVAR,NCOL,NROW,NLAY)
+      SUBROUTINE mfLibF90_STR(STRM,ISTRM,NSTREM,MXSTRM,IN,IOUT,ITRBAR,NSS,NTRIB,IDIVAR,NCOL,NROW,NLAY,NAUX,STRAUX)
 
       implicit none
-      integer, intent(in)   ::NSTREM,MXSTRM,IN,IOUT,NSS,NTRIB,NCOL,NROW,NLAY
+      integer, intent(in)   ::NSTREM,MXSTRM,IN,IOUT,NSS,NTRIB,NCOL,NROW,NLAY,NAUX
+      character,intent(in)  ::STRAUX(*)
       integer, intent(out)  ::ISTRM(5,MXSTRM),ITRBAR(NSS,NTRIB),IDIVAR(NSS)
-      real, intent(out)     ::STRM(11,MXSTRM)
+      real, intent(out)     ::STRM(11+NAUX,MXSTRM)
 !     SPECIFICATIONS:
 !     ------------------------------------------------------------------
       CHARACTER*200 LINE
@@ -484,6 +491,7 @@ module mfLib
 !     ------------------------------------------------------------------
 !     Read the stream data
 !     ------------------------------------------------------------------
+      CALL MFLIB_STR_AUX(NAUX,STRAUX)
       CALL mfLib_ReadSTR(SUCCESS,NSTREM,NSS,NTRIB,NCOL,NROW,STRM,ISTRM,ITRBAR,IDIVAR,LINE)
       IF(SUCCESS.EQ.0) CALL USTOP('ERROR READING STREAM DATA.')
         call mfLibF_DebugCheckMemory

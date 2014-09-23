@@ -140,6 +140,9 @@ DLLEXPORT void MFLIB_ULSTRD_DBL(int *a_SUCCESS,
                                 double *a_RLIST,
                                 const char *a_LINE,
                                 int a_LINElen);
+DLLEXPORT void MFLIB_STR_AUX(int *a_NAUX,
+                             const char* a_STRAUX,
+                             int a_dummy);
 DLLEXPORT void MFLIB_READSTR(int *a_SUCCESS,
                              const int *a_NSTREM,
                              const int *a_NSS,
