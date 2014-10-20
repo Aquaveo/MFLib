@@ -2117,8 +2117,8 @@ module module_exportData
     character(256)      :: outName
     IGRID = -1
     
-    if (NOT(ed_getExportData())) return
     call mfLibExp_NameFile_Filename(MODTYPE,IGRID,FNAME)
+    if (NOT(ed_getExportData())) return
     if (ed_getExportDB()) return
     ! open a file for writing the output to on unit 98765
     idx1 = 1
