@@ -165,6 +165,46 @@ module module_exportData
         END SUBROUTINE mfLibExp_GmgPackage
 !     ------------------------------------------------------------------
 !      Declare the C function
+        SUBROUTINE mfLibExp_SmsPackage(IFDPARAM,HCLOSE,HICLOSE,MXITER,ITER1,IPRSMS,NONMETH,LINMETH,THETA,AKAPPA,GAMMA,AMOMENTUM,NUMTRACK,BTOL,BREDUC,RESLIM)
+          INTEGER      IFDPARAM [REFERENCE]
+          DOUBLEPRECISION HCLOSE [REFERENCE]
+          DOUBLEPRECISION HICLOSE [REFERENCE]
+          INTEGER      MXITER [REFERENCE]
+          INTEGER      ITER1 [REFERENCE]
+          INTEGER      IPRSMS [REFERENCE]
+          INTEGER      NONMETH [REFERENCE]
+          INTEGER      LINMETH [REFERENCE]
+          DOUBLEPRECISION THETA [REFERENCE]
+          DOUBLEPRECISION AKAPPA [REFERENCE]
+          DOUBLEPRECISION GAMMA [REFERENCE]
+          DOUBLEPRECISION AMOMENTUM [REFERENCE]
+          INTEGER      NUMTRACK [REFERENCE]
+          DOUBLEPRECISION BTOL [REFERENCE]
+          DOUBLEPRECISION BREDUC [REFERENCE]
+          DOUBLEPRECISION RESLIM [REFERENCE]
+        END SUBROUTINE mfLibExp_SmsPackage
+!     ------------------------------------------------------------------
+!      Declare the C function
+        SUBROUTINE mfLibExp_SmsXmdPackage(IACL,NORDER,LEVEL,NORTH,IREDSYS,RRCTOL,IDROPTOL,EPSRN)
+          INTEGER      IACL [REFERENCE]
+          INTEGER      NORDER [REFERENCE]
+          INTEGER      LEVEL [REFERENCE]
+          INTEGER      NORTH [REFERENCE]
+          INTEGER      IREDSYS [REFERENCE]
+          DOUBLEPRECISION RRCTOL [REFERENCE]
+          INTEGER      IDROPTOL [REFERENCE]
+          DOUBLEPRECISION EPSRN [REFERENCE]
+        END SUBROUTINE mfLibExp_SmsXmdPackage
+!     ------------------------------------------------------------------
+!      Declare the C function
+        SUBROUTINE mfLibExp_SmsPcguPackage(IPC,ISCL,IORD,RCLOSEPCGU)
+          INTEGER      IPC [REFERENCE]
+          INTEGER      ISCL [REFERENCE]
+          INTEGER      IORD [REFERENCE]
+          REAL         RCLOSEPCGU [REFERENCE]
+        END SUBROUTINE mfLibExp_SmsPcguPackage
+!     ------------------------------------------------------------------
+!      Declare the C function
         SUBROUTINE MFLIB_AREALOPT_EXDATA(OPT,NAME)
           INTEGER       OPT [REFERENCE]
           CHARACTER*10  NAME [REFERENCE]
@@ -983,7 +1023,8 @@ module module_exportData
 
   public:: exp_GeoDB, exp_GLO1BAS6DF, exp_GLO1BAS6RP, &
            exp_ListPackage, exp_SipPackage, exp_De4Line1, exp_De4Line2, &
-           exp_SorPackage, exp_PcgPackage, exp_LmgPackage, exp_GmgPackage
+           exp_SorPackage, exp_PcgPackage, exp_LmgPackage, exp_GmgPackage, &
+           exp_SmsPackage, exp_SmsXmdPackage, exp_SmsPcguPackage
   save
   REAL    ::  m_LMG_STOR1, m_LMG_STOR2, m_LMG_STOR3
   integer ::  m_LMG_ICG
@@ -1216,6 +1257,45 @@ module module_exportData
     !IF(myIPRSOR.EQ.999)myIPRSOR=0
     call mfLibExp_GmgPackage(BCTYPE,RCLOSE,IITER,HCLOSE,MXITER,DAMP,IADAMP,IOUTGMG,ISM,ISC,RELAX)
   end subroutine exp_GmgPackage
+
+  !-----------------------------------------------------------------------------
+  ! BRIEF:  
+  !-----------------------------------------------------------------------------
+  subroutine exp_SmsPackage (IFDPARAM,HCLOSE,HICLOSE,MXITER,ITER1,IPRSMS,NONMETH,LINMETH,THETA,AKAPPA,GAMMA,AMOMENTUM,NUMTRACK,BTOL,BREDUC,RESLIM)
+    implicit none
+    integer, intent(in)         :: IFDPARAM,MXITER,ITER1,IPRSMS,NONMETH,LINMETH,NUMTRACK
+    doubleprecision, intent(in) :: HCLOSE,HICLOSE,THETA,AKAPPA,GAMMA,AMOMENTUM,BTOL,BREDUC,RESLIM
+
+    if (NOT(ed_getExportData())) return
+
+    call mfLibExp_SmsPackage(IFDPARAM,HCLOSE,HICLOSE,MXITER,ITER1,IPRSMS,NONMETH,LINMETH,THETA,AKAPPA,GAMMA,AMOMENTUM,NUMTRACK,BTOL,BREDUC,RESLIM)
+  end subroutine exp_SmsPackage
+
+  !-----------------------------------------------------------------------------
+  ! BRIEF:  
+  !-----------------------------------------------------------------------------
+  subroutine exp_SmsXmdPackage (IACL,NORDER,LEVEL,NORTH,IREDSYS,RRCTOL,IDROPTOL,EPSRN)
+    implicit none
+    integer, intent(in)         :: IACL,NORDER,LEVEL,NORTH,IREDSYS,IDROPTOL
+    doubleprecision, intent(in) :: RRCTOL,EPSRN
+
+    if (NOT(ed_getExportData())) return
+
+    call mfLibExp_SmsXmdPackage(IACL,NORDER,LEVEL,NORTH,IREDSYS,RRCTOL,IDROPTOL,EPSRN)
+  end subroutine exp_SmsXmdPackage
+
+  !-----------------------------------------------------------------------------
+  ! BRIEF:  
+  !-----------------------------------------------------------------------------
+  subroutine exp_SmsPcguPackage (IPC,ISCL,IORD,RCLOSEPCGU)
+    implicit none
+    integer, intent(in)      :: IPC,ISCL,IORD
+    real, intent(in)         :: RCLOSEPCGU
+
+    if (NOT(ed_getExportData())) return
+
+    call mfLibExp_SmsPcguPackage(IPC,ISCL,IORD,RCLOSEPCGU)
+  end subroutine exp_SmsPcguPackage
 
   !-----------------------------------------------------------------------------
   ! BRIEF:  

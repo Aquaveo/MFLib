@@ -42,6 +42,12 @@ public:
   void testLine2a_NWT();
   void testLine2b_NWT();
 
+  void testLine1a_SMS();
+  void testLine1b_SMS();
+  void testLine2_SMS();
+  void testLine3_SMS();
+  void testLine4_SMS();
+
   MfData::Export::NativeExpSolver* m_p;
 };
 #endif

@@ -42,6 +42,7 @@ bool NativeExpSolver::Export ()
   else if (Packages::LMG == name) Export_LMG();
   else if (Packages::GMG == name) Export_GMG();
   else if (Packages::NWT == name) Export_NWT();
+  else if (Packages::SMS == name) Export_SMS();
 
   WriteComments();
   WriteStoredLines();
@@ -103,6 +104,13 @@ CStr NativeExpSolver::Desc (CStr a_name,
     desc.push_back("2a. [MAXITINNER] [ILUMETHOD][LEVFILL][STOPTOL][MSDR]");
     desc.push_back("2b. [IACL][NORDER][LEVEL][NORTH][IREDSYS][RRCTOLS]"
                    "[IDROPTOL][EPSRN] [HCLOSEXMD][MXITERXMD]");
+  }
+  else if (SMS == a_name) {
+    desc.push_back("1a. OPTIONS");
+    desc.push_back("1b. HCLOSE HICLOSE MXITER ITER1 IPRSMS NONLINMETH LINMETH");
+    desc.push_back(" 2. THETA AKAPPA GAMMA AMOMENTUM NUMTRACK BTOL BREDUC RESLIM");
+    desc.push_back(" 3. IACL NORDER LEVEL NORTH IREDSYS RRCTOL IDROPTOL EPSRN");
+    desc.push_back(" 4. IPC ISCL IORD RCLOSEPCGU");
   }
 
   try
@@ -693,6 +701,216 @@ CStr NativeExpSolver::Line2b_NWT ()
   }
   return rval;
 } // NativeExpSolver::Line2b_NWT
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void NativeExpSolver::Export_SMS ()
+{
+  if (WriteLine1a_SMS()) {
+    AddToStoredLinesDesc(Line1a_SMS(), Desc(SMS, 1));
+  }
+  AddToStoredLinesDesc(Line1b_SMS(), Desc(SMS, 2));
+  if (WriteLine2_SMS()) {
+    AddToStoredLinesDesc(Line2_SMS(), Desc(SMS, 3));
+  }
+  if (WriteLine3_SMS()) {
+    AddToStoredLinesDesc(Line3_SMS(), Desc(SMS, 4));
+  }
+  if (WriteLine4_SMS()) {
+    AddToStoredLinesDesc(Line4_SMS(), Desc(SMS, 5));
+  }
+} // NativeExpSolver::Export_SMS
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+bool NativeExpSolver::WriteLine1a_SMS ()
+{
+  const int* IFDPARAM(0);
+
+  MfPackage* p = GetPackage();
+  if (p->GetField(SmsPack::IFDPARAM, &IFDPARAM) && IFDPARAM)
+  {
+    return (*IFDPARAM >= 1 && *IFDPARAM <= 3);
+  }
+  return true;
+} // NativeExpSolver::WriteLine1a_SMS
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+bool NativeExpSolver::WriteLine2_SMS ()
+{
+  bool rval = true;
+  const int* NONLINMETH(0),* IFDPARAM(0);
+
+  MfPackage* p = GetPackage();
+  if (p->GetField(SmsPack::IFDPARAM, &IFDPARAM) && IFDPARAM &&
+      p->GetField(SmsPack::NONLINMETH, &NONLINMETH) && NONLINMETH)
+  {
+    rval = (*NONLINMETH != 0 && (*IFDPARAM < 1 || *IFDPARAM > 3));
+  }
+  return rval;
+} // NativeExpSolver::WriteLine2_SMS
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+bool NativeExpSolver::WriteLine3_SMS ()
+{
+  bool rval = true;
+  const int* LINMETH(0),* IFDPARAM(0);
+
+  MfPackage* p = GetPackage();
+  if (p->GetField(SmsPack::IFDPARAM, &IFDPARAM) && IFDPARAM &&
+      p->GetField(SmsPack::LINMETH, &LINMETH) && LINMETH)
+  {
+    rval = (*LINMETH == 1 && (*IFDPARAM < 1 || *IFDPARAM > 3));
+  }
+  return rval;
+} // NativeExpSolver::WriteLine3_SMS
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+bool NativeExpSolver::WriteLine4_SMS ()
+{
+  bool rval = true;
+  const int* LINMETH(0),* IFDPARAM(0);
+
+  MfPackage* p = GetPackage();
+  if (p->GetField(SmsPack::IFDPARAM, &IFDPARAM) && IFDPARAM &&
+      p->GetField(SmsPack::LINMETH, &LINMETH) && LINMETH)
+  {
+    rval = (*LINMETH == 2 && (*IFDPARAM < 1 || *IFDPARAM > 3));
+  }
+  return rval;
+} // NativeExpSolver::WriteLine4_SMS
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+CStr NativeExpSolver::Line1a_SMS ()
+{
+  CStr rval;
+  const int* IFDPARAM(0);
+
+  MfPackage* p = GetPackage();
+  if (p->GetField(SmsPack::IFDPARAM, &IFDPARAM) && IFDPARAM)
+  {
+    CStr OPTIONS;
+    switch (*IFDPARAM) {
+    case 1:
+      OPTIONS = "SIMPLE";
+      break;
+    case 2:
+      OPTIONS = "MODERATE";
+      break;
+    case 3:
+      OPTIONS = "COMPLEX";
+      break;
+    default:
+      OPTIONS = "";
+      break;
+    }
+    if (!OPTIONS.empty()) {
+      rval.Format("%s ", OPTIONS);
+    }
+  }
+  return rval;
+} // NativeExpSolver::Line1a_SMS
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+CStr NativeExpSolver::Line1b_SMS ()
+{
+  CStr rval;
+  const double* HCLOSE(0),* HICLOSE(0);
+  const int* MXITER(0),* ITER1(0),* IPRSMS(0),
+           * NONLINMETH(0),* LINMETH(0);
+
+  MfPackage* p = GetPackage();
+  if (p->GetField(SmsPack::HCLOSE, &HCLOSE) && HCLOSE &&
+      p->GetField(SmsPack::HICLOSE, &HICLOSE) && HICLOSE &&
+      p->GetField(SmsPack::MXITER, &MXITER) && MXITER &&
+      p->GetField(SmsPack::ITER1, &ITER1) && ITER1 &&
+      p->GetField(SmsPack::IPRSMS, &IPRSMS) && IPRSMS &&
+      p->GetField(SmsPack::NONLINMETH, &NONLINMETH) && NONLINMETH &&
+      p->GetField(SmsPack::LINMETH, &LINMETH) && LINMETH)
+  {
+    rval.Format("%s %s %d %d %d %d %d ",
+                STR(*HCLOSE), STR(*HICLOSE), *MXITER, *ITER1, *IPRSMS,
+                *NONLINMETH, *LINMETH);
+  }
+  return rval;
+} // NativeExpSolver::Line1b_SMS
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+CStr NativeExpSolver::Line2_SMS ()
+{
+  CStr rval;
+  const double* THETA(0),* AKAPPA(0),* GAMMA(0),* AMOMENTUM(0),* BTOL(0),
+              * BREDUC(0), * RESLIM(0);
+  const int* NUMTRACK(0);
+
+  MfPackage* p = GetPackage();
+  if (p->GetField(SmsPack::THETA, &THETA) && THETA &&
+      p->GetField(SmsPack::AKAPPA, &AKAPPA) && AKAPPA &&
+      p->GetField(SmsPack::GAMMA, &GAMMA) && GAMMA &&
+      p->GetField(SmsPack::AMOMENTUM, &AMOMENTUM) && AMOMENTUM &&
+      p->GetField(SmsPack::NUMTRACK, &NUMTRACK) && NUMTRACK &&
+      p->GetField(SmsPack::BTOL, &BTOL) && BTOL &&
+      p->GetField(SmsPack::BREDUC, &BREDUC) && BREDUC &&
+      p->GetField(SmsPack::RESLIM, &RESLIM) && RESLIM)
+  {
+    rval.Format("%s %s %s %s %d %s %s %s ",
+                STR(*THETA), STR(*AKAPPA), STR(*GAMMA), STR(*AMOMENTUM),
+                *NUMTRACK, STR(*BTOL), STR(*BREDUC), STR(*RESLIM));
+  }
+  return rval;
+} // NativeExpSolver::Line2_SMS
+//------------------------------------------------------------------------------
+/// \brief xMD stuff.
+//------------------------------------------------------------------------------
+CStr NativeExpSolver::Line3_SMS ()
+{
+  CStr rval;
+  const double* RRCTOL(0),* EPSRN(0);
+  const int* IACL(0),* NORDER(0),* LEVEL(0),* NORTH(0),* IREDSYS(0),* IDROPTOL(0);
+
+  MfPackage* p = GetPackage();
+  if (p->GetField(SmsPack::IACL, &IACL) && IACL &&
+      p->GetField(SmsPack::NORDER, &NORDER) && NORDER &&
+      p->GetField(SmsPack::LEVEL, &LEVEL) && LEVEL &&
+      p->GetField(SmsPack::NORTH, &NORTH) && NORTH &&
+      p->GetField(SmsPack::IREDSYS, &IREDSYS) && IREDSYS &&
+      p->GetField(SmsPack::RRCTOL, &RRCTOL) && RRCTOL &&
+      p->GetField(SmsPack::IDROPTOL, &IDROPTOL) && IDROPTOL &&
+      p->GetField(SmsPack::EPSRN, &EPSRN) && EPSRN)
+  {
+    rval.Format("%d %d %d %d %d %s %d %s ",
+                *IACL, *NORDER, *LEVEL, *NORTH, *IREDSYS, STR(*RRCTOL),
+                *IDROPTOL, STR(*EPSRN));
+  }
+  return rval;
+} // NativeExpSolver::Line3_SMS
+//------------------------------------------------------------------------------
+/// \brief PCGU stuff.
+//------------------------------------------------------------------------------
+CStr NativeExpSolver::Line4_SMS ()
+{
+  CStr rval;
+  const double* RCLOSEPCGU(0);
+  const int* IPC(0),* ISCL(0),* IORD(0);
+
+  MfPackage* p = GetPackage();
+  if (p->GetField(SmsPack::IPC, &IPC) && IPC &&
+      p->GetField(SmsPack::ISCL, &ISCL) && ISCL &&
+      p->GetField(SmsPack::IORD, &IORD) && IORD &&
+      p->GetField(SmsPack::RCLOSEPCGU, &RCLOSEPCGU) && RCLOSEPCGU)
+  {
+    rval.Format("%d %d %d %s ",
+                *IPC, *ISCL, *IORD, STR(*RCLOSEPCGU));
+  }
+  return rval;
+} // NativeExpSolver::Line4_SMS
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // TESTS
@@ -1179,5 +1397,113 @@ void NativeExpSolverT::testLine2b_NWT ()
   CStr str = m_p->Line2b_NWT();
   TS_ASSERT_EQUALS2(base, str);
 } // NativeExpSolverT::testLine2b_NWT
+//------------------------------------------------------------------------------
+void NativeExpSolverT::testLine1a_SMS ()
+{
+  int IFDPARAM(0);
+  MfPackage* p = m_p->GetPackage();
+  p->SetField(SmsPack::IFDPARAM, &IFDPARAM);
+  CStr base = "";
+  CStr str = m_p->Line1a_SMS();
+  TS_ASSERT_EQUALS2(base, str);
 
+  IFDPARAM = 1;
+  p->SetField(SmsPack::IFDPARAM, &IFDPARAM);
+  base = "SIMPLE ";
+  str = m_p->Line1a_SMS();
+  TS_ASSERT_EQUALS2(base, str);
+
+  IFDPARAM = 2;
+  p->SetField(SmsPack::IFDPARAM, &IFDPARAM);
+  base = "MODERATE ";
+  str = m_p->Line1a_SMS();
+  TS_ASSERT_EQUALS2(base, str);
+
+  IFDPARAM = 3;
+  p->SetField(SmsPack::IFDPARAM, &IFDPARAM);
+  base = "COMPLEX ";
+  str = m_p->Line1a_SMS();
+  TS_ASSERT_EQUALS2(base, str);
+} // NativeExpSolverT::testLine1a_SMS
+//------------------------------------------------------------------------------
+void NativeExpSolverT::testLine1b_SMS ()
+{
+  int MXITER(100), ITER1(100), IPRSMS(1), NONLINMETH(0), LINMETH(1);
+  double HCLOSE(1e-8), HICLOSE(1e-8);
+  MfPackage* p = m_p->GetPackage();
+  p->SetField(SmsPack::HCLOSE, &HCLOSE);
+  p->SetField(SmsPack::HICLOSE, &HICLOSE);
+  p->SetField(SmsPack::MXITER, &MXITER);
+  p->SetField(SmsPack::ITER1, &ITER1);
+  p->SetField(SmsPack::IPRSMS, &IPRSMS);
+  p->SetField(SmsPack::NONLINMETH, &NONLINMETH);
+  p->SetField(SmsPack::LINMETH, &LINMETH);
+  CStr base;
+  if (sizeof(Real) == 8) {
+    base = "1.0e-008 1.0e-008 100 100 1 0 1 ";
+  }
+  else if (sizeof(Real) == 4) {
+    base = "1.0e-008 1.0e-008 100 100 1 0 1 ";
+    //base = "9.99999994e-009 9.99999994e-009 100 100 1 0 1 ";
+      // I get this in production code.
+  }
+  else {
+    TS_FAIL("NativeExpSolverT::testLine1b_SMS");
+  }
+  CStr str = m_p->Line1b_SMS();
+  TS_ASSERT_EQUALS2(base, str);
+
+} // NativeExpSolverT::testLine1b_SMS
+//------------------------------------------------------------------------------
+void NativeExpSolverT::testLine2_SMS ()
+{
+  int NUMTRACK(200);
+  double THETA(.9), AKAPPA(.07), GAMMA(.1), AMOMENTUM(0), BTOL(1.1),
+         BREDUC(.2), RESLIM(1);
+  MfPackage* p = m_p->GetPackage();
+  p->SetField(SmsPack::THETA, &THETA);
+  p->SetField(SmsPack::AKAPPA, &AKAPPA);
+  p->SetField(SmsPack::GAMMA, &GAMMA);
+  p->SetField(SmsPack::AMOMENTUM, &AMOMENTUM);
+  p->SetField(SmsPack::NUMTRACK, &NUMTRACK);
+  p->SetField(SmsPack::BTOL, &BTOL);
+  p->SetField(SmsPack::BREDUC, &BREDUC);
+  p->SetField(SmsPack::RESLIM, &RESLIM);
+  CStr base = "0.9 0.07 0.1 0.0 200 1.1 0.2 1.0 ";
+  CStr str = m_p->Line2_SMS();
+  TS_ASSERT_EQUALS2(base, str);
+
+} // NativeExpSolverT::testLine2_SMS
+//------------------------------------------------------------------------------
+void NativeExpSolverT::testLine3_SMS ()
+{
+  int IACL(2), NORDER(1), LEVEL(3), NORTH(14), IREDSYS(0), IDROPTOL(0);
+  double RRCTOL(0.0), EPSRN(1e-3);
+  MfPackage* p = m_p->GetPackage();
+  p->SetField(SmsPack::IACL, &IACL);
+  p->SetField(SmsPack::NORDER, &NORDER);
+  p->SetField(SmsPack::LEVEL, &LEVEL);
+  p->SetField(SmsPack::NORTH, &NORTH);
+  p->SetField(SmsPack::IREDSYS, &IREDSYS);
+  p->SetField(SmsPack::RRCTOL, &RRCTOL);
+  p->SetField(SmsPack::IDROPTOL, &IDROPTOL);
+  p->SetField(SmsPack::EPSRN, &EPSRN);
+  CStr base = "2 1 3 14 0 0.0 0 0.001 ";
+  CStr str = m_p->Line3_SMS();
+  TS_ASSERT_EQUALS2(base, str);
+}
+//------------------------------------------------------------------------------
+void NativeExpSolverT::testLine4_SMS ()
+{
+  int IPC(1), ISCL(2), IORD(3);
+  double RCLOSEPCGU(0.1);
+  MfPackage* p = m_p->GetPackage();
+  p->SetField(SmsPack::IPC, &IPC);
+  p->SetField(SmsPack::ISCL, &ISCL);
+  p->SetField(SmsPack::IORD, &IORD);
+  p->SetField(SmsPack::RCLOSEPCGU, &RCLOSEPCGU);
+  CStr base = "1 2 3 0.1 ";
+  CStr str = m_p->Line4_SMS();
+  TS_ASSERT_EQUALS2(base, str);
+}
 #endif

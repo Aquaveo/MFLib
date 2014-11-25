@@ -404,6 +404,56 @@ DLLEXPORT void MFLIBEXP_GMGPACKAGE (const char* a_type,
                      a_IADAMP, a_IOUTGMG, a_ISM, a_ISC, a_RELAX);
 } // MFLIBEXP_GMGPACKAGE
 //------------------------------------------------------------------------------
+/// \brief Data associated with the SMS solver package for MODFLOW.
+//------------------------------------------------------------------------------
+DLLEXPORT void MFLIBEXP_SMSPACKAGE (const int* a_IFDPARAM,
+                                    const double* a_HCLOSE,
+                                    const double* a_HICLOSE,
+                                    const int* a_MXITER,
+                                    const int* a_ITER1,
+                                    const int* a_IPRSMS,
+                                    const int* a_NONMETH,
+                                    const int* a_LINMETH,
+                                    const double* a_THETA,
+                                    const double* a_AKAPPA,
+                                    const double* a_GAMMA,
+                                    const double* a_AMOMENTUM,
+                                    const int* a_NUMTRACK,
+                                    const double* a_BTOL,
+                                    const double* a_BREDUC,
+                                    const double* a_RESLIM
+                                    )
+{
+  MfData::SmsPackage(a_IFDPARAM, a_HCLOSE, a_HICLOSE, a_MXITER, a_ITER1,
+                     a_IPRSMS, a_NONMETH, a_LINMETH, a_THETA, a_AKAPPA,
+                     a_GAMMA, a_AMOMENTUM, a_NUMTRACK, a_BTOL, a_BREDUC,
+                     a_RESLIM);
+} // MFLIBEXP_SMSPACKAGE
+//------------------------------------------------------------------------------
+/// \brief Data associated with the SMS solver package for MODFLOW.
+//------------------------------------------------------------------------------
+DLLEXPORT void MFLIBEXP_SMSXMDPACKAGE (const int* a_IACL,
+                                       const int* a_NORDER,
+                                       const int* a_LEVEL,
+                                       const int* a_NORTH,
+                                       const int* a_IREDSYS,
+                                       const double* a_RRCTOL,
+                                       const int* a_IDROPTOL,
+                                       const double* a_EPSRN)
+{
+  MfData::SmsXmdPackage(a_IACL,a_NORDER,a_LEVEL,a_NORTH,a_IREDSYS,a_RRCTOL,a_IDROPTOL,a_EPSRN);
+} // MFLIBEXP_SMSXMDPACKAGE
+//------------------------------------------------------------------------------
+/// \brief Data associated with the SMS (PCGU) solver package for MODFLOW.
+//------------------------------------------------------------------------------
+DLLEXPORT void MFLIBEXP_SMSPCGUPACKAGE (const int* a_IPC,
+                                       const int* a_ISCL,
+                                       const int* a_IORD,
+                                       const Real* a_RCLOSEPCGU)
+{
+  MfData::SmsPcguPackage(a_IPC, a_ISCL, a_IORD, a_RCLOSEPCGU);
+} // MFLIBEXP_SMSPCGUPACKAGE
+//------------------------------------------------------------------------------
 /// \brief This is the data associated with an array
 //------------------------------------------------------------------------------
 DLLEXPORT void MFLIBEXP_U2DREL (const char *a_name,

@@ -196,7 +196,104 @@ void MfData::Packages::PcgPackage (const char*  const a_type,
   MfData::Get().Export(a_type);
 } // MfData::Packages::PcgPackage
 //------------------------------------------------------------------------------
-/// \brief This receives the data that belongs to the SOR package
+/// \brief SMS Solver stuff common to both xMD and PCGU.
+//------------------------------------------------------------------------------
+void MfData::Packages::SmsPackage (const int* IFDPARAM,
+                                   const double* HCLOSE,
+                                   const double* HICLOSE,
+                                   const int* MXITER,
+                                   const int* ITER1,
+                                   const int* IPRSMS,
+                                   const int* NONMETH,
+                                   const int* LINMETH,
+                                   const double* THETA,
+                                   const double* AKAPPA,
+                                   const double* GAMMA,
+                                   const double* AMOMENTUM,
+                                   const int* NUMTRACK,
+                                   const double* BTOL,
+                                   const double* BREDUC,
+                                   const double* RESLIM)
+{
+  const char* const type = MfData::Packages::SMS;
+  MfPackage pack(type);
+  MfPackage *p(MfData::Get().GetPackage(type));
+  bool exists(p ? 1 : 0);
+  if (!exists)
+    p = &pack;
+  p->SetField(MfData::Packages::SmsPack::IFDPARAM, IFDPARAM);
+  p->SetField(MfData::Packages::SmsPack::HCLOSE, HCLOSE);
+  p->SetField(MfData::Packages::SmsPack::HICLOSE, HICLOSE);
+  p->SetField(MfData::Packages::SmsPack::MXITER, MXITER);
+  p->SetField(MfData::Packages::SmsPack::ITER1, ITER1);
+  p->SetField(MfData::Packages::SmsPack::IPRSMS, IPRSMS);
+  p->SetField(MfData::Packages::SmsPack::NONLINMETH, NONMETH);
+  p->SetField(MfData::Packages::SmsPack::LINMETH, LINMETH);
+  p->SetField(MfData::Packages::SmsPack::THETA, THETA);
+  p->SetField(MfData::Packages::SmsPack::AKAPPA, AKAPPA);
+  p->SetField(MfData::Packages::SmsPack::GAMMA, GAMMA);
+  p->SetField(MfData::Packages::SmsPack::AMOMENTUM, AMOMENTUM);
+  p->SetField(MfData::Packages::SmsPack::NUMTRACK, NUMTRACK);
+  p->SetField(MfData::Packages::SmsPack::BTOL, BTOL);
+  p->SetField(MfData::Packages::SmsPack::BREDUC, BREDUC);
+  p->SetField(MfData::Packages::SmsPack::RESLIM, RESLIM);
+  if (!exists)
+    MfData::Get().AddPackage(p);
+} // MfData::Packages::SmsPackage
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+void MfData::Packages::SmsXmdPackage (const int* IACL,
+                                      const int* NORDER,
+                                      const int* LEVEL,
+                                      const int* NORTH,
+                                      const int* IREDSYS,
+                                      const double* RRCTOL,
+                                      const int* IDROPTOL,
+                                      const double* EPSRN)
+{
+  const char* const type = MfData::Packages::SMS;
+  MfPackage pack(type);
+  MfPackage *p(MfData::Get().GetPackage(type));
+  bool exists(p ? 1 : 0);
+  if (!exists)
+    p = &pack;
+  p->SetField(MfData::Packages::SmsPack::IACL, IACL);
+  p->SetField(MfData::Packages::SmsPack::NORDER, NORDER);
+  p->SetField(MfData::Packages::SmsPack::LEVEL, LEVEL);
+  p->SetField(MfData::Packages::SmsPack::NORTH, NORTH);
+  p->SetField(MfData::Packages::SmsPack::IREDSYS, IREDSYS);
+  p->SetField(MfData::Packages::SmsPack::RRCTOL, RRCTOL);
+  p->SetField(MfData::Packages::SmsPack::IDROPTOL, IDROPTOL);
+  p->SetField(MfData::Packages::SmsPack::EPSRN, EPSRN);
+  if (!exists)
+    MfData::Get().AddPackage(p);
+  MfData::Get().Export(type);
+} // MfData::Packages::SmsXmdPackage
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+void MfData::Packages::SmsPcguPackage (const int* IPC,
+                                       const int* ISCL,
+                                       const int* IORD,
+                                       const Real* RCLOSEPCGU)
+{
+  const char* const type = MfData::Packages::SMS;
+  MfPackage pack(type);
+  MfPackage *p(MfData::Get().GetPackage(type));
+  bool exists(p ? 1 : 0);
+  if (!exists)
+    p = &pack;
+  p->SetField(MfData::Packages::SmsPack::IPC, IPC);
+  p->SetField(MfData::Packages::SmsPack::ISCL, ISCL);
+  p->SetField(MfData::Packages::SmsPack::IORD, IORD);
+  p->SetField(MfData::Packages::SmsPack::RCLOSEPCGU, RCLOSEPCGU);
+  if (!exists)
+    MfData::Get().AddPackage(p);
+  MfData::Get().Export(type);
+} // MfData::Packages::SmsPcguPackage
+//------------------------------------------------------------------------------
+/// \brief This receives the data that belongs to the LMG package
 //------------------------------------------------------------------------------
 void MfData::Packages::LmgPackage (const char* const a_type,
                                    const Real* a_STOR1,
@@ -231,7 +328,7 @@ void MfData::Packages::LmgPackage (const char* const a_type,
   MfData::Get().Export(a_type);
 } // MfData::Packages::LmgPackage
 //------------------------------------------------------------------------------
-/// \brief This receives the data that belongs to the SOR package
+/// \brief This receives the data that belongs to the GMG package
 //------------------------------------------------------------------------------
 void MfData::Packages::GmgPackage (const char* const a_type,
                                    const Real* a_RCLOSE,

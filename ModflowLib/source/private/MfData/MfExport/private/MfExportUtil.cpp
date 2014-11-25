@@ -114,7 +114,8 @@ bool MfExportUtil::IsSolver (const CStr &a_name)
   if (SIP == a_name  || DE4 == a_name ||
       SOR == a_name  || PCG == a_name ||
       PCGN == a_name || LMG == a_name ||
-      GMG == a_name  || NWT == a_name)
+      GMG == a_name  || NWT == a_name ||
+      SMS == a_name)
   {
     return true;
   }

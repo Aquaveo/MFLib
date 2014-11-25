@@ -135,6 +135,41 @@ namespace MfData
       const char * const ISC = "ISC";
       const char * const RELAX = "RELAX";
     }
+    namespace SmsPack
+    {
+      const char * const IFDPARAM = "IFDPARAM";
+      const char * const HCLOSE = "HCLOSE";
+      const char * const HICLOSE = "HICLOSE";
+      const char * const MXITER = "MXITER";
+      const char * const ITER1 = "ITER1";
+      const char * const IPRSMS = "IPRSMS";
+      const char * const NONLINMETH = "NONLINMETH";
+      const char * const LINMETH = "LINMETH";
+
+      const char * const THETA = "THETA";
+      const char * const AKAPPA = "AKAPPA";
+      const char * const GAMMA = "GAMMA";
+      const char * const AMOMENTUM = "AMOMENTUM";
+      const char * const NUMTRACK = "NUMTRACK";
+      const char * const BTOL = "BTOL";
+      const char * const BREDUC = "BREDUC";
+      const char * const RESLIM = "RSLIM";
+
+      // XMD
+      const char * const IACL = "IACL";
+      const char * const NORDER = "NORDER";
+      const char * const LEVEL = "LEVEL";
+      const char * const NORTH = "NORTH";
+      const char * const IREDSYS = "IREDSYS";
+      const char * const RRCTOL = "RRCTOL";
+      const char * const IDROPTOL = "IDROPTOL";
+      const char * const EPSRN = "EPSRN";
+      // PCGU
+      const char * const IPC = "IPC";
+      const char * const ISCL = "ISCL";
+      const char * const IORD = "IORD";
+      const char * const RCLOSEPCGU = "RCLOSEPCGU";
+    }
     namespace Array
     {
       const char * const ARRAY = "ARRAY";

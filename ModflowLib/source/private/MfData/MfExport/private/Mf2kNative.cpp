@@ -62,7 +62,7 @@ bool MfData::Export::Mf2kNative::ExportPackage (MfData::MfGlobal* a_global,
     fflush(stdout);
   }
   return rval;
-} // EMf2kNative::DisPackage
+} // MfData::Export::Mf2kNative::ExportPackage
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
