@@ -315,7 +315,7 @@ bool MfPackage::impl::GetField (const char *a_field,
   it = m_data.find(str);
   if (it == m_data.end())
     return false;
-  std::pair<int*,float*> p;
+  //std::pair<int*,float*> p;    p never used so I commented out this line. -MJK
   GetStructVal(a_, it->second);
   return true;
 } // MfPackage::impl::GetField
