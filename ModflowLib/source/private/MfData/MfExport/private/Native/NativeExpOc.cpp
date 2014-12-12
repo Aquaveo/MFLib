@@ -40,7 +40,6 @@ bool NativeExpOc::Export ()
     CStr l2 = Line2(), d2 = Desc2();
     std::vector<CStr> l3 = Line3(), d3 = Desc3();
     MfPackage* p = GetGlobal()->GetPackage(Packages::OC);
-    if (!p) p = GetGlobal()->GetPackage(Packages::OCT);
     this->SetData(GetNative(), GetGlobal(), p);
     AddToStoredLinesDesc(l2, d2);
     AddToStoredLinesDesc(l3, d3);
