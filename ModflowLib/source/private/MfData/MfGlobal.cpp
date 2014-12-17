@@ -708,7 +708,7 @@ void MfGlobalT::testGetPackage()
 void MfGlobalT::testInit_Get ()
 {
   MfData::Init(1, -1, "", "", "");
-  MfData::Set(1,2,3,4,5,6,0);
+  MfData::Set(1,2,3,4,5,6,0,1);
   TS_ASSERT_EQUALS(MfData::Get().ModelType(), 1);
   TS_ASSERT_EQUALS(MfData::Get().NumRow(), 1);
   TS_ASSERT_EQUALS(MfData::Get().NumCol(), 2);
@@ -716,6 +716,7 @@ void MfGlobalT::testInit_Get ()
   TS_ASSERT_EQUALS(MfData::Get().NumPeriods(), 4);
   TS_ASSERT_EQUALS(MfData::Get().TimeUnit(), 5);
   TS_ASSERT_EQUALS(MfData::Get().LengthUnit(), 6);
+  TS_ASSERT_EQUALS(MfData::Get().Unstructured(), 1);
   MfData::Init(MfData::MF2K, -1, "", "", "");
 }
 //------------------------------------------------------------------------------
@@ -731,7 +732,7 @@ void MfGlobalT::testAttachExporter ()
 void MfGlobalT::testExport ()
 {
   MfData::Init(1, -1, "", "", "");
-  MfData::Set(1,2,3,4,5,6,0);
+  MfData::Set(1,2,3,4,5,6,0,1);
   TS_ASSERT(!MfData::Get().Export("dis"));
   MfData::MfPackage pack("stuff");
   MfData::Get().AddPackage(&pack);

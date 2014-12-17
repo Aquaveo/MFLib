@@ -2176,16 +2176,17 @@ void MfDataT::testGlobal ()
   CStr str, e, f;
   int *iptr(NULL);
   int nlay(2), nrow(4), ncol(5), nper(3), itmuni(7), lenuni(8), laycbd[2]={0,0};
+  int unstructured(1);
   TS_ASSERT(!MfData::SetGlobal(iptr, &nrow, &ncol, &nper));
   TS_ASSERT(!MfData::SetGlobal(&nlay, iptr, &ncol, &nper));
   TS_ASSERT(!MfData::SetGlobal(&nlay, &nrow, iptr, &nper));
   TS_ASSERT(!MfData::SetGlobal(&nlay, &nrow, &ncol, iptr));
 
-  TS_ASSERT(!MfData::SetGlobal(&nlay, iptr, &ncol, &nper, &itmuni, &lenuni,laycbd));
-  TS_ASSERT(!MfData::SetGlobal(&nlay, &nrow, iptr, &nper, &itmuni, &lenuni,laycbd));
-  TS_ASSERT(!MfData::SetGlobal(&nlay, &nrow, &ncol, iptr, &itmuni, &lenuni,laycbd));
-  TS_ASSERT(!MfData::SetGlobal(&nlay, &nrow, &ncol, &nper, iptr, &lenuni,laycbd));
-  TS_ASSERT(!MfData::SetGlobal(&nlay, &nrow, &ncol, &nper, &itmuni, iptr,laycbd));
+  TS_ASSERT(!MfData::SetGlobal(&nlay, iptr, &ncol, &nper, &itmuni, &lenuni,laycbd, &unstructured));
+  TS_ASSERT(!MfData::SetGlobal(&nlay, &nrow, iptr, &nper, &itmuni, &lenuni,laycbd, &unstructured));
+  TS_ASSERT(!MfData::SetGlobal(&nlay, &nrow, &ncol, iptr, &itmuni, &lenuni,laycbd, &unstructured));
+  TS_ASSERT(!MfData::SetGlobal(&nlay, &nrow, &ncol, &nper, iptr, &lenuni,laycbd, &unstructured));
+  TS_ASSERT(!MfData::SetGlobal(&nlay, &nrow, &ncol, &nper, &itmuni, iptr,laycbd, &unstructured));
   std::stringstream stream;
   ErrorStack::Get().PrintErrors(stream);
   char myChar[100];
@@ -2197,7 +2198,7 @@ void MfDataT::testGlobal ()
   ErrorStack::Get().ClearErrors();
   TS_ASSERT(MfData::InitGlobal(MfData::MF2K, -1, e, f, ""));
   TS_ASSERT(MfData::SetGlobal(&nlay, &nrow, &ncol, &nper));
-  TS_ASSERT(MfData::SetGlobal(&nlay, &nrow, &ncol, &nper, &itmuni, &lenuni,laycbd));
+  TS_ASSERT(MfData::SetGlobal(&nlay, &nrow, &ncol, &nper, &itmuni, &lenuni,laycbd, &unstructured));
   std::stringstream stream1;
   ErrorStack::Get().PrintErrors(stream1);
   stream1.getline(myChar, 100);
@@ -2213,7 +2214,7 @@ void MfDataT::testGlobal ()
   ncol = 6;
   nper = 2;
   MfData::InitGlobal(MfData::MF2K5, -1, e, f, "");
-  MfData::SetGlobal(&nlay, &nrow, &ncol, &nper, &itmuni, &lenuni,laycbd);
+  MfData::SetGlobal(&nlay, &nrow, &ncol, &nper, &itmuni, &lenuni,laycbd, &unstructured);
   TS_ASSERT_EQUALS(MfData::Get().ModelType(), 1);
   TS_ASSERT_EQUALS(MfData::Get().NumLay(), 3);
   TS_ASSERT_EQUALS(MfData::Get().NumRow(), 5);
@@ -2221,13 +2222,14 @@ void MfDataT::testGlobal ()
   TS_ASSERT_EQUALS(MfData::Get().NumPeriods(), 2);
   TS_ASSERT_EQUALS(MfData::Get().TimeUnit(), 7);
   TS_ASSERT_EQUALS(MfData::Get().LengthUnit(), 8);
+  TS_ASSERT_EQUALS(MfData::Get().Unstructured(), 1);
 
   MfData::InitGlobal(MfData::MF2K, -1, e, f, "");
 }
 //------------------------------------------------------------------------------
 void MfDataT::testDispPackage2 ()
 {
-  int nlay(2), nrow(4), ncol(5), nper(3), itmuni(7), lenuni(8);
+  int nlay(2), nrow(4), ncol(5), nper(3), itmuni(7), lenuni(8), unstructured(1);
   CStr e, f;
   MfData::InitGlobal(MfData::MF2K, -1, e, f, "");
 
@@ -2237,7 +2239,7 @@ void MfDataT::testDispPackage2 ()
   std::vector<int> laycbd(nlay), nstp(nper, 2), issflg(nper, 0);
   std::vector<Real> delr(ncol), delc(nrow), botm(nrow*ncol*nbotm),
                      perlen(nper, 5), tsmult(nper, 1);
-  MfData::SetGlobal(&nlay, &nrow, &ncol, &nper, &itmuni, &lenuni,&laycbd[0]);
+  MfData::SetGlobal(&nlay, &nrow, &ncol, &nper, &itmuni, &lenuni,&laycbd[0], &unstructured);
 
   TS_ASSERT(!MfData::DisPackage2(fptr, &delc[0], &nbotm, &botm[0],
                                  &perlen[0], &nstp[0], &tsmult[0], &issflg[0]))
