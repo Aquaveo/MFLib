@@ -27,7 +27,9 @@ using namespace MfData::Export;
 /// \brief
 //------------------------------------------------------------------------------
 NativeExpLstPack::NativeExpLstPack ()
-: m_nBcs(0)
+: m_usg(false)
+, m_unstructured(false)
+, m_nBcs(0)
 , m_nAux(0)
 , m_nDataFields(0)
 , m_nFields(0)
@@ -36,7 +38,18 @@ NativeExpLstPack::NativeExpLstPack ()
 , m_returnFlow(0)
 , m_NP(0)
 , m_MXL(0)
+, m_nI(0)
+, m_nJ(0)
+, m_nK(0)
 {
+  m_usg = MfData::MfGlobal::Get().ModelType() == MfData::USG;
+  if (m_usg)
+  {
+    m_nK = MfData::MfGlobal::Get().NumLay();
+    m_nI = MfData::MfGlobal::Get().NumRow();
+    m_nJ = MfData::MfGlobal::Get().NumCol();
+    m_unstructured = MfData::MfGlobal::Get().Unstructured() ? 1 : 0;
+  }
 } // MfNativeExpLstPack::MfNativeExpLstPack
 //------------------------------------------------------------------------------
 /// \brief
@@ -280,9 +293,27 @@ void NativeExpLstPack::Line6 ()
 CStr NativeExpLstPack::IjkToStr (int a_i)
 {
   CStr ln;
-  ln.Format("%5d %5d %5d ", (int)m_data[a_i*(*m_nDataFields)+0],
-                            (int)m_data[a_i*(*m_nDataFields)+1],
-                            (int)m_data[a_i*(*m_nDataFields)+2]);
+  if (!m_usg)
+  {
+    ln.Format("%5d %5d %5d ", (int)m_data[a_i*(*m_nDataFields)+0],
+                              (int)m_data[a_i*(*m_nDataFields)+1],
+                              (int)m_data[a_i*(*m_nDataFields)+2]);
+  }
+  else
+  {
+    if (!m_unstructured)
+    { // calculate i, j, k from cell id
+      int id = (int)m_data[a_i*(*m_nDataFields)+0];
+      int i  = ( (id-1)/m_nJ ) % m_nI + 1;
+      int j  = (id-1) % m_nJ + 1;
+      int k  = (id-1) / (m_nI*m_nJ) + 1;
+      ln.Format("%5d %5d %5d ", k, i, j);
+    }
+    else
+    {
+      ln.Format("%5d ", (int)m_data[a_i*(*m_nDataFields)+0]);
+    }
+  }
   return ln;
 } // NativeExpLstPack::IjkToStr
 //------------------------------------------------------------------------------

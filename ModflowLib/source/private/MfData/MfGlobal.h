@@ -13,7 +13,7 @@ namespace MfData
 {
   class MfPackage;
   
-  enum enumModelType { MF2K = 0, MF2K5, MFNWT, SEAWAT, LGR };
+  enum enumModelType { MF2K = 0, MF2K5, MFNWT, SEAWAT, LGR, USG };
 
   class MfGlobal
   {

@@ -86,8 +86,9 @@ namespace MfData
       void Line7(FILE* a_fp, int a_sp);
       void BufferTheLineForComments(CStr& a_line);
 
+      bool                m_usg, m_unstructured;
       const int          *m_nBcs, *m_nAux, *m_nDataFields;
-      int                 m_nFields;
+      int                 m_nFields, m_nI, m_nJ, m_nK;
       const Real         *m_data;
       std::vector<CStr>   m_fieldStrings;
       bool                m_returnFlow;
