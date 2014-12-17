@@ -42,7 +42,7 @@ module module_exportData
         END SUBROUTINE mfLibExp_putCurrentGrid
 !     ------------------------------------------------------------------
 !      Declare the C function
-        SUBROUTINE mfLibExp_DisPackage1(NLAY,NROW,NCOL,NPER,ITMUNI,LENUNI,LAYCBD)
+        SUBROUTINE mfLibExp_DisPackage1(NLAY,NROW,NCOL,NPER,ITMUNI,LENUNI,LAYCBD,IUNSTR)
           INTEGER NLAY [REFERENCE]
           INTEGER NROW [REFERENCE]
           INTEGER NCOL [REFERENCE]
@@ -50,6 +50,7 @@ module module_exportData
           INTEGER ITMUNI [REFERENCE]
           INTEGER LENUNI [REFERENCE]
           INTEGER LAYCBD (*)
+          INTEGER IUNSTR [REFERENCE]
         END SUBROUTINE mfLibExp_DisPackage1
 !     ------------------------------------------------------------------
 !      Declare the C function
@@ -1087,12 +1088,12 @@ module module_exportData
   !-----------------------------------------------------------------------------
   ! BRIEF:  
   !-----------------------------------------------------------------------------
-  subroutine exp_GLO1BAS6DF (NLAY,NROW,NCOL,NPER,ITMUNI,LENUNI,LAYCBD)
+  subroutine exp_GLO1BAS6DF (NLAY,NROW,NCOL,NPER,ITMUNI,LENUNI,LAYCBD,IUNSTR)
     implicit none
-    integer, intent(in) :: NLAY,NROW,NCOL,NPER,ITMUNI,LENUNI,LAYCBD(*)
+    integer, intent(in) :: NLAY,NROW,NCOL,NPER,ITMUNI,LENUNI,LAYCBD(*),IUNSTR
 
     !if (NOT(ed_getExportData())) return
-    call mfLibExp_DisPackage1(NLAY,NROW,NCOL,NPER,ITMUNI,LENUNI,LAYCBD)
+    call mfLibExp_DisPackage1(NLAY,NROW,NCOL,NPER,ITMUNI,LENUNI,LAYCBD,IUNSTR)
   end subroutine exp_GLO1BAS6DF
 
   !-----------------------------------------------------------------------------

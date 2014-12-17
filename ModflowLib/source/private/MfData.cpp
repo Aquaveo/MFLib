@@ -82,7 +82,8 @@ bool MfData::SetGlobal (const int *a_NLAY,
                         const int *a_NPER,
                         const int *a_ITMUNI,
                         const int *a_LENUNI,
-                        const int *a_LAYCBD)
+                        const int *a_LAYCBD,
+                        const int *a_IUNSTR)
 {
   if (!a_NLAY ||
       !a_NROW ||
@@ -90,13 +91,14 @@ bool MfData::SetGlobal (const int *a_NLAY,
       !a_NPER ||
       !a_ITMUNI ||
       !a_LENUNI ||
-      !a_LAYCBD)
+      !a_LAYCBD ||
+      !a_IUNSTR)
   {
     util::NullFuncArg(__FILE__, __LINE__);
     return false;
   }
   MfData::Set(*a_NROW, *a_NCOL, *a_NLAY, *a_NPER, *a_ITMUNI, *a_LENUNI,
-              a_LAYCBD);
+              a_LAYCBD, *a_IUNSTR);
   return true;
 } // MfData::Global
 //------------------------------------------------------------------------------

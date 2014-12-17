@@ -33,7 +33,8 @@ DLLEXPORT void MFLIBEXP_DISPACKAGE1(const int *a_NLAY,
                                     const int *a_NPER,
                                     const int *a_ITMUNI,
                                     const int *a_LENUNI,
-                                    const int *a_LAYCBD);
+                                    const int *a_LAYCBD,
+                                    const int *a_IUNSTR);
 DLLEXPORT void MFLIBEXP_DISPACKAGE2(const Real *a_DELR,
                                     const Real *a_DELC,
                                     const int *a_NBTOM,

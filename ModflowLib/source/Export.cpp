@@ -194,12 +194,13 @@ DLLEXPORT void MFLIBEXP_DISPACKAGE1 (const int *a_NLAY,
                                      const int *a_NPER,
                                      const int *a_ITMUNI,
                                      const int *a_LENUNI,
-                                     const int *a_LAYCBD)
+                                     const int *a_LAYCBD,
+                                     const int *a_IUNSTR)
 {
   CStr exporter, filename;
 
   MfData::SetGlobal(a_NLAY, a_NROW, a_NCOL, a_NPER, a_ITMUNI, a_LENUNI,
-                    a_LAYCBD);
+                    a_LAYCBD, a_IUNSTR);
 } // MFLIBEXP_DISPACKAGE1
 //------------------------------------------------------------------------------
 /// \brief This is the data associated with Discretization package for MODFLOW.

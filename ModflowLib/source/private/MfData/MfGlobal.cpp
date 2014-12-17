@@ -52,6 +52,7 @@ public:
   ParamList& GetParamList() { VectorSizes(); return *m_params[m_curModIdx]; }
   size_t CurModIdx() { return m_curModIdx; }
   CStr& LgrName() { return m_LgrName; }
+  int& Unstructured () { return m_unstructured; }
 
   std::vector<MfData::Export::MfExporter*>& vExporter() { return m_export; }
 
@@ -70,6 +71,7 @@ private:
   std::vector<ParamList*> m_params;
   size_t m_curModIdx;
   CStr m_LgrName;
+  int m_unstructured;
   void VectorSizes()
   {
     size_t idx = m_curModIdx + 1;
@@ -128,10 +130,11 @@ void MfData::Set (int a_NROW,
                   int a_NPER,
                   int a_ITMUNI,
                   int a_LENUNI,
-                  const int *a_LAYCBD)
+                  const int *a_LAYCBD,
+                  int a_IUNSTR)
 {
   MfData::MfGlobal::Set(a_NROW, a_NCOL, a_NLAY, a_NPER, a_ITMUNI, a_LENUNI,
-                        a_LAYCBD);
+                        a_LAYCBD, a_IUNSTR);
 } // MfData::Set
 //------------------------------------------------------------------------------
 /// \brief Gets a reference to the Global Modflow data.
@@ -180,15 +183,17 @@ void MfData::MfGlobal::Set (int a_NROW,
                             int a_NPER,
                             int a_ITMUNI,
                             int a_LENUNI,
-                            const int *a_LAYCBD)
+                            const int *a_LAYCBD,
+                            int a_IUNSTR)
 {
   MfGlobal& global = MfData::Get();
   global.m_p->Row() = a_NROW;
   global.m_p->Col() = a_NCOL;
   global.m_p->Lay() = a_NLAY;
   global.m_p->nPer() = a_NPER;
-  global.m_p->TimeU()= a_ITMUNI;
-  global.m_p->LengthU()= a_LENUNI;
+  global.m_p->TimeU() = a_ITMUNI;
+  global.m_p->LengthU() = a_LENUNI;
+  global.m_p->Unstructured() = a_IUNSTR;
 
   if (a_NLAY > 0)
     global.m_p->LAYCBD().assign(a_NLAY, 0);
@@ -416,6 +421,18 @@ const char* MfGlobal::LgrName ()
   return (LPCTSTR)m_p->LgrName();
 }
 //------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+void MfGlobal::Unstructured (int a_)
+{
+  m_p->Unstructured() = a_;
+}
+//------------------------------------------------------------------------------
+int MfGlobal::Unstructured () const
+{
+  return m_p->Unstructured();
+}
+//------------------------------------------------------------------------------
 /// \brief Sets an integer variable by name
 //------------------------------------------------------------------------------
 void MfGlobal::SetIntVar (const char* a_NAME,
@@ -509,7 +526,8 @@ m_intVars(),
 m_export(),
 m_nameFile(),
 m_curModIdx(),
-m_LgrName()
+m_LgrName(),
+m_unstructured(0)
 {
   m_laycbd.push_back(std::vector<int>());
   if (Lay() > 0)
@@ -535,7 +553,8 @@ m_intVars(rhs.m_intVars),
 m_export(),
 m_nameFile(rhs.m_nameFile),
 m_curModIdx(rhs.m_curModIdx),
-m_LgrName(rhs.m_LgrName)
+m_LgrName(rhs.m_LgrName),
+m_unstructured(rhs.m_unstructured)
 {
   for (size_t i=0; i<rhs.m_export.size(); ++i)
   {
@@ -569,6 +588,7 @@ const MfGlobal::impl& MfGlobal::impl::operator= (const MfGlobal::impl &rhs)
     m_nameFile = rhs.m_nameFile;
     m_curModIdx = rhs.m_curModIdx;
     m_LgrName = rhs.m_LgrName;
+    m_unstructured = rhs.m_unstructured;
   }
   return(*this);
 } // MfGlobal::impl::impl

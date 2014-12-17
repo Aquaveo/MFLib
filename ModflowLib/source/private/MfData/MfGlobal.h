@@ -30,6 +30,7 @@ namespace MfData
     MfGlobal(const MfGlobal &rhs);
     const MfGlobal &operator=(const MfGlobal &rhs);
 
+    int Unstructured() const;
     int ModelType();
     int NumRow();
     int NumCol();
@@ -65,6 +66,7 @@ namespace MfData
     void LgrName(const char *a_);
     const char* LgrName();
     void ModelType(int a_modelType);
+    void Unstructured(int a);
 
     static MfGlobal& Get();
     static void Init(int a_modelType,
@@ -82,7 +84,8 @@ namespace MfData
                     int a_NPER,
                     int a_ITMUNI,
                     int a_LENUNI,
-                    const int *a_LAYCBD);
+                    const int *a_LAYCBD,
+                    int a_IUNSTR);
 
   private:
 
@@ -106,7 +109,8 @@ namespace MfData
            int a_NPER,
            int a_ITMUNI,
            int a_LENUNI,
-           const int *a_LAYCBD);
+           const int *a_LAYCBD,
+           int a_IUNSTR);
 }
 
 #endif
