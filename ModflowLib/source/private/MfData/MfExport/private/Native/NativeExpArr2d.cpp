@@ -23,6 +23,55 @@
 using namespace MfData::Export;
 namespace
 {
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+template <typename T>
+void iArrayDataToStream (std::ostream& a_os, const T* a_data,
+                         const int* a_iData, int a_nrow, int a_ncol)
+{
+  if (a_os.bad())
+  {
+    ASSERT(0);
+    return;
+  }
+
+  int w = 0, len;
+  int flg = STR_FULLWIDTH;
+
+  if (a_data)
+  {
+    for (int i=0; i<a_nrow*a_ncol; ++i)
+    {
+      len = STR(a_data[i]).GetLength();
+      if (len > w) w = len;
+    }
+    for (int i=0; i<a_nrow*a_ncol; ++i)
+    {
+      a_os << STR(a_data[i],-1,w,flg) << " ";
+      if (i > 0 && (i+1)%a_ncol == 0) a_os << "\n";
+    }
+  }
+  else
+  {
+    CStr tmp, fmt;
+    for (int i=0; i<a_nrow*a_ncol; ++i)
+    {
+      tmp.Format("%d", a_iData[i]);
+      len = tmp.GetLength();
+      if (len > w) w = len;
+    }
+    tmp.Format("%d", w);
+    fmt = "%" + tmp + "d";
+    for (int i=0; i<a_nrow*a_ncol; ++i)
+    {
+      tmp.Format(fmt, a_iData[i]);
+      a_os << tmp << " ";
+      if (i > 0 && (i+1)%a_ncol == 0) a_os << "\n";
+    }
+  }
+} // NativeExpArr2d::ArrayDataToStream
+//------------------------------------------------------------------------------
 CStr getIprn2dRel (int a_)
 {
   if (a_ < 0 || a_ > 21)
@@ -38,6 +87,7 @@ CStr getIprn2dRel (int a_)
   str.Format("%d", a_);
   return str;
 } // getIprn2dRel 
+//------------------------------------------------------------------------------
 CStr getIprn2dInt (int a_)
 {
   if (a_ < 0 || a_ > 9)
@@ -52,6 +102,7 @@ CStr getIprn2dInt (int a_)
   str.Format("%d", a_);
   return str;
 } // getIprn2dInt
+//------------------------------------------------------------------------------
 bool ClustersExistForParType (ParamList* a_plist,
                               CStr a_partype)
 {
@@ -66,6 +117,7 @@ bool ClustersExistForParType (ParamList* a_plist,
   }
   return false;
 } // ClustersExistForParType
+//------------------------------------------------------------------------------
 void KeysValuesForParType(ParamList* a_plist,
                           CStr a_partype,
                           std::set<double>& a_keys,
@@ -83,6 +135,7 @@ void KeysValuesForParType(ParamList* a_plist,
   }
 
 } // KeysValuesForParType
+//------------------------------------------------------------------------------
 MfData::MfPackage* iGetPackage(MfData::MfGlobal* a_global,
                                const CStr& a_pack)
 {
@@ -95,6 +148,7 @@ MfData::MfPackage* iGetPackage(MfData::MfGlobal* a_global,
   }
   return p;
 } // iGetPackage
+//------------------------------------------------------------------------------
 bool ArealArray (const CStr& a_name)
 {
   bool rval = false;
@@ -117,6 +171,7 @@ bool ArealArray (const CStr& a_name)
     rval = true;
   return rval;
 } // ArealArray
+//------------------------------------------------------------------------------
 static void RemoveLastReturn (CStr& line)
 {
   // remove the last return
@@ -126,6 +181,8 @@ static void RemoveLastReturn (CStr& line)
   }
 } // RemoveLastReturn
 } // unnamed namespace
+
+
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
@@ -137,6 +194,7 @@ NativeExpArr2d::NativeExpArr2d () :
 , m_iPRN(0)
 , m_dataConst(0)
 , m_data(0)
+, m_dataD(nullptr)
 , m_mult(0)
 , m_firstTime(1)
 {
@@ -189,28 +247,37 @@ CStr NativeExpArr2d::ArrayName ()
 bool NativeExpArr2d::GetData ()
 {
   m_name = ArrayName();
-  if (!GetPackage()->GetField(Packages::Array::LAYER, &m_lay) || !m_lay)
+  MfPackage* package = GetPackage();
+  if (!package->GetField(Packages::Array::LAYER, &m_lay) || !m_lay)
   {
     ASSERT(0);
     return false;
   }
-  if (!GetPackage()->GetField(Packages::Array::ARRAY, &m_dataConst) || !m_dataConst ||
-      !GetPackage()->GetField(Packages::Array::MULT, &m_mult) || !m_mult)
+  const double *dataConstDbl(nullptr);
+  if (!package->GetField(Packages::Array::ARRAY, &m_dataConst) || !m_dataConst ||
+      !package->GetField(Packages::Array::MULT, &m_mult) || !m_mult)
   {
-    if (!GetPackage()->GetField(Packages::Array::ARRAY, &m_iData) || !m_iData ||
-        !GetPackage()->GetField(Packages::Array::MULT, &m_iMult) || !m_iMult)
+    if (!package->GetField(Packages::Array::ARRAY, &m_iData) || !m_iData ||
+        !package->GetField(Packages::Array::MULT, &m_iMult) || !m_iMult)
     {
-      ASSERT(0);
-      return false;
+      if (!package->GetField(Packages::Array::ARRAY, &dataConstDbl) || !dataConstDbl ||
+          !package->GetField(Packages::Array::MULT, &m_mult) || !m_mult)
+      {
+        ASSERT(0);
+        return false;
+      }
     }
   }
-  GetPackage()->GetField(Packages::Array::IPRN, &m_iPRN);
+  package->GetField(Packages::Array::IPRN, &m_iPRN);
   m_nrow = GetGlobal()->NumRow();
   m_ncol = GetGlobal()->NumCol();
   m_curSp = GetGlobal()->GetCurrentPeriod();
   if (m_dataConst)
   {
     m_data = const_cast<Real*>(m_dataConst);
+  }
+  if (!m_data && dataConstDbl) {
+    m_dataD = const_cast<double*>(dataConstDbl);
   }
   if (m_name == ARR_BAS_IBND) SaveIbound();
   return true;
@@ -373,19 +440,33 @@ bool NativeExpArr2d::CanDoConstant ()
       (m_iMult && 1 == *m_iMult))
   {
     bool constant(true);
-    for (int i=1; m_mult && i<m_nrow*m_ncol && constant; ++i)
+    if (m_mult && !m_dataD)
     {
-      if (m_data[0] != m_data[i]) constant = false;
+      for (int i=1; i<m_nrow*m_ncol && constant; ++i)
+      {
+        if (m_data[0] != m_data[i]) constant = false;
+      }
     }
-    for (int i=1; m_iMult && i<m_nrow*m_ncol && constant; ++i)
+    else if (m_mult && m_dataD)
     {
-      if (m_iData[0] != m_iData[i]) constant = false;
+      for (int i=1; i<m_nrow*m_ncol && constant; ++i)
+      {
+        if (m_dataD[0] != m_dataD[i]) constant = false;
+      }
+    }
+    else if (m_iMult)
+    {
+      for (int i=1; i<m_nrow*m_ncol && constant; ++i)
+      {
+        if (m_iData[0] != m_iData[i]) constant = false;
+      }
     }
     if (constant)
     {
       CStr str;
-      if (m_mult) str.Format("CONSTANT %s", STR(m_data[0]));
-      else str.Format("CONSTANT %d", m_iData[0]);
+      if (m_mult && !m_dataD)     str.Format("CONSTANT %s", STR(m_data[0]));
+      else if (m_mult && m_dataD) str.Format("CONSTANT %s", STR(m_dataD[0]));
+      else                        str.Format("CONSTANT %d", m_iData[0]);
       AddToStoredLinesDesc(str, "");
       
       SubstituteMultArray();
@@ -406,7 +487,15 @@ bool NativeExpArr2d::WriteInternalArray ()
   str.Format("INTERNAL %s (FREE) %s", StrMult(), StrIprn());
   AddToStoredLinesDesc(str, "");
   std::stringstream os;
-  ArrayDataToStream(os, m_data, m_iData);
+  if (m_dataD)
+  {
+    ArrayDataToStreamDbl(os, m_dataD, m_iData);
+  }
+  else
+  {
+    ArrayDataToStream(os, m_data, m_iData);
+  }
+
   str = os.str();
   RemoveLastReturn(str);
   AddToStoredLinesDesc(str, "");
@@ -419,7 +508,14 @@ void NativeExpArr2d::SubstituteMultArray ()
 {
   if (m_name.find(ARR_MLT) == -1) return;
 
-  Parameters::SubstituteArray(m_data, (size_t)(m_nrow*m_ncol), m_name);
+  if (m_dataD)
+  {
+    Parameters::SubstituteArray(m_dataD, (size_t)(m_nrow*m_ncol), m_name);
+  }
+  else
+  {
+    Parameters::SubstituteArray(m_data, (size_t)(m_nrow*m_ncol), m_name);
+  }
 } // SubstituteMultArray
 //------------------------------------------------------------------------------
 /// \brief
@@ -427,7 +523,14 @@ void NativeExpArr2d::SubstituteMultArray ()
 void NativeExpArr2d::WriteToFile ()
 {
   CStr fname = GetArrayFileName(m_name);
-  ArrayDataToFile(fname, m_data, m_iData);
+  if (m_dataD)
+  {
+    ArrayDataToFileDbl(fname, m_dataD, m_iData);
+  }
+  else
+  {
+    ArrayDataToFile(fname, m_data, m_iData);
+  }
   util::StripPathFromFilename(fname, fname);
   if (GetNative()->GetArraysInFolder())
   {
@@ -449,6 +552,16 @@ void NativeExpArr2d::ArrayDataToFile (const CStr& a_fname,
   ArrayDataToStream(os, a_data, a_iData);
   os.close();
 } // NativeExpArr2d::ArrayDataToFile
+//----- OVERLOAD ---------------------------------------------------------------
+void NativeExpArr2d::ArrayDataToFileDbl (const CStr& a_fname,
+                                      const double* a_data,
+                                      const int*  a_iData)
+{
+  std::fstream os;
+  os.open((LPCTSTR)a_fname, std::ios_base::out);
+  ArrayDataToStreamDbl(os, a_data, a_iData);
+  os.close();
+} // NativeExpArr2d::ArrayDataToFiledbl
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
@@ -456,47 +569,15 @@ void NativeExpArr2d::ArrayDataToStream (std::ostream& a_os,
                                         const Real* a_data,
                                         const int*  a_iData)
 {
-  if (a_os.bad())
-  {
-    ASSERT(0);
-    return;
-  }
-
-  int w = 0, len;
-  int flg = STR_FULLWIDTH;
-
-  if (a_data)
-  {
-    for (int i=0; i<m_nrow*m_ncol; ++i)
-    {
-      len = STR(a_data[i]).GetLength();
-      if (len > w) w = len;
-    }
-    for (int i=0; i<m_nrow*m_ncol; ++i)
-    {
-      a_os << STR(a_data[i],-1,w,flg) << " ";
-      if (i > 0 && (i+1)%m_ncol == 0) a_os << "\n";
-    }
-  }
-  else
-  {
-    CStr tmp, fmt;
-    for (int i=0; i<m_nrow*m_ncol; ++i)
-    {
-      tmp.Format("%d", a_iData[i]);
-      len = tmp.GetLength();
-      if (len > w) w = len;
-    }
-    tmp.Format("%d", w);
-    fmt = "%" + tmp + "d";
-    for (int i=0; i<m_nrow*m_ncol; ++i)
-    {
-      tmp.Format(fmt, a_iData[i]);
-      a_os << tmp << " ";
-      if (i > 0 && (i+1)%m_ncol == 0) a_os << "\n";
-    }
-  }
+  iArrayDataToStream(a_os, a_data, a_iData, m_nrow, m_ncol);
 } // NativeExpArr2d::ArrayDataToStream
+//----- OVERLOAD ---------------------------------------------------------------
+void NativeExpArr2d::ArrayDataToStreamDbl (std::ostream& a_os,
+                                        const double* a_data,
+                                        const int*  a_iData)
+{
+  iArrayDataToStream(a_os, a_data, a_iData, m_nrow, m_ncol);
+} // NativeExpArr2d::ArrayDataToStreamDbl
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
@@ -506,7 +587,7 @@ CStr NativeExpArr2d::StrIprn ()
   if (*m_iPRN < 0) rval = "-1";
   if (rval.IsEmpty())
   {
-    if (m_data) rval = getIprn2dRel(*m_iPRN);
+    if (m_data || m_dataD) rval = getIprn2dRel(*m_iPRN);
     else rval = getIprn2dInt(*m_iPRN);
   }
   return rval;
@@ -517,7 +598,7 @@ CStr NativeExpArr2d::StrIprn ()
 CStr NativeExpArr2d::StrMult ()
 {
   CStr rval;
-  if (m_data) rval = STR(*m_mult);
+  if (m_data || m_dataD) rval = STR(*m_mult);
   else rval.Format("%d", *m_iMult);
   return rval;
 } // NativeExpArr2d::StrMult
@@ -558,7 +639,14 @@ bool NativeExpArr2d::CheckParameters ()
 
   if (Packages::BCF == GetNative()->PackageFromArrayName(m_name))
   {
-    Parameters::SubstituteArray(m_data, (size_t)(m_nrow*m_ncol), m_name);
+    if (m_dataD)
+    {
+      Parameters::SubstituteArray(m_dataD, (size_t)(m_nrow*m_ncol), m_name);
+    }
+    else
+    {
+      Parameters::SubstituteArray(m_data, (size_t)(m_nrow*m_ncol), m_name);
+    }
     return false;
   }
   // get the key values for all parameters of this type
@@ -590,22 +678,22 @@ void NativeExpArr2d::WriteZoneMultArrays (std::set<double>& a_keys,
   {
     if (ibnd[i]) // only worry about active cells
     {
-      if (a_keys.find((double)m_data[i]) == a_keys.end())
+      if (a_keys.find(m_dataD ? m_dataD[i] : (double)m_data[i]) == a_keys.end())
       {
         if (!addParam) EnsureParCluster(-999, a_list);
         addParam = true;
         zone[i] = -999;
-        mlt[i] = (Real)m_data[i];
+        mlt[i] = (Real)(m_dataD ? m_dataD[i] : m_data[i]);
       }
       else
       {
-        zone[i] = (int)m_data[i];
+        zone[i] = (int)(m_dataD ? m_dataD[i] : m_data[i]);
         mlt[i] = 1.0;
         if (foundKeys.find(zone[i]) == foundKeys.end())
         {
           foundKeys.insert(zone[i]);
           // make sure a cluster exists for this parameter in this layer
-          EnsureParCluster(m_data[i], a_list);
+          EnsureParCluster((Real)(m_dataD ? m_dataD[i] : m_data[i]), a_list);
         }
       }
 
