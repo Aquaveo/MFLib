@@ -28,7 +28,6 @@ namespace MfData
     const char * const DE4 = "DE4";
     const char * const DE4Line1 = "DE4Line1";
     const char * const DE4Line2 = "DE4Line2";
-    const char * const SMS = "SMS";
     const char * const BCF = "BCF";
     const char * const LPF = "LPF";
     const char * const HED = "HED";
@@ -97,6 +96,10 @@ namespace MfData
     const char * const LMT6 = "LMT6";
     const char * const BCF6 = "BCF6";
     const char * const HUF2 = "HUF2";
+    // USG
+    const char * const DISU = "DISU";
+    const char * const SMS = "SMS";
+
   }
 }
 #endif

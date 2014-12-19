@@ -50,13 +50,26 @@ bool NativeExpBas::Export ()
   AddToStoredLinesDesc(Line3(), Desc(3));
   Line4();
 
+  MfPackage *pOld = GetPackage(), p(MfData::Packages::BAS6);
+  const char *heading1(nullptr), *heading2(nullptr);
+//  pOld->GetField("HEADNG1", &heading1);
+//  pOld->GetField("HEADNG2", &heading2);
   CStr comment;
   MfData::Packages::GetComments(MfData::Packages::BAS, comment);
+  if (heading1)
+  {
+    if (!comment.IsEmpty()) comment += "\n";
+    comment += heading1;
+  }
+  if (heading2)
+  {
+    if (!comment.IsEmpty()) comment += "\n";
+    comment += heading2;
+  }
   if (!comment.IsEmpty())
   {
     MfData::Packages::Comment(MfData::Packages::BAS6, comment);
   }
-  MfPackage *pOld = GetPackage(), p(MfData::Packages::BAS6);
   SetData(GetNative(), GetGlobal(), &p);
   AddToStoredLinesDesc(pOld->StringsToWrite(), pOld->StringDescriptions());
   WriteComments();

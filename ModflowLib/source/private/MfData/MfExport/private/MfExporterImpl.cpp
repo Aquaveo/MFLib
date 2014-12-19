@@ -252,6 +252,8 @@ void MfExporterImpl::InitExtensions ()
   m_types.insert(std::make_pair(NWT,NWT));
   m_types.insert(std::make_pair(MNW2,MNW2));
   m_types.insert(std::make_pair(MNWI,MNWI));
+  m_types.insert(std::make_pair(DISU, DISU));
+  m_types.insert(std::make_pair(SMS, SMS));
 
   m_exp->SetTypesToExtensions(m_types);
 } // MfExporterImpl::InitExtensions
