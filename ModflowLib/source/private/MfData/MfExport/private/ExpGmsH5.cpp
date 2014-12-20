@@ -8963,7 +8963,7 @@ void ExpGmsH5T::testSupportedPackage ()
   TS_ASSERT(!t->IsTypeSupported(VSC));
   TS_ASSERT(t->IsTypeSupported(ZON));
 
-  TS_ASSERT(e.m_types.size() == 43);
+  TS_ASSERT(e.m_types.size() == 45);
 }
 //------------------------------------------------------------------------------
 void ExpGmsH5T::testexpNameFile ()
