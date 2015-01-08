@@ -30,7 +30,12 @@ namespace MfData
       void Lines2and3();
       std::vector<CStr> Line4();
       std::vector<CStr> Line6();
+      CStr KijijFactToStr (const Real* a_, int a_idx, int a_rowSize);
 
+      bool m_usg;
+      int  m_nI, m_nJ;
+      int  m_VAL_ROW_SIZE;
+      int  m_HFB_ROW_SIZE;
     };
 
   }

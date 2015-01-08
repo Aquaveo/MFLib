@@ -52,7 +52,13 @@ NativeExpStr::NativeExpStr () :
   m_mapParKeyVal()
 , m_mapParSegKey()
 , m_mapParSegInstances()
+, m_usg(false)
+, m_nI(0)
+, m_nJ(0)
 {
+  m_usg = MfData::MfGlobal::Get().ModelType() == MfData::USG;
+  m_nI = MfData::MfGlobal::Get().NumRow();
+  m_nJ = MfData::MfGlobal::Get().NumCol();
 } // MfNativeExpStr::MfNativeExpStr
 //------------------------------------------------------------------------------
 /// \brief
@@ -176,6 +182,10 @@ CStr NativeExpStr::Line6FromData (int i,
   std::map<int, double>& mapPar = GetParamMap();
 
   ck    = ForElement(istrm, 1, i, 5);
+  if (m_usg)
+  {
+    ck = ck / (m_nI*m_nJ) + 1;
+  }
   ci    = ForElement(istrm, 2, i, 5);
   cj    = ForElement(istrm, 3, i, 5);
   seg   = ForElement(istrm, 4, i, 5);
@@ -373,8 +383,8 @@ void NativeExpStr::CheckParameters ()
       a_p->GetField(Packages::STRpack::ITRBAR, &itrbar) && itrbar &&
       a_p->GetField(Packages::STRpack::IDIVAR, &idivar) && idivar)
   {
-    CStr wFlg("a");
-    if (GetGlobal()->GetCurrentPeriod() == 1) wFlg = "w";
+    CStr wFlg("ab");
+    if (GetGlobal()->GetCurrentPeriod() == 1) wFlg = "wb";
     FILE *fp = fopen(StrTmpFileName().c_str(), wFlg.c_str());
     int cnt = *itmp;
     fwrite(itmp, sizeof(int), 1, fp);
@@ -441,7 +451,7 @@ std::map<int, double>& NativeExpStr::GetParamMap ()
 void NativeExpStr::WriteParDefAndStressToTmp (std::vector<int>& a_parSeg)
 {
   // open the tmp file with the stream data
-  FILE *fp = fopen(StrTmpFileName().c_str(), "r");
+  FILE *fp = fopen(StrTmpFileName().c_str(), "rb");
   if (!fp) return;
 
   // set up the num instances for each segment parameter

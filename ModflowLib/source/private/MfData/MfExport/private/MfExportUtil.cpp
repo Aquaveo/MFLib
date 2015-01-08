@@ -52,7 +52,8 @@ MfExporterImpl* MfExportUtil::CreateExporter (const char *a_type)
     ret = new Mf2kNative;
     if (ret) ((Mf2kNative*)ret)->SetArraysInFolder(true);
   }
-  else if (type == "-exporttext_arraysinternal")
+  else if (type == "-exporttext_arraysinternal" ||
+           type == "-exporttextai")
   {
     ret = new Mf2kNative;
     if (ret) ((Mf2kNative*)ret)->SetArraysInternal(true);

@@ -139,6 +139,7 @@ module module_aquaveo
         if (arg1.eq.'-exportText') flag=1
         if (arg1.eq.'-exportText_ArraysInFolder') flag=1
         if (arg1.eq.'-exportText_ArraysInternal') flag=1
+        if (arg1.eq.'-exportTextAI') flag=1
         if (arg1.eq.'-exportGeoDB') flag=1
         if (arg1.eq.'-exportGeoDBFree') flag=1
         if (arg1.eq.'-exportSQLite') flag=1

@@ -11,7 +11,7 @@
 #include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\MfData\MfExport\private\TxtExporter.h>
 //#include <private\MfData\MfExport\private\Native\NativeUtil.h>
-//#include <private\MfData\MfGlobal.h>
+#include <private\MfData\MfGlobal.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
 //#include <private\MfData\Packages\MfPackStrings.h>
@@ -19,15 +19,18 @@
 #include <private\Parameters\Param.h>
 #include <private\Parameters\ParamList.h>
 
-const int VAL_ROW_SIZE=6;
-const int HFB_ROW_SIZE = 7;
-
 using namespace MfData::Export;
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
 NativeExpHfb::NativeExpHfb ()
+: m_usg(false)
+, m_VAL_ROW_SIZE(6)
+, m_HFB_ROW_SIZE(7)
 {
+  m_usg = MfData::MfGlobal::Get().ModelType() == MfData::USG;
+  m_nI = MfData::MfGlobal::Get().NumRow();
+  m_nJ = MfData::MfGlobal::Get().NumCol();
 } // MfNativeExpHfb::MfNativeExpHfb
 //------------------------------------------------------------------------------
 /// \brief
@@ -92,7 +95,6 @@ CStr NativeExpHfb::Line1 ()
 { //NPHFB MXFB NHFBNP Option
   CStr rval;
 
-  const int VAL_ROW_SIZE=6;
   const int* nhfbnp(0);
   if (GetPackage()->GetField(Packages::HFBpack::NHFBNP, &nhfbnp) && nhfbnp)
   {
@@ -101,7 +103,7 @@ CStr NativeExpHfb::Line1 ()
     std::map<CStr, std::vector<Real> >::iterator it(par.begin());
     for (; it != par.end(); ++it)
     {
-      mxfb += (int)it->second.size()/VAL_ROW_SIZE;
+      mxfb += (int)it->second.size()/m_VAL_ROW_SIZE;
     }
     rval.Format("%d %d %d", nphfb, mxfb, *nhfbnp);
   }
@@ -124,7 +126,7 @@ void NativeExpHfb::Lines2and3 ()
   {
     CStr pname = it->first;
     std::vector<Real>& values = it->second;
-    size_t nlst = values.size()/VAL_ROW_SIZE;
+    size_t nlst = values.size()/m_VAL_ROW_SIZE;
 
     ParamList *list(0);
     Parameters::GetParameterList(&list);
@@ -141,16 +143,7 @@ void NativeExpHfb::Lines2and3 ()
       AddToStoredLinesDesc(s, Desc(2));
       for (size_t i = 0; i < nlst; ++i)
       {
-        int lay = static_cast<int>(values[(i*VAL_ROW_SIZE)+0]);
-        int row1 = static_cast<int>(values[(i*VAL_ROW_SIZE)+1]);
-        int col1 = static_cast<int>(values[(i*VAL_ROW_SIZE)+2]);
-        int row2 = static_cast<int>(values[(i*VAL_ROW_SIZE)+3]);
-        int col2 = static_cast<int>(values[(i *VAL_ROW_SIZE)+4]);
-        Real factor = values[(i*VAL_ROW_SIZE)+5];
-
-        // Line 3: Layer IROW1 ICOL1 IROW2 ICOL2 Factor
-        s.Format("%d %d %d %d %d %s ", lay, row1, col1, row2, col2,
-                                        STR(factor));
+        s = KijijFactToStr(&values[0], (int)i, m_VAL_ROW_SIZE);
         AddToStoredLinesDesc(s, Desc(3));
       }
     }
@@ -171,16 +164,8 @@ std::vector<CStr> NativeExpHfb::Line4 ()
 
   for (int i = 0; i < *nhfbnp; ++i)
   {
-    int lay = static_cast<int>(hfb[(i*HFB_ROW_SIZE)+0]);
-    int row1 = static_cast<int>(hfb[(i*HFB_ROW_SIZE)+1]);
-    int col1 = static_cast<int>(hfb[(i*HFB_ROW_SIZE)+2]);
-    int row2 = static_cast<int>(hfb[(i*HFB_ROW_SIZE)+3]);
-    int col2 = static_cast<int>(hfb[(i *HFB_ROW_SIZE)+4]);
-    Real hydc = hfb[(i*HFB_ROW_SIZE)+5];
-
     // Line 4: Layer IROW1 ICOL1 IROW2 ICOL2 Hydchr
-    CStr s;
-    s.Format("%d %d %d %d %d %s ", lay, row1, col1, row2, col2, STR(hydc));
+    CStr s = KijijFactToStr(hfb, i, m_HFB_ROW_SIZE);
     rval.push_back(s);
   }
 
@@ -203,6 +188,43 @@ std::vector<CStr> NativeExpHfb::Line6 ()
   }
   return rval;
 } // NativeExpHfb::Line6
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+CStr NativeExpHfb::KijijFactToStr (
+  const Real* a_,
+  int a_idx,
+  int a_rowSize)
+{
+  int k_loc(0), r_loc(1), c_loc(2);
+  if (m_usg)
+  {
+    k_loc = 2;
+    r_loc = 0;
+    c_loc = 1;
+  }
+
+  int lay  = static_cast<int>(a_[(a_idx*a_rowSize)+k_loc]);
+  int row1 = static_cast<int>(a_[(a_idx*a_rowSize)+r_loc]);
+  int col1 = static_cast<int>(a_[(a_idx*a_rowSize)+c_loc]);
+  int row2 = static_cast<int>(a_[(a_idx*a_rowSize)+3]);
+  int col2 = static_cast<int>(a_[(a_idx*a_rowSize)+4]);
+  Real hydc = a_[(a_idx*a_rowSize)+5];
+
+  if (m_usg)
+  {
+    int c1 = row1, c2 = col1;
+    row1 = ( (c1-1)/m_nJ ) % m_nI + 1;
+    col1 = (c1-1) % m_nJ + 1;
+    row2 = ( (c2-1)/m_nJ ) % m_nI + 1;
+    col2 = (c2-1) % m_nJ + 1;
+  }
+
+  CStr s;
+  s.Format("%d %d %d %d %d %s ", lay, row1, col1, row2, col2, STR(hydc));
+  return s;
+} // NativeExpHfb::KijijFactToStr
+
 ///////////////////////////////////////////////////////////////////////////////
 // TESTS
 ///////////////////////////////////////////////////////////////////////////////

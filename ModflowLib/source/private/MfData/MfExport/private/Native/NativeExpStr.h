@@ -83,7 +83,8 @@ namespace MfData
       std::map<int, int>    m_mapParSegKey;
       std::map<int, int>    m_mapParSegInstances;
       std::map<int, int>    m_mapParSegNlst;
-
+      bool m_usg;
+      int m_nI, m_nJ;
     };
 
   }
