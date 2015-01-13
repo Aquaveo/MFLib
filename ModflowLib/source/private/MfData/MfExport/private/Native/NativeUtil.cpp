@@ -17,6 +17,7 @@
 #include <private\MfData\MfExport\private\Native\NativeExpEts.h>
 #include <private\MfData\MfExport\private\Native\NativeExpEvt.h>
 #include <private\MfData\MfExport\private\Native\NativeExpGag.h>
+#include <private\MfData\MfExport\private\Native\NativeExpGnc.h>
 #include <private\MfData\MfExport\private\Native\NativeExpHfb.h>
 #include <private\MfData\MfExport\private\Native\NativeExpHuf.h>
 #include <private\MfData\MfExport\private\Native\NativeExpLak.h>
@@ -184,6 +185,7 @@ NativePackExp* NativeUtil::CreatePackExp (Mf2kNative* a_native,
   else if (UzfPack(type))                       ret = new NativeExpUzf();
   else if (StrPack(type))                       ret = new NativeExpStr();
   else if (LgrPack(type))                       ret = new NativeExpLgr();
+  else if (Packages::GNC == type)               ret = new NativeExpGnc();
 
   // leave at end. This is the last "package" processed
   else if ("STP" == type)                       ret = new NativeExpSTP();

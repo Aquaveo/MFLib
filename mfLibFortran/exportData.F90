@@ -288,6 +288,21 @@ module module_exportData
         END SUBROUTINE mfLibExp_RCH
 !     ------------------------------------------------------------------
 !      Declare the C function
+        SUBROUTINE mfLibExp_Gnc1(NPGNCn,MXGNn,NGNCNPn,MXADJn,I2Kn,ISYMGNCn,IFLALPHAn,IPRGNCn,N1,N2,GNCn)
+          INTEGER      NPGNCn [REFERENCE]
+          INTEGER      MXGNn [REFERENCE]
+          INTEGER      NGNCNPn [REFERENCE]
+          INTEGER      MXADJn [REFERENCE]
+          INTEGER      I2Kn [REFERENCE]
+          INTEGER      ISYMGNCn [REFERENCE]
+          INTEGER      IFLALPHAn [REFERENCE]
+          INTEGER      IPRGNCn [REFERENCE]
+          INTEGER      N1 [REFERENCE]
+          INTEGER      N2 [REFERENCE]
+          DIMENSION    GNCn (*)
+        END SUBROUTINE mfLibExp_Gnc1
+!     ------------------------------------------------------------------
+!      Declare the C function
         SUBROUTINE mfLibExp_SingleValInt(PACKNAME,NAME,VAL)
           CHARACTER     PACKNAME (*)
           CHARACTER     NAME (*)
@@ -1025,7 +1040,8 @@ module module_exportData
   public:: exp_GeoDB, exp_GLO1BAS6DF, exp_GLO1BAS6RP, &
            exp_ListPackage, exp_SipPackage, exp_De4Line1, exp_De4Line2, &
            exp_SorPackage, exp_PcgPackage, exp_LmgPackage, exp_GmgPackage, &
-           exp_SmsPackage, exp_SmsXmdPackage, exp_SmsPcguPackage
+           exp_SmsPackage, exp_SmsXmdPackage, exp_SmsPcguPackage, &
+           exp_Gnc1
   save
   REAL    ::  m_LMG_STOR1, m_LMG_STOR2, m_LMG_STOR3
   integer ::  m_LMG_ICG
@@ -1382,6 +1398,22 @@ module module_exportData
     if (NOT(ed_getExportData())) return
     call mfLibExp_RCH(NRCHOP,INRECH,INIRCH)
   end subroutine exp_RCHPackage
+
+  !-----------------------------------------------------------------------------
+  ! BRIEF:  
+  !-----------------------------------------------------------------------------
+  subroutine exp_Gnc1 (NPGNCn,MXGNn,NGNCNPn,MXADJn,I2Kn,ISYMGNCn,IFLALPHAn, &
+                      IPRGNCn,N1,N2,GNCn)
+    implicit none
+    integer, intent(in) :: NPGNCn,MXGNn,NGNCNPn,MXADJn,I2Kn,ISYMGNCn,&
+                           IFLALPHAn,IPRGNCn
+    integer, intent(in) :: N1, N2
+    real, intent(in)    :: GNCn(N1,N2)
+
+    if (NOT(ed_getExportData())) return
+    call mfLibExp_Gnc1(NPGNCn,MXGNn,NGNCNPn,MXADJn,I2Kn,ISYMGNCn,IFLALPHAn, &
+                      IPRGNCn,N1,N2,GNCn)
+  end subroutine exp_Gnc1
 
   !-----------------------------------------------------------------------------
   ! BRIEF:  

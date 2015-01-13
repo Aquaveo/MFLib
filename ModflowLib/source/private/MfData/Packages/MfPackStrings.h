@@ -15,6 +15,7 @@ namespace MfData
     const char * const DRN = "DRN";
     const char * const DRT = "DRT";
     const char * const GHB = "GHB";
+    const char * const GNC = "GNC";
     const char * const CHD = "CHD";
     const char * const EVT = "EVT";
     const char * const ETS = "ETS";

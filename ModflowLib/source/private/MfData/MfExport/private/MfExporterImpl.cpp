@@ -222,6 +222,7 @@ void MfExporterImpl::InitExtensions ()
   m_types.insert(std::make_pair(GHB, GHB));
   m_types.insert(std::make_pair(GLOBAL, "glo"));
   m_types.insert(std::make_pair(GMG, GMG));
+  m_types.insert(std::make_pair(GNC, GNC));
   m_types.insert(std::make_pair(HFB, "hfb"));
   m_types.insert(std::make_pair(HUF2, HUF));
   m_types.insert(std::make_pair(HUF, HUF));

@@ -193,6 +193,20 @@ namespace MfData
       const char * const INRECH = "RCH_INRECH";
       const char * const INIRCH = "RCH_INIRCH";
     }
+    namespace GNCpack
+    {
+      const char * const NPGNCn = "NPGNCn";
+      const char * const MXGNn = "MXGNn";
+      const char * const NGNCNPn = "NGNCNPn";
+      const char * const MXADJn = "MXADJn";
+      const char * const I2Kn = "I2Kn";
+      const char * const ISYMGNCn = "ISYMGNCn";
+      const char * const IFLALPHAn = "IFALPHAn";
+      const char * const IPRGNCn = "IPRGNCn";
+      const char * const N1 = "N1";
+      const char * const N2 = "N2";
+      const char * const GNCn = "GNCn";
+    }
     namespace LPFpack
     {
       const char * const NLAY = "NLAY";

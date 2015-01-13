@@ -156,6 +156,17 @@ namespace MfData
   bool RCH(const int *a_NRCHOP,
            const int *a_INRECH,
            const int *a_INIRCH);
+  bool GNC1(const int *a_NPGNCn,
+           const int *a_MXGNn,
+           const int *a_NGNCNPn,
+           const int *a_MXADJn,
+           const int *a_I2Kn,
+           const int *a_ISYMGNCn,
+           const int *a_IFLALPHAn,
+           const int *a_IPRGNCn,
+           const int* a_N1,
+           const int* a_N2,
+           const Real* a_GNCn);
   bool Head(const int* a_iper,
             const int* a_ncol,
             const int* a_nrow,

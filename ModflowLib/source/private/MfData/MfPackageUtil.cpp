@@ -473,6 +473,45 @@ void MfData::Packages::RCHPackage (const int *a_NRCHOP,
   MfData::Get().Export(p->PackageName());
 } // MfData::Packages::RCHPackage
 //------------------------------------------------------------------------------
+/// \brief This receives the data that belongs to the GNC package
+/// \param a_N1: The first dimension of the array.
+/// \param a_N2: The second dimension of the array.
+//------------------------------------------------------------------------------
+void MfData::Packages::GNCPackage1 (const int *a_NPGNCn,
+                                   const int *a_MXGNn,
+                                   const int *a_NGNCNPn,
+                                   const int *a_MXADJn,
+                                   const int *a_I2Kn,
+                                   const int *a_ISYMGNCn,
+                                   const int *a_IFLALPHAn,
+                                   const int *a_IPRGNCn,
+                                   const int *a_N1,
+                                   const int *a_N2,
+                                   const Real *a_GNCn)
+{
+  MfPackage pack(GNC);
+  MfPackage *p(MfData::Get().GetPackage(GNC));
+  bool exists(p ? 1 : 0);
+  if (!exists)
+    p = &pack;
+
+  p->SetField(MfData::Packages::GNCpack::NPGNCn, a_NPGNCn);
+  p->SetField(MfData::Packages::GNCpack::MXGNn, a_MXGNn);
+  p->SetField(MfData::Packages::GNCpack::NGNCNPn, a_NGNCNPn);
+  p->SetField(MfData::Packages::GNCpack::MXADJn, a_MXADJn);
+  p->SetField(MfData::Packages::GNCpack::I2Kn, a_I2Kn);
+  p->SetField(MfData::Packages::GNCpack::ISYMGNCn, a_ISYMGNCn);
+  p->SetField(MfData::Packages::GNCpack::IFLALPHAn, a_IFLALPHAn);
+  p->SetField(MfData::Packages::GNCpack::IPRGNCn, a_IPRGNCn);
+  p->SetField(MfData::Packages::GNCpack::N1, a_N1);
+  p->SetField(MfData::Packages::GNCpack::N2, a_N2);
+  p->SetField(MfData::Packages::GNCpack::GNCn, a_GNCn);
+
+  if (!exists)
+    MfData::Get().AddPackage(p);
+  MfData::Get().Export(p->PackageName());
+} // MfData::Packages::GNCPackage1
+//------------------------------------------------------------------------------
 /// \brief 
 //------------------------------------------------------------------------------
 void MfData::Packages::Head (const int* a_iper,
@@ -1310,7 +1349,7 @@ static bool GetPilotPar (const char *PNAME,
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-static bool ParamWithPackageValue(const char *PNAME,
+static bool ParamWithPackageValue (const char *PNAME,
                                   const char *PTYPE,
                                   const Real *PVAL,
                                   Param &par)
@@ -1836,10 +1875,13 @@ bool MfData::Packages::GetPackNameFromParameter (MfData::MfPackage* a_package,
     a_name = CHD;
   else if (p.CompareNoCase("HFB") == 0)
     a_name = HFB;
+  else if (p.CompareNoCase("GNC") == 0)
+    a_name = GNC;
   else
     return false;
   return true;
 } // MfData::Packages::GetPackNameFromParameter
+//------------------------------------------------------------------------------
 static bool iGetParSrcDestFields (const CStr& a_packName,
                                   std::vector<CStr>& srcFields,
                                   std::vector<CStr>& destFields,

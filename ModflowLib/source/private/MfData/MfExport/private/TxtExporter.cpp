@@ -160,7 +160,7 @@ CStr TxtExporter::GetExtension (const char *a_type)
 //------------------------------------------------------------------------------
 /// \brief Sets the allowed types and the matching extensions
 //------------------------------------------------------------------------------
-void TxtExporter::SetTypesToExtensions(const std::map<CStr, CStr> &a_)
+void TxtExporter::SetTypesToExtensions (const std::map<CStr, CStr> &a_)
 {
   m_p->SetTypesToExtensions(a_);
 } // TxtExporter::SetTypesToExtensions
@@ -336,7 +336,7 @@ CStr TxtExporter::impl::GetExtension (const char *a_type)
 //------------------------------------------------------------------------------
 /// \brief Sets the allowed types and the matching extensions
 //------------------------------------------------------------------------------
-void TxtExporter::impl::SetTypesToExtensions(const std::map<CStr, CStr> &a_)
+void TxtExporter::impl::SetTypesToExtensions (const std::map<CStr, CStr> &a_)
 {
   m_ext = a_;
 } // TxtExporter::impl::SetTypesToExtensions

@@ -295,6 +295,9 @@
     <ClCompile Include="source\private\samg\samg.cpp">
       <Filter>source\private\samg</Filter>
     </ClCompile>
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpGnc.cpp">
+      <Filter>source\private\MfData\MfExport\private\Native</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Export.h">
@@ -824,6 +827,9 @@
     </ClInclude>
     <ClInclude Include="source\private\samg\samg.h">
       <Filter>source\private\samg</Filter>
+    </ClInclude>
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpGnc.h">
+      <Filter>source\private\MfData\MfExport\private\Native</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

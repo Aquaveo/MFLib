@@ -515,7 +515,7 @@ DLLEXPORT void MFLIBEXP_ET (const char *a_PACK,
              a_NETSEG, a_INSGDF);
 } // MFLIBEXP_ET
 //------------------------------------------------------------------------------
-/// \brief This is the data associated with the EVT package
+/// \brief This is the data associated with the RCH package
 //------------------------------------------------------------------------------
 DLLEXPORT void MFLIBEXP_RCH (const int *a_NRCHOP,
                              const int *a_INRECH,
@@ -523,6 +523,24 @@ DLLEXPORT void MFLIBEXP_RCH (const int *a_NRCHOP,
 {
   MfData::RCH(a_NRCHOP, a_INRECH, a_INIRCH);
 } // MFLIBEXP_RCH
+//------------------------------------------------------------------------------
+/// \brief This is the data associated with the GNC package
+//------------------------------------------------------------------------------
+DLLEXPORT void MFLIBEXP_GNC1 (const int *a_NPGNCn,
+                             const int *a_MXGNn,
+                             const int *a_NGNCNPn,
+                             const int *a_MXADJn,
+                             const int *a_I2Kn,
+                             const int *a_ISYMGNCn,
+                             const int *a_IFLALPHAn,
+                             const int *a_IPRGNCn,
+                             const int *a_N1,
+                             const int *a_N2,
+                             const Real *a_GNCn)
+{
+  MfData::GNC1(a_NPGNCn, a_MXGNn, a_NGNCNPn, a_MXADJn, a_I2Kn, a_ISYMGNCn,
+               a_IFLALPHAn, a_IPRGNCn, a_N1, a_N2, a_GNCn);
+} // MFLIBEXP_GNC1
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------

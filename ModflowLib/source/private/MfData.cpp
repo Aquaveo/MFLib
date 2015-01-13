@@ -656,6 +656,43 @@ bool MfData::RCH (const int *a_NRCHOP,
   return true;
 } // MfData::RCH
 //------------------------------------------------------------------------------
+/// \brief This receives the data that belongs to the GNC package
+/// \param a_N1: The first dimension of the array.
+/// \param a_N2: The second dimension of the array.
+//------------------------------------------------------------------------------
+bool MfData::GNC1 (const int *a_NPGNCn,
+                  const int *a_MXGNn,
+                  const int *a_NGNCNPn,
+                  const int *a_MXADJn,
+                  const int *a_I2Kn,
+                  const int *a_ISYMGNCn,
+                  const int *a_IFLALPHAn,
+                  const int *a_IPRGNCn,
+                  const int *a_N1,
+                  const int *a_N2,
+                  const Real *a_GNCn)
+{
+  if (!a_NPGNCn ||
+      !a_MXGNn ||
+      !a_NGNCNPn ||
+      !a_MXADJn ||
+      !a_I2Kn ||
+      !a_ISYMGNCn ||
+      !a_IFLALPHAn ||
+      !a_IPRGNCn ||
+      !a_N1 ||
+      !a_N2 ||
+      !a_GNCn)
+  {
+    util::NullFuncArg(__FILE__, __LINE__);
+    return false;
+  }
+
+  MfData::Packages::GNCPackage1(a_NPGNCn, a_MXGNn, a_NGNCNPn, a_MXADJn, a_I2Kn,
+                       a_ISYMGNCn, a_IFLALPHAn, a_IPRGNCn, a_N1, a_N2, a_GNCn);
+  return true;
+} // MfData::GNC1
+//------------------------------------------------------------------------------
 /// \brief 
 //------------------------------------------------------------------------------
 bool MfData::Head (const int* a_iper,
