@@ -120,6 +120,7 @@ void NativeExpGnc::Line4 ()
 // TESTS
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
+#if 0
 
 #include <private\MfData\MfExport\private\Native\NativeExpGnc.t.h>
 
@@ -152,4 +153,5 @@ void NativeExpGncT::testCreateClass ()
   TS_ASSERT(m_p);
 } // NativeExpGncT::testCreateClass
 
+#endif
 #endif
