@@ -120,7 +120,6 @@ void NativeExpGnc::Line4 ()
 // TESTS
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
-#if 0
 
 #include <private\MfData\MfExport\private\Native\NativeExpGnc.t.h>
 
@@ -137,7 +136,7 @@ void NativeExpGncT::setUp ()
   m_p = NULL;
   Mf2kNative* n = new Mf2kNative;
   MfGlobal* g= new MfGlobal(10, 15, 3, 2, 3, 2, 0);
-  MfPackage* dis = new MfPackage(Packages::RCH);
+  MfPackage* dis = new MfPackage(Packages::GNC);
   NativePackExp* p = NativeUtil::CreatePackExp(n, g, dis);
   m_p = dynamic_cast<NativeExpGnc*>(p);
 } // NativeExpGncT::setUp
@@ -153,5 +152,4 @@ void NativeExpGncT::testCreateClass ()
   TS_ASSERT(m_p);
 } // NativeExpGncT::testCreateClass
 
-#endif
 #endif

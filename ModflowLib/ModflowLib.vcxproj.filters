@@ -831,6 +831,9 @@
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpGnc.h">
       <Filter>source\private\MfData\MfExport\private\Native</Filter>
     </ClInclude>
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpGnc.t.h">
+      <Filter>source\private\MfData\MfExport\private\Native</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="CxxTest">

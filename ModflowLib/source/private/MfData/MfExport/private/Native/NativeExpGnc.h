@@ -14,7 +14,7 @@ namespace MfData
   {
     class NativeExpGnc : public NativePackExp
     {
-      //friend NativeExpGncT;
+      friend NativeExpGncT;
     public:
       NativeExpGnc();
       ~NativeExpGnc();

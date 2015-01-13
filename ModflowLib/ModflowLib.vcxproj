@@ -1044,6 +1044,7 @@ build_test_runner.bat
     <ClInclude Include="source\private\MfData.h" />
     <ClInclude Include="source\private\MfData.t.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpGnc.h" />
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpGnc.t.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpLgr.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpLgr.t.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NeArealPar.h" />
