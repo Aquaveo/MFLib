@@ -27,6 +27,15 @@ namespace MfData
                  const int *a_LENUNI,
                  const int *a_LAYCBD,
                  const int *a_IUNSTR);
+  bool Disu1 (const int *a_NODES,
+              const int *a_NJAG,
+              const int *a_IVSD,
+              const int *a_IDSYMRD);
+  bool Disu2 (const int *a_NODLAY);
+  bool Disu3 (const Real* a_PERLEN,
+              const int* a_NSTP,
+              const Real* a_TSMULT,
+              const int* a_ISSFLG);
   bool DisPackage2(const Real *a_DELR,
                    const Real *a_DELC,
                    const int *a_NBTOM,

@@ -14,7 +14,13 @@
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
+
+namespace { // unnamed namespace
+
+} // unnamed namespace
+
 using namespace MfData::Export;
+
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
@@ -32,47 +38,51 @@ NativeExpArr1d::~NativeExpArr1d ()
 //------------------------------------------------------------------------------
 bool NativeExpArr1d::Export ()
 {
-  CStr name(GetPackage()->PackageName());
   const int  *JJ(0), *IPRN(0);
   const Real *ARR(0), *MULT(0);
-  if (!GetPackage()->GetField("ARR", &ARR) || !ARR ||
-      !GetPackage()->GetField("MULT", &MULT) || !MULT ||
-      !GetPackage()->GetField("JJ", &JJ) || !JJ ||
-      !GetPackage()->GetField("IPRN", &IPRN) || !IPRN)
+  const double *ARRdbl(0);
+  const int *ARRint(0);
+  const int *K(0);
+  int k = 0;
+
+  MfPackage* p = GetPackage();
+  if ((!p->GetField("ARR", &ARR) || !ARR) &&
+      (!p->GetField("ARR", &ARRdbl) || !ARRdbl) &&
+      (!p->GetField("ARR", &ARRint) || !ARRint)) {
+    ASSERT(0);
+    return false;
+  }
+
+  if (!p->GetField("MULT", &MULT) || !MULT ||
+      !p->GetField("JJ", &JJ) || !JJ ||
+      !p->GetField("IPRN", &IPRN) || !IPRN)
   {
     ASSERT(0);
     return false;
   }
 
-  // see if we can do constant
-  if (1.0 == *MULT)
-  {
-    bool constant(true);
-    for (int i=1; i<*JJ && constant; ++i)
-    {
-      if (ARR[0] != ARR[i]) constant = false;
-    }
-    if (constant)
-    {
-      CStr str;
-      str.Format("CONSTANT %s", STR(ARR[0]));
-      AddToStoredLinesDesc(str, "");
-      return true;
-    }
+  if (!GetPackage()->GetField("K", &K) || !K) {
+    K = &k;
   }
 
-  if (!GetNative()->GetArraysInternal())
-    WriteExternal(JJ, IPRN, ARR, MULT);
-  else
-    WriteInternal(JJ, IPRN, ARR, MULT);
+  // Because ARR can be Real, double or int, we do everything in templates
+  bool rv;
+  if (ARR) {
+    rv = ExportT(JJ, IPRN, ARR, MULT, K);
+  }
+  else if (ARRdbl) {
+    rv = ExportT(JJ, IPRN, ARRdbl, MULT, K);
+  }
+  else {
+    rv = ExportT(JJ, IPRN, ARRint, MULT, K);
+  }
+  return rv;
 
-  return true;
 } // MfNativeExpArr1d::Export
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-void NativeExpArr1d::WriteExternal (const int* JJ, const int* IPRN,
-                                    const Real* ARR, const Real* MULT)
+CStr NativeExpArr1d::GetFname (const int* K)
 {
   CStr name(GetPackage()->PackageName());
   // write the array to a file
@@ -88,14 +98,18 @@ void NativeExpArr1d::WriteExternal (const int* JJ, const int* IPRN,
     CStr dir = path + "arrays";
     ::CreateDirectory(dir, NULL);
   }
-  fname.Format("%s%s%s_array_%s.txt", path, folderStr, fname1, name);
-
-  std::fstream os;
-  os.open((LPCTSTR)fname, std::ios_base::out);
-  if (os.bad()) return;
-  WriteToStream(os, JJ, ARR);
-  os.close();
-
+  if (*K == 0)
+    fname.Format("%s%s%s_array_%s.txt", path, folderStr, fname1, name);
+  else
+    fname.Format("%s%s%s_array_%s_%d.txt", path, folderStr, fname1, name, *K);
+  return fname;
+} // NativeExpArr1d::GetFname
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void NativeExpArr1d::AddLine (const int* IPRN, const Real* MULT,
+                               CStr fname)
+{
   CStr strIprn, strMult;
   strIprn.Format("%5d", *IPRN);
   //if (*IPRN < 0) strIprn = "-1";
@@ -110,37 +124,4 @@ void NativeExpArr1d::WriteExternal (const int* JJ, const int* IPRN,
   CStr str;
   str.Format("OPEN/CLOSE %s %s (FREE) %s", fname, strMult, strIprn);
   AddToStoredLinesDesc(str, "");
-} // NativeExpArr1d::WriteExternal
-//------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
-void NativeExpArr1d::WriteInternal  (const int* JJ, const int* IPRN,
-                                     const Real* ARR, const Real* MULT)
-{
-  CStr str, strIprn, strMult;
-  strIprn.Format("%5d", *IPRN);
-  strMult = STR(*MULT);
-  str.Format("INTERNAL %s (FREE) %s", strMult, strIprn);
-  AddToStoredLinesDesc(str, "");
-  std::stringstream os;
-  WriteToStream(os, JJ, ARR);
-  str = os.str();
-  while (str.at(str.GetLength()-1) == '\n')
-  {
-    str.pop_back();
-  }
-  AddToStoredLinesDesc(str, "");
-} // NativeExpArr1d::WriteInternal
-//------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
-void NativeExpArr1d::WriteToStream (std::ostream& a_os, const int* JJ,
-                                    const Real* ARR)
-{
-  for (int i=0; i<*JJ; ++i)
-  {
-    a_os << STR(ARR[i]) << " ";
-    if (i > 0 && i%10 == 0) a_os << "\n";
-  }
-} // NativeExpArr1d::WriteToStream
-
+} // NativeExpArr1d::AddLine

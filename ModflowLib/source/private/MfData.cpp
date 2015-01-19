@@ -51,7 +51,7 @@ bool MfData::InitGlobal (int a_modelType,
 {
   MfGlobal::Init(a_modelType, a_IGRID, a_exp, a_fileName, a_tables);
   return true;
-} // MfData::Global
+} // MfData::InitGlobal
 //------------------------------------------------------------------------------
 /// \brief This receives the data that belongs to the DIS (discretization)
 /// package.
@@ -71,7 +71,7 @@ bool MfData::SetGlobal (const int *a_NLAY,
   }
   MfData::Set(*a_NROW, *a_NCOL, *a_NLAY, *a_NPER);
   return true;
-} // MfData::Global
+} // MfData::SetGlobal
 //------------------------------------------------------------------------------
 /// \brief This receives the data that belongs to the DIS (discretization)
 /// package.
@@ -100,7 +100,61 @@ bool MfData::SetGlobal (const int *a_NLAY,
   MfData::Set(*a_NROW, *a_NCOL, *a_NLAY, *a_NPER, *a_ITMUNI, *a_LENUNI,
               a_LAYCBD, *a_IUNSTR);
   return true;
-} // MfData::Global
+} // MfData::SetGlobal
+//------------------------------------------------------------------------------
+/// \brief This receives the data that belongs to the DISU (discretization)
+/// package.
+//------------------------------------------------------------------------------
+bool MfData::Disu1 (const int *a_NODES,
+                    const int *a_NJAG,
+                    const int *a_IVSD,
+                    const int *a_IDSYMRD)
+{
+  if (!a_NODES ||
+      !a_NJAG ||
+      !a_IVSD ||
+      !a_IDSYMRD)
+  {
+    util::NullFuncArg(__FILE__, __LINE__);
+    return false;
+  }
+  MfData::Packages::Disu1(a_NODES, a_NJAG, a_IVSD, a_IDSYMRD);
+  return true;
+} // MfData::Disu1
+//------------------------------------------------------------------------------
+/// \brief This receives the data that belongs to the DISU (discretization)
+/// package.
+//------------------------------------------------------------------------------
+bool MfData::Disu2 (const int *a_NODLAY)
+{
+  if (!a_NODLAY)
+  {
+    util::NullFuncArg(__FILE__, __LINE__);
+    return false;
+  }
+  MfData::Packages::Disu2(a_NODLAY);
+  return true;
+} // MfData::Disu2
+//------------------------------------------------------------------------------
+/// \brief This receives the data that belongs to the DISU (discretization)
+/// package.
+//------------------------------------------------------------------------------
+bool MfData::Disu3 (const Real* a_PERLEN,
+                    const int* a_NSTP,
+                    const Real* a_TSMULT,
+                    const int* a_ISSFLG)
+{
+  if (!a_PERLEN ||
+      !a_NSTP ||
+      !a_TSMULT ||
+      !a_ISSFLG)
+  {
+    util::NullFuncArg(__FILE__, __LINE__);
+    return false;
+  }
+  MfData::Packages::Disu3(a_PERLEN, a_NSTP, a_TSMULT, a_ISSFLG);
+  return true;
+} // MfData::Disu3
 //------------------------------------------------------------------------------
 /// \brief This receives the data that belongs to the DIS (discretization)
 /// package.
@@ -135,7 +189,7 @@ bool MfData::DisPackage2 (const Real *a_DELR,
                                a_TSMULT,
                                a_ISSFLG);
   return true;
-} // MfData::DisPack
+} // MfData::DisPackage2
 //------------------------------------------------------------------------------
 /// \brief This receives the data that belongs to the List based packages
 //------------------------------------------------------------------------------

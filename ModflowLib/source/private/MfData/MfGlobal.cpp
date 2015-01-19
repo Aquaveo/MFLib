@@ -416,6 +416,9 @@ void MfGlobal::LgrName (const char* a_)
 {
   m_p->LgrName() = a_;
 } // MfGlobal::LgrName
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
 const char* MfGlobal::LgrName ()
 {
   return (LPCTSTR)m_p->LgrName();

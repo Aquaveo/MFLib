@@ -27,6 +27,15 @@ DLLEXPORT void MFLIBEXP_TABLES(const char *a_arg,
                                int dummy);
 DLLEXPORT void MFLIBEXP_PUTCURRENTPERIOD(const int *a_KPER);
 DLLEXPORT void MFLIBEXP_PUTCURRENTGRID(const int *a_IGRID);
+DLLEXPORT void MFLIBEXP_DISU1(const int *a_NODES,
+                              const int *a_NJAG,
+                              const int *a_IVSD,
+                              const int *a_IDSYMRD);
+DLLEXPORT void MFLIBEXP_DISU2(const int *a_NODLAY);
+DLLEXPORT void MFLIBEXP_DISU3 (const Real* a_PERLEN,
+                               const int* a_NSTP,
+                               const Real* a_TSMULT,
+                               const int* a_ISSFLG);
 DLLEXPORT void MFLIBEXP_DISPACKAGE1(const int *a_NLAY,
                                     const int *a_NROW,
                                     const int *a_NCOL,
@@ -219,6 +228,11 @@ DLLEXPORT void MFLIBEXP_ARRAYVALFLT(const char *a_pckg,
                                     const char *a_name,
                                     int a_dummy1,
                                     const Real *a_flag);
+DLLEXPORT void MFLIBEXP_ARRAYVALDBL(const char *a_pckg,
+                                    int a_dummy,
+                                    const char *a_name,
+                                    int a_dummy1,
+                                    const double *a_flag);
 DLLEXPORT void MFLIBEXP_SINGLEVALSTR(const char *a_pckg,
                                      int a_dummy,
                                      const char *a_name,

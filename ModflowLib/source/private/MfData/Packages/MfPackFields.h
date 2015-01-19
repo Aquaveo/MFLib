@@ -20,6 +20,29 @@ namespace MfData
       const char * const TSMULT = "TSMULT";
       const char * const ISSFLG = "SSorTr";
     }
+    namespace Disu
+    {
+      const char * const LAYCBD = "LAYCBD";
+      const char * const NODES = "NODES";
+      const char * const NJAG = "NJAG";
+      const char * const IVSD = "IVSD";
+      const char * const IDSYMRD = "IDSYMRD";
+      const char * const NODLAY = "NODLAY";
+      const char * const TOP = "TOP";
+      const char * const BOT = "BOT";
+      const char * const AREA = "AREA";
+      const char * const IA = "IA";
+      const char * const JA = "JA";
+      const char * const IVC = "IVC";
+      const char * const CL1 = "CL1";
+      const char * const CL2 = "CL2";
+      const char * const CL12 = "CL12";
+      const char * const FAHL = "FAHL";
+      const char * const PERLEN = "PERLEN";
+      const char * const NSTP = "NSTP";
+      const char * const TSMULT = "TSMULT";
+      const char * const ISSFLG = "ISSFLG";
+    }
     namespace ListPack
     {
       const char * const ITMP = "ITMP";

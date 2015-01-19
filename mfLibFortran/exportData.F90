@@ -42,6 +42,27 @@ module module_exportData
         END SUBROUTINE mfLibExp_putCurrentGrid
 !     ------------------------------------------------------------------
 !      Declare the C function
+        SUBROUTINE mfLibExp_Disu1(NODES,NJAG,IVSD,IDSYMRD)
+          INTEGER NODES [REFERENCE]
+          INTEGER NJAG [REFERENCE]
+          INTEGER IVSD [REFERENCE]
+          INTEGER IDSYMRD [REFERENCE]
+        END SUBROUTINE mfLibExp_Disu1
+!     ------------------------------------------------------------------
+!      Declare the C function
+        SUBROUTINE mfLibExp_Disu2(NODLAY)
+          INTEGER NODLAY (*)
+        END SUBROUTINE mfLibExp_Disu2
+!     ------------------------------------------------------------------
+!      Declare the C function
+        SUBROUTINE mfLibExp_Disu3(PERLEN,NSTP,TSMULT,ISSFLG)
+          REAL PERLEN (*)
+          INTEGER NSTP (*)
+          REAL TSMULT (*)
+          INTEGER ISSFLG (*)
+        END SUBROUTINE mfLibExp_Disu3
+!     ------------------------------------------------------------------
+!      Declare the C function
         SUBROUTINE mfLibExp_DisPackage1(NLAY,NROW,NCOL,NPER,ITMUNI,LENUNI,LAYCBD,IUNSTR)
           INTEGER NLAY [REFERENCE]
           INTEGER NROW [REFERENCE]
@@ -329,6 +350,13 @@ module module_exportData
           CHARACTER     NAME (*)
           DIMENSION     VAL (*)
         END SUBROUTINE mfLibExp_ArrayValFlt
+!     ------------------------------------------------------------------
+!      Declare the C function
+        SUBROUTINE mfLibExp_ArrayValDbl(PACKNAME,NAME,VAL)
+          CHARACTER     PACKNAME (*)
+          CHARACTER     NAME (*)
+          DOUBLE PRECISION VAL (*)
+        END SUBROUTINE mfLibExp_ArrayValDbl
 !     ------------------------------------------------------------------
 !      Declare the C function
         SUBROUTINE mfLibExp_ArrayValInt(PACKNAME,NAME,IVAL)
@@ -1038,6 +1066,7 @@ module module_exportData
      END INTERFACE
 
   public:: exp_GeoDB, exp_GLO1BAS6DF, exp_GLO1BAS6RP, &
+           exp_DISU1, exp_DISU2, exp_DISU3, &
            exp_ListPackage, exp_SipPackage, exp_De4Line1, exp_De4Line2, &
            exp_SorPackage, exp_PcgPackage, exp_LmgPackage, exp_GmgPackage, &
            exp_SmsPackage, exp_SmsXmdPackage, exp_SmsPcguPackage, &
@@ -1100,6 +1129,42 @@ module module_exportData
     !if (NOT(ed_getExportData())) return
     call mfLibExp_putCurrentGrid(IGRID)
   end subroutine exp_putCurrentGrid
+
+  !-----------------------------------------------------------------------------
+  ! BRIEF:  
+  !-----------------------------------------------------------------------------
+  subroutine exp_DISU1 (NODES,NJAG,IVSD,IDSYMRD)
+    implicit none
+    integer, intent(in) :: NODES,NJAG,IVSD,IDSYMRD
+
+    !if (NOT(ed_getExportData())) return
+    call mfLibExp_Disu1(NODES,NJAG,IVSD,IDSYMRD)
+  end subroutine exp_DISU1
+
+  !-----------------------------------------------------------------------------
+  ! BRIEF:  
+  !-----------------------------------------------------------------------------
+  subroutine exp_DISU2 (NODLAY)
+    implicit none
+    integer, intent(in) :: NODLAY(*)
+
+    !if (NOT(ed_getExportData())) return
+    call mfLibExp_Disu2(NODLAY)
+  end subroutine exp_DISU2
+
+  !-----------------------------------------------------------------------------
+  ! BRIEF:  
+  !-----------------------------------------------------------------------------
+  subroutine exp_DISU3 (PERLEN,NSTP,TSMULT,ISSFLG)
+    implicit none
+    real, intent(in) :: PERLEN(*)
+    integer, intent(in) :: NSTP(*)
+    real, intent(in) :: TSMULT(*)
+    integer, intent(in) :: ISSFLG(*)
+
+    !if (NOT(ed_getExportData())) return
+    call mfLibExp_Disu3(PERLEN,NSTP,TSMULT,ISSFLG)
+  end subroutine exp_DISU3
 
   !-----------------------------------------------------------------------------
   ! BRIEF:  
@@ -1583,23 +1648,90 @@ module module_exportData
   end subroutine exp_PES
 
   !-----------------------------------------------------------------------------
+  ! BRIEF:  Replace long unwieldy names with short names from documentation.
+  !-----------------------------------------------------------------------------
+  subroutine FixName (NAME1, NAME2)
+    implicit none
+    character*24, intent(in)  :: NAME1
+    character*24, intent(inout)  :: NAME2
+    
+    if (NAME1 .eq.     'VERT CONNECT INDEX ARRAY') then
+      NAME2 = 'IVC'
+    elseif (NAME1 .eq. '     CONNECTION LENGTH 1') then
+      NAME2 = 'CL1'
+    elseif (NAME1 .eq. '     CONNECTION LENGTH 2') then
+      NAME2 = 'CL2'
+    elseif (NAME1 .eq. '    CONNECTION LENGTH 12') then
+      NAME2 = 'CL12'
+    elseif (NAME1 .eq. '      PERPENDICULAR AREA') then
+      NAME2 = 'FAHL'
+    else
+      NAME2 = NAME1
+    endif
+  end subroutine FixName
+    
+  !-----------------------------------------------------------------------------
   ! BRIEF:  
   !-----------------------------------------------------------------------------
-  subroutine exp_U1DREL (NAME,JJ,ARR,MULT,IPRN)
+  subroutine exp_U1DINT (NAME,JJ,ARR,MULT,K,IPRN)
     implicit none
     character*24, intent(in)  :: NAME
-    integer, intent(in)       :: JJ,IPRN
-    real, intent(in)          :: ARR(JJ),MULT
+    integer, intent(in)       :: JJ,K,IPRN
+    integer, intent(in)       :: ARR(JJ)
+    real, intent(in)          :: MULT
 
 
     if (NOT(ed_getExportData())) return
 
     call mfLibExp_SingleValInt(NAME,'JJ',JJ)
+    call mfLibExp_SingleValInt(NAME,'K',K)
     call mfLibExp_SingleValInt(NAME,'IPRN',IPRN)
     call mfLibExp_SingleValFlt(NAME,'MULT',MULT)
-    call mfLibExp_ArrayValFlt(NAME,'ARR',ARR)
+    call mfLibExp_ArrayValInt(NAME,'ARR',ARR)
     call mfLibExp_ExpPack(NAME)
+  end subroutine exp_U1DINT
+
+  !-----------------------------------------------------------------------------
+  ! BRIEF:  
+  !-----------------------------------------------------------------------------
+  subroutine exp_U1DREL (NAME,JJ,ARR,MULT,K,IPRN)
+    implicit none
+    character*24, intent(in)  :: NAME
+    integer, intent(in)       :: JJ,K,IPRN
+    real, intent(in)          :: ARR(JJ),MULT
+    character*24 NAME2
+
+    if (NOT(ed_getExportData())) return
+
+    call FixName(NAME, NAME2)
+    call mfLibExp_SingleValInt(NAME2,'JJ',JJ)
+    call mfLibExp_SingleValInt(NAME2,'K',K)
+    call mfLibExp_SingleValInt(NAME2,'IPRN',IPRN)
+    call mfLibExp_SingleValFlt(NAME2,'MULT',MULT)
+    call mfLibExp_ArrayValFlt(NAME2,'ARR',ARR)
+    call mfLibExp_ExpPack(NAME2)
   end subroutine exp_U1DREL
+
+  !-----------------------------------------------------------------------------
+  ! BRIEF:  
+  !-----------------------------------------------------------------------------
+  subroutine exp_U1DREL8 (NAME,JJ,ARR,MULT,K,IPRN)
+    implicit none
+    character*24, intent(in)    :: NAME
+    integer, intent(in)         :: JJ,K,IPRN
+    doubleprecision, intent(in) :: ARR(JJ)
+    real, intent(in)            :: MULT
+
+
+    if (NOT(ed_getExportData())) return
+
+    call mfLibExp_SingleValInt(NAME,'JJ',JJ)
+    call mfLibExp_SingleValInt(NAME,'K',K)
+    call mfLibExp_SingleValInt(NAME,'IPRN',IPRN)
+    call mfLibExp_SingleValFlt(NAME,'MULT',MULT)
+    call mfLibExp_ArrayValDbl(NAME,'ARR',ARR)
+    call mfLibExp_ExpPack(NAME)
+  end subroutine exp_U1DREL8
 
   !-----------------------------------------------------------------------------
   ! BRIEF:  

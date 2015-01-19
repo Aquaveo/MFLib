@@ -30,6 +30,75 @@ static std::map<CStr, CStr>& GetCommentsMap()
   //return m_map;
 } // GetCommentMap
 //------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+void MfData::Packages::Disu1 (const int *a_NODES,
+                              const int *a_NJAG,
+                              const int *a_IVSD,
+                              const int *a_IDSYMRD)
+{
+  MfPackage pack(MfData::Packages::DISU);
+  MfPackage *p(MfData::Get().GetPackage(MfData::Packages::DISU));
+  bool exists(p ? 1 : 0);
+  if (!exists)
+    p = &pack;
+  // we have to copy the LAYCBD because MODFLOW changes the values before
+  // we write the file
+  p->SetField(MfData::Packages::Disu::LAYCBD, MfGlobal::Get().LayCbd());
+  p->SetField(MfData::Packages::Disu::NODES, a_NODES);
+  p->SetField(MfData::Packages::Disu::NJAG, a_NJAG);
+  p->SetField(MfData::Packages::Disu::IVSD, a_IVSD);
+  p->SetField(MfData::Packages::Disu::IDSYMRD, a_IDSYMRD);
+  if (!exists)
+    MfData::Get().AddPackage(&pack);
+
+} // MfData::Packages::Disu1
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+void MfData::Packages::Disu2 (const int *a_NODLAY)
+{
+  MfPackage pack(MfData::Packages::DISU);
+  MfPackage *p(MfData::Get().GetPackage(MfData::Packages::DISU));
+  bool exists(p ? 1 : 0);
+  if (!exists)
+    p = &pack;
+
+  // we need to copy the data because modflow changes the values
+  // after they are read
+  int nLay = MfGlobal::Get().NumLay();
+  int* nodlay = util::NewIntArray(nLay);
+  for (int i=0; i<nLay; i++)
+  {
+    nodlay[i] = a_NODLAY[i];
+  }
+
+  p->SetField(MfData::Packages::Disu::NODLAY, nodlay);
+  if (!exists)
+    MfData::Get().AddPackage(&pack);
+} // MfData::Packages::Disu2
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+void MfData::Packages::Disu3 (const Real* a_PERLEN,
+                              const int* a_NSTP,
+                              const Real* a_TSMULT,
+                              const int* a_ISSFLG)
+{
+  MfPackage pack(MfData::Packages::DISU);
+  MfPackage *p(MfData::Get().GetPackage(MfData::Packages::DISU));
+  bool exists(p ? 1 : 0);
+  if (!exists)
+    p = &pack;
+  p->SetField(MfData::Packages::Disu::PERLEN, a_PERLEN);
+  p->SetField(MfData::Packages::Disu::NSTP, a_NSTP);
+  p->SetField(MfData::Packages::Disu::TSMULT, a_TSMULT);
+  p->SetField(MfData::Packages::Disu::ISSFLG, a_ISSFLG);
+  if (!exists)
+    MfData::Get().AddPackage(&pack);
+  MfData::Get().Export(MfData::Packages::DISU);
+} // MfData::Packages::Disu3
+//------------------------------------------------------------------------------
 /// \brief This receives the data that belongs to the DIS (discretization)
 /// package.
 //------------------------------------------------------------------------------

@@ -20,15 +20,87 @@ namespace MfData
       NativeExpArr1d(const NativeExpArr1d& rhs);
       const NativeExpArr1d& operator=(const NativeExpArr1d& rhs);
 
-      void WriteExternal(const int* JJ, const int* IPRN, const Real* ARR,
-                         const Real* MULT);
-      void WriteInternal(const int* JJ, const int* IPRN, const Real* ARR,
-                         const Real* MULT);
-      void WriteToStream(std::ostream& a_os, const int* JJ,const Real* ARR);
-    };
+      CStr GetFname(const int* K);
+      void AddLine(const int* IPRN, const Real* MULT, CStr fname);
 
-  }
-}
+      //------------------------------------------------------------------------
+      template<typename T>
+      bool ExportT (const int* JJ, const int* IPRN, const T* ARR,
+                    const Real* MULT, const int* K)
+      {
+        if (1.0 == *MULT)
+        {
+          if (IsConstant(JJ, ARR))
+          {
+            CStr str;
+            str.Format("CONSTANT %s", STR(ARR[0]));
+            AddToStoredLinesDesc(str, "");
+            return true;
+          }
+        }
+
+        if (!GetNative()->GetArraysInternal())
+          WriteExternal(JJ, IPRN, ARR, MULT, K);
+        else
+          WriteInternal(JJ, IPRN, ARR, MULT);
+
+        return true;
+      } // ExportT
+      //------------------------------------------------------------------------
+      template<typename T>
+      bool IsConstant (const int* JJ, T* ARR) const
+      {
+        bool constant(true);
+        for (int i=1; i<*JJ && constant; ++i) {
+          if (ARR[0] != ARR[i]) constant = false;
+        }
+        return constant;
+      } // IsConstant
+      //------------------------------------------------------------------------
+      template<typename T>
+      void WriteExternal (const int* JJ, const int* IPRN, const T* ARR,
+                          const Real* MULT, const int* K)
+      {
+        CStr fname = GetFname(K);
+        std::fstream os;
+        os.open((LPCTSTR)fname, std::ios_base::out);
+        if (os.bad()) return;
+        WriteToStream(os, JJ, ARR);
+        os.close();
+        AddLine(IPRN, MULT, fname);
+      } // WriteExternal
+      //------------------------------------------------------------------------
+      template<typename T>
+      void WriteInternal  (const int* JJ, const int* IPRN, const T* ARR,
+                           const Real* MULT)
+      {
+        CStr str, strIprn, strMult;
+        strIprn.Format("%5d", *IPRN);
+        strMult = STR(*MULT);
+        str.Format("INTERNAL %s (FREE) %s", strMult, strIprn);
+        AddToStoredLinesDesc(str, "");
+        std::stringstream os;
+        WriteToStream(os, JJ, ARR);
+        str = os.str();
+        while (str.at(str.GetLength()-1) == '\n')
+        {
+          str.pop_back();
+        }
+        AddToStoredLinesDesc(str, "");
+      } // WriteInternal
+      //------------------------------------------------------------------------
+      template<typename T>
+      void WriteToStream (std::ostream& a_os, const int* JJ, const T* ARR) const
+      {
+        for (int i=0; i<*JJ; ++i)
+        {
+          a_os << STR(ARR[i]) << " ";
+          if (i > 0 && i%10 == 0) a_os << "\n";
+        }
+      } // WriteToStream
+    }; // class NativeExpArr1d
+  } // namespace Export
+} // namespace MfData
 
 #endif
 

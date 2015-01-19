@@ -14,6 +14,7 @@
 #include <private\MfData\MfExport\private\Native\NativeExpBas.h>
 #include <private\MfData\MfExport\private\Native\NativeExpBcf.h>
 #include <private\MfData\MfExport\private\Native\NativeExpDis.h>
+#include <private\MfData\MfExport\private\Native\NativeExpDisu.h>
 #include <private\MfData\MfExport\private\Native\NativeExpEts.h>
 #include <private\MfData\MfExport\private\Native\NativeExpEvt.h>
 #include <private\MfData\MfExport\private\Native\NativeExpGag.h>
@@ -154,6 +155,7 @@ NativePackExp* NativeUtil::CreatePackExp (Mf2kNative* a_native,
   else if (MfExportUtil::IsSolver(type))        ret = new NativeExpSolver();
   else if (Packages::NAM == type)               ret = new NativeExpNam();
   else if (Packages::DIS == type)               ret = new NativeExpDis();
+  else if (Packages::DISU == type)              ret = new NativeExpDisu();
   else if (Packages::BAS == type)               ret = new NativeExpBas();
   else if (Packages::BCF == type)               ret = new NativeExpBcf();
   else if ("L98" == type)                       ret = new NativeExpLpf();
@@ -195,7 +197,7 @@ NativePackExp* NativeUtil::CreatePackExp (Mf2kNative* a_native,
     ret->SetData(a_native, a_global, a_package);
   }
   return(ret);
-} // MfExportUtil::GetExporter
+} // MfExportUtil::CreatePackExp
 
 
 #if 0

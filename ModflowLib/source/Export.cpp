@@ -181,6 +181,44 @@ DLLEXPORT void MFLIBEXP_PUTCURRENTGRID (const int *a_IGRID)
 } // MFLIBEXP_PUTCURRENTGRID
 //------------------------------------------------------------------------------
 /// \brief This is the data associated with Discretization package for MODFLOW.
+/// \param a_NODES
+/// \param a_NJAG
+/// \param a_IVSD
+/// \param a_IDSYMRD
+//------------------------------------------------------------------------------
+DLLEXPORT void MFLIBEXP_DISU1 (const int *a_NODES,
+                               const int *a_NJAG,
+                               const int *a_IVSD,
+                               const int *a_IDSYMRD)
+{
+  CStr exporter, filename;
+
+  MfData::Disu1(a_NODES, a_NJAG, a_IVSD, a_IDSYMRD);
+} // MFLIBEXP_DISU1
+//------------------------------------------------------------------------------
+/// \brief This is the data associated with Discretization package for MODFLOW.
+/// \param a_NODLAY: Array of number of nodes per layer, size of num layers.
+//------------------------------------------------------------------------------
+DLLEXPORT void MFLIBEXP_DISU2 (const int *a_NODLAY)
+{
+  CStr exporter, filename;
+
+  MfData::Disu2(a_NODLAY);
+} // MFLIBEXP_DISU2
+//------------------------------------------------------------------------------
+/// \brief This is the data associated with Discretization package for MODFLOW.
+//------------------------------------------------------------------------------
+DLLEXPORT void MFLIBEXP_DISU3 (const Real* a_PERLEN,
+                               const int* a_NSTP,
+                               const Real* a_TSMULT,
+                               const int* a_ISSFLG)
+{
+  CStr exporter, filename;
+
+  MfData::Disu3(a_PERLEN, a_NSTP, a_TSMULT, a_ISSFLG);
+} // MFLIBEXP_DISU3
+//------------------------------------------------------------------------------
+/// \brief This is the data associated with Discretization package for MODFLOW.
 /// \param a_NLAY number of layers in the grid
 /// \param a_NROW number of rows in the model grid
 /// \param a_NCOL number of columns in the model grid
@@ -613,7 +651,7 @@ DLLEXPORT void MFLIBEXP_ARRAYVALINT (const char *a_pckg,
   CStr pckg(util::GetStr(a_pckg, a_dummy));
   CStr name(util::GetStr(a_name, a_dummy1));
   MfData::SingleValInt(pckg, name, a_flag);
-} // MFLIBEXP_ARRAYVALFLT
+} // MFLIBEXP_ARRAYVALINT
 //------------------------------------------------------------------------------
 /// \brief 
 //------------------------------------------------------------------------------
@@ -627,6 +665,19 @@ DLLEXPORT void MFLIBEXP_ARRAYVALFLT (const char *a_pckg,
   CStr name(util::GetStr(a_name, a_dummy1));
   MfData::SingleValFlt(pckg, name, a_flag);
 } // MFLIBEXP_ARRAYVALFLT
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+DLLEXPORT void MFLIBEXP_ARRAYVALDBL (const char *a_pckg,
+                                     int a_dummy,
+                                    const char *a_name,
+                                    int a_dummy1,
+                                    const double *a_flag)
+{
+  CStr pckg(util::GetStr(a_pckg, a_dummy));
+  CStr name(util::GetStr(a_name, a_dummy1));
+  MfData::SingleValDbl(pckg, name, a_flag);
+} // MFLIBEXP_ARRAYVALDBL
 //------------------------------------------------------------------------------
 /// \brief 
 //------------------------------------------------------------------------------

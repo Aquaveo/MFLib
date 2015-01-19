@@ -10,6 +10,7 @@
 #include <private\util\util.h>
 #include <private\MfData\MfExport\MfExporter.h>
 #include <private\MfData\Packages\MfPackStrings.h>
+#include <private\MfData\Packages\MfPackFields.h>
 #include <private\MfData\MfExport\private\ExpGeoDb.h>
 #include <private\MfData\MfExport\private\ExpGmsH5.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
@@ -99,8 +100,14 @@ bool MfExportUtil::IsDataArray (const CStr &a_name,
 //------------------------------------------------------------------------------
 bool MfExportUtil::Is1dArray (const CStr &a_name)
 {
+  using namespace MfData::Packages;
   if (a_name == "DELR" || a_name == "DELC" ||
-      a_name == "COLUMN TO ROW ANISOTROPY")
+      a_name == "COLUMN TO ROW ANISOTROPY" ||
+      a_name == Disu::TOP || a_name == Disu::BOT ||
+      a_name == Disu::AREA || a_name == Disu::IA ||
+      a_name == Disu::JA || a_name == Disu::IVC ||
+      a_name == Disu::CL1 || a_name == Disu::CL1 ||
+      a_name == Disu::CL12 || a_name == Disu::FAHL)
   {
     return true;
   }

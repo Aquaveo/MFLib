@@ -14,6 +14,15 @@ namespace MfData
   {
     void GetComments(CStr a_pack,
                      CStr& a_comment);
+    void Disu1 (const int *a_NODES,
+                const int *a_NJAG,
+                const int *a_IVSD,
+                const int *a_IDSYMRD);
+    void Disu2 (const int *a_NODLAY);
+    void Disu3 (const Real* a_PERLEN,
+                const int* a_NSTP,
+                const Real* a_TSMULT,
+                const int* a_ISSFLG);
     void DisPackage(const Real *a_DELR,
                     const Real *a_DELC,
                     const int *a_NBTOM,
