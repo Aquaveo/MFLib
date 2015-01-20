@@ -103,6 +103,7 @@ bool MfExportUtil::Is1dArray (const CStr &a_name)
   using namespace MfData::Packages;
   if (a_name == "DELR" || a_name == "DELC" ||
       a_name == "COLUMN TO ROW ANISOTROPY" ||
+      a_name == Disu::LAYCBD || a_name == Disu::NODLAY ||
       a_name == Disu::TOP || a_name == Disu::BOT ||
       a_name == Disu::AREA || a_name == Disu::IA ||
       a_name == Disu::JA || a_name == Disu::IVC ||

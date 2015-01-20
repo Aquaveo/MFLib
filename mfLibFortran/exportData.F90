@@ -1655,7 +1655,9 @@ module module_exportData
     character*24, intent(in)  :: NAME1
     character*24, intent(inout)  :: NAME2
     
-    if (NAME1 .eq.     'VERT CONNECT INDEX ARRAY') then
+    if (NAME1 .eq.     '  NO. OF NODES PER LAYER') then
+      NAME2 = 'NODLAY'
+    elseif (NAME1 .eq. 'VERT CONNECT INDEX ARRAY') then
       NAME2 = 'IVC'
     elseif (NAME1 .eq. '     CONNECTION LENGTH 1') then
       NAME2 = 'CL1'
@@ -1679,16 +1681,17 @@ module module_exportData
     integer, intent(in)       :: JJ,K,IPRN
     integer, intent(in)       :: ARR(JJ)
     real, intent(in)          :: MULT
-
+    character*24 NAME2
 
     if (NOT(ed_getExportData())) return
 
-    call mfLibExp_SingleValInt(NAME,'JJ',JJ)
-    call mfLibExp_SingleValInt(NAME,'K',K)
-    call mfLibExp_SingleValInt(NAME,'IPRN',IPRN)
-    call mfLibExp_SingleValFlt(NAME,'MULT',MULT)
-    call mfLibExp_ArrayValInt(NAME,'ARR',ARR)
-    call mfLibExp_ExpPack(NAME)
+    call FixName(NAME, NAME2)
+    call mfLibExp_SingleValInt(NAME2,'JJ',JJ)
+    call mfLibExp_SingleValInt(NAME2,'K',K)
+    call mfLibExp_SingleValInt(NAME2,'IPRN',IPRN)
+    call mfLibExp_SingleValFlt(NAME2,'MULT',MULT)
+    call mfLibExp_ArrayValInt(NAME2,'ARR',ARR)
+    call mfLibExp_ExpPack(NAME2)
   end subroutine exp_U1DINT
 
   !-----------------------------------------------------------------------------

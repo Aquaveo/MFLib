@@ -122,22 +122,7 @@ CStr NativeExpDisu::Line2 ()
 //------------------------------------------------------------------------------
 void NativeExpDisu::Line3 ()
 {
-  using namespace MfData::Packages;
-  const int* nodlay(0);
-  std::stringstream ss;
-  CStr aStr;
-  MfPackage* p = GetPackage();
-  if (p->GetField(Disu::NODLAY, &nodlay) && nodlay)
-  {
-    for (int k=0; k<m_nLay; ++k)
-    {
-      ss << nodlay[k] << " ";
-    }
-    aStr = ss.str();
-    aStr.Trim();
-  }
-  else ASSERT(0);
-  AddToStoredLinesDesc(aStr, Desc("3"));
+  AddArrayLines(Packages::Disu::NODLAY, "3");
 } // NativeExpDisu::Line3
 //------------------------------------------------------------------------------
 /// \brief 4. Top(NDSLAY) - U1DREL
@@ -284,7 +269,15 @@ void NativeExpDisu::AddArrayLines (const CStr& a_name, const CStr& a_desc)
   std::vector<CStr>& lines(p->StringsToWrite());
   ASSERT(!lines.empty());
   for (size_t i = 0; i < lines.size(); ++i) {
-    AddToStoredLinesDesc(lines[i], (i == 0 ? Desc(a_desc) : ""));
+    // Show the description on just the first line of the array
+    CStr desc = "";
+    if (i == 0 ||
+        lines[i].find("CONSTANT") != std::string::npos ||
+        lines[i].find("OPEN/CLOSE") != std::string::npos ||
+        lines[i].find("INTERNAL") != std::string::npos) {
+      desc = Desc(a_desc);
+    }
+    AddToStoredLinesDesc(lines[i], desc);
   }
 } // NativeExpDisu::AddArrayLines
 
