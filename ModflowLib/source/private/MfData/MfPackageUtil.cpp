@@ -11,6 +11,7 @@
 #include <set>
 #include <sstream>
 
+#include <private\MfData\MfExport\private\Native\NativeExpCln.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\Packages\MfPackFields.h>
 #include <private\MfData\Packages\MfPackage.h>
@@ -29,6 +30,123 @@ static std::map<CStr, CStr>& GetCommentsMap()
   //static std::map<CStr, CStr> m_map;
   //return m_map;
 } // GetCommentMap
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+void MfData::Packages::ClnLine1 (const int *a_NCLN,
+                                 const int *a_ICLNNDS,
+                                 const int *a_ICLNCB,
+                                 const int *a_ICLNHD,
+                                 const int *a_ICLNDD,
+                                 const int *a_ICLNIB,
+                                 const int *a_NCLNGWC,
+                                 const int *a_NCONDUITYP)
+{
+  MfPackage pack(MfData::Packages::CLNLine1);
+  MfPackage *p(MfData::Get().GetPackage(MfData::Packages::CLNLine1));
+  bool exists(p ? 1 : 0);
+  if (!exists)
+    p = &pack;
+  p->SetField(MfData::Packages::Cln::NCLN, a_NCLN);
+  p->SetField(MfData::Packages::Cln::ICLNNDS, a_ICLNNDS);
+  p->SetField(MfData::Packages::Cln::ICLNCB, a_ICLNCB);
+  p->SetField(MfData::Packages::Cln::ICLNHD, a_ICLNHD);
+  p->SetField(MfData::Packages::Cln::ICLNDD, a_ICLNDD);
+  p->SetField(MfData::Packages::Cln::ICLNIB, a_ICLNIB);
+  p->SetField(MfData::Packages::Cln::NCLNGWC, a_NCLNGWC);
+  p->SetField(MfData::Packages::Cln::NCONDUITYP, a_NCONDUITYP);
+  if (!exists)
+    MfData::Get().AddPackage(&pack);
+  MfData::Get().Export(MfData::Packages::CLNLine1);
+} // MfData::Packages::ClnLine1
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+void MfData::Packages::ClnLine4 (const Real *a_ACLNNDSAQ,
+                                 const int *a_NCLNNDS)
+{
+  MfPackage pack(MfData::Packages::CLN);
+  MfPackage *p(MfData::Get().GetPackage(MfData::Packages::CLN));
+  bool exists(p ? 1 : 0);
+  if (!exists)
+    p = &pack;
+
+  // Make a copy of the array because it is freed right away
+  int size = (*a_NCLNNDS) * MfData::Export::NativeExpCln::ASE_LN4;
+  Real* aclnndsaq = util::NewRealArray(size);
+  for (int i=0; i<size; i++) {
+    aclnndsaq[i] = a_ACLNNDSAQ[i];
+  }
+
+  p->SetField(MfData::Packages::Cln::ACLNNDSAQ, aclnndsaq);
+  p->SetField(MfData::Packages::Cln::NCLNNDS, a_NCLNNDS);
+  if (!exists)
+    MfData::Get().AddPackage(&pack);
+} // MfData::Packages::ClnLine4
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+void MfData::Packages::ClnLine5Or6 (const Real *a_ACLNGWCAQ, int a_size2)
+{
+  MfPackage pack(MfData::Packages::CLN);
+  MfPackage *p(MfData::Get().GetPackage(MfData::Packages::CLN));
+  bool exists(p ? 1 : 0);
+  if (!exists)
+    p = &pack;
+
+  // Get size of the array
+  MfPackage *pLine1 = MfData::Get().GetPackage(MfData::Packages::CLNLine1);
+  const int* nclngwc(0);
+  if (!pLine1->GetField(Cln::NCLNGWC, &nclngwc) || !nclngwc)
+    return;
+
+  // Make a copy of the array because it is freed right away
+  int size = (*nclngwc) * a_size2;
+  Real* aclnndsaq = util::NewRealArray(size);
+  for (int i=0; i<size; i++) {
+    aclnndsaq[i] = a_ACLNGWCAQ[i];
+  }
+
+  p->SetField(MfData::Packages::Cln::ACLNGWCAQ, aclnndsaq);
+  if (!exists)
+    MfData::Get().AddPackage(&pack);
+} // MfData::Packages::ClnLine5Or6
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+void MfData::Packages::ClnLine5 (const Real *a_ACLNGWCAQ)
+{
+  ClnLine5Or6(a_ACLNGWCAQ, MfData::Export::NativeExpCln::ASE_LN5);
+} // MfData::Packages::ClnLine5
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+void MfData::Packages::ClnLine6 (const Real *a_ACLNGWCAQ)
+{
+  ClnLine5Or6(a_ACLNGWCAQ, MfData::Export::NativeExpCln::ASE_LN6);
+} // MfData::Packages::ClnLine6
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+void MfData::Packages::ClnLine7 (const Real *a_ACLNCOND)
+{
+  MfPackage pack(MfData::Packages::CLN);
+  MfPackage *p(MfData::Get().GetPackage(MfData::Packages::CLN));
+  bool exists(p ? 1 : 0);
+  if (!exists)
+    p = &pack;
+
+  p->SetField(MfData::Packages::Cln::ACLNCOND, a_ACLNCOND);
+  if (!exists)
+    MfData::Get().AddPackage(&pack);
+} // MfData::Packages::ClnLine7
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+void MfData::Packages::ClnLines8And9 ()
+{
+  MfData::Get().Export(MfData::Packages::CLN);
+} // MfData::Packages::ClnLines8And9
 //------------------------------------------------------------------------------
 /// \brief 
 //------------------------------------------------------------------------------

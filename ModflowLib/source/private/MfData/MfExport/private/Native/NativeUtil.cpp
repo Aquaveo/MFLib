@@ -13,6 +13,7 @@
 #include <private\MfData\MfExport\private\Native\NativeExpArr2d.h>
 #include <private\MfData\MfExport\private\Native\NativeExpBas.h>
 #include <private\MfData\MfExport\private\Native\NativeExpBcf.h>
+#include <private\MfData\MfExport\private\Native\NativeExpCln.h>
 #include <private\MfData\MfExport\private\Native\NativeExpDis.h>
 #include <private\MfData\MfExport\private\Native\NativeExpDisu.h>
 #include <private\MfData\MfExport\private\Native\NativeExpEts.h>
@@ -55,6 +56,12 @@ using namespace MfData::Export;
 
 namespace
 {
+//------------------------------------------------------------------------------
+bool ClnPack (const CStr& type)
+{
+  if (Packages::CLNLine1 == type || Packages::CLN == type) return true;
+  return false;
+} // ClnPack
 //------------------------------------------------------------------------------
 bool HobPack (const CStr& type)
 {
@@ -154,6 +161,7 @@ NativePackExp* NativeUtil::CreatePackExp (Mf2kNative* a_native,
   else if (MfExportUtil::Is1dArray(type))       ret = new NativeExpArr1d();
   else if (MfExportUtil::IsSolver(type))        ret = new NativeExpSolver();
   else if (Packages::NAM == type)               ret = new NativeExpNam();
+  else if (ClnPack(type))                       ret = new NativeExpCln();
   else if (Packages::DIS == type)               ret = new NativeExpDis();
   else if (Packages::DISU == type)              ret = new NativeExpDisu();
   else if (Packages::BAS == type)               ret = new NativeExpBas();

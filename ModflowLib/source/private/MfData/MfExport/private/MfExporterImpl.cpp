@@ -212,8 +212,10 @@ void MfExporterImpl::InitExtensions ()
   m_types.insert(std::make_pair(BCF, "bc6"));
   m_types.insert(std::make_pair(BCF6, "bc6"));
   m_types.insert(std::make_pair(CHD, CHD));
+  m_types.insert(std::make_pair(CLN, CLN));
   m_types.insert(std::make_pair(DE4, DE4));
   m_types.insert(std::make_pair(DIS, DIS));
+  m_types.insert(std::make_pair(DISU, DISU));
   m_types.insert(std::make_pair(DRN, DRN));
   m_types.insert(std::make_pair(DRT, DRT));
   m_types.insert(std::make_pair(EVT, EVT));
@@ -233,7 +235,10 @@ void MfExporterImpl::InitExtensions ()
   m_types.insert(std::make_pair(LPF, LPF));
   m_types.insert(std::make_pair(MLT, "mlt"));
   m_types.insert(std::make_pair(MNW, "mnw"));
+  m_types.insert(std::make_pair(MNW2,MNW2));
+  m_types.insert(std::make_pair(MNWI,MNWI));
   m_types.insert(std::make_pair(NAM, "mfn"));
+  m_types.insert(std::make_pair(NWT,NWT));
   m_types.insert(std::make_pair(OC, OC));
   m_types.insert(std::make_pair(PCG, PCG));
   m_types.insert(std::make_pair(PVAL, "pval"));
@@ -243,18 +248,14 @@ void MfExporterImpl::InitExtensions ()
   m_types.insert(std::make_pair(SEN, SEN));
   m_types.insert(std::make_pair(SFR, SFR));
   m_types.insert(std::make_pair(SIP, SIP));
+  m_types.insert(std::make_pair(SMS, SMS));
   m_types.insert(std::make_pair(SOR, SOR));
   m_types.insert(std::make_pair(STRSP, STRSP));
   m_types.insert(std::make_pair(SUB, SUB));
+  m_types.insert(std::make_pair(UPW, UPW));
   m_types.insert(std::make_pair(UZF, UZF));
   m_types.insert(std::make_pair(WEL, WEL));
   m_types.insert(std::make_pair(ZON, "zon"));
-  m_types.insert(std::make_pair(UPW, UPW));
-  m_types.insert(std::make_pair(NWT,NWT));
-  m_types.insert(std::make_pair(MNW2,MNW2));
-  m_types.insert(std::make_pair(MNWI,MNWI));
-  m_types.insert(std::make_pair(DISU, DISU));
-  m_types.insert(std::make_pair(SMS, SMS));
 
   m_exp->SetTypesToExtensions(m_types);
 } // MfExporterImpl::InitExtensions

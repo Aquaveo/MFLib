@@ -8921,6 +8921,7 @@ void ExpGmsH5T::testSupportedPackage ()
   TS_ASSERT(t->IsTypeSupported(BCF));
   TS_ASSERT(t->IsTypeSupported(BCF6));
   TS_ASSERT(t->IsTypeSupported(CHD));
+  TS_ASSERT(t->IsTypeSupported(CLN));
   TS_ASSERT(t->IsTypeSupported(DE4));
   TS_ASSERT(t->IsTypeSupported(DIS));
   TS_ASSERT(t->IsTypeSupported(DRN));
@@ -8964,7 +8965,7 @@ void ExpGmsH5T::testSupportedPackage ()
   TS_ASSERT(!t->IsTypeSupported(VSC));
   TS_ASSERT(t->IsTypeSupported(ZON));
 
-  TS_ASSERT_EQUALS(e.m_types.size(), 46);
+  TS_ASSERT_EQUALS(e.m_types.size(), 47);
 }
 //------------------------------------------------------------------------------
 void ExpGmsH5T::testexpNameFile ()

@@ -180,6 +180,56 @@ DLLEXPORT void MFLIBEXP_PUTCURRENTGRID (const int *a_IGRID)
   MfData::PutCurrentGrid(a_IGRID);
 } // MFLIBEXP_PUTCURRENTGRID
 //------------------------------------------------------------------------------
+/// \brief CLN package.
+//------------------------------------------------------------------------------
+DLLEXPORT void MFLIBEXP_CLNLINE1 (const int *a_NCLN,
+                                  const int *a_ICLNNDS,
+                                  const int *a_ICLNCB,
+                                  const int *a_ICLNHD,
+                                  const int *a_ICLNDD,
+                                  const int *a_ICLNIB,
+                                  const int *a_NCLNGWC,
+                                  const int *a_NCONDUITYP)
+{
+  MfData::ClnLine1(a_NCLN,a_ICLNNDS,a_ICLNCB,a_ICLNHD,a_ICLNDD,a_ICLNIB,a_NCLNGWC,a_NCONDUITYP);
+} // MFLIBEXP_CLNLINE1
+//------------------------------------------------------------------------------
+/// \brief CLN package.
+//------------------------------------------------------------------------------
+DLLEXPORT void MFLIBEXP_CLNLINE4 (const Real *a_ACLNNDSAQ,
+                                  const int *a_NCLNNDS)
+{
+  MfData::ClnLine4(a_ACLNNDSAQ, a_NCLNNDS);
+} // MFLIBEXP_CLNLINE4
+//------------------------------------------------------------------------------
+/// \brief CLN package.
+//------------------------------------------------------------------------------
+DLLEXPORT void MFLIBEXP_CLNLINE5 (const Real *a_ACLNGWCAQ)
+{
+  MfData::ClnLine5(a_ACLNGWCAQ);
+} // MFLIBEXP_CLNLINE5
+//------------------------------------------------------------------------------
+/// \brief CLN package.
+//------------------------------------------------------------------------------
+DLLEXPORT void MFLIBEXP_CLNLINE6 (const Real *a_ACLNGWCAQ)
+{
+  MfData::ClnLine6(a_ACLNGWCAQ);
+} // MFLIBEXP_CLNLINE6
+//------------------------------------------------------------------------------
+/// \brief CLN package.
+//------------------------------------------------------------------------------
+DLLEXPORT void MFLIBEXP_CLNLINE7 (const Real *a_ACLNCOND)
+{
+  MfData::ClnLine7(a_ACLNCOND);
+} // MFLIBEXP_CLNLINE7
+//------------------------------------------------------------------------------
+/// \brief CLN package.
+//------------------------------------------------------------------------------
+DLLEXPORT void MFLIBEXP_CLNLINES8AND9 ()
+{
+  MfData::ClnLines8And9();
+} // MFLIBEXP_CLNLINES8AND9
+//------------------------------------------------------------------------------
 /// \brief This is the data associated with Discretization package for MODFLOW.
 /// \param a_NODES
 /// \param a_NJAG
@@ -191,8 +241,6 @@ DLLEXPORT void MFLIBEXP_DISU1 (const int *a_NODES,
                                const int *a_IVSD,
                                const int *a_IDSYMRD)
 {
-  CStr exporter, filename;
-
   MfData::Disu1(a_NODES, a_NJAG, a_IVSD, a_IDSYMRD);
 } // MFLIBEXP_DISU1
 //------------------------------------------------------------------------------
@@ -213,8 +261,6 @@ DLLEXPORT void MFLIBEXP_DISU3 (const Real* a_PERLEN,
                                const Real* a_TSMULT,
                                const int* a_ISSFLG)
 {
-  CStr exporter, filename;
-
   MfData::Disu3(a_PERLEN, a_NSTP, a_TSMULT, a_ISSFLG);
 } // MFLIBEXP_DISU3
 //------------------------------------------------------------------------------
@@ -235,8 +281,6 @@ DLLEXPORT void MFLIBEXP_DISPACKAGE1 (const int *a_NLAY,
                                      const int *a_LAYCBD,
                                      const int *a_IUNSTR)
 {
-  CStr exporter, filename;
-
   MfData::SetGlobal(a_NLAY, a_NROW, a_NCOL, a_NPER, a_ITMUNI, a_LENUNI,
                     a_LAYCBD, a_IUNSTR);
 } // MFLIBEXP_DISPACKAGE1
