@@ -1407,6 +1407,13 @@ static std::map<CStr, std::vector<int> >& GetChunkMap ()
     fg_chunkMap[MFBC_DZMULT] = v_3;
     fg_chunkMap[MFBC_NZ] = v_5000;
     fg_chunkMap[MFBC_NZMULT] = v_3;
+    // swi
+    fg_chunkMap[MFBC_SWI_ZETA] = v_5000;
+    fg_chunkMap[MFBC_SWI_ZETAMULT] = v_3;
+    fg_chunkMap[MFBC_SWI_SSZ] = v_5000;
+    fg_chunkMap[MFBC_SWI_SSZMULT] = v_3;
+    fg_chunkMap[MFBC_SWI_ISOURCE] = v_5000;
+    fg_chunkMap[MFBC_SWI_ISOURCEMULT] = v_3;
   }
   return fg_chunkMap;
 } // GetChunkMap
@@ -8973,7 +8980,7 @@ void ExpGmsH5T::testSupportedPackage ()
   TS_ASSERT(!t->IsTypeSupported(VSC));
   TS_ASSERT(t->IsTypeSupported(ZON));
 
-  TS_ASSERT_EQUALS(e.m_types.size(), 47);
+  TS_ASSERT_EQUALS(e.m_types.size(), 48);
 }
 //------------------------------------------------------------------------------
 void ExpGmsH5T::testexpNameFile ()
@@ -9588,7 +9595,7 @@ void ExpGmsH5T::testGetArrayMap ()
 {
   ExpGmsH5 ex;
   std::map<CStr, CStr> &m(ex.GetMapArrays());
-  TS_ASSERT_EQUALS(60, m.size());
+  TS_ASSERT_EQUALS(63, m.size());
   TS_ASSERT(m.find("crap") == m.end());
 
   TS_ASSERT(m[ARR_DIS_TOP] == "top");
@@ -9655,6 +9662,10 @@ void ExpGmsH5T::testGetArrayMap ()
   TS_ASSERT(m[ARR_SUB_DCOM] == "SUB/26. DCOM");
   TS_ASSERT(m[ARR_SUB_DZ] == "SUB/28. DZ");
   TS_ASSERT(m[ARR_SUB_NZ] == "SUB/30. NZ");
+
+  TS_ASSERT(m[ARR_SWI_ZETA] == "SWI/12. ZETA");
+  TS_ASSERT(m[ARR_SWI_SSZ] == "SWI/14. SSZ");
+  TS_ASSERT(m[ARR_SWI_ISOURCE] == "SWI/16. ISOURCE");
 
   TS_ASSERT(m[ARR_LAK_ID] == "Lak_");
   TS_ASSERT(m[ARR_LAK_LEAK] == "LakLeak_");
