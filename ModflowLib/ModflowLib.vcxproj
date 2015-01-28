@@ -932,6 +932,7 @@ build_test_runner.bat
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpDisu.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpGnc.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpLgr.cpp" />
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpSwi.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NeArealPar.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpArr1d.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpArr2d.cpp" />
@@ -1053,6 +1054,7 @@ build_test_runner.bat
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpGnc.t.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpLgr.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpLgr.t.h" />
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpSwi.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NeArealPar.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpArr1d.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpArr2d.h" />

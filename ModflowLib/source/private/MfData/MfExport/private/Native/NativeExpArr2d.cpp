@@ -356,6 +356,13 @@ CStr NativeExpArr2d::GetArrayFileName (const CStr& a_name)
       tmp.Format("_Sp%d", m_curSp);
       layStr += tmp;
     }
+    else if (name.find(ARR_SWI_ZETA) != -1) {
+      // Strip number from string. It's in a field 3 wide.
+      layStr = a_name;
+      layStr.Replace(ARR_SWI_ZETA, "");
+      name.Replace(layStr, "");
+      layStr.Trim();
+    }
 
     arrName.Format("%s_%s_%s", GetNative()->PackageFromArrayName(name),
                                GetNative()->VarNameFromArrayName(name),

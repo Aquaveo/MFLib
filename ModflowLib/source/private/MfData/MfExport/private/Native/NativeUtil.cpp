@@ -40,10 +40,11 @@
 #include <private\MfData\MfExport\private\Native\NativeExpRch.h>
 #include <private\MfData\MfExport\private\Native\NativeExpSen.h>
 #include <private\MfData\MfExport\private\Native\NativeExpSfr.h>
-#include <private\MfData\MfExport\private\Native\NativeExpStr.h>
 #include <private\MfData\MfExport\private\Native\NativeExpSolver.h>
 #include <private\MfData\MfExport\private\Native\NativeExpSTP.h>
+#include <private\MfData\MfExport\private\Native\NativeExpStr.h>
 #include <private\MfData\MfExport\private\Native\NativeExpSub.h>
+#include <private\MfData\MfExport\private\Native\NativeExpSwi.h>
 #include <private\MfData\MfExport\private\Native\NativeExpUzf.h>
 #include <private\MfData\MfExport\private\Native\NativeExpZon.h>
 #include <private\MfData\MfGlobal.h>
@@ -196,6 +197,7 @@ NativePackExp* NativeUtil::CreatePackExp (Mf2kNative* a_native,
   else if (StrPack(type))                       ret = new NativeExpStr();
   else if (LgrPack(type))                       ret = new NativeExpLgr();
   else if (Packages::GNC == type)               ret = new NativeExpGnc();
+  else if (Packages::SWI == type)               ret = new NativeExpSwi();
 
   // leave at end. This is the last "package" processed
   else if ("STP" == type)                       ret = new NativeExpSTP();

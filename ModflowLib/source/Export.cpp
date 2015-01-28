@@ -624,6 +624,47 @@ DLLEXPORT void MFLIBEXP_GNC1 (const int *a_NPGNCn,
                a_IFLALPHAn, a_IPRGNCn, a_N1, a_N2, a_GNCn);
 } // MFLIBEXP_GNC1
 //------------------------------------------------------------------------------
+/// \brief This is the data associated with the SWI package
+//------------------------------------------------------------------------------
+DLLEXPORT void MFLIBEXP_SWI (const int *a_NSRF,
+                             const int *a_ISTRAT,
+                             const int *a_NOBS,
+                             const int *a_ISWIZT,
+                             const int *a_ISWIBD,
+                             const int *a_ISWIOBS,
+                             const int *a_iadptflg,
+                             const int *a_NSOLVER,
+                             const int *a_IPRSOL,
+                             const int *a_MUTSOL,
+                             const int *a_MXITER,
+                             const int *a_ITER1,
+                             const int *a_NPCOND,
+                             const Real *a_ZCLOSE,
+                             const Real *a_RCLOSE,
+                             const Real *a_RELAX,
+                             const int *a_NBPOL,
+                             const Real *a_DAMP,
+                             const Real *a_DAMPT,
+                             const Real *a_TOESLOPE,
+                             const Real *a_TIPSLOPE,
+                             const Real *a_ALPHA,
+                             const Real *a_BETA,
+                             const int *a_NADPTMX,
+                             const int *a_NADPTMN,
+                             const Real *a_ADPTFCT,
+                             const char* a_obsname,
+                             int /*dummy1*/,
+                             const int *a_obsk,
+                             const int *a_obsi,
+                             const int *a_obsj)
+{
+  MfData::SWI(a_NSRF,a_ISTRAT,a_NOBS,a_ISWIZT,a_ISWIBD,a_ISWIOBS,a_iadptflg,
+              a_NSOLVER,a_IPRSOL,a_MUTSOL,a_MXITER,a_ITER1,a_NPCOND,a_ZCLOSE,
+              a_RCLOSE,a_RELAX,a_NBPOL,a_DAMP,a_DAMPT,a_TOESLOPE,a_TIPSLOPE,
+              a_ALPHA,a_BETA,a_NADPTMX,a_NADPTMN,a_ADPTFCT,a_obsname,a_obsk,
+              a_obsi, a_obsj);
+} // MFLIBEXP_SWI
+//------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
 DLLEXPORT void MFLIBEXP_HEADINIT (const int* a_nper,
@@ -1477,6 +1518,16 @@ DLLEXPORT void MFLIBEXP_IUNIT (const int* IUNIT,
 //------------------------------------------------------------------------------
 /// \brief 
 //------------------------------------------------------------------------------
+DLLEXPORT void MFLIBEXP_SETSAVECOMMENTS (const int* UNIT,
+                                         const int* ISAVE)
+{
+  if (!UNIT || !ISAVE) return;
+
+  MfData::SetSaveComments(*UNIT, *ISAVE);
+} // MFLIBEXP_SETSAVECOMMENTS
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
 DLLEXPORT void MFLIBEXP_COMMENT (const int* UNIT,
                                  const char* LINE,
                                  int a_dummy1)
@@ -1486,7 +1537,7 @@ DLLEXPORT void MFLIBEXP_COMMENT (const int* UNIT,
   CStr line(util::GetStr(LINE, a_dummy1));
   std::map<int, CStr>& aMap(GetIunitMap());
   std::map<int, CStr>::iterator it(aMap.find(*UNIT));
-  if (it != aMap.end())
+  if (it != aMap.end() && MfData::GetSaveComments(*UNIT))
   {
     MfData::Comment(it->second.c_str(), line.c_str());
   }

@@ -84,6 +84,7 @@ namespace MfData
     const char * const SUB = "SUB";
     const char * const SUBLine15 = "SU2";
     const char * const SUBLine16 = "SU3";
+    const char * const SWI = "SWI2";
     const char * const SWN = "SWN";
     const char * const TOB = "TOB";
     const char * const UPW = "UPW";

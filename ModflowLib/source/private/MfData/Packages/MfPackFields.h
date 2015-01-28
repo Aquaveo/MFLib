@@ -248,6 +248,41 @@ namespace MfData
       const char * const N2 = "N2";
       const char * const GNCn = "GNCn";
     }
+    namespace Swi
+    {
+      const char * const NSRF = "NSRF";
+      const char * const ISTRAT = "ISTRAT";
+      const char * const NOBS = "NOBS";
+      const char * const ISWIZT = "ISWIZT";
+      const char * const ISWIBD = "ISWIBD";
+      const char * const ISWIOBS = "ISWIOBS";
+      const char * const iadptflg = "iadptflg";
+      const char * const NSOLVER = "NSOLVER";
+      const char * const IPRSOL = "IPRSOL";
+      const char * const MUTSOL = "MUTSOL";
+      const char * const MXITER = "MXITER";
+      const char * const ITER1 = "ITER1";
+      const char * const NPCOND = "NPCOND";
+      const char * const ZCLOSE = "ZCLOSE";
+      const char * const RCLOSE = "RCLOSE";
+      const char * const RELAX = "RELAX";
+      const char * const NBPOL = "NBPOL";
+      const char * const DAMP = "DAMP";
+      const char * const DAMPT = "DAMPT";
+      const char * const TOESLOPE = "TOESLOPE";
+      const char * const TIPSLOPE = "TIPSLOPE";
+      const char * const ALPHA = "ALPHA";
+      const char * const BETA = "BETA";
+      const char * const NADPTMX = "NADPTMX";
+      const char * const NADPTMN = "NADPTMN";
+      const char * const ADPTFCT = "ADPTFCT";
+      const char * const NUZONE = "NUZONE";
+      const char * const NUSURF = "NUSRF";
+      const char * const OBSNAME = "OBSNAME";
+      const char * const OBSK = "OBSK";
+      const char * const OBSI = "OBSI";
+      const char * const OBSJ = "OBSJ";
+    }
     namespace LPFpack
     {
       const char * const NLAY = "NLAY";

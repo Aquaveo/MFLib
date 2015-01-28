@@ -361,6 +361,46 @@ module module_exportData
         END SUBROUTINE mfLibExp_Gnc1
 !     ------------------------------------------------------------------
 !      Declare the C function
+      subroutine mfLibExp_Swi (NSRF,ISTRAT,NOBS,ISWIZT,ISWIBD,ISWIOBS, &
+                               iadptflg, NSOLVER,IPRSOL,MUTSOL,MXITER, &
+                               ITER1,NPCOND,ZCLOSE, &
+                               RCLOSE,RELAX,NBPOL, &
+                               DAMP,DAMPT,TOESLOPE, &
+                               TIPSLOPE,ALPHA,BETA,NADPTMX,NADPTMN,ADPTFCT, &
+                               obsname,obsk, obsi, obsj)
+        INTEGER NSRF [REFERENCE]
+        INTEGER ISTRAT [REFERENCE]
+        INTEGER NOBS [REFERENCE]
+        INTEGER ISWIZT [REFERENCE]
+        INTEGER ISWIBD [REFERENCE]
+        INTEGER ISWIOBS [REFERENCE]
+        INTEGER iadptflg [REFERENCE]
+        INTEGER NSOLVER [REFERENCE]
+        INTEGER IPRSOL [REFERENCE]
+        INTEGER MUTSOL [REFERENCE]
+        INTEGER MXITER [REFERENCE]
+        INTEGER ITER1 [REFERENCE]
+        INTEGER NPCOND [REFERENCE]
+        REAL ZCLOSE [REFERENCE]
+        REAL RCLOSE [REFERENCE]
+        REAL RELAX [REFERENCE]
+        INTEGER NBPOL [REFERENCE]
+        REAL DAMP [REFERENCE]
+        REAL DAMPT [REFERENCE]
+        REAL TOESLOPE [REFERENCE]
+        REAL TIPSLOPE [REFERENCE]
+        REAL ALPHA [REFERENCE]
+        REAL BETA [REFERENCE]
+        INTEGER NADPTMX [REFERENCE]
+        INTEGER NADPTMN [REFERENCE]
+        REAL ADPTFCT [REFERENCE]
+        CHARACTER*12 obsname (*)
+        INTEGER obsk (*)
+        INTEGER obsi (*)
+        INTEGER obsj (*)
+      end subroutine mfLibExp_Swi
+!     ------------------------------------------------------------------
+!      Declare the C function
         SUBROUTINE mfLibExp_SingleValInt(PACKNAME,NAME,VAL)
           CHARACTER     PACKNAME (*)
           CHARACTER     NAME (*)
@@ -1095,6 +1135,12 @@ module module_exportData
         END SUBROUTINE MFLIBEXP_MNWIEND
 !     ------------------------------------------------------------------
 !      Declare the C function
+        SUBROUTINE MFLIBEXP_SETSAVECOMMENTS(UNIT,ISAVE)
+          INTEGER UNIT [REFERENCE]
+          INTEGER ISAVE [REFERENCE]
+        END SUBROUTINE MFLIBEXP_SETSAVECOMMENTS
+!     ------------------------------------------------------------------
+!      Declare the C function
         SUBROUTINE MFLIBEXP_COMMENT(UNIT,LINE)
           INTEGER          UNIT [REFERENCE]
           CHARACTER        LINE(*)
@@ -1110,7 +1156,7 @@ module module_exportData
            exp_ListPackage, exp_SipPackage, exp_De4Line1, exp_De4Line2, &
            exp_SorPackage, exp_PcgPackage, exp_LmgPackage, exp_GmgPackage, &
            exp_SmsPackage, exp_SmsXmdPackage, exp_SmsPcguPackage, &
-           exp_Gnc1
+           exp_Gnc1, exp_Swi
   save
   REAL    ::  m_LMG_STOR1, m_LMG_STOR2, m_LMG_STOR3
   integer ::  m_LMG_ICG
@@ -1642,6 +1688,35 @@ module module_exportData
     call mfLibExp_Gnc1(NPGNCn,MXGNn,NGNCNPn,MXADJn,I2Kn,ISYMGNCn,IFLALPHAn, &
                       IPRGNCn,N1,N2,GNCn)
   end subroutine exp_Gnc1
+
+  !-----------------------------------------------------------------------------
+  ! BRIEF:  
+  !-----------------------------------------------------------------------------
+  subroutine exp_Swi (NSRF,ISTRAT,NOBS,ISWIZT,ISWIBD,ISWIOBS, &
+                      iadptflg,NSOLVER,IPRSOL,MUTSOL,MXITER, &
+                      ITER1,NPCOND,ZCLOSE, &
+                      RCLOSE,RELAX,NBPOL, &
+                      DAMP,DAMPT,TOESLOPE, &
+                      TIPSLOPE,ALPHA,BETA,NADPTMX,NADPTMN,ADPTFCT, &
+                      obsname,obsk,obsi,obsj)
+    implicit none
+    integer, intent(in) :: NSRF,ISTRAT,NOBS,ISWIZT,ISWIBD,ISWIOBS,iadptflg, &
+                           NSOLVER,IPRSOL,MUTSOL,MXITER,ITER1,NPCOND,&
+                           NBPOL,NADPTMX,NADPTMN
+    real, intent(in)    :: ZCLOSE,RCLOSE,RELAX,DAMP,DAMPT, &
+                           TOESLOPE,TIPSLOPE,ALPHA,BETA,ADPTFCT
+    character*12, intent(in) :: obsname(*)
+    integer, intent(in) :: obsk(*), obsi(*), obsj(*)
+
+    if (NOT(ed_getExportData())) return
+    call mfLibExp_Swi(NSRF,ISTRAT,NOBS,ISWIZT,ISWIBD,ISWIOBS, &
+                      iadptflg,NSOLVER,IPRSOL,MUTSOL,MXITER, &
+                      ITER1,NPCOND,ZCLOSE, &
+                      RCLOSE,RELAX,NBPOL, &
+                      DAMP,DAMPT,TOESLOPE, &
+                      TIPSLOPE,ALPHA,BETA,NADPTMX,NADPTMN,ADPTFCT, &
+                      obsname,obsk, obsi, obsj)
+  end subroutine exp_Swi
 
   !-----------------------------------------------------------------------------
   ! BRIEF:  
@@ -2740,6 +2815,17 @@ module module_exportData
       call mfLibExp_IUNIT(IUNIT(i),CUNIT(i))
     end do
   end subroutine exp_NamesAndUnits
+  !-----------------------------------------------------------------------------
+  ! BRIEF:  
+  !-----------------------------------------------------------------------------
+  subroutine exp_SetSaveComments (UNIT,ISAVE)
+    implicit none
+    integer, intent(in) :: UNIT
+    integer, intent(in) :: ISAVE
+
+    if (NOT(ed_getExportData())) return
+    call MFLIBEXP_SETSAVECOMMENTS(UNIT,ISAVE)
+  end subroutine exp_SetSaveComments
   !-----------------------------------------------------------------------------
   ! BRIEF:  
   !-----------------------------------------------------------------------------

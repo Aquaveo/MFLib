@@ -107,6 +107,13 @@ using std::set;
 #define MFBC_DZMULT      "29. DZ Multiplier"
 #define MFBC_NZ          "30. NZ"
 #define MFBC_NZMULT      "31. NZ Multiplier"
+// SWI
+#define MFBC_SWI_ZETA     "12. ZETA"
+#define MFBC_SWI_ZETAMULT "13. ZETA Multiplier"
+#define MFBC_SWI_SSZ      "14. SSZ"
+#define MFBC_SWI_SSZMULT  "15. SSZ Multiplier"
+#define MFBC_SWI_ISOURCE      "16. ISOURCE"
+#define MFBC_SWI_ISOURCEMULT  "17. ISOURCE Multiplier"
 
 #define MFBC_MAX_STR_LEN "Max. String Length"
 
@@ -8955,6 +8962,7 @@ void ExpGmsH5T::testSupportedPackage ()
   TS_ASSERT(t->IsTypeSupported(SOR));
   TS_ASSERT(t->IsTypeSupported(STRSP));
   TS_ASSERT(t->IsTypeSupported(SUB));
+  TS_ASSERT(t->IsTypeSupported(SWI));
   TS_ASSERT(t->IsTypeSupported(WEL));
   TS_ASSERT(t->IsTypeSupported(MNW));
   TS_ASSERT(t->IsTypeSupported(MNW2));

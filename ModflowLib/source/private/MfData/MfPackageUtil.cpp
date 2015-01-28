@@ -21,7 +21,16 @@
 #include <private\Parameters\Param.h>
 #include <private\Parameters\ParamList.h>
 
-static std::map<CStr, CStr>& GetCommentsMap()
+//------------------------------------------------------------------------------
+static std::set<int>& GetSuspendedCommentsSet ()
+{
+  static std::vector< std::set<int> > m_set; // ok to leave static
+  size_t idx = MfData::Get().CurModIdx();
+  while (m_set.size() < idx+1) m_set.push_back(std::set<int>());
+  return m_set[idx];
+} // GetSuspendedCommentsSet
+//------------------------------------------------------------------------------
+static std::map<CStr, CStr>& GetCommentsMap ()
 {
   static std::vector< std::map<CStr, CStr> > m_map; // ok to leave static
   size_t idx = MfData::Get().CurModIdx();
@@ -698,6 +707,83 @@ void MfData::Packages::GNCPackage1 (const int *a_NPGNCn,
     MfData::Get().AddPackage(p);
   MfData::Get().Export(p->PackageName());
 } // MfData::Packages::GNCPackage1
+//------------------------------------------------------------------------------
+/// \brief This receives the data that belongs to the SWI package
+/// \param a_N1: The first dimension of the array.
+/// \param a_N2: The second dimension of the array.
+//------------------------------------------------------------------------------
+void MfData::Packages::SwiPack (const int *a_NSRF,
+                                const int *a_ISTRAT,
+                                const int *a_NOBS,
+                                const int *a_ISWIZT,
+                                const int *a_ISWIBD,
+                                const int *a_ISWIOBS,
+                                const int *a_iadptflg,
+                                const int *a_NSOLVER,
+                                const int *a_IPRSOL,
+                                const int *a_MUTSOL,
+                                const int *a_MXITER,
+                                const int *a_ITER1,
+                                const int *a_NPCOND,
+                                const Real *a_ZCLOSE,
+                                const Real *a_RCLOSE,
+                                const Real *a_RELAX,
+                                const int *a_NBPOL,
+                                const Real *a_DAMP,
+                                const Real *a_DAMPT,
+                                const Real *a_TOESLOPE,
+                                const Real *a_TIPSLOPE,
+                                const Real *a_ALPHA,
+                                const Real *a_BETA,
+                                const int *a_NADPTMX,
+                                const int *a_NADPTMN,
+                                const Real *a_ADPTFCT,
+                                const char* a_obsname,
+                                const int *a_obsk,
+                                const int *a_obsi,
+                                const int *a_obsj)
+{
+  MfPackage pack(SWI);
+  MfPackage *p(MfData::Get().GetPackage(SWI));
+  bool exists(p ? 1 : 0);
+  if (!exists)
+    p = &pack;
+
+  p->SetField(MfData::Packages::Swi::NSRF, a_NSRF);
+  p->SetField(MfData::Packages::Swi::ISTRAT, a_ISTRAT);
+  p->SetField(MfData::Packages::Swi::NOBS, a_NOBS);
+  p->SetField(MfData::Packages::Swi::ISWIZT, a_ISWIZT);
+  p->SetField(MfData::Packages::Swi::ISWIBD, a_ISWIBD);
+  p->SetField(MfData::Packages::Swi::ISWIOBS, a_ISWIOBS);
+  p->SetField(MfData::Packages::Swi::iadptflg, a_iadptflg);
+  p->SetField(MfData::Packages::Swi::NSOLVER, a_NSOLVER);
+  p->SetField(MfData::Packages::Swi::IPRSOL, a_IPRSOL);
+  p->SetField(MfData::Packages::Swi::MUTSOL, a_MUTSOL);
+  p->SetField(MfData::Packages::Swi::MXITER, a_MXITER);
+  p->SetField(MfData::Packages::Swi::ITER1, a_ITER1);
+  p->SetField(MfData::Packages::Swi::NPCOND, a_NPCOND);
+  p->SetField(MfData::Packages::Swi::ZCLOSE, a_ZCLOSE);
+  p->SetField(MfData::Packages::Swi::RCLOSE, a_RCLOSE);
+  p->SetField(MfData::Packages::Swi::RELAX, a_RELAX);
+  p->SetField(MfData::Packages::Swi::NBPOL, a_NBPOL);
+  p->SetField(MfData::Packages::Swi::DAMP, a_DAMP);
+  p->SetField(MfData::Packages::Swi::DAMPT, a_DAMPT);
+  p->SetField(MfData::Packages::Swi::TOESLOPE, a_TOESLOPE);
+  p->SetField(MfData::Packages::Swi::TIPSLOPE, a_TIPSLOPE);
+  p->SetField(MfData::Packages::Swi::ALPHA, a_ALPHA);
+  p->SetField(MfData::Packages::Swi::BETA, a_BETA);
+  p->SetField(MfData::Packages::Swi::NADPTMX, a_NADPTMX);
+  p->SetField(MfData::Packages::Swi::NADPTMN, a_NADPTMN);
+  p->SetField(MfData::Packages::Swi::ADPTFCT, a_ADPTFCT);
+  p->SetField(MfData::Packages::Swi::OBSNAME, a_obsname);
+  p->SetField(MfData::Packages::Swi::OBSK, a_obsk);
+  p->SetField(MfData::Packages::Swi::OBSI, a_obsi);
+  p->SetField(MfData::Packages::Swi::OBSJ, a_obsj);
+
+  if (!exists)
+    MfData::Get().AddPackage(p);
+  MfData::Get().Export(p->PackageName());
+} // MfData::Packages::SwiPack
 //------------------------------------------------------------------------------
 /// \brief 
 //------------------------------------------------------------------------------
@@ -2657,6 +2743,36 @@ bool MfData::Packages::UPW1 (const int* NLAY,
     MfData::Get().AddPackage(p);
   return true;
 } // MfData::Packages::UPW1
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+bool MfData::Packages::GetSaveComments (int UNIT)
+{
+  std::set<int>& aSet(GetSuspendedCommentsSet());
+
+  std::set<int>::iterator it(aSet.find(UNIT));
+  return (it == aSet.end());
+} // MfData::Packages::GetSaveComments
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+void MfData::Packages::SetSaveComments (int UNIT,
+                                        int ISAVE)
+{
+  std::set<int>& aSet(GetSuspendedCommentsSet());
+
+  std::set<int>::iterator it(aSet.find(UNIT));
+  if (ISAVE != 0) { // yes, save
+    // Remove item from set if it exists
+    if (it != aSet.end())
+      aSet.erase(it);
+  }
+  else { // don't save
+    // Add item to set if it exists
+    if (it == aSet.end())
+      aSet.insert(UNIT);
+  }
+} // MfData::Packages::SetSaveComments
 //------------------------------------------------------------------------------
 /// \brief 
 //------------------------------------------------------------------------------

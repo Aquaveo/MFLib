@@ -136,8 +136,8 @@ void NativeExpGncT::setUp ()
   m_p = NULL;
   Mf2kNative* n = new Mf2kNative;
   MfGlobal* g= new MfGlobal(10, 15, 3, 2, 3, 2, 0);
-  MfPackage* dis = new MfPackage(Packages::GNC);
-  NativePackExp* p = NativeUtil::CreatePackExp(n, g, dis);
+  MfPackage* gnc = new MfPackage(Packages::GNC);
+  NativePackExp* p = NativeUtil::CreatePackExp(n, g, gnc);
   m_p = dynamic_cast<NativeExpGnc*>(p);
 } // NativeExpGncT::setUp
 //------------------------------------------------------------------------------

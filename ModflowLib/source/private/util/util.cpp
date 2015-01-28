@@ -1014,6 +1014,13 @@ long util::lrint(double x)
   else
     return static_cast<long>(x - 0.5);
 }
+//----------------------------------------------------------------------------
+/// \brief Retrieve index from two dimensional FORTRAN array (1 based).
+//----------------------------------------------------------------------------
+int util::ForIndex (int a_first, int a_second, int a_firstSize)
+{
+  return (a_second - 1)*a_firstSize + a_first - 1;
+} // ForIndex
 
 #ifdef CXX_TEST
 

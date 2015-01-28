@@ -92,6 +92,14 @@ bool MfExportUtil::IsDataArray (const CStr &a_name,
     m.insert(std::make_pair(a_name, str));
     return true;
   }
+  // SWI
+  else if (a_name.find("ZETA SURFACE") != -1) {
+    // The number is in a field 3 wide, which makes it harder to remove
+    int pos = a_name.ReverseFind(' ');
+    CStr s = "zeta_" + a_name.Right(a_name.GetLength() - pos - 1);
+    m.insert(std::make_pair(a_name, s));
+    return true;
+  }
 
   return false;
 } // MfExportUtil::IsDataArray
@@ -110,7 +118,8 @@ bool MfExportUtil::Is1dArray (const CStr &a_name)
       a_name == Disu::CL1 || a_name == Disu::CL1 ||
       a_name == Disu::CL12 || a_name == Disu::FAHL ||
       a_name == Cln::NNDCLN || a_name == Cln::IBOUND ||
-      a_name == Cln::STRT)
+      a_name == Cln::STRT || a_name == Swi::NUZONE ||
+      a_name == Swi::NUSURF)
   {
     return true;
   }
@@ -131,7 +140,7 @@ bool MfExportUtil::IsSolver (const CStr &a_name)
     return true;
   }
   return false;
-} // MfExportUtil::Is1dArray
+} // MfExportUtil::IsSolver
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------

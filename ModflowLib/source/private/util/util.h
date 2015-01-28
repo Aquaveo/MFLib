@@ -85,6 +85,7 @@ namespace util
                 const char *a_dest);
   bool FileExists(const char *a_filePath);
   long lrint(double x);
+  int ForIndex(int a_first, int a_second, int a_firstSize);
 
 #ifdef CXX_TEST
   void DirectoryFilesEqual(const char* a_file,
@@ -99,7 +100,7 @@ namespace util
   template <class T>
   T& ForElement(T* a_, int a_first, int a_second, int a_firstSize)
   {
-    T& result = a_[(a_second - 1)*a_firstSize + a_first - 1];
+    T& result = a_[ForIndex(a_first, a_second, a_firstSize)];
     return result;
   } // ForElement
 
@@ -109,7 +110,7 @@ namespace util
   template <class T>
   T& ForElement(std::vector<T>& a_, int a_first, int a_second, int a_firstSize)
   {
-    T& result = a_[(a_second - 1)*a_firstSize + a_first - 1];
+    T& result = a_[ForIndex(a_first, a_second, a_firstSize)];
     return result;
   } // ForElement
   

@@ -837,6 +837,84 @@ bool MfData::GNC1 (const int *a_NPGNCn,
   return true;
 } // MfData::GNC1
 //------------------------------------------------------------------------------
+/// \brief This receives the data that belongs to the SWI package
+//------------------------------------------------------------------------------
+bool MfData::SWI (const int *a_NSRF,
+                  const int *a_ISTRAT,
+                  const int *a_NOBS,
+                  const int *a_ISWIZT,
+                  const int *a_ISWIBD,
+                  const int *a_ISWIOBS,
+                  const int *a_iadptflg,
+                  const int *a_NSOLVER,
+                  const int *a_IPRSOL,
+                  const int *a_MUTSOL,
+                  const int *a_MXITER,
+                  const int *a_ITER1,
+                  const int *a_NPCOND,
+                  const Real *a_ZCLOSE,
+                  const Real *a_RCLOSE,
+                  const Real *a_RELAX,
+                  const int *a_NBPOL,
+                  const Real *a_DAMP,
+                  const Real *a_DAMPT,
+                  const Real *a_TOESLOPE,
+                  const Real *a_TIPSLOPE,
+                  const Real *a_ALPHA,
+                  const Real *a_BETA,
+                  const int *a_NADPTMX,
+                  const int *a_NADPTMN,
+                  const Real *a_ADPTFCT,
+                  const char* a_obsname,
+                  const int *a_obsk,
+                  const int *a_obsi,
+                  const int *a_obsj)
+{
+  if (!a_NSRF ||
+      !a_ISTRAT ||
+      !a_NOBS ||
+      !a_ISWIZT ||
+      !a_ISWIBD ||
+      !a_ISWIOBS ||
+      !a_iadptflg ||
+      !a_NSOLVER ||
+      !a_IPRSOL ||
+      !a_MUTSOL ||
+      !a_MXITER ||
+      !a_ITER1 ||
+      !a_NPCOND ||
+      !a_ZCLOSE ||
+      !a_RCLOSE ||
+      !a_RELAX ||
+      !a_NBPOL ||
+      !a_DAMP ||
+      !a_DAMPT ||
+      !a_TOESLOPE ||
+      !a_TIPSLOPE ||
+      !a_ALPHA ||
+      !a_BETA ||
+      !a_NADPTMX ||
+      !a_NADPTMN ||
+      !a_ADPTFCT ||
+      !a_obsname ||
+      !a_obsk ||
+      !a_obsi ||
+      !a_obsj)
+
+  {
+    util::NullFuncArg(__FILE__, __LINE__);
+    return false;
+  }
+
+  MfData::Packages::SwiPack(a_NSRF,a_ISTRAT,a_NOBS,a_ISWIZT,a_ISWIBD,a_ISWIOBS,
+                        a_iadptflg,a_NSOLVER,a_IPRSOL,a_MUTSOL,a_MXITER,
+                        a_ITER1,a_NPCOND,a_ZCLOSE,a_RCLOSE,a_RELAX,a_NBPOL,
+                        a_DAMP,a_DAMPT,a_TOESLOPE,a_TIPSLOPE,a_ALPHA,
+                        a_BETA,a_NADPTMX,a_NADPTMN,a_ADPTFCT,a_obsname,a_obsk,
+                        a_obsi,a_obsj);
+  return true;
+} // MfData::SWI
+//------------------------------------------------------------------------------
 /// \brief 
 //------------------------------------------------------------------------------
 bool MfData::Head (const int* a_iper,
@@ -2028,6 +2106,21 @@ bool MfData::UPW1 (const int* NLAY,
                          LAYVKAUPW,LAYWET);
   return true;
 } // MfData::NwtLn2a
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+bool MfData::GetSaveComments (int UNIT)
+{
+  return MfData::Packages::GetSaveComments(UNIT);
+} // MfData::GetSaveComments
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+void MfData::SetSaveComments (int UNIT,
+                              int ISAVE)
+{
+  MfData::Packages::SetSaveComments(UNIT, ISAVE);
+} // MfData::SetSaveComments
 //------------------------------------------------------------------------------
 /// \brief 
 //------------------------------------------------------------------------------

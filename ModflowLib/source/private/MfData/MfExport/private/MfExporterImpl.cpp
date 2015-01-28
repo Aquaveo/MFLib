@@ -93,6 +93,10 @@ void ArrayMap (std::map<CStr, ArrayInfo>& a_map)
   a_map[ARR_SUB_DCOM] = ArrayInfo(PA::SUB, "SUB/26. DCOM", "", "DCOM");
   a_map[ARR_SUB_DZ] = ArrayInfo(PA::SUB, "SUB/28. DZ", "", "DZ");
   a_map[ARR_SUB_NZ] = ArrayInfo(PA::SUB, "SUB/30. NZ", "", "NZ");
+  // SWI
+  a_map[ARR_SWI_ZETA] = ArrayInfo(PA::SWI, "SWI/12. ZETA", "", "ZETA");
+  a_map[ARR_SWI_SSZ] = ArrayInfo(PA::SWI, "SWI/14. SSZ", "", "SSZ");
+  a_map[ARR_SWI_ISOURCE] = ArrayInfo(PA::SWI, "SWI/16. ISOURCE", "", "ISOURCE");
   // LAK
   a_map[ARR_LAK_ID] = ArrayInfo(PA::LAK, "Lak_", "", "ID");
   a_map[ARR_LAK_LEAK] = ArrayInfo(PA::LAK, "LakLeak_", "", "BDLKNC");
@@ -252,6 +256,7 @@ void MfExporterImpl::InitExtensions ()
   m_types.insert(std::make_pair(SOR, SOR));
   m_types.insert(std::make_pair(STRSP, STRSP));
   m_types.insert(std::make_pair(SUB, SUB));
+  m_types.insert(std::make_pair(SWI, SWI));
   m_types.insert(std::make_pair(UPW, UPW));
   m_types.insert(std::make_pair(UZF, UZF));
   m_types.insert(std::make_pair(WEL, WEL));
@@ -295,9 +300,11 @@ CStr MfExporterImpl::VarNameFromArrayName (CStr a_name)
   CStr rval;
   std::map<CStr, ArrayInfo> theMap;
   ArrayMap(theMap);
-  if (theMap.find(a_name) != theMap.end())
+  std::map<CStr, ArrayInfo>::const_iterator it = theMap.find(a_name);
+  if (it != theMap.end())
   {
-    rval = theMap[a_name].m_mfVarName;
+    const ArrayInfo& a = it->second;
+    rval = a.m_mfVarName;
   }
   return rval;
 } // MfExporterImpl::VarNameFromArrayName
