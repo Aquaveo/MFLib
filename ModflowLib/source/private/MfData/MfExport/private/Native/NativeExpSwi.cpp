@@ -112,21 +112,23 @@ void NativeExpSwi::Line2b ()
   CStr desc = "2b. MXITER ITER1 NPCOND ZCLOSE RCLOSE RELAX NBPOL DAMP [DAMPT]";
 
   const int *mxiter(0), *iter1(0), *npcond(0), *nbpol(0);
-  const Real *zclose(0), *rclose(0), *damp(0), *dampt(0);
+  const Real *zclose(0), *rclose(0), *relax(0), *damp(0), *dampt(0);
   MfPackage* a_p=GetPackage();
   if (!a_p->GetField(Packages::Swi::MXITER, &mxiter) || !mxiter ||
       !a_p->GetField(Packages::Swi::ITER1, &iter1) || !iter1 ||
       !a_p->GetField(Packages::Swi::NPCOND, &npcond) || !npcond ||
       !a_p->GetField(Packages::Swi::ZCLOSE, &zclose) || !zclose ||
       !a_p->GetField(Packages::Swi::RCLOSE, &rclose) || !rclose ||
-      !a_p->GetField(Packages::Swi::RELAX, &nbpol) || !nbpol ||
-      !a_p->GetField(Packages::Swi::NBPOL, &damp) || !damp ||
-      !a_p->GetField(Packages::Swi::DAMP, &dampt) || !dampt)
+      !a_p->GetField(Packages::Swi::RELAX, &relax) || !relax ||
+      !a_p->GetField(Packages::Swi::NBPOL, &nbpol) || !nbpol ||
+      !a_p->GetField(Packages::Swi::DAMP, &damp) || !damp ||
+      !a_p->GetField(Packages::Swi::DAMPT, &dampt) || !dampt)
     return;
 
   CStr ln;
-  ln.Format("%5d %5d %5d %s %s %5d %5d %s %s", *mxiter, *iter1, *npcond,
-            STR(*zclose), STR(*rclose), *nbpol, STR(*damp), STR(*dampt));
+  ln.Format("%5d %5d %5d %s %s %s %5d %s %s", *mxiter, *iter1, *npcond,
+            STR(*zclose), STR(*rclose), STR(*relax), *nbpol, STR(*damp),
+            STR(*dampt));
   AddToStoredLinesDesc(ln, desc);
 } // NativeExpSwi::Line2b
 //------------------------------------------------------------------------------
@@ -206,15 +208,12 @@ void NativeExpSwi::Line5 ()
 //------------------------------------------------------------------------------
 void NativeExpSwi::Line6 ()
 {
-  int nlay = GetGlobal()->NumLay();
-  for (int i = 0; i < nlay; ++i) {
-    MfPackage* p = GetGlobal()->GetPackage(ARR_SWI_SSZ);
-    if (p) {
-      std::vector<CStr>& lines(p->StringsToWrite());
-      std::vector<CStr>& desc(p->StringDescriptions());
-      desc[0] = " 6. SSZ(NCOL,NROW)";
-      AddToStoredLinesDesc(lines, desc);
-    }
+  MfPackage* p = GetGlobal()->GetPackage(ARR_SWI_SSZ);
+  if (p) {
+    std::vector<CStr>& lines(p->StringsToWrite());
+    std::vector<CStr>& desc(p->StringDescriptions());
+    desc[0] = " 6. SSZ(NCOL,NROW)";
+    AddToStoredLinesDesc(lines, desc);
   }
 } // NativeExpSwi::Line6
 //------------------------------------------------------------------------------
@@ -222,15 +221,12 @@ void NativeExpSwi::Line6 ()
 //------------------------------------------------------------------------------
 void NativeExpSwi::Line7 ()
 {
-  int nlay = GetGlobal()->NumLay();
-  for (int i = 0; i < nlay; ++i) {
-    MfPackage* p = GetGlobal()->GetPackage(ARR_SWI_ISOURCE);
-    if (p) {
-      std::vector<CStr>& lines(p->StringsToWrite());
-      std::vector<CStr>& desc(p->StringDescriptions());
-      desc[0] = " 7. ISOURCE(NCOL,NROW)";
-      AddToStoredLinesDesc(lines, desc);
-    }
+  MfPackage* p = GetGlobal()->GetPackage(ARR_SWI_ISOURCE);
+  if (p) {
+    std::vector<CStr>& lines(p->StringsToWrite());
+    std::vector<CStr>& desc(p->StringDescriptions());
+    desc[0] = " 7. ISOURCE(NCOL,NROW)";
+    AddToStoredLinesDesc(lines, desc);
   }
 } // NativeExpSwi::Line7
 //------------------------------------------------------------------------------
@@ -238,7 +234,6 @@ void NativeExpSwi::Line7 ()
 //------------------------------------------------------------------------------
 void NativeExpSwi::Line8 ()
 {
-  //using util::ForElement;
   using util::ForIndex;
 
   CStr desc = " 8. OBSNAM LAYER ROW COLUMN";

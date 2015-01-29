@@ -357,11 +357,14 @@ CStr NativeExpArr2d::GetArrayFileName (const CStr& a_name)
       layStr += tmp;
     }
     else if (name.find(ARR_SWI_ZETA) != -1) {
-      // Strip number from string. It's in a field 3 wide.
-      layStr = a_name;
-      layStr.Replace(ARR_SWI_ZETA, "");
-      name.Replace(layStr, "");
-      layStr.Trim();
+      // Use zeta surface number and layer number
+      CStr surfaceNumber = a_name;
+      surfaceNumber.Replace(ARR_SWI_ZETA, "");
+      name.Replace(surfaceNumber, "");
+      surfaceNumber.Trim();
+      std::stringstream ss;
+      ss << surfaceNumber << "_" << *m_lay;
+      layStr = ss.str();
     }
 
     arrName.Format("%s_%s_%s", GetNative()->PackageFromArrayName(name),
