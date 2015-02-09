@@ -3169,7 +3169,11 @@ static void ExportArealParamList (std::vector<Param>& rchList,
     for (j=0; j<nInst; j++)
     {
       if (nInst > 1)
-        a_exp->WriteLineToFile(packName, p->m_instNames[j]);
+      {
+        CStr iName = p->m_instNames[j];
+        MfExportUtil::InsertSingleQuotesInName(iName);
+        a_exp->WriteLineToFile(packName, iName);
+      }
       for (k=0; k<nClst; k++)
       {
         int q(j*nClst); // offset for instances
@@ -3223,6 +3227,7 @@ static void ExportArealStressParam (std::vector<Param>& rchList,
       {
         CStr pname(p->m_name);
         MfExportUtil::InsertSingleQuotesInName(pname);
+        MfExportUtil::InsertSingleQuotesInName(nameToWrite);
         if (p->m_instNames.size() > 0)
           name.Format("%s %s", pname, nameToWrite);
         else
@@ -3730,6 +3735,7 @@ static void expPVAL (MfPackage *a_p,
     {
       CStr parnamStr(parnam + i*10, 10);
       parnamStr.Trim();
+      MfExportUtil::InsertSingleQuotesInName(parnamStr);
       aCStr.Format("%s %s",
                    parnamStr.c_str(), STR(b[i]));
       a_exp->WriteLineToFile(PVAL, aCStr);
