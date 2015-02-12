@@ -366,7 +366,8 @@ bool MfGlobal::Export (const char *a_)
 
   CStr type(a_);
   MfPackage *p(0);
-  for (size_t i=0; !p && i<m_p->Packages().size(); i++)
+  size_t size = m_p->Packages().size();
+  for (size_t i=0; !p && i<size; i++)
   {
     if (type == m_p->Packages().at(i)->PackageName())
       p = m_p->Packages().at(i).get();

@@ -20,6 +20,7 @@
 #include <private\Parameters\Param.h>
 #include <private\Parameters\ParamList.h>
 
+
 using namespace MfData::Export;
 //------------------------------------------------------------------------------
 /// \brief
@@ -87,7 +88,7 @@ void NativeExpSwi::Line1 ()
   AddToStoredLinesDesc(ln, desc);
 } // NativeExpSwi::Line1
 //------------------------------------------------------------------------------
-/// \brief
+/// \brief NSOLVER IPRSOL MUTSOL
 //------------------------------------------------------------------------------
 void NativeExpSwi::Line2a ()
 {
@@ -105,7 +106,7 @@ void NativeExpSwi::Line2a ()
   AddToStoredLinesDesc(ln, desc);
 } // NativeExpSwi::Line2a
 //------------------------------------------------------------------------------
-/// \brief
+/// \brief MXITER ITER1 NPCOND ZCLOSE RCLOSE RELAX NBPOL DAMP [DAMPT]
 //------------------------------------------------------------------------------
 void NativeExpSwi::Line2b ()
 {
@@ -132,7 +133,7 @@ void NativeExpSwi::Line2b ()
   AddToStoredLinesDesc(ln, desc);
 } // NativeExpSwi::Line2b
 //------------------------------------------------------------------------------
-/// \brief
+/// \brief TOESLOPE TIPSLOPE [ALPHA] [BETA]
 //------------------------------------------------------------------------------
 void NativeExpSwi::Line3a ()
 {
@@ -152,7 +153,7 @@ void NativeExpSwi::Line3a ()
   AddToStoredLinesDesc(ln, desc);
 } // NativeExpSwi::Line3a
 //------------------------------------------------------------------------------
-/// \brief
+/// \brief NADPTMX NADPTMN ADPTFCT
 //------------------------------------------------------------------------------
 void NativeExpSwi::Line3b ()
 {
@@ -171,13 +172,12 @@ void NativeExpSwi::Line3b ()
   AddToStoredLinesDesc(ln, desc);
 } // NativeExpSwi::Line3b
 //------------------------------------------------------------------------------
-/// \brief
+/// \brief NU(ISTRAT=0: NSRF+2, ISTRAT=1: NSRF+1)
 //------------------------------------------------------------------------------
 void NativeExpSwi::Line4 ()
 {
   MfPackage* p = GetGlobal()->GetPackage(MfData::Packages::Swi::NUZONE);
-  if (!p)
-  {
+  if (!p) {
     p = GetGlobal()->GetPackage(MfData::Packages::Swi::NUSURF);
   }
   std::vector<CStr>& lines(p->StringsToWrite());
@@ -186,7 +186,7 @@ void NativeExpSwi::Line4 ()
   AddToStoredLinesDesc(lines, desc);
 } // NativeExpSwi::Line4
 //------------------------------------------------------------------------------
-/// \brief
+/// \brief ZETA(NCOL,NROW) U2DREL
 //------------------------------------------------------------------------------
 void NativeExpSwi::Line5 ()
 {
@@ -204,7 +204,7 @@ void NativeExpSwi::Line5 ()
   }
 } // NativeExpSwi::Line5
 //------------------------------------------------------------------------------
-/// \brief
+/// \brief SSZ(NCOL,NROW) U2DREL
 //------------------------------------------------------------------------------
 void NativeExpSwi::Line6 ()
 {
@@ -217,7 +217,7 @@ void NativeExpSwi::Line6 ()
   }
 } // NativeExpSwi::Line6
 //------------------------------------------------------------------------------
-/// \brief
+/// \brief ISOURCE(NCOL,NROW) U2DINT
 //------------------------------------------------------------------------------
 void NativeExpSwi::Line7 ()
 {
@@ -230,7 +230,7 @@ void NativeExpSwi::Line7 ()
   }
 } // NativeExpSwi::Line7
 //------------------------------------------------------------------------------
-/// \brief
+/// \brief OBSNAM LAYER ROW COLUMN
 //------------------------------------------------------------------------------
 void NativeExpSwi::Line8 ()
 {

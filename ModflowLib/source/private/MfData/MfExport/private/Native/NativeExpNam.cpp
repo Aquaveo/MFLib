@@ -110,6 +110,7 @@ void NativeExpNam::WriteFileStp ()
   setNativeSupported.insert("GBOB");
   setNativeSupported.insert("RVOB");
   setNativeSupported.insert("STOB");
+  setNativeSupported.insert("SWI2");
 
   CStr file, baseName = exp->GetBaseFileName();
   util::StripPathFromFilename(baseName, baseName);

@@ -112,7 +112,7 @@ bool TxtExporter::WriteStringToFile (const char *a_type,
                                    const char *a_line)
 {
   return(m_p->WriteStringToFile(a_type, a_line));
-} // TxtExporter::WriteLineToFile
+} // TxtExporter::WriteStringToFile
 //------------------------------------------------------------------------------
 /// \brief Writes a line to the specified file
 //------------------------------------------------------------------------------
@@ -121,7 +121,7 @@ bool TxtExporter::WriteLinesAndDescriptionsToFile (const char* a_type,
                                                    std::vector<CStr>& a_desc)
 {
   return(m_p->WriteLinesAndDescriptionsToFile(a_type, a_lines, a_desc));
-} // TxtExporter::WriteLineToFile
+} // TxtExporter::WriteLinesAndDescriptionsToFile
 //------------------------------------------------------------------------------
 /// \brief sets the base filename
 //------------------------------------------------------------------------------
@@ -250,7 +250,7 @@ bool TxtExporter::impl::WriteStringToFile (const char *a_type,
     return false;
   (*os) << a_string;
   return true;
-} // TxtExporter::impl::WriteLineToFile
+} // TxtExporter::impl::WriteStringToFile
 //------------------------------------------------------------------------------
 /// \brief Gets the ostream from the map
 //------------------------------------------------------------------------------

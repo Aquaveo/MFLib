@@ -4,10 +4,11 @@
 #ifndef NativeExpSwi_H
 #define NativeExpSwi_H
 
+#include <private\MfData\MfExport\private\Native\NativePackExp.h>
+
 class NativeExpSwiT;
 class Param;
 
-#include <private\MfData\MfExport\private\Native\NativePackExp.h>
 namespace MfData
 {
   namespace Export

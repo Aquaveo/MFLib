@@ -359,11 +359,11 @@ CStr NativeExpArr2d::GetArrayFileName (const CStr& a_name)
     else if (name.find(ARR_SWI_ZETA) != -1) {
       // Use zeta surface number and layer number
       CStr surfaceNumber = a_name;
-      surfaceNumber.Replace(ARR_SWI_ZETA, "");
-      name.Replace(surfaceNumber, "");
+      surfaceNumber.Replace(ARR_SWI_ZETA, ""); // Remove all but surface #
+      name.Replace(surfaceNumber, ""); // Remove surface number string
       surfaceNumber.Trim();
       std::stringstream ss;
-      ss << surfaceNumber << "_" << *m_lay;
+      ss << surfaceNumber << "_" << *m_lay; // "surface#_layer#"
       layStr = ss.str();
     }
 
