@@ -70,7 +70,7 @@ void iArrayDataToStream (std::ostream& a_os, const T* a_data,
       if (i > 0 && (i+1)%a_ncol == 0) a_os << "\n";
     }
   }
-} // NativeExpArr2d::ArrayDataToStream
+} // iArrayDataToStream
 //------------------------------------------------------------------------------
 CStr getIprn2dRel (int a_)
 {
