@@ -94,9 +94,9 @@ void ArrayMap (std::map<CStr, ArrayInfo>& a_map)
   a_map[ARR_SUB_DZ] = ArrayInfo(PA::SUB, "SUB/28. DZ", "", "DZ");
   a_map[ARR_SUB_NZ] = ArrayInfo(PA::SUB, "SUB/30. NZ", "", "NZ");
   // SWI
-  a_map[ARR_SWI_ZETA] = ArrayInfo(PA::SWI, "SWI/12. ZETA", "", "ZETA");
-  a_map[ARR_SWI_SSZ] = ArrayInfo(PA::SWI, "SWI/14. SSZ", "", "SSZ");
-  a_map[ARR_SWI_ISOURCE] = ArrayInfo(PA::SWI, "SWI/16. ISOURCE", "", "ISOURCE");
+  a_map[ARR_SWI_ZETA] = ArrayInfo(PA::SWI, "ZETA", "", "ZETA");
+  a_map[ARR_SWI_SSZ] = ArrayInfo(PA::SWI, "SSZ", "", "SSZ");
+  a_map[ARR_SWI_ISOURCE] = ArrayInfo(PA::SWI, "ISOURCE", "", "ISOURCE");
   // LAK
   a_map[ARR_LAK_ID] = ArrayInfo(PA::LAK, "Lak_", "", "ID");
   a_map[ARR_LAK_LEAK] = ArrayInfo(PA::LAK, "LakLeak_", "", "BDLKNC");

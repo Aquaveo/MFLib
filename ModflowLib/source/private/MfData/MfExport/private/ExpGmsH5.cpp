@@ -107,13 +107,6 @@ using std::set;
 #define MFBC_DZMULT      "29. DZ Multiplier"
 #define MFBC_NZ          "30. NZ"
 #define MFBC_NZMULT      "31. NZ Multiplier"
-// SWI
-#define MFBC_SWI_ZETA     "12. ZETA"
-#define MFBC_SWI_ZETAMULT "13. ZETA Multiplier"
-#define MFBC_SWI_SSZ      "14. SSZ"
-#define MFBC_SWI_SSZMULT  "15. SSZ Multiplier"
-#define MFBC_SWI_ISOURCE      "16. ISOURCE"
-#define MFBC_SWI_ISOURCEMULT  "17. ISOURCE Multiplier"
 
 #define MFBC_MAX_STR_LEN "Max. String Length"
 
@@ -1407,13 +1400,6 @@ static std::map<CStr, std::vector<int> >& GetChunkMap ()
     fg_chunkMap[MFBC_DZMULT] = v_3;
     fg_chunkMap[MFBC_NZ] = v_5000;
     fg_chunkMap[MFBC_NZMULT] = v_3;
-    // swi
-    fg_chunkMap[MFBC_SWI_ZETA] = v_5000;
-    fg_chunkMap[MFBC_SWI_ZETAMULT] = v_3;
-    fg_chunkMap[MFBC_SWI_SSZ] = v_5000;
-    fg_chunkMap[MFBC_SWI_SSZMULT] = v_3;
-    fg_chunkMap[MFBC_SWI_ISOURCE] = v_5000;
-    fg_chunkMap[MFBC_SWI_ISOURCEMULT] = v_3;
   }
   return fg_chunkMap;
 } // GetChunkMap
@@ -8975,7 +8961,7 @@ void ExpGmsH5T::testSupportedPackage ()
   TS_ASSERT(t->IsTypeSupported(SOR));
   TS_ASSERT(t->IsTypeSupported(STRSP));
   TS_ASSERT(t->IsTypeSupported(SUB));
-  TS_ASSERT(t->IsTypeSupported(SWI));
+  //TS_ASSERT(t->IsTypeSupported(SWI));
   TS_ASSERT(t->IsTypeSupported(WEL));
   TS_ASSERT(t->IsTypeSupported(MNW));
   TS_ASSERT(t->IsTypeSupported(MNW2));
@@ -8986,7 +8972,7 @@ void ExpGmsH5T::testSupportedPackage ()
   TS_ASSERT(!t->IsTypeSupported(VSC));
   TS_ASSERT(t->IsTypeSupported(ZON));
 
-  TS_ASSERT_EQUALS(e.m_types.size(), 48);
+  TS_ASSERT_EQUALS(e.m_types.size(), 47);
 }
 //------------------------------------------------------------------------------
 void ExpGmsH5T::testexpNameFile ()
@@ -9669,9 +9655,9 @@ void ExpGmsH5T::testGetArrayMap ()
   TS_ASSERT(m[ARR_SUB_DZ] == "SUB/28. DZ");
   TS_ASSERT(m[ARR_SUB_NZ] == "SUB/30. NZ");
 
-  TS_ASSERT(m[ARR_SWI_ZETA] == "SWI/12. ZETA");
-  TS_ASSERT(m[ARR_SWI_SSZ] == "SWI/14. SSZ");
-  TS_ASSERT(m[ARR_SWI_ISOURCE] == "SWI/16. ISOURCE");
+  TS_ASSERT(m[ARR_SWI_ZETA] == "ZETA");
+  TS_ASSERT(m[ARR_SWI_SSZ] == "SSZ");
+  TS_ASSERT(m[ARR_SWI_ISOURCE] == "ISOURCE");
 
   TS_ASSERT(m[ARR_LAK_ID] == "Lak_");
   TS_ASSERT(m[ARR_LAK_LEAK] == "LakLeak_");
