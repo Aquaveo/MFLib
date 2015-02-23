@@ -17,8 +17,13 @@ using namespace MfData::Export;
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-NativeExpEvt::NativeExpEvt ()
+NativeExpEvt::NativeExpEvt () :
+  m_par()
+, m_usg(false)
+, m_unstructured(false)
 {
+  m_usg = MfData::MfGlobal::Get().ModelType() == MfData::USG;
+  if (m_usg) m_unstructured = MfData::MfGlobal::Get().Unstructured() ? 1 : 0;
 } // MfNativeExpEvt::MfNativeExpEvt
 //------------------------------------------------------------------------------
 /// \brief
@@ -56,9 +61,20 @@ void NativeExpEvt::Line2 ()
       !a_p->GetField("IEVTCB", &ievtcb) || !ievtcb)
     return;
 
-  CStr ln;
+  CStr ln, desc = " 2. NEVTOP IEVTCB";
+  if (m_usg) desc.Replace(" 2", "2a");
   ln.Format("%5d %5d", *nevtop, *ievtcb);
-  AddToStoredLinesDesc(ln, " 2. NEVTOP IEVTCB");
+  AddToStoredLinesDesc(ln, desc);
+  if (m_usg && 2 == *nevtop && m_unstructured)
+  {
+    desc = "2b. MXNDEVT";
+    const int *mxndevt(0);
+    if (a_p->GetField(Packages::EVTpack::MXNDEVT, &mxndevt) && mxndevt)
+    {
+      ln.Format("%5d", *mxndevt);
+      AddToStoredLinesDesc(ln, desc);
+    }
+  }
 } // MfNativeExpEvt::Line2
 //------------------------------------------------------------------------------
 /// \brief

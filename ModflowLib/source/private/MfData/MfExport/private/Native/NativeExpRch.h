@@ -34,6 +34,7 @@ namespace MfData
       void Line8();
 
       NeArealPar m_par;
+      bool m_usg, m_unstructured;
 
       void RewriteFileWithParameters();
     };

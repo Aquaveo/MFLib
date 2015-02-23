@@ -39,6 +39,8 @@ void iArrayDataToStream (std::ostream& a_os, const T* a_data,
   int w = 0, len;
   int flg = STR_FULLWIDTH;
 
+  int txtCol = a_ncol;
+  if (1 == a_nrow) txtCol = 15;
   if (a_data)
   {
     for (int i=0; i<a_nrow*a_ncol; ++i)
@@ -49,7 +51,7 @@ void iArrayDataToStream (std::ostream& a_os, const T* a_data,
     for (int i=0; i<a_nrow*a_ncol; ++i)
     {
       a_os << STR(a_data[i],-1,w,flg) << " ";
-      if (i > 0 && (i+1)%a_ncol == 0) a_os << "\n";
+      if (i > 0 && (i+1)%txtCol == 0) a_os << "\n";
     }
   }
   else
@@ -67,7 +69,7 @@ void iArrayDataToStream (std::ostream& a_os, const T* a_data,
     {
       tmp.Format(fmt, a_iData[i]);
       a_os << tmp << " ";
-      if (i > 0 && (i+1)%a_ncol == 0) a_os << "\n";
+      if (i > 0 && (i+1)%txtCol == 0) a_os << "\n";
     }
   }
 } // iArrayDataToStream
@@ -197,7 +199,14 @@ NativeExpArr2d::NativeExpArr2d () :
 , m_dataD(nullptr)
 , m_mult(0)
 , m_firstTime(1)
+, m_unstructured(0)
+, m_tmp_iMult(1)
 {
+  bool usg = MfData::MfGlobal::Get().ModelType() == MfData::USG;
+  if (usg)
+  {
+    m_unstructured = MfData::MfGlobal::Get().Unstructured() ? 1 : 0;
+  }
 } // MfNativeExpArr2d::MfNativeExpArr2d
 //------------------------------------------------------------------------------
 /// \brief
@@ -254,11 +263,19 @@ bool NativeExpArr2d::GetData ()
     return false;
   }
   const double *dataConstDbl(nullptr);
+  package->GetField(Packages::Array::MULT, &m_mult);
   if (!package->GetField(Packages::Array::ARRAY, &m_dataConst) || !m_dataConst ||
-      !package->GetField(Packages::Array::MULT, &m_mult) || !m_mult)
+      !m_mult)
   {
+    package->GetField(Packages::Array::MULT, &m_iMult);
+    if (!m_iMult && m_mult)
+    {
+      m_tmp_iMult = static_cast<int>(*m_mult);
+      m_iMult = &m_tmp_iMult;
+      m_mult = nullptr;
+    }
     if (!package->GetField(Packages::Array::ARRAY, &m_iData) || !m_iData ||
-        !package->GetField(Packages::Array::MULT, &m_iMult) || !m_iMult)
+        !m_iMult)
     {
       if (!package->GetField(Packages::Array::ARRAY, &dataConstDbl) || !dataConstDbl ||
           !package->GetField(Packages::Array::MULT, &m_mult) || !m_mult)
@@ -271,6 +288,17 @@ bool NativeExpArr2d::GetData ()
   package->GetField(Packages::Array::IPRN, &m_iPRN);
   m_nrow = GetGlobal()->NumRow();
   m_ncol = GetGlobal()->NumCol();
+  if (m_unstructured)
+  {
+    m_nrow = 1;
+    const int* JJ(nullptr);
+    if (!package->GetField("JJ", &JJ) || !JJ)
+    {
+      ASSERT(0);
+      return false;
+    }
+    m_ncol = *JJ;
+  }
   m_curSp = GetGlobal()->GetCurrentPeriod();
   if (m_dataConst)
   {

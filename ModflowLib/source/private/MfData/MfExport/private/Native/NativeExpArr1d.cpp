@@ -104,24 +104,3 @@ CStr NativeExpArr1d::GetFname (const int* K)
     fname.Format("%s%s%s_array_%s_%d.txt", path, folderStr, fname1, name, *K);
   return fname;
 } // NativeExpArr1d::GetFname
-//------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
-void NativeExpArr1d::AddLine (const int* IPRN, const Real* MULT,
-                               CStr fname)
-{
-  CStr strIprn, strMult;
-  strIprn.Format("%5d", *IPRN);
-  //if (*IPRN < 0) strIprn = "-1";
-  //else if (*IPRN == 0) strIprn = "10G12.5";
-  //else strIprn = "5G12.5";
-  strMult = STR(*MULT);
-  util::StripPathFromFilename(fname, fname);
-  if (GetNative()->GetArraysInFolder())
-  {
-    fname = ".\\arrays\\" + fname;
-  }
-  CStr str;
-  str.Format("OPEN/CLOSE %s %s (FREE) %s", fname, strMult, strIprn);
-  AddToStoredLinesDesc(str, "");
-} // NativeExpArr1d::AddLine

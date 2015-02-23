@@ -38,6 +38,7 @@ void ArrayMap (std::map<CStr, ArrayInfo>& a_map)
   a_map[ARR_DIS_VCB] = ArrayInfo(PA::DIS, "vcb", "", "BOTM");
   // BCF
   a_map[ARR_BCF_HY] = ArrayInfo(PA::BCF, "HY_", "HK", "HY");
+  a_map[ARR_BCF_HK_U] = ArrayInfo(PA::BCF, "HY_", "HK", "HY");
   a_map[ARR_BCF_TRAN] = ArrayInfo(PA::BCF, "TRAN_", "", "TRAN");
   a_map[ARR_BCF_VCONT] = ArrayInfo(PA::BCF, "LEAK_", "", "Vcont");
   a_map[ARR_BCF_SF1] = ArrayInfo(PA::BCF, "SF1_", "", "Sf1");
@@ -56,6 +57,7 @@ void ArrayMap (std::map<CStr, ArrayInfo>& a_map)
   a_map[ARR_LPF_SY] = ArrayInfo(PA::LPF, "SY", "SY", "SY");
   a_map[ARR_LPF_WET] = ArrayInfo(PA::LPF, "WET", "", "WETDRY");
   a_map[ARR_LPF_VKCBD] = ArrayInfo(PA::LPF, "QUASIVK", "VKCB", "VKCB");
+  a_map[ARR_LPF_ANGX] = ArrayInfo(PA::LPF, "ANGLEX", "", "ANGLEX");
   // RCH
   a_map[ARR_RCH_RCH] = ArrayInfo(PA::RCH, "Recharge/07. Property", "RCH", "RECH");
   a_map[ARR_RCH_LAY] = ArrayInfo(PA::RCH, "Recharge/09. Layer", "", "IRCH");

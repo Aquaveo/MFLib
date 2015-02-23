@@ -25,7 +25,11 @@ using namespace MfData::Export;
 //------------------------------------------------------------------------------
 NativeExpRch::NativeExpRch () :
   m_par()
+, m_usg(false)
+, m_unstructured(false)
 {
+  m_usg = MfData::MfGlobal::Get().ModelType() == MfData::USG;
+  if (m_usg) m_unstructured = MfData::MfGlobal::Get().Unstructured() ? 1 : 0;
 } // MfNativeExpRch::MfNativeExpRch
 //------------------------------------------------------------------------------
 /// \brief
@@ -57,6 +61,7 @@ bool NativeExpRch::Export ()
 void NativeExpRch::Line2 ()
 {
   CStr desc = " 2. NRCHOP IRCHCB";
+  if (m_usg) desc.Replace(" 2", "2a");
 
   const int *nrchop(0), *irchcb(0);
   MfPackage* a_p=GetPackage();
@@ -68,6 +73,16 @@ void NativeExpRch::Line2 ()
   CStr ln;
   ln.Format("%5d %5d", *nrchop, *irchcb);
   AddToStoredLinesDesc(ln, desc);
+  if (m_unstructured && 2 == *nrchop)
+  {
+    desc = "2b. MXNDRCH";
+    const int *mxndrch(0);
+    if (a_p->GetField(Packages::RCHpack::MXNDRCH, &mxndrch) && mxndrch)
+    {
+      ln.Format("%5d", *mxndrch);
+      AddToStoredLinesDesc(ln, desc);
+    }
+  }
 } // NativeExpRch::Line2
 //------------------------------------------------------------------------------
 /// \brief

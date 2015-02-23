@@ -772,13 +772,16 @@ bool NativeExpSolver::WriteLine3_SMS ()
 bool NativeExpSolver::WriteLine4_SMS ()
 {
   bool rval = true;
-  const int* LINMETH(0),* IFDPARAM(0);
+  const int* LINMETH(0)/*,* IFDPARAM(0)*/;
 
   MfPackage* p = GetPackage();
-  if (p->GetField(SmsPack::IFDPARAM, &IFDPARAM) && IFDPARAM &&
+  if (//p->GetField(SmsPack::IFDPARAM, &IFDPARAM) && IFDPARAM &&
       p->GetField(SmsPack::LINMETH, &LINMETH) && LINMETH)
   {
-    rval = (*LINMETH == 2 && (*IFDPARAM < 1 || *IFDPARAM > 3));
+    // this line follows the documentation but the documentation is not
+    // followed by USG. If LINMETH=2 then we should write this line.
+    //rval = (*LINMETH == 2 && (*IFDPARAM < 1 || *IFDPARAM > 3));
+    rval = (*LINMETH == 2);
   }
   return rval;
 } // NativeExpSolver::WriteLine4_SMS
@@ -834,7 +837,7 @@ CStr NativeExpSolver::Line1b_SMS ()
       p->GetField(SmsPack::LINMETH, &LINMETH) && LINMETH)
   {
     rval.Format("%s %s %d %d %d %d %d ",
-                STR(*HCLOSE), STR(*HICLOSE), *MXITER, *ITER1, *IPRSMS,
+                STR((Real)*HCLOSE), STR((Real)*HICLOSE), *MXITER, *ITER1, *IPRSMS,
                 *NONLINMETH, *LINMETH);
   }
   return rval;
@@ -896,7 +899,7 @@ CStr NativeExpSolver::Line3_SMS ()
 CStr NativeExpSolver::Line4_SMS ()
 {
   CStr rval;
-  const double* RCLOSEPCGU(0);
+  const Real* RCLOSEPCGU(0);
   const int* IPC(0),* ISCL(0),* IORD(0);
 
   MfPackage* p = GetPackage();

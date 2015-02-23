@@ -86,7 +86,14 @@ NativeExpSfr::NativeExpSfr () :
 , m_seg(0)
 , m_segVec()
 , m_sz(26)
+, m_usg(false)
+, m_unstructured(false)
 {
+  m_usg = MfData::MfGlobal::Get().ModelType() == MfData::USG;
+  if (m_usg)
+  {
+    m_unstructured = MfData::MfGlobal::Get().Unstructured() ? 1 : 0;
+  }
 } // MfNativeExpSfr::MfNativeExpSfr
 //------------------------------------------------------------------------------
 /// \brief
@@ -161,6 +168,7 @@ void NativeExpSfr::Line1 ()
     int flg = STR_FULLWIDTH;
     int w = util::RealWidth();
     CStr ln, desc = " 1. NSTRM NSS NSFRPAR NPARSEG CONST DLEAK ISTCB1 ISTCB2 ";
+    if (m_usg) desc.Replace(" 1", "1c");
     ln.Format("%5d %5d %5d %5d %s %s %5d %5d", *nstrm, *nss, 0, 0,
               STR(*constv,-1,w,flg), STR(*dleak,-1,w,flg), *istcb1, *istcb2);
 
@@ -215,6 +223,8 @@ void NativeExpSfr::Line2 ()
     for (int i = 0; i < numReaches; i++)
     {
       CStr desc = " 2. KRCH IRCH JRCH ISEG IREACH RCHLEN ";
+      int nrch;
+      if (m_usg) desc.Replace(" 2", "2a");
       int ck = istrm[i*(*nistrmd)+0];
       int ci = istrm[i*(*nistrmd)+1];
       int cj = istrm[i*(*nistrmd)+2];
@@ -223,6 +233,14 @@ void NativeExpSfr::Line2 ()
       Real rchlen = strm[i*(*nstrmd)+0];
       ln.Format("%5d %5d %5d %5d %5d %s ", ck, ci, cj, iseg, ireach,
                 STR(rchlen,-1,w,flg));
+      if (m_unstructured)
+      {
+        desc = "2b. NRCH ISEG IREACH RCHLEN ";
+        nrch = istrm[i*(*nistrmd)+5];
+        ln.Format("%5d %5d %5d %s ", nrch, iseg, ireach,
+                  STR(rchlen,-1,w,flg));
+      }
+
       // STRTOP, SLOPE, STRTHICK, and STRHC1 are read when NSTRM is less
       // than 0 and ISFROPT is 1, 2, or 3.
       if (*nstrm < 0 && *isfropt > 0 && *isfropt < 4)
@@ -939,7 +957,10 @@ void NativeExpSfr::RewriteLines1and2 (CStr& a_tmpF, int a_npar)
   {
     if (ln.Find("#") == 0) continue;
     if (ln.Find("#  1. NSTRM") != -1 ||
-        ln.Find("#  2. KRCH") != -1)
+        ln.Find("# 1c. NSTRM") != -1 || 
+        ln.Find("#  2. KRCH") != -1 ||
+        ln.Find("# 2a. KRCH") != -1 ||
+        ln.Find("# 2b. NRCH") != -1)
     {
       desc = ln;
       ln1 = ln.Left(ln.Find("#"));
@@ -947,7 +968,8 @@ void NativeExpSfr::RewriteLines1and2 (CStr& a_tmpF, int a_npar)
       desc.Replace("# ", "");
       ln1.TrimRight();
 
-      if (ln.Find("#  1. NSTRM") != -1)
+      if (ln.Find("#  1. NSTRM") != -1 ||
+          ln.Find("# 1c. NSTRM") != -1)
       {
         int nstrm, nss, tmp, nparseg;
         GetGlobal()->GetIntVar(SFR_NPARSEG, nparseg);

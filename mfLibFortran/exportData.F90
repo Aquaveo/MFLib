@@ -1223,7 +1223,7 @@ module module_exportData
     implicit none
     integer, intent(in) :: NCLN,ICLNNDS,ICLNCB,ICLNHD,ICLNDD,ICLNIB,NCLNGWC,NCONDUITYP
 
-    !if (NOT(ed_getExportData())) return
+    if (NOT(ed_getExportData())) return
     call mfLibexp_ClnLine1(NCLN,ICLNNDS,ICLNCB,ICLNHD,ICLNDD,ICLNIB,NCLNGWC,NCONDUITYP)
   end subroutine exp_ClnLine1
 
@@ -1236,6 +1236,7 @@ module module_exportData
     integer, intent(in) :: NCLNNDS, I, IFNO, IFTYP, IFDIR, IFLIN, ICCWADI
     real, intent(in) :: FLENG, FELEV, FANGLE
 
+    if (NOT(ed_getExportData())) return
     ACLNNDSAQ(I,1) = IFNO
     ACLNNDSAQ(I,2) = IFTYP
     ACLNNDSAQ(I,3) = IFDIR
@@ -1254,7 +1255,7 @@ module module_exportData
     real, intent(in) :: ACLNNDSAQ(*)
     integer, intent(in) :: NCLNNDS
 
-    !if (NOT(ed_getExportData())) return
+    if (NOT(ed_getExportData())) return
     call mfLibexp_ClnLine4(ACLNNDSAQ,NCLNNDS)
   end subroutine exp_ClnLine4
 
@@ -1267,6 +1268,7 @@ module module_exportData
     integer, intent(in) :: NCLNGWC, I, IFNO, IFNOD, IFCON, ICGWADI
     real, intent(in) :: FSKIN, FLENG, FANISO
 
+    if (NOT(ed_getExportData())) return
     ACLNGWCAQ(I,1) = IFNO
     ACLNGWCAQ(I,2) = IFNOD
     ACLNGWCAQ(I,3) = IFCON
@@ -1283,7 +1285,7 @@ module module_exportData
     implicit none
     real, intent(in) :: ACLNGWCAQ(*)
 
-    !if (NOT(ed_getExportData())) return
+    if (NOT(ed_getExportData())) return
     call mfLibExp_ClnLine5(ACLNGWCAQ)
   end subroutine exp_ClnLine5
 
@@ -1296,6 +1298,7 @@ module module_exportData
     integer, intent(in) :: NCLNGWC, I, IFNO, IFLAY, IFROW, IFCOL, IFCON, ICGWADI
     real, intent(in) :: FSKIN, FLENG, FANISO
 
+    if (NOT(ed_getExportData())) return
     ACLNGWCAQ(I,1) = IFNO
     ACLNGWCAQ(I,2) = IFLAY
     ACLNGWCAQ(I,3) = IFROW
@@ -1314,7 +1317,7 @@ module module_exportData
     implicit none
     real, intent(in) :: ACLNGWCAQ(*)
 
-    !if (NOT(ed_getExportData())) return
+    if (NOT(ed_getExportData())) return
     call mfLibExp_ClnLine6(ACLNGWCAQ)
   end subroutine exp_ClnLine6
 
@@ -1325,7 +1328,7 @@ module module_exportData
     implicit none
     real, intent(in) :: ACLNCOND(*)
 
-    !if (NOT(ed_getExportData())) return
+    if (NOT(ed_getExportData())) return
     call mfLibExp_ClnLine7(ACLNCOND)
   end subroutine exp_ClnLine7
 
@@ -1335,7 +1338,7 @@ module module_exportData
   subroutine exp_ClnLines8And9 ()
     implicit none
 
-    !if (NOT(ed_getExportData())) return
+    if (NOT(ed_getExportData())) return
     call mfLibExp_ClnLines8And9()
   end subroutine exp_ClnLines8And9
 
@@ -1346,7 +1349,7 @@ module module_exportData
     implicit none
     integer, intent(in) :: NODES,NJAG,IVSD,IDSYMRD
 
-    !if (NOT(ed_getExportData())) return
+    if (NOT(ed_getExportData())) return
     call mfLibExp_Disu1(NODES,NJAG,IVSD,IDSYMRD)
   end subroutine exp_DISU1
 
@@ -1357,7 +1360,7 @@ module module_exportData
     implicit none
     integer, intent(in) :: NODLAY(*)
 
-    !if (NOT(ed_getExportData())) return
+    if (NOT(ed_getExportData())) return
     call mfLibExp_Disu2(NODLAY)
   end subroutine exp_DISU2
 
@@ -1371,7 +1374,7 @@ module module_exportData
     real, intent(in) :: TSMULT(*)
     integer, intent(in) :: ISSFLG(*)
 
-    !if (NOT(ed_getExportData())) return
+    if (NOT(ed_getExportData())) return
     call mfLibExp_Disu3(PERLEN,NSTP,TSMULT,ISSFLG)
   end subroutine exp_DISU3
 
@@ -1932,9 +1935,11 @@ module module_exportData
     call FixName(NAME, NAME2)
     call mfLibExp_SingleValInt(NAME2,'JJ',JJ)
     call mfLibExp_SingleValInt(NAME2,'K',K)
+    call mfLibExp_SingleValInt(NAME2,'LAYER',K)
     call mfLibExp_SingleValInt(NAME2,'IPRN',IPRN)
     call mfLibExp_SingleValFlt(NAME2,'MULT',MULT)
     call mfLibExp_ArrayValInt(NAME2,'ARR',ARR)
+    call mfLibExp_ArrayValInt(NAME2,'ARRAY',ARR)
     call mfLibExp_ExpPack(NAME2)
   end subroutine exp_U1DINT
 
@@ -1946,6 +1951,7 @@ module module_exportData
     character*24, intent(in)  :: NAME
     integer, intent(in)       :: JJ,K,IPRN
     real, intent(in)          :: ARR(JJ),MULT
+    integer IMULT
     character*24 NAME2
 
     if (NOT(ed_getExportData())) return
@@ -1953,9 +1959,11 @@ module module_exportData
     call FixName(NAME, NAME2)
     call mfLibExp_SingleValInt(NAME2,'JJ',JJ)
     call mfLibExp_SingleValInt(NAME2,'K',K)
+    call mfLibExp_SingleValInt(NAME2,'LAYER',K)
     call mfLibExp_SingleValInt(NAME2,'IPRN',IPRN)
     call mfLibExp_SingleValFlt(NAME2,'MULT',MULT)
     call mfLibExp_ArrayValFlt(NAME2,'ARR',ARR)
+    call mfLibExp_ArrayValFlt(NAME2,'ARRAY',ARR)
     call mfLibExp_ExpPack(NAME2)
   end subroutine exp_U1DREL
 
@@ -1995,6 +2003,7 @@ module module_exportData
       return
     end if
 
+    call mfLibExp_SingleValInt(NAME,'JJ',JJ)
     call mfLibExp_U2DREL(NAME,ARR,MULT,K,IPRN)
   end subroutine exp_U2DREL
 
@@ -2030,6 +2039,7 @@ module module_exportData
       return
     end if
 
+    call mfLibExp_SingleValInt(NAME,'JJ',JJ)
     call mfLibExp_U2DINT(NAME,ARR,MULT,K,IPRN)
   end subroutine exp_U2DINT
 

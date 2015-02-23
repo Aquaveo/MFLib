@@ -37,6 +37,7 @@ namespace MfData
       void ArrayToFile(MfPackage* p, const CStr& a_desc);
 
       NeArealPar m_par;
+      bool m_usg, m_unstructured;
     };
 
   }

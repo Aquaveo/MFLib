@@ -87,6 +87,7 @@ namespace MfData
 
       std::map<int, CStr> m_mapKeyName;
       std::map<int, Real> m_mapKeyVal;
+      bool m_usg, m_unstructured;
     };
 
   }

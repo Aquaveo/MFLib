@@ -29,6 +29,7 @@ namespace MfData
       void Line2();
       void Lines5to6();
       void Lines8to10();
+      CStr KijStr (int ck, int ci, int cj);
       CStr Line6FromData(int a_i, const int* a_istrm, const Real* a_str);
       void Lines8to10FromData(const int* itmp, const int* icalc,
                               const int* nss, const int* itrib,
@@ -83,7 +84,7 @@ namespace MfData
       std::map<int, int>    m_mapParSegKey;
       std::map<int, int>    m_mapParSegInstances;
       std::map<int, int>    m_mapParSegNlst;
-      bool m_usg;
+      bool m_usg, m_unstructured;
       int m_nI, m_nJ;
     };
 

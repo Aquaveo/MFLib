@@ -25,10 +25,12 @@ using namespace MfData::Export;
 //------------------------------------------------------------------------------
 NativeExpHfb::NativeExpHfb ()
 : m_usg(false)
+, m_unstructured(false)
 , m_VAL_ROW_SIZE(6)
 , m_HFB_ROW_SIZE(7)
 {
   m_usg = MfData::MfGlobal::Get().ModelType() == MfData::USG;
+  if (m_usg) m_unstructured = MfData::MfGlobal::Get().Unstructured() ? 1 : 0;
   m_nI = MfData::MfGlobal::Get().NumRow();
   m_nJ = MfData::MfGlobal::Get().NumCol();
 } // MfNativeExpHfb::MfNativeExpHfb
@@ -78,6 +80,16 @@ CStr NativeExpHfb::Desc (int a_line)
                   " 4. Layer IROW1 ICOL1 IROW2 ICOL2 Hydchr",
                   " 5. NACTHFB",
                   " 6. Pname"};
+  if (m_usg)
+  {
+    rval[2] = "3b. Layer IROW1 ICOL1 IROW2  ICOL2 Factor";
+    rval[3] = "4b. Layer IROW1 ICOL1 IROW2 ICOL2 Hydchr";
+    if (m_unstructured)
+    {
+      rval[2] = "3a. Node1 Node2 Factor";
+      rval[3] = "4a. Node1 Node2 Hydchr";
+    }
+  }
   return rval[a_line-1];
 } // MfNativeExpHfb::Desc
 //------------------------------------------------------------------------------
@@ -221,6 +233,13 @@ CStr NativeExpHfb::KijijFactToStr (
   }
 
   CStr s;
+  if (m_unstructured)
+  {
+    int node1 = static_cast<int>(a_[(a_idx*a_rowSize)+0]);
+    int node2 = static_cast<int>(a_[(a_idx*a_rowSize)+1]);
+    s.Format("%d %d %s ", node1, node2, STR(hydc));
+    return s;
+  }
   s.Format("%d %d %d %d %d %s ", lay, row1, col1, row2, col2, STR(hydc));
   return s;
 } // NativeExpHfb::KijijFactToStr

@@ -53,10 +53,12 @@ NativeExpStr::NativeExpStr () :
 , m_mapParSegKey()
 , m_mapParSegInstances()
 , m_usg(false)
+, m_unstructured(false)
 , m_nI(0)
 , m_nJ(0)
 {
   m_usg = MfData::MfGlobal::Get().ModelType() == MfData::USG;
+  if (m_usg) m_unstructured = MfData::MfGlobal::Get().Unstructured() ? 1 : 0;
   m_nI = MfData::MfGlobal::Get().NumRow();
   m_nJ = MfData::MfGlobal::Get().NumCol();
 } // MfNativeExpStr::MfNativeExpStr
@@ -161,6 +163,11 @@ void NativeExpStr::Lines5to6 ()
     GetGlobal()->SetStrVar("STR_LN_5", myStr);
 
     desc = " 6. Layer Row Col Seg Reach Flow Stage Cond Sbot Stop [xyz]";
+    if (m_usg)
+    {
+      desc.Replace(" 6", "6a");
+      if (m_unstructured) desc.Replace("6a. Layer Row Col", "6b. Node");
+    }
     for (int i=1; i<=*itmp; ++i)
     {
       line = Line6FromData(i, istrm, strm);
@@ -168,6 +175,16 @@ void NativeExpStr::Lines5to6 ()
     }
   }
 } // NativeExpStr::Lines5to6
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+CStr NativeExpStr::KijStr (int ck, int ci, int cj)
+{
+  CStr s;
+  if (!m_unstructured) s.Format("%4d %4d %4d", ck, ci, cj);
+  else                 s.Format("%4d", ck);
+  return s;
+} // NativeExpStr::KijStr
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
@@ -182,7 +199,7 @@ CStr NativeExpStr::Line6FromData (int i,
   std::map<int, double>& mapPar = GetParamMap();
 
   ck    = ForElement(istrm, 1, i, 5);
-  if (m_usg)
+  if (m_usg && !m_unstructured)
   {
     ck = ck / (m_nI*m_nJ) + 1;
   }
@@ -197,7 +214,7 @@ CStr NativeExpStr::Line6FromData (int i,
   stop  = ForElement(strm, 5, i, 11);
   flowStr = "              ";
   if (1 == reach || !isMf2k) flowStr.Format("%s", STR(flow,-1,14,flg));
-  line.Format("%4d %4d %4d %4d %4d %s %s %s %s %s", ck, ci, cj, seg, reach,
+  line.Format("%s %4d %4d %s %s %s %s %s", KijStr(ck, ci, cj), seg, reach,
               flowStr, STR(stage,-1,9,flg), STR(cond,-1,9,flg),
               STR(sbot,-1,9,flg), STR(stop,-1,9,flg));
   condInt = static_cast<int>(cond);
@@ -808,6 +825,7 @@ void NativeExpStr::Par_Lines3to4 (std::vector< std::vector<CStr> >& a_spLines)
           a_spLines[i].back() += instName;
         }
         desc = "4b. Layer Row Col Seg Reach Flow Stage Condfact Sbot Stop [xyz]";
+        if (m_unstructured) desc.Replace("4b. Layer Row Col", "4c. Node");
         for (int j=0; j<nline; ++j)
         {
           r.GetLine(&line);

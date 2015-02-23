@@ -28,7 +28,8 @@ namespace MfData
 
       virtual void OnSetData();
 
-      CStr Desc(int a_line, int a_lay=-1);
+      CStr Desc(int a_line);
+      CStr Desc(int a_line, int a_lay);
       CStr Line1();
       CStr Line2to6(int a_line);
       bool CanWriteLine(int a_line, int a_lay=-1);
@@ -39,9 +40,12 @@ namespace MfData
       CStr Line9(PClust* a_clust);
       void Line10to16(int a_line, int a_lay);
       void Line12(int a_lay);
+      void Line10Usg();
 
       int m_nLay;
       int m_nPar;
+      int m_ikcflag;
+      bool m_usg, m_unstructured, m_anyChaniNotOne;
     };
 
   }

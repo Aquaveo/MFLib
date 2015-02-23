@@ -30,7 +30,12 @@ NativeExpBcf::NativeExpBcf () :
   m_nLay(0)
 , m_lineCnt(10, 0)
 , m_internalArrays(0)
+, m_usg(0)
+, m_unstructured(0)
+, m_anyTRPYnotEqualToOne(0)
 {
+  m_usg = MfData::MfGlobal::Get().ModelType() == MfData::USG;
+  if (m_usg) m_unstructured = MfData::MfGlobal::Get().Unstructured() ? 1 : 0;
 } // MfNativeExpBcf::MfNativeExpBcf
 //------------------------------------------------------------------------------
 /// \brief
@@ -46,6 +51,7 @@ bool NativeExpBcf::Export ()
   AddToStoredLinesDesc(Line1(), Desc(1));
   AddToStoredLinesDesc(Line2(), Desc(2));
   AddToStoredLinesDesc(Line3(), Desc(3));
+  if (m_unstructured) Line4Usg();
   for (int i=1; i<=m_nLay; ++i)
   {
     if (CanWriteLine(4, i)) Line4to9(4,i);
@@ -71,7 +77,7 @@ void NativeExpBcf::OnSetData ()
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-CStr NativeExpBcf::Desc (int a_line, int a_lay)
+CStr NativeExpBcf::DocStr (int a_line)
 {
   CStr desc[9] = {" 1. IBCFCB HDRY IWDFLG WETFCT IWETIT IHDWET",
                   " 2. Ltype(NLAY)",
@@ -83,8 +89,55 @@ CStr NativeExpBcf::Desc (int a_line, int a_lay)
                   " 8. Sf2(NCOL,NROW)     LAY ",
                   " 9. WETDRY(NCOL,NROW)  LAY "
                  };
+  if (!m_usg) return desc[a_line-1];
+
+
+  MfPackage* p = GetPackage();
+  const int  *ikvflag(0);
+  p->GetField(Packages::BCFpack::IKVFLAG, &ikvflag);
+  if (!m_unstructured)
+  {
+    CStr descUsg[10] =
+    {"1a. IBCFCB HDRY IWDFLG WETFCT IWETIT IHDWET IKVFLAG",
+     " 2. Ltype(NLAY)",
+     " 3. TRPY(NLAY)",
+     "12. Sf1(NCOL,NROW)     LAY ",
+     "13. Tran(NCOL,NROW)    LAY ",
+     "14. HY(NCOL,NROW)      LAY ",
+     "15. Vcont(NCOL,NROW)   LAY ",
+     "17. Sf2(NCOL,NROW)     LAY ",
+     "18. WETDRY(NCOL,NROW)  LAY ",
+     " 4. ANGLEX(NJAG)"
+    };
+    if (ikvflag && 1 == *ikvflag) descUsg[6] = "16. Kv(NCOL,NROW)      LAY ";
+    return descUsg[a_line-1];
+  }
+  else
+  {
+    CStr descUn[10] =
+    {"1b. IBCFCB HDRY IWDFLG WETFCT IWETIT IHDWET IKVFLAG IKCFLAG",
+    " 2. Ltype(NLAY)",
+    " 3. TRPY(NLAY)",
+    " 5. Sf1(NDSLAY)     LAY ",
+    "6a. Tran(NDSLAY)    LAY ",
+    "6b. HY(NDSLAY)      LAY ",
+    " 7. Vcont(NDSLAY)   LAY ",
+    " 9. Sf2(NDSLAY)     LAY ",
+    "10. WETDRY(NDSLAY)  LAY ",
+    " 4. ANGLEX(NJAG)"
+    };
+    if (ikvflag && 1 == *ikvflag) descUn[6] = " 8. Kv(NDSLAY)      LAY ";
+    return descUn[a_line-1];
+  }
+
+} // NativeExpBcf::DocStr
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+CStr NativeExpBcf::Desc (int a_line, int a_lay)
+{
   std::stringstream ss;
-  ss << desc[a_line-1];
+  ss << DocStr(a_line);
   if (-1 != a_lay)
   {
     ss << a_lay;
@@ -111,6 +164,23 @@ CStr NativeExpBcf::Line1 ()
   // IBCFCB HDRY IWDFLG WETFCT IWETIT IHDWET
   rval.Format("%d %s %d %s %d %d ", *ibcfcb, STR(*hdry), *iwdflg, STR(*wetfct),
                                     *iwetit, *ihdwet);
+  if (m_usg)
+  {
+    CStr str;
+    const int  *ikvflag(0), *ikcflag(0);
+    if (p->GetField(Packages::BCFpack::IKVFLAG, &ikvflag) && ikvflag)
+    {
+      str.Format("%d ", *ikvflag);
+    }
+    if (p->GetField(Packages::BCFpack::IKCFLAG, &ikcflag) && ikcflag &&
+        m_unstructured)
+    {
+      CStr s;
+      s.Format("%d", *ikcflag);
+      str += s;
+    }
+    rval += str;
+  }
   return rval;
 } // NativeExpBcf::Line1
 //------------------------------------------------------------------------------
@@ -155,6 +225,42 @@ CStr NativeExpBcf::Line3 ()
   rval = p->StringsToWrite().front();
   return rval;
 } // NativeExpBcf::Line3
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void NativeExpBcf::Line4Usg ()
+{
+  if (!m_unstructured) return;
+
+  {
+    MfPackage* p = GetGlobal()->GetPackage(ARR_TRPY);
+    if (p)
+    {
+      const int *jj;
+      const Real *arr;
+      if (p->GetField("JJ", &jj) && jj &&
+          p->GetField("ARR", &arr) && arr)
+      {
+        for (int i=0; i<*jj; ++i)
+        {
+          if (arr[i] != 1) m_anyTRPYnotEqualToOne = true;
+        }
+      }
+    }
+  }
+  if (!m_anyTRPYnotEqualToOne) return;
+
+  MfPackage* p = GetGlobal()->GetPackage("FACE ANGLE");
+  CStr rval = p->StringsToWrite().front();
+  p->StringsToWrite().erase(p->StringsToWrite().begin());
+  AddToStoredLinesDesc(rval, Desc(10));
+  if (GetNative()->GetArraysInternal() &&
+    rval.Find("CONSTANT") == -1)
+  {
+    AddToStoredLinesDesc(p->StringsToWrite()[0], "");
+    p->StringsToWrite().erase(p->StringsToWrite().begin());
+  }
+} // NativeExpBcf::Line4Usg
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
@@ -226,8 +332,16 @@ bool NativeExpBcf::CanWriteLine (int a_line, int a_lay)
 CStr NativeExpBcf::GetArrayName (int a_line)
 {
   if (4 == a_line) return ARR_BCF_SF1;
-  else if (5 == a_line) return ARR_BCF_TRAN;
-  else if (6 == a_line) return ARR_LPF_HK;  // have to use LPF to find package
+  else if (5 == a_line)
+  {
+    if (!m_unstructured) return ARR_BCF_TRAN;
+    else                 return ARR_BCF_HK_U;
+  }
+  else if (6 == a_line)
+  {
+    if (!m_unstructured) return ARR_LPF_HK;  // have to use LPF to find package
+    else                 return ARR_BCF_HK_U;
+  }
   else if (7 == a_line) return ARR_BCF_VCONT;
   else if (8 == a_line) return ARR_BCF_SF2;
   else if (9 == a_line) return ARR_LPF_WET; // have to use LPF to find package

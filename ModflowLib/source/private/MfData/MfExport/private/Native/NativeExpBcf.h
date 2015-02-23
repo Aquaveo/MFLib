@@ -25,9 +25,11 @@ namespace MfData
 
       virtual void OnSetData();
       CStr Desc(int a_line, int a_lay=-1);
+      CStr DocStr(int a_line);
       CStr Line1();
       CStr Line2();
       CStr Line3();
+      void Line4Usg();
       void Line4to9(int a_line, int a_lay);
       bool CanWriteLine(int a_line, int a_lay);
       CStr GetArrayName(int a_line);
@@ -35,6 +37,8 @@ namespace MfData
       int              m_nLay;
       std::vector<int> m_lineCnt;
       bool             m_internalArrays;
+      bool             m_usg, m_unstructured;
+      bool             m_anyTRPYnotEqualToOne;
     };
 
   }

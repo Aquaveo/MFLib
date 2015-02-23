@@ -65,8 +65,9 @@ namespace MfData
       const double* m_dataConstD;
       Real*       m_data;
       double*     m_dataD;
-      int         m_nrow, m_ncol, m_curSp;
+      int         m_nrow, m_ncol, m_curSp, m_tmp_iMult;
       bool        m_firstTime;
+      bool        m_unstructured;
       std::vector<double> m_pilotKeys;
     };
 

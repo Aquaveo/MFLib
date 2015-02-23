@@ -248,6 +248,8 @@ void NativeExpLstPack::Line5 ()
 CStr NativeExpLstPack::Desc6 ()
 {
   CStr desc = " 6. Layer Row Column ";
+  if (m_usg) desc.Replace(" 6", "6a");
+  if (m_unstructured) desc = "6b. Node ";
   if (Packages::DRT == GetPackage()->PackageName()) desc.Replace("6", "5");
   CStr nm = GetPackage()->PackageName();
   if (Packages::DRN == nm)      desc += "Elevation Cond ";
@@ -1028,6 +1030,8 @@ CStr NativeExpLstPack::Desc4b ()
   CStr s = Desc6();
   s.Replace(" 5", "3b");
   s.Replace(" 6", "4b");
+  s.Replace("6a", "4b");
+  s.Replace("6b", "4c");
   s.Replace("Cond", "Condfact");
   s.Replace("Q", "Qfact");
   s.Replace("Shead", "Shdfact");
@@ -1181,6 +1185,10 @@ void NativeExpLstPack::BufferTheLineForComments (CStr& a_line)
     // buffer the text out to the max
     CStr buff(diff, ' ');
     a_line += buff;
+  }
+  else if (a_line.GetAt((int)a_line.size()-1) != ' ')
+  {
+    a_line += " ";
   }
 } // NativeExpLstPack::BufferTheLineForComments
 

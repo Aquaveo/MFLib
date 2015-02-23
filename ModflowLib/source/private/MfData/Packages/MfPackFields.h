@@ -227,12 +227,14 @@ namespace MfData
       const char * const INIEVT = "EVT_INIEVT";
       const char * const NETSEG = "EVT_NETSEG";
       const char * const INSGDF = "EVT_INSGDF";
+      const char * const MXNDEVT = "MXNDEVT";
     }
     namespace RCHpack
     {
       const char * const NRCHOP = "NRCHOP";
       const char * const INRECH = "RCH_INRECH";
       const char * const INIRCH = "RCH_INIRCH";
+      const char * const MXNDRCH = "MXNDRCH";
     }
     namespace GNCpack
     {
@@ -300,6 +302,7 @@ namespace MfData
       const char * const ITHFLG = "ITHFLG";
       const char * const NOCVCO = "NOCVCO";
       const char * const NOVFC = "NOVFC";
+      const char * const IKCFLAG = "IKCFLAG";
     }
     namespace BCFpack
     {
@@ -313,6 +316,8 @@ namespace MfData
       const char * const LAYCON = "LAYCON";
       const char * const LAYAVG = "LAYAVG";
       const char * const TRPY = "TRPY";
+      const char * const IKVFLAG = "IKVFLAG";
+      const char * const IKCFLAG = "IKCFLAG";
     }
     namespace HeadPack
     {

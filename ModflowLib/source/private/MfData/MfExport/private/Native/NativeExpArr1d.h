@@ -67,8 +67,23 @@ namespace MfData
         if (os.bad()) return;
         WriteToStream(os, JJ, ARR);
         os.close();
-        AddLine(IPRN, MULT, fname);
+        AddLine(IPRN, MULT, fname, ARR);
       } // WriteExternal
+      //------------------------------------------------------------------------
+      CStr MultString (const float*, const Real* MULT)
+      {
+        return STR(*MULT);
+      }
+      CStr MultString (const double*, const Real* MULT)
+      {
+        return STR(*MULT);
+      }
+      CStr MultString (const int*, const Real* MULT)
+      {
+        CStr s;
+        s.Format("%d", (int)*MULT);
+        return s;
+      }
       //------------------------------------------------------------------------
       template<typename T>
       void WriteInternal  (const int* JJ, const int* IPRN, const T* ARR,
@@ -76,7 +91,7 @@ namespace MfData
       {
         CStr str, strIprn, strMult;
         strIprn.Format("%5d", *IPRN);
-        strMult = STR(*MULT);
+        strMult = MultString(ARR,MULT);
         str.Format("INTERNAL %s (FREE) %s", strMult, strIprn);
         AddToStoredLinesDesc(str, "");
         std::stringstream os;
@@ -98,6 +113,23 @@ namespace MfData
           if (i > 0 && i%10 == 0) a_os << "\n";
         }
       } // WriteToStream
+      //------------------------------------------------------------------------
+      template<typename T>
+      void AddLine (const int* IPRN, const Real* MULT, CStr fname, const T* ARR)
+      {
+        CStr strIprn, strMult;
+        strIprn.Format("%5d", *IPRN);
+        strMult = MultString(ARR, MULT);
+        util::StripPathFromFilename(fname, fname);
+        if (GetNative()->GetArraysInFolder())
+        {
+          fname = ".\\arrays\\" + fname;
+        }
+        CStr str;
+        str.Format("OPEN/CLOSE %s %s (FREE) %s", fname, strMult, strIprn);
+        AddToStoredLinesDesc(str, "");
+      } // NativeExpArr1d::AddLine
+
     }; // class NativeExpArr1d
   } // namespace Export
 } // namespace MfData

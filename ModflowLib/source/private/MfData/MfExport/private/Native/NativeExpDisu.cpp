@@ -65,7 +65,8 @@ bool NativeExpDisu::Export ()
   Line11();
   Line12();
   
-  AddToStoredLinesDesc(Line13(), std::vector<CStr>(1, Desc("13")));
+  std::vector<CStr> l13 = Line13();
+  AddToStoredLinesDesc(l13, std::vector<CStr>(l13.size(), Desc("13")));
 
   WriteComments();
   WriteStoredLines();

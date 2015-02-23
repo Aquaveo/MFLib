@@ -27,7 +27,16 @@ using namespace MfData::Export;
 NativeExpLpf::NativeExpLpf () :
   m_nLay(0)
 , m_nPar(0)
+, m_ikcflag(-999)
+, m_usg(0)
+, m_unstructured(0)
+, m_anyChaniNotOne(0)
 {
+  m_usg = MfData::MfGlobal::Get().ModelType() == MfData::USG;
+  if (m_usg)
+  {
+    m_unstructured = MfData::MfGlobal::Get().Unstructured() ? 1 : 0;
+  }
 } // MfNativeExpLpf::MfNativeExpLpf
 //------------------------------------------------------------------------------
 /// \brief
@@ -52,6 +61,7 @@ bool NativeExpLpf::Export ()
   AddToStoredLinesDesc(Line2to6(6), Desc(6));
   if (CanWriteLine(7)) AddToStoredLinesDesc(Line7(), Desc(7));
   if (CanWriteLine(8)) WriteLpfParams();
+  if (m_unstructured && m_ikcflag == 0 && m_anyChaniNotOne) Line10Usg();
   for (int k=1; k<=m_nLay; ++k)
   {
     Line10to16(10, k);
@@ -80,7 +90,7 @@ void NativeExpLpf::OnSetData ()
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-CStr NativeExpLpf::Desc (int a_line, int a_lay)
+CStr NativeExpLpf::Desc (int a_line)
 {
   CStr desc[16] = {" 1. ILPFCB HDRY NPLPF [Options]",
                    " 2. Ltype(NLAY)",
@@ -98,13 +108,31 @@ CStr NativeExpLpf::Desc (int a_line, int a_lay)
                    "14. [Sy(NCOL,NROW)]      LAY ",
                    "15. [VKCB(NCOL,NROW)]    LAY ",
                    "16. [WETDRY(NCOL,NROW)]  LAY "
-                 };
-  if (Packages::UPW == GetPackage()->PackageName())
-  {
-    desc[0] = " 1. IUPWCB HDRY NPUPW IPHDRY [Options]";
-  }
+                   };
+  if (m_usg) desc[0].Replace(" 1", "1a");
+
+  if (!m_unstructured || (a_line > 1 && a_line < 10) ) return desc[a_line-1];
+
+  CStr descUsg[17] = {"1b. ILPFCB HDRY NPLPF IKCFLAG [Options]",
+                      "","","","","","","","",
+                      "11. HK(NDSLAY)        LAY ",
+                      "12. [HANI(NDSLAY)]    LAY ",
+                      "13. VKA(NDSLAY)       LAY ",
+                      "14. [Ss(NDSLAY)]      LAY ",
+                      "15. [Sy(NDSLAY)]      LAY ",
+                      "16. [VKCB(NDSLAY)]    LAY ",
+                      "17. [WETDRY(NDSLAY)]  LAY ",
+                      "10. [ANGLEX(NJAG)]"
+                      };
+  return descUsg[a_line-1];
+} // NativeExpLpf::Desc
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+CStr NativeExpLpf::Desc (int a_line, int a_lay)
+{
   std::stringstream ss;
-  ss << desc[a_line-1];
+  ss << Desc(a_line);
   if (-1 != a_lay)
   {
     ss << a_lay;
@@ -147,6 +175,18 @@ CStr NativeExpLpf::Line1 ()
 
   // ILPFCB HDRY NPLPF VERTLEAKFLAG
   rval.Format("%d %s %d", *ILPFCB, STR(*hdry), m_nPar);
+  if (m_unstructured)
+  { // IKCFLAG - we only support option 0
+    const int* ikcflag(0);
+    p->GetField(Packages::LPFpack::IKCFLAG, &ikcflag);
+    CStr s = " 0";
+    if (ikcflag)
+    {
+      s.Format(" %d", *ikcflag);
+      m_ikcflag = *ikcflag;
+    }
+    rval += s;
+  }
   if (IPHDRY)
   {
     CStr iStr;
@@ -203,6 +243,7 @@ CStr NativeExpLpf::Line2to6 (int a_line)
     if (vals) ss << vals[i];
     else ss << STR(rVals[i]);
     ss << " ";
+    if (a_line == 4 && rVals[i] != 1) m_anyChaniNotOne = true;
   }
   return ss.str();
 } // NativeExpLpf::Line2
@@ -254,9 +295,13 @@ bool NativeExpLpf::CanWriteLine (int a_line, int a_lay/*-1*/)
   else if (15 == a_line)
   {
     MfPackage* p = GetGlobal()->GetPackage(Packages::DIS);
-    const int* laycbd;
-    p->GetField(Packages::DisPack::LAYCBD, &laycbd);
-    if (0 != laycbd[a_lay-1]) return true;
+    if (m_unstructured) p = GetGlobal()->GetPackage(Packages::DISU);
+    if (p)
+    {
+      const int* laycbd;
+      p->GetField(Packages::DisPack::LAYCBD, &laycbd);
+      if (0 != laycbd[a_lay-1]) return true;
+    }
   }
   else if (16 == a_line)
   {
@@ -439,6 +484,22 @@ void NativeExpLpf::Line12 (int a_lay)
     p->StringsToWrite().erase(p->StringsToWrite().begin());
   }
 } // NativeExpLpf::Line12
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void NativeExpLpf::Line10Usg ()
+{
+  MfPackage* p = GetGlobal()->GetPackage("FACE ANGLE");
+  CStr rval = p->StringsToWrite().front();
+  p->StringsToWrite().erase(p->StringsToWrite().begin());
+  AddToStoredLinesDesc(rval, Desc(17));
+  if (GetNative()->GetArraysInternal() &&
+      rval.Find("CONSTANT") == -1)
+  {
+    AddToStoredLinesDesc(p->StringsToWrite()[0], "");
+    p->StringsToWrite().erase(p->StringsToWrite().begin());
+  }
+} // NativeExpLpf::Line10Usg
 
 ///////////////////////////////////////////////////////////////////////////////
 // TESTS
