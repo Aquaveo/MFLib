@@ -223,7 +223,7 @@ CStr NativeExpHfb::KijijFactToStr (
   int col2 = static_cast<int>(a_[(a_idx*a_rowSize)+4]);
   Real hydc = a_[(a_idx*a_rowSize)+5];
 
-  if (m_usg)
+  if (m_usg && !m_unstructured)
   {
     int c1 = row1, c2 = col1;
     row1 = ( (c1-1)/m_nJ ) % m_nI + 1;
