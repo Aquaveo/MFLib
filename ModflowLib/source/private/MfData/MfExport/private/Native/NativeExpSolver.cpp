@@ -1499,7 +1499,7 @@ void NativeExpSolverT::testLine3_SMS ()
 void NativeExpSolverT::testLine4_SMS ()
 {
   int IPC(1), ISCL(2), IORD(3);
-  double RCLOSEPCGU(0.1);
+  Real RCLOSEPCGU((Real)0.1);
   MfPackage* p = m_p->GetPackage();
   p->SetField(SmsPack::IPC, &IPC);
   p->SetField(SmsPack::ISCL, &ISCL);

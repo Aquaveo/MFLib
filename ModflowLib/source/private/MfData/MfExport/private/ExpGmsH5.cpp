@@ -9587,7 +9587,7 @@ void ExpGmsH5T::testGetArrayMap ()
 {
   ExpGmsH5 ex;
   std::map<CStr, CStr> &m(ex.GetMapArrays());
-  TS_ASSERT_EQUALS(63, m.size());
+  TS_ASSERT_EQUALS(65, m.size());
   TS_ASSERT(m.find("crap") == m.end());
 
   TS_ASSERT(m[ARR_DIS_TOP] == "top");
@@ -9612,6 +9612,7 @@ void ExpGmsH5T::testGetArrayMap ()
   TS_ASSERT(m[ARR_ETS_PETM] == "ETS/18. Evap Rate");
 
   TS_ASSERT(m[ARR_BCF_HY] == "HY_");
+  TS_ASSERT(m[ARR_BCF_HK_U] == "HY_");
   TS_ASSERT(m[ARR_BCF_TRAN] == "TRAN_");
   TS_ASSERT(m[ARR_BCF_VCONT] == "LEAK_");
   TS_ASSERT(m[ARR_BCF_SF1] == "SF1_");
@@ -9626,6 +9627,7 @@ void ExpGmsH5T::testGetArrayMap ()
   TS_ASSERT(m[ARR_LPF_SY] == "SY");
   TS_ASSERT(m[ARR_LPF_WET] == "WET");
   TS_ASSERT(m[ARR_LPF_VKCBD] == "QUASIVK");
+  TS_ASSERT(m[ARR_LPF_ANGX] == "ANGLEX");
 
   TS_ASSERT(m[ARR_UZF_UBND] == "UZF/12. IUZFBND");
   TS_ASSERT(m[ARR_UZF_RBND] == "UZF/14. IRUNBND");
