@@ -109,6 +109,10 @@ CStr NativeExpLpf::Desc (int a_line)
                    "15. [VKCB(NCOL,NROW)]    LAY ",
                    "16. [WETDRY(NCOL,NROW)]  LAY "
                    };
+  if (Packages::UPW == GetPackage()->PackageName())
+  {
+    desc[0] = " 1. IUPWCB HDRY NPUPW IPHDRY [Options]";
+  }
   if (m_usg) desc[0].Replace(" 1", "1a");
 
   if (!m_unstructured || (a_line > 1 && a_line < 10) ) return desc[a_line-1];
