@@ -30,6 +30,7 @@ static void iReadArray(int* a_SUCCESS,
                        int* a_IPRN,
                        const int* a_I,
                        const int* a_J,
+                       const int* a_K,
                        T* a_A,
                        const char* a_CNTRL,
                        int a_CNTRLlen,
@@ -279,13 +280,14 @@ DLLEXPORT void MFLIB_U2DREL (int *a_SUCCESS,
                              int *a_IPRN,
                              const int *a_I,
                              const int *a_J,
+                             const int *a_K,
                              Real *a_A,
                              const char* a_CNTRL,
                              int a_CNTRLlen,
                              const char* a_NAME,
                              int a_NAMElen)
 {
-  iReadArray(a_SUCCESS, a_IPRN, a_I, a_J, a_A, a_CNTRL, a_CNTRLlen, a_NAME,
+  iReadArray(a_SUCCESS, a_IPRN, a_I, a_J, a_K, a_A, a_CNTRL, a_CNTRLlen, a_NAME,
              a_NAMElen);
 } // MFLIB_U2DREL
 //----- OVERLOAD ---------------------------------------------------------------
@@ -294,56 +296,16 @@ DLLEXPORT void MFLIB_U2DREL8 (int *a_SUCCESS,
                               int *a_IPRN,
                               const int *a_I,
                               const int *a_J,
+                              const int *a_K,
                               double *a_A,
                               const char* a_CNTRL,
                               int a_CNTRLlen,
                               const char* a_NAME,
                               int a_NAMElen)
 {
-  iReadArray(a_SUCCESS, a_IPRN, a_I, a_J, a_A, a_CNTRL, a_CNTRLlen, a_NAME,
+  iReadArray(a_SUCCESS, a_IPRN, a_I, a_J, a_K, a_A, a_CNTRL, a_CNTRLlen, a_NAME,
              a_NAMElen);
 } // MFLIB_U2DREL8
-//----- OVERLOAD ---------------------------------------------------------------
-// Same as mfLib_U2DREL but with additional path argument so we can
-// make the path absolute.
-DLLEXPORT void MFLIB_U2DREL2 (int *a_SUCCESS,
-                             int *a_IPRN,
-                             const int *a_I,
-                             const int *a_J,
-                             Real *a_A,
-                             const char* a_CNTRL,
-                             int a_CNTRLlen,
-                             const char* a_path,
-                             int a_pathLen)
-{
-  try
-  {
-    std::string cntrl = util::GetStr(a_CNTRL, a_CNTRLlen);
-    std::string path = util::GetStr(a_path, a_pathLen);
-
-    // The fourth arg is the filename. Skip the first three args (space delimited)
-    size_t idx1, idx2;
-    idx1 = 0;
-    for (int i = 0; i < 3; ++i)
-    {
-      idx1 = cntrl.find(' ', idx1);
-      idx1++;
-    }
-
-    std::string str;
-    idx1 = cntrl.find('"', idx1);         // find opening brace
-    idx1++;
-    idx2 = cntrl.find('"', idx1);         // find closing brace
-    str = cntrl.substr(idx1, idx2-idx1);  // extract the file name
-    path += str;                          // prepend the path
-    cntrl.replace(idx1, idx2-idx1, path); // replace filename with full path
-    MFLIB_U2DREL(a_SUCCESS, a_IPRN, a_I, a_J, a_A, cntrl.c_str(), (int)cntrl.size(),
-                 0, 0);
-  }
-  catch (std::length_error)
-  {
-  }
-} // MFLIB_U2DREL2
 //------------------------------------------------------------------------------
 DLLEXPORT void MFLIB_U2DDBL (int *a_SUCCESS,
                              int *a_IPRN,
@@ -353,7 +315,8 @@ DLLEXPORT void MFLIB_U2DDBL (int *a_SUCCESS,
                              const char* a_CNTRL,
                              int a_CNTRLlen)
 {
-  iReadArray(a_SUCCESS, a_IPRN, a_I, a_J, a_A, a_CNTRL, a_CNTRLlen, 0, 0);
+  int k(-1);
+  iReadArray(a_SUCCESS, a_IPRN, a_I, a_J, &k, a_A, a_CNTRL, a_CNTRLlen, 0, 0);
 } // MFLIB_U2DDBL
 //------------------------------------------------------------------------------
 /// \brief This is called from MODFLOWs U2DREL subroutine to read data from
@@ -395,7 +358,8 @@ DLLEXPORT void MFLIB_U2DINT (int *a_SUCCESS,
                              const char* a_CNTRL,
                              int a_CNTRLlen)
 {
-  iReadArray(a_SUCCESS, a_IPRN, a_I, a_J, a_A, a_CNTRL, a_CNTRLlen, 0, 0);
+  int k(-1);
+  iReadArray(a_SUCCESS, a_IPRN, a_I, a_J, &k, a_A, a_CNTRL, a_CNTRLlen, 0, 0);
 } // MFLIB_U2DINT
 //------------------------------------------------------------------------------
 DLLEXPORT void MFLIB_SQLITE_U2DINT(int *a_SUCCESS,
@@ -464,6 +428,7 @@ static void iReadArray (int* a_SUCCESS,
                         int* a_IPRN,
                         const int* a_I,
                         const int* a_J,
+                        const int* a_K,
                         T* a_A,
                         const char* a_CNTRL,
                         int a_CNTRLlen,
@@ -476,7 +441,7 @@ static void iReadArray (int* a_SUCCESS,
   try 
   {
     // do some checks on what was passed in
-    if (!a_IPRN || !a_I || !a_J || !a_A)
+    if (!a_IPRN || !a_I || !a_J || !a_K || !a_A)
     {
       ErrorStack::Get().PutError("Null parameters passed to mfLib_U2DREL."
                                  "Aborting.");
@@ -485,6 +450,7 @@ static void iReadArray (int* a_SUCCESS,
 
     CStr line = util::GetStr(a_CNTRL, a_CNTRLlen);
     ArrayReader reader(line);
+    reader.SetKvar(*a_K);
     if (!reader.ValidInputString())
       throw EException();
     *a_IPRN = reader.GetIPRN();

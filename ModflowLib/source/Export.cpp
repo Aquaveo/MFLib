@@ -249,8 +249,6 @@ DLLEXPORT void MFLIBEXP_DISU1 (const int *a_NODES,
 //------------------------------------------------------------------------------
 DLLEXPORT void MFLIBEXP_DISU2 (const int *a_NODLAY)
 {
-  CStr exporter, filename;
-
   MfData::Disu2(a_NODLAY);
 } // MFLIBEXP_DISU2
 //------------------------------------------------------------------------------

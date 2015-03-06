@@ -18,6 +18,7 @@ public:
   ~ArrayReader();
 
   bool  ValidInputString() const;
+  void  SetKvar(int a_);
 
   int    GetIPRN() const;
   double GetMultiplier() const;

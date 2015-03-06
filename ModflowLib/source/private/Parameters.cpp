@@ -20,6 +20,9 @@
 #include <private\H5DataReader\H5DataSetWriterSetup.h>
 #include <private\MfData\MfExport\private\ExpGmsH5.h>
 #include <private\MfData\MfGlobal.h>
+#include <private\MfData\Packages\MfPackage.h>
+#include <private\MfData\Packages\MfPackStrings.h>
+#include <private\MfData\Packages\MfPackFields.h>
 #include <private\Parameters\MultArray.h>
 #include <private\Parameters\Param.h>
 #include <private\Parameters\ParamList.h>
@@ -485,10 +488,50 @@ bool Parameters::FillInParType (const int* a_NPVAL,
   return true;
 } // Parameters::FillInParType
 //------------------------------------------------------------------------------
+/// \brief Gets the number of cells in the unstructured grid
+//------------------------------------------------------------------------------
+int iGetNumCellsUnstructured ()
+{
+  int rval = 0;
+  MfData::MfPackage *p = MfData::Get().GetPackage("###");
+  ASSERT(p);
+  if (p)
+  {
+    const int* nodes(0);
+    p->GetField("NODES", &nodes);
+    if (nodes) rval = *nodes;
+  }
+  return rval;
+} // iGetNumCellsUnstructured
+//------------------------------------------------------------------------------
+/// \brief figures out the starting position in the pilot point array for
+/// unstructured grids.
+//------------------------------------------------------------------------------
+int iGetStart (int a_lay)
+{
+  int rval = 0;
+  if (!MfData::Get().Unstructured()) return rval;
+  if (a_lay < 2) return rval;
+
+  // get the number of nodes per layer
+  MfData::MfPackage* p = MfData::Get().GetPackage(MfData::Packages::DISU);
+  if (p)
+  {
+    const int* nodlay(0);
+    p->GetField(MfData::Packages::Disu::NODLAY, &nodlay);
+    if (nodlay)
+    {
+      for (int i=0; i<a_lay-1; ++i) rval += nodlay[i];
+    }
+  }
+
+  return rval;
+} // iGetStart
+//------------------------------------------------------------------------------
 /// \brief Substitutes the parameter value for the key value in the array.
 //------------------------------------------------------------------------------
 template <class T>
-bool SubstituteArrayT (T *a_, size_t a_size, const CStr& a_name)
+bool SubstituteArrayT (T *a_, size_t a_size, int a_layer, const CStr& a_name)
 {
   if (!a_ || a_size < 1)
     return false;
@@ -504,6 +547,7 @@ bool SubstituteArrayT (T *a_, size_t a_size, const CStr& a_name)
   stdext::hash_map<int, pData>::iterator itHash, itHashEnd;
   itHashEnd = GetPData().end();
 
+  int start = iGetStart(a_layer);
   double intPart, decimalPart;
   for (size_t i=0; i<a_size; i++)
   {
@@ -522,7 +566,7 @@ bool SubstituteArrayT (T *a_, size_t a_size, const CStr& a_name)
           }
           else
           {
-            a_[i] = (T)itHash->second.m_arrVals.at(i);
+            a_[i] = (T)itHash->second.m_arrVals.at(i+start);
           }
         }
       }
@@ -533,18 +577,20 @@ bool SubstituteArrayT (T *a_, size_t a_size, const CStr& a_name)
 //------------------------------------------------------------------------------
 /// \brief Substitutes the parameter value for the key value in the array.
 //------------------------------------------------------------------------------
-bool Parameters::SubstituteArray (double *a_, size_t a_size, const CStr& a_name)
+bool Parameters::SubstituteArray (double *a_, size_t a_size, int a_layer,
+                                  const CStr& a_name)
 {
-  return SubstituteArrayT(a_, a_size, a_name);
+  return SubstituteArrayT(a_, a_size, a_layer, a_name);
 } // Parameters::SubstituteArray
 //------------------------------------------------------------------------------
 /// \brief Substitutes the parameter value for the key value in the array.
 //------------------------------------------------------------------------------
-bool Parameters::SubstituteArray (float *a_, size_t a_size, const CStr& a_name)
+bool Parameters::SubstituteArray (float *a_, size_t a_size, int a_layer,
+                                  const CStr& a_name)
 {
-  return SubstituteArrayT(a_, a_size, a_name);
+  return SubstituteArrayT(a_, a_size, a_layer, a_name);
 } // Parameters::SubstituteArray
-void Parameters::SubstituteArray (int* /*a_*/, size_t /*a_size*/, const CStr& )
+void Parameters::SubstituteArray (int* /*a_*/, size_t /*a_size*/,int, const CStr& )
 {
   // we don't do anything with int arrays and parameters
   return;
@@ -733,7 +779,9 @@ bool Parameters::CheckArraySubstituteOk (const char * const a_h5Path)
       path.find("top") != -1 ||
       path.find("bot") != -1 ||
       path.find("vcb") != -1 ||
-      path.find("starthead") != -1)
+      path.find("starthead") != -1 ||
+      path.find("anglex") != -1 ||
+      path.find("ibound") != -1)
     return false;
   return true;
 } // Parameters::CheckArraySubstituteOk
@@ -761,8 +809,13 @@ static void iCopyArray (std::vector<Real>& a_vec,
   int nCellsLay( (*a_JJ)*(*a_II) );
   int k(*a_K);
   if (k < 1) k = 1;
-  int start( (k-1) * nCellsLay );
+  int start(iGetStart(k));
   int nVal( (k) * nCellsLay );
+  if (MfData::Get().Unstructured())
+  {
+    nVal = iGetNumCellsUnstructured();
+  }
+
   // make sure vector is big enough
   a_vec.resize(nVal);
   for (int i=0; i<nCellsLay; ++i)
@@ -774,14 +827,16 @@ static void iCopyArray (std::vector<Real>& a_vec,
 /// \brief Gets the active array for a data set
 //------------------------------------------------------------------------------
 static void iGetActiveArray (const CStr& a_dsName,
-                             std::vector<char>& a_act)
+                             std::vector<char>& a_act,
+                             const int* a_JJ,
+                             const int* a_II)
 {
   std::map<CStr, std::vector<Real> >& aMap(iArraysToWrite());
   std::vector<Real>& ibound(aMap[ARR_BAS_IBND]);
-  if (a_dsName.find("RCH ") != -1)
+  if (a_dsName.find("RCH ") != -1 && 
+      !MfData::Get().Unstructured())
   {
-    int nCellsLay = MfData::Get().NumRow() *
-                    MfData::Get().NumCol();
+    int nCellsLay = *a_JJ * *a_II;
     a_act.assign(nCellsLay, 0);
     // assign the first layer of the ibound to the array
     for (int i=0; i<nCellsLay; i++)
@@ -845,7 +900,9 @@ static void iGetActiveArray (const CStr& a_dsName,
 /// \brief Writes a MODFLOW array that had parameters to a data set
 //------------------------------------------------------------------------------
 static void iWriteDataSet (std::vector<Real>& a_vec,
-                           const CStr& a_dsName)
+                           const CStr& a_dsName,
+                           const int* a_JJ,
+                           const int* a_II)
 {
   using namespace H5DataReader;
 
@@ -864,7 +921,7 @@ static void iWriteDataSet (std::vector<Real>& a_vec,
 
   // get activity array
   std::vector<char> act;
-  iGetActiveArray(a_dsName, act);
+  iGetActiveArray(a_dsName, act, a_JJ, a_II);
   // get data set min and max
   Real dmin;
   Real dmax;
@@ -894,6 +951,11 @@ static void iWriteDataSet (std::vector<Real>& a_vec,
   int nCells = MfData::Get().NumRow() *
                MfData::Get().NumCol() *
                MfData::Get().NumLay();
+  if (MfData::Get().Unstructured())
+  {
+    nCells = iGetNumCellsUnstructured();
+  }
+
   if (a_vec.size() < (size_t)nCells)
   {
     std::vector<Real> tmpReal;
@@ -1052,12 +1114,14 @@ static void iGetDataSetNameFromArrayName (const CStr& a_NAME,
 //------------------------------------------------------------------------------
 /// \brief Exports an array that uses pilot points to a data set
 //------------------------------------------------------------------------------
-void Parameters::ExportParameterArrayToDataSet (CStr& a_NAME,
-                                                const Real* a_ARR,
-                                                const Real* a_MULT,
-                                                const int* a_K,
-                                                const int* a_JJ,
-                                                const int* a_II)
+template <class T>
+static void iExportParameterArrayToDataSetT (
+  CStr& a_NAME,
+  const T* a_ARR,
+  const Real* a_MULT,
+  const int* a_K,
+  const int* a_JJ,
+  const int* a_II)
 {
   std::map<CStr, std::set<int> >& aMap(iGetArrayNameKeyMap());
   if (aMap.find(a_NAME) == aMap.end())
@@ -1073,11 +1137,11 @@ void Parameters::ExportParameterArrayToDataSet (CStr& a_NAME,
   {
     // don't write the data set until we have the IBOUND
     if (iArraysToWrite().find(ARR_BAS_IBND) != iArraysToWrite().end() &&
-        a_K && *a_K == MfData::Get().NumLay())
+      a_K && *a_K == MfData::Get().NumLay())
     {
 
       iUpdateDataSetName(dataName, a_NAME);
-      iWriteDataSet(iArraysToWrite()[a_NAME], dataName);
+      iWriteDataSet(iArraysToWrite()[a_NAME], dataName, a_JJ, a_II);
       delArray = true;
     }
   }
@@ -1090,7 +1154,7 @@ void Parameters::ExportParameterArrayToDataSet (CStr& a_NAME,
     MfData::Get().GetIntVar("NRCHOP", opt);
     if (2 != opt)
     {
-      iWriteDataSet(iArraysToWrite()[a_NAME], dName);
+      iWriteDataSet(iArraysToWrite()[a_NAME], dName, a_JJ, a_II);
       delArray = true;
     }
   }
@@ -1101,6 +1165,19 @@ void Parameters::ExportParameterArrayToDataSet (CStr& a_NAME,
     iArraysToWrite().erase(a_NAME);
     aMap.erase(a_NAME);
   }
+
+} // iExportParameterArrayToDataSetT
+//------------------------------------------------------------------------------
+/// \brief Exports an array that uses pilot points to a data set
+//------------------------------------------------------------------------------
+void Parameters::ExportParameterArrayToDataSet (CStr& a_NAME,
+                                                const Real* a_ARR,
+                                                const Real* a_MULT,
+                                                const int* a_K,
+                                                const int* a_JJ,
+                                                const int* a_II)
+{
+  iExportParameterArrayToDataSetT(a_NAME, a_ARR, a_MULT, a_K, a_JJ, a_II);
 } // Parameters::ExportParameterArrayToDataSet
 //------------------------------------------------------------------------------
 /// \brief Exports an array that uses pilot points to a data set
@@ -1112,48 +1189,7 @@ void Parameters::ExportParameterArrayToDataSet8 (CStr& a_NAME,
                                                  const int* a_JJ,
                                                  const int* a_II)
 {
-  std::map<CStr, std::set<int> >& aMap(iGetArrayNameKeyMap());
-  if (aMap.find(a_NAME) == aMap.end())
-    return;
-
-  // copy the data
-  iCopyArray(iArraysToWrite()[a_NAME],a_ARR,a_MULT,a_K,a_JJ,a_II);
-
-  bool delArray(false);
-  CStr dataName;
-  iGetDataSetNameFromArrayName(a_NAME, dataName);
-  if (!dataName.IsEmpty())
-  {
-    // don't write the data set until we have the IBOUND
-    if (iArraysToWrite().find(ARR_BAS_IBND) != iArraysToWrite().end() &&
-        a_K && *a_K == MfData::Get().NumLay())
-    {
-
-      iUpdateDataSetName(dataName, a_NAME);
-      iWriteDataSet(iArraysToWrite()[a_NAME], dataName);
-      delArray = true;
-    }
-  }
-  else if ("RECHARGE" == a_NAME)
-  {
-    CStr dName;
-    dName.Format("RCH SP_%d", MfData::Get().GetCurrentPeriod());
-    iUpdateDataSetName(dName, a_NAME);
-    int opt(1);
-    MfData::Get().GetIntVar("NRCHOP", opt);
-    if (2 != opt)
-    {
-      iWriteDataSet(iArraysToWrite()[a_NAME], dName);
-      delArray = true;
-    }
-  }
-
-  // write the data set
-  if (delArray)
-  {
-    iArraysToWrite().erase(a_NAME);
-    aMap.erase(a_NAME);
-  }
+  iExportParameterArrayToDataSetT(a_NAME, a_ARR, a_MULT, a_K, a_JJ, a_II);
 } // Parameters::ExportParameterArrayToDataSet8
 //------------------------------------------------------------------------------
 /// \brief Exports an array that uses pilot points to a data set
@@ -1207,7 +1243,7 @@ void Parameters::ExportParameterArrayToDataSet (CStr& a_NAME,
       {
         iGetDataSetNameFromArrayName(it->first, dataName);
         iUpdateDataSetName(dataName, it->first);
-        iWriteDataSet(iArraysToWrite()[it->first], dataName);
+        iWriteDataSet(iArraysToWrite()[it->first], dataName, a_JJ, a_II);
       }
     }
   }
@@ -1216,7 +1252,7 @@ void Parameters::ExportParameterArrayToDataSet (CStr& a_NAME,
     iUpdateDataSetName(dataName, arrayName);
     if (iArraysToWrite().find(arrayName) != iArraysToWrite().end())
     {
-      iWriteDataSet(iArraysToWrite()[arrayName], dataName);
+      iWriteDataSet(iArraysToWrite()[arrayName], dataName, a_JJ, a_II);
     }
   }
 

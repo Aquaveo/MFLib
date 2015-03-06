@@ -8,22 +8,24 @@ module mfLib
     END SUBROUTINE mfLib_CheckMemory
 !     ------------------------------------------------------------------
 !      Declare the C function
-    SUBROUTINE mfLib_U2DREL(SUCCESS, IPRN, II, JJ, A, CNTRL,NAME)
+    SUBROUTINE mfLib_U2DREL(SUCCESS, IPRN, II, JJ, K, A, CNTRL,NAME)
       INTEGER SUCCESS [REFERENCE]
       INTEGER IPRN [REFERENCE]
       INTEGER II [REFERENCE]
       INTEGER JJ [REFERENCE]
+      INTEGER K [REFERENCE]
       DIMENSION A (*)
       CHARACTER*200 CNTRL [REFERENCE]
       CHARACTER*24 NAME [REFERENCE]
     END SUBROUTINE mfLib_U2DREL
 !     ------------------------------------------------------------------
 !      Declare the C function
-    SUBROUTINE mfLib_U2DREL8(SUCCESS, IPRN, II, JJ, A, CNTRL,NAME)
+    SUBROUTINE mfLib_U2DREL8(SUCCESS, IPRN, II, JJ, K, A, CNTRL,NAME)
       INTEGER SUCCESS [REFERENCE]
       INTEGER IPRN [REFERENCE]
       INTEGER II [REFERENCE]
       INTEGER JJ [REFERENCE]
+      INTEGER K [REFERENCE]
       REAL*8 A (*)
       CHARACTER*200 CNTRL [REFERENCE]
       CHARACTER*24 NAME [REFERENCE]
@@ -361,7 +363,7 @@ module mfLib
           end do
         end do
 
-        call mfLib_U2DREL(a_success, a_IPRN, a_II, a_JJ, a_A, a_CNTRL,a_ANAME)
+        call mfLib_U2DREL(a_success, a_IPRN, a_II, a_JJ, a_K, a_A, a_CNTRL,a_ANAME)
         call mfLibF_DebugCheckMemory
       end subroutine mfLibF90_U2DREL
 
@@ -386,7 +388,7 @@ module mfLib
           end do
         end do
 
-        call mfLib_U2DREL8(a_success, a_IPRN, a_II, a_JJ, a_A, a_CNTRL,a_ANAME)
+        call mfLib_U2DREL8(a_success, a_IPRN, a_II, a_JJ, a_K, a_A, a_CNTRL,a_ANAME)
         call mfLibF_DebugCheckMemory
       end subroutine mfLibF90_U2DREL8
 !-----------------------------------------------------------------------

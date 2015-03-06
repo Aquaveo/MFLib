@@ -18,12 +18,15 @@ namespace Parameters
                      char* a_PARTYP);
   bool SubstituteArray(double *a_,
                        size_t a_size,
+                       int a_layer,
                        const CStr& a_name);
   bool SubstituteArray(float *a_,
                        size_t a_size,
+                       int a_layer,
                        const CStr& a_name);
   void SubstituteArray(int *a_,
                        size_t a_size,
+                       int a_layer,
                        const CStr& a_name);
   bool SubstituteValue(double *a_);
   bool SubstituteList(std::vector<Real> &a_,

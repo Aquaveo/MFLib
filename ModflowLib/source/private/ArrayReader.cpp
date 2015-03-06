@@ -23,6 +23,7 @@ public:
   impl(const CStr &a_);
 
   // data
+  int m_k;
   ArrayReaderParser m_parser;
 };
 
@@ -48,6 +49,13 @@ bool ArrayReader::ValidInputString () const
 {
   return(m_impl->m_parser.ValidInputString());
 } // ArrayReader::ValidInputString
+//------------------------------------------------------------------------------
+/// \brief Sets the layer
+//------------------------------------------------------------------------------
+void ArrayReader::SetKvar (int a_)
+{
+  m_impl->m_k = a_;
+} // ArrayReader::SetKvar
 //------------------------------------------------------------------------------
 /// \brief Get the IPRN value
 //------------------------------------------------------------------------------
@@ -118,7 +126,7 @@ void ArrayReader::GetDataT (T *a_arr,
   if (Parameters::CheckArraySubstituteOk(m_impl->m_parser.GetPath()))
   {
     // do parameter substitution
-    Parameters::SubstituteArray(a_arr, a_size, a_name);
+    Parameters::SubstituteArray(a_arr, a_size, m_impl->m_k, a_name);
     Parameters::SubstituteValue(&mult);
   }
 
@@ -149,6 +157,7 @@ void ArrayReader::GetDataT (T *a_arr,
 //------------------------------------------------------------------------------
 ArrayReader::impl::impl (const CStr &a_) :
 m_parser(a_)
+, m_k(-1)
 {
 }
 

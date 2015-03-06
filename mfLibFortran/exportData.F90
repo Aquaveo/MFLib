@@ -1360,7 +1360,7 @@ module module_exportData
     implicit none
     integer, intent(in) :: NODLAY(*)
 
-    if (NOT(ed_getExportData())) return
+    !if (NOT(ed_getExportData())) return
     call mfLibExp_Disu2(NODLAY)
   end subroutine exp_DISU2
 
@@ -1929,8 +1929,14 @@ module module_exportData
     integer, intent(in)       :: ARR(JJ)
     real, intent(in)          :: MULT
     character*24 NAME2
+    integer II, IMULT
 
-    if (NOT(ed_getExportData())) return
+    if (NOT(ed_getExportData())) then
+      II = 1
+      IMULT = INT(MULT)
+      call mfLib_U2DINT_EXDATA(NAME,ARR,IMULT,K,JJ,II)
+      return
+    end if
 
     call FixName(NAME, NAME2)
     call mfLibExp_SingleValInt(NAME2,'JJ',JJ)
@@ -1951,10 +1957,14 @@ module module_exportData
     character*24, intent(in)  :: NAME
     integer, intent(in)       :: JJ,K,IPRN
     real, intent(in)          :: ARR(JJ),MULT
-    integer IMULT
     character*24 NAME2
+    integer II
 
-    if (NOT(ed_getExportData())) return
+    if (NOT(ed_getExportData())) then
+      II = 1
+      call mfLib_U2DREL_EXDATA(NAME,ARR,MULT,K,JJ,II)
+      return
+    endif 
 
     call FixName(NAME, NAME2)
     call mfLibExp_SingleValInt(NAME2,'JJ',JJ)
@@ -1976,9 +1986,10 @@ module module_exportData
     integer, intent(in)         :: JJ,K,IPRN
     doubleprecision, intent(in) :: ARR(JJ)
     real, intent(in)            :: MULT
+    integer                     :: II
 
 
-    if (NOT(ed_getExportData())) return
+    if (NOT(ed_getExportData())) return 
 
     call mfLibExp_SingleValInt(NAME,'JJ',JJ)
     call mfLibExp_SingleValInt(NAME,'K',K)

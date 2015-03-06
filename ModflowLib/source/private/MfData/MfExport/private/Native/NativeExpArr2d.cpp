@@ -548,11 +548,11 @@ void NativeExpArr2d::SubstituteMultArray ()
 
   if (m_dataD)
   {
-    Parameters::SubstituteArray(m_dataD, (size_t)(m_nrow*m_ncol), m_name);
+    Parameters::SubstituteArray(m_dataD, (size_t)(m_nrow*m_ncol), *m_lay, m_name);
   }
   else
   {
-    Parameters::SubstituteArray(m_data, (size_t)(m_nrow*m_ncol), m_name);
+    Parameters::SubstituteArray(m_data, (size_t)(m_nrow*m_ncol), *m_lay, m_name);
   }
 } // SubstituteMultArray
 //------------------------------------------------------------------------------
@@ -679,11 +679,11 @@ bool NativeExpArr2d::CheckParameters ()
   {
     if (m_dataD)
     {
-      Parameters::SubstituteArray(m_dataD, (size_t)(m_nrow*m_ncol), m_name);
+      Parameters::SubstituteArray(m_dataD, (size_t)(m_nrow*m_ncol), *m_lay, m_name);
     }
     else
     {
-      Parameters::SubstituteArray(m_data, (size_t)(m_nrow*m_ncol), m_name);
+      Parameters::SubstituteArray(m_data, (size_t)(m_nrow*m_ncol), *m_lay, m_name);
     }
     return false;
   }
