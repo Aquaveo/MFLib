@@ -1507,23 +1507,25 @@ void ParametersT::testSubstituteValue ()
 void ParametersT::testSubstituteArray_NoParam ()
 {
   Real f, *fptr(NULL);
+  int k(-1);
   CStr str;
-  TS_ASSERT(!Parameters::SubstituteArray(fptr, 1, str));
-  TS_ASSERT(!Parameters::SubstituteArray(&f, 0, str));
-  TS_ASSERT(Parameters::SubstituteArray(&f, 1, str));
+  TS_ASSERT(!Parameters::SubstituteArray(fptr, 1, k, str));
+  TS_ASSERT(!Parameters::SubstituteArray(&f, 0, k, str));
+  TS_ASSERT(Parameters::SubstituteArray(&f, 1, k, str));
 }
 //------------------------------------------------------------------------------
 void ParametersT::testSubstituteArray_NoKey ()
 {
   Real a[6] = {19.0,19.0,19.0,10.0,10.0,10.0};
   Real result[6] = {19.0,19.0,19.0,10.0,10.0,10.0};
+  int k(-1);
   CStr str;
   // no parameters
-  TS_ASSERT(Parameters::SubstituteArray(a, 6, str));
+  TS_ASSERT(Parameters::SubstituteArray(a, 6, k, str));
   // make a param
   Param p("hk_1", -1, "HK", 5, .01, 100);
   GetList().PushBack(&p);
-  TS_ASSERT(Parameters::SubstituteArray(a, 6, str));
+  TS_ASSERT(Parameters::SubstituteArray(a, 6, k, str));
   for (int i=0; i<6; i++)
     TS_ASSERT_EQUALS(a[i], result[i]);
 }
@@ -1532,13 +1534,14 @@ void ParametersT::testSubstituteArray_NoPilot ()
 {
   Real a[6] = {-1,19.0,-1,10.0,-1,10.0};
   Real result[6] = {5,19.0,5,10.0,5,10.0};
+  int k(-1);
   CStr str;
   // no parameters
-  TS_ASSERT(Parameters::SubstituteArray(a, 6, str));
+  TS_ASSERT(Parameters::SubstituteArray(a, 6, k, str));
   // make a param
   Param p("hk_1", -1, "HK", 5, .01, 100);
   GetList().PushBack(&p);
-  TS_ASSERT(Parameters::SubstituteArray(a, 6, str));
+  TS_ASSERT(Parameters::SubstituteArray(a, 6, k, str));
   for (int i=0; i<6; i++)
     TS_ASSERT_EQUALS(a[i], result[i]);
 }
@@ -1554,7 +1557,8 @@ void ParametersT::testSubstituteArray_NoPilot_WithMultArray ()
   Param p("rch_150", -1, "RCH", 2, 1.0e-010, 3);
   p.m_multArray = true;
   GetList().PushBack(&p);
-  TS_ASSERT(Parameters::SubstituteArray(a, 6, str));
+  int k(-1);
+  TS_ASSERT(Parameters::SubstituteArray(a, 6, k, str));
   for (int i=0; i<6; i++)
     TS_ASSERT_DELTA(a[i], result[i], 1e-5);
 }

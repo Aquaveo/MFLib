@@ -413,8 +413,13 @@ void NeArealPar::RewriteFileWithParameters ()
 
   // add back line 2
   if ("ETS" != m_type) m_pack->AddToStoredLinesDesc(oldLine[0], oldDesc[0]);
-  Lines3to4(false);
   int curLine = 1;
+  if (oldDesc.size() > 1 && oldDesc[1].Find("2b") != -1)
+  {
+    m_pack->AddToStoredLinesDesc(oldLine[1], oldDesc[2]);
+    curLine = 2;
+  }
+  Lines3to4(false);
   bool arrInside = m_pack->GetNative()->GetArraysInternal();
   for (int i=0; i<m_pack->GetGlobal()->NumPeriods(); ++i)
   {

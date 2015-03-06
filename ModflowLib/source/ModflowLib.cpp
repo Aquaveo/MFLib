@@ -1030,23 +1030,23 @@ void ModflowLibT::test_imfLib_GetStr ()
 //------------------------------------------------------------------------------
 void ModflowLibT::test_mfLib_U2DREL ()
 {
-  int s(0), iprn, i(70), j(42);
+  int s(0), iprn, i(70), j(42), k(-1);
   std::vector<Real> vFlt(2940, 0);
   Real f;
   CStr str;
   str.Format("HDF5 1.0 1 \"%s\" \"Arrays/HANI1\" 1 0 2940", m_file);
-  MFLIB_U2DREL(&s, &iprn, &i, &j, &vFlt.at(0), str.c_str(), str.GetLength(),0,0);
+  MFLIB_U2DREL(&s, &iprn, &i, &j, &k, &vFlt.at(0), str.c_str(), str.GetLength(),0,0);
   TS_ASSERT(s);
   TS_ASSERT_EQUALS(vFlt.at(0), 1);
   TS_ASSERT_EQUALS(vFlt.at(2939), 1);
   str.Format("HDF5 3.54 1 \"%s\" \"Arrays/HANI1\" 1 0 2940", m_file);
-  MFLIB_U2DREL(&s, &iprn, &i, &j, &vFlt.at(0), str.c_str(), str.GetLength(),0,0);
+  MFLIB_U2DREL(&s, &iprn, &i, &j, &k, &vFlt.at(0), str.c_str(), str.GetLength(),0,0);
   TS_ASSERT(s);
   f = (Real)3.54;
   TS_ASSERT_EQUALS(vFlt.at(0), f);
   TS_ASSERT_EQUALS(vFlt.at(2939), f);
   str.Format("HDF5 CONSTANT 5.6");
-  MFLIB_U2DREL(&s, &iprn, &i, &j, &vFlt.at(0), str.c_str(), str.GetLength(),0,0);
+  MFLIB_U2DREL(&s, &iprn, &i, &j, &k, &vFlt.at(0), str.c_str(), str.GetLength(),0,0);
   TS_ASSERT(s);
   f = (Real)5.6;
   TS_ASSERT_EQUALS(vFlt.at(0), f);
