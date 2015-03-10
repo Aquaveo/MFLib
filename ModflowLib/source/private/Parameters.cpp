@@ -493,13 +493,16 @@ bool Parameters::FillInParType (const int* a_NPVAL,
 int iGetNumCellsUnstructured ()
 {
   int rval = 0;
-  MfData::MfPackage *p = MfData::Get().GetPackage("###");
+  MfData::MfPackage *p = MfData::Get().GetPackage(MfData::Packages::DISU);
   ASSERT(p);
   if (p)
   {
-    const int* nodes(0);
-    p->GetField("NODES", &nodes);
-    if (nodes) rval = *nodes;
+    const int* nodlay(0);
+    p->GetField(MfData::Packages::Disu::NODLAY, &nodlay);
+    if (nodlay)
+    {
+      for (int i=0; i<MfData::Get().NumLay(); ++i) rval += nodlay[i];
+    }
   }
   return rval;
 } // iGetNumCellsUnstructured

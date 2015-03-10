@@ -200,12 +200,20 @@ NativeExpArr2d::NativeExpArr2d () :
 , m_mult(0)
 , m_firstTime(1)
 , m_unstructured(0)
+, m_stacked(0)
 , m_tmp_iMult(1)
 {
   bool usg = MfData::MfGlobal::Get().ModelType() == MfData::USG;
   if (usg)
   {
     m_unstructured = MfData::MfGlobal::Get().Unstructured() ? 1 : 0;
+    MfPackage* p = MfData::MfGlobal::Get().GetPackage(MfData::Packages::DISU);
+    if (p)
+    {
+      const int* ivsd(0);
+      p->GetField(MfData::Packages::Disu::IVSD, &ivsd);
+      if (ivsd && -1 == *ivsd) m_stacked = true;
+    }
   }
 } // MfNativeExpArr2d::MfNativeExpArr2d
 //------------------------------------------------------------------------------
@@ -745,6 +753,26 @@ void NativeExpArr2d::WriteZoneMultArrays (std::set<double>& a_keys,
       if (rVal != mlt[i]) rConst = false;
     }
   }
+  if (m_unstructured && !m_stacked)
+  { // need to use MXNODLAY for the size of the array
+    MfPackage* pp = iGetPackage(GetGlobal(), MfData::Packages::DISU);
+    if (pp)
+    {
+      const int* nodlay(0);
+      pp->GetField("NODLAY", &nodlay);
+      if (nodlay)
+      {
+        int mxnodlay(0);
+        for (int i=0; i<GetGlobal()->NumLay(); ++i)
+        {
+          if (nodlay[i] > mxnodlay) mxnodlay = nodlay[i];
+        }
+        m_ncol = mxnodlay;
+        zone.resize(mxnodlay);
+        mlt.resize(mxnodlay);
+      }
+    }
+  }
 
   CStr pName = GetPackage()->PackageName();
   MfPackage* p = iGetPackage(GetGlobal(), MfData::Packages::ZON);
@@ -847,9 +875,10 @@ void NativeExpArr2d::EnsureParCluster (Real a_key, ParamList* a_list)
       return;
     }
   }
-  if (p.m_clust.empty() && p.m_pilotPoints)
+  if (p.m_pilotPoints &&
+      (p.m_clust.empty() || (m_unstructured && !m_stacked)) )
   { // write the pilot point multiplier arrays
-    WritePilotPointMultArrays(a_list, p);
+    WritePilotPointMultArrays(a_list, p, lay);
   }
   p.m_clust.push_back(clust);
   // add instance for stress period par
@@ -865,7 +894,8 @@ void NativeExpArr2d::EnsureParCluster (Real a_key, ParamList* a_list)
 /// \brief
 //------------------------------------------------------------------------------
 void NativeExpArr2d::WritePilotPointMultArrays (ParamList* a_list,
-                                                Param& a_p)
+                                                Param& a_p,
+                                                int a_layer)
 {
   if (!a_list) return;
   std::vector<double> ppVals;
@@ -875,6 +905,28 @@ void NativeExpArr2d::WritePilotPointMultArrays (ParamList* a_list,
   util::StripExtensionFromFilename(fname, fname);
   fname += ".h5";
   PilotPoints pp(fname, a_p);
+  int ncolOrig = m_ncol;
+  if (m_unstructured && !m_stacked)
+  {
+    MfPackage* p = GetGlobal()->GetPackage(MfData::Packages::DISU);
+    if (p)
+    {
+      const int *nodlay(0);
+      p->GetField("NODLAY", &nodlay);
+      if (nodlay)
+      {
+        int mxnodlay(0);
+        std::vector<int> vNodes(GetGlobal()->NumLay(), 0);
+        for (int i=0; i<GetGlobal()->NumLay(); ++i)
+        {
+          if (nodlay[i] > mxnodlay) mxnodlay = nodlay[i];
+          vNodes[i] = nodlay[i];
+        }
+        pp.SetUnstructured(vNodes);
+        m_ncol = mxnodlay;
+      }
+    }
+  }
 
   CStr line, ppName, fname1 = GetNative()->FileName();
   util::StripExtensionFromFilename(fname1, fname1);
@@ -883,8 +935,13 @@ void NativeExpArr2d::WritePilotPointMultArrays (ParamList* a_list,
   std::vector<Real> mlt(m_nrow*m_ncol, 0);
   for (size_t i = 0; i<ppVals.size(); ++i)
   {
+    pp.SetLayer(a_layer);
     pp.GetWeightsForPoint((int)i+1, mlt);
     ppName.Format("pp%d_%d", a_p.m_scatIndex, i+1);
+    if (a_layer > 1)
+    {
+      ppName.Format("pp%dL%d_%d", a_p.m_scatIndex, a_layer, i+1);
+    }
     pMlt->StringsToWrite().push_back(ppName);
     if (!GetNative()->GetArraysInternal())
     {
@@ -907,6 +964,7 @@ void NativeExpArr2d::WritePilotPointMultArrays (ParamList* a_list,
       pMlt->StringsToWrite().push_back(line);
     }
   }
+  m_ncol = ncolOrig;
 } // NativeExpArr2d::WritePilotPointMultArrays
 //------------------------------------------------------------------------------
 /// \brief

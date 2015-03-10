@@ -24,6 +24,9 @@ public:
   bool DoInterpolation(std::vector<Real> &a_arrayVals);
   void GetWeightsForPoint(int a_idx, std::vector<Real>& a_w);
 
+  void SetUnstructured(std::vector<int>& a_nodes);
+  void SetLayer(int a_);
+
 private:
   PilotPoints(const PilotPoints &rhs);
   const PilotPoints& operator=(const PilotPoints &rhs);

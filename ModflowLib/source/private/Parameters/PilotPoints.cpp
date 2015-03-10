@@ -31,11 +31,12 @@ public:
   void GetWeightsForPoint(int a_idx, std::vector<Real>& a_w);
   bool ReadStartVals();
 
-private:
   bool ReadWeights();
   bool ReadIndices();
 
   void PostDataForExport();
+  int  GetStartIdx();
+  int  GetEndIdx(int a_start);
 
   template<class T>
   bool ReadData(const CStr &a_path,
@@ -48,6 +49,8 @@ private:
   std::vector<int> m_isens;
   CAR_REL2D m_weights;
   CAR_INT2D m_indices;
+  int m_layer, m_mxnodlay;
+  std::vector<int> m_nodes;
 };
 
 //------------------------------------------------------------------------------
@@ -56,7 +59,9 @@ private:
 PilotPoints::impl::impl (const char *a_,
                          const Param &a_param) :
 m_file(a_),
-m_param(a_param)
+m_param(a_param),
+m_layer(-1),
+m_mxnodlay(-1)
 {
   m_setIndex = m_param.m_scatIndex;
 } // PilotPoints::PilotPoints::impl
@@ -204,26 +209,27 @@ bool PilotPoints::impl::DoInterpolation (std::vector<Real> &a_arrayVals)
 //------------------------------------------------------------------------------
 void PilotPoints::impl::GetWeightsForPoint (int a_idx, std::vector<Real>& a_w)
 {
+  for (size_t i=0; i<a_w.size(); ++i) a_w[i] = 0;
   if (1 > m_weights.GetSize1())
   {
     if (!ReadWeights() || !ReadIndices()) return;
   }
   if (m_weights.GetSize1() != m_indices.GetSize1() ||
-      m_weights.GetSize2() != m_indices.GetSize2() ||
-      (int)a_w.size() != m_weights.GetSize1())
+      m_weights.GetSize2() != m_indices.GetSize2())
   {
-    return;
+    if (m_nodes.empty() && (int)a_w.size() != m_weights.GetSize1()) return;
   }
 
-  int *iPtr, cnt(0);
+  int *iPtr, cnt(0), start(GetStartIdx()), end(GetEndIdx(start));
   Real *fPtr;
   m_indices.GetPtr(&iPtr);
   m_weights.GetPtr(&fPtr);
-  for (int i=0; i<m_weights.GetSize1(); i++)
+  cnt = start;
+  for (int i=start; i<end; i++)
   {
     for(int j=0; j<m_weights.GetSize2(); ++j, ++cnt)
     {
-      if (a_idx == iPtr[cnt]) a_w[i] = fPtr[cnt];
+      if (a_idx == iPtr[cnt]) a_w[i-start] = fPtr[cnt];
     }
   }
 } // PilotPoints::impl::WriteMultiplierArrays
@@ -245,7 +251,31 @@ void PilotPoints::impl::PostDataForExport ()
                                    &m_weights.at(0,0),
                                    &m_indices.at(0,0));
 } // PilotPoints::impl::PostDataForExport
-
+//------------------------------------------------------------------------------
+/// \brief Get the starting index. This is usually 0 but except when usg is
+/// using an unstructured grid.
+//------------------------------------------------------------------------------
+int PilotPoints::impl::GetStartIdx ()
+{
+  int rval(0);
+  if (m_nodes.empty() || m_layer < 2) return rval;
+  if (m_layer > 0 && m_layer <= (int)m_nodes.size())
+  {
+    rval = m_weights.GetSize2() * m_nodes[m_layer-1];
+  }
+  return rval;
+} // PilotPoints::impl::GetStartIdx
+//------------------------------------------------------------------------------
+/// \brief This is usually the size of the m_weights variable unless we are
+/// doing usg with an unstructured grid
+//------------------------------------------------------------------------------
+int PilotPoints::impl::GetEndIdx (int a_start)
+{
+  int rval(m_weights.GetSize1());
+  if (m_nodes.empty()) return rval;
+  rval = a_start + m_mxnodlay;
+  return rval;
+} // PilotPoints::impl::GetEndIdx
 
 //------------------------------------------------------------------------------
 /// \brief Constructor.
@@ -295,7 +325,25 @@ void PilotPoints::GetWeightsForPoint (int a_idx, std::vector<Real>& a_w)
 {
   m_p->GetWeightsForPoint(a_idx, a_w);
 } // PilotPoints::WriteMultiplierArrays
-
+//------------------------------------------------------------------------------
+/// \brief Sets the layer if we are doing usg with an unstructured grid
+//------------------------------------------------------------------------------
+void PilotPoints::SetLayer (int a_)
+{
+  m_p->m_layer = a_;
+} // PilotPoints::SetLayer
+//------------------------------------------------------------------------------
+/// \brief Sets the number of nodes in each layer if doing usg with an
+/// unstructured grid
+//------------------------------------------------------------------------------
+void PilotPoints::SetUnstructured (std::vector<int>& a_nodes)
+{
+  m_p->m_nodes = a_nodes;
+  for (size_t i=0; i<a_nodes.size(); ++i)
+  {
+    if (a_nodes[i] > m_p->m_mxnodlay) m_p->m_mxnodlay = a_nodes[i];
+  }
+} // PilotPoints::SetUnstructured
 ///////////////////////////////////////////////////////////////////////////////
 // TESTS
 ///////////////////////////////////////////////////////////////////////////////

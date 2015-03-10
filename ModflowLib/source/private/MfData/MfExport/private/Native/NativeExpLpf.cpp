@@ -30,12 +30,20 @@ NativeExpLpf::NativeExpLpf () :
 , m_ikcflag(-999)
 , m_usg(0)
 , m_unstructured(0)
+, m_stacked(0)
 , m_anyChaniNotOne(0)
 {
   m_usg = MfData::MfGlobal::Get().ModelType() == MfData::USG;
   if (m_usg)
   {
     m_unstructured = MfData::MfGlobal::Get().Unstructured() ? 1 : 0;
+    MfPackage* p = MfData::MfGlobal::Get().GetPackage(MfData::Packages::DISU);
+    if (p)
+    {
+      const int* ivsd(0);
+      p->GetField(MfData::Packages::Disu::IVSD, &ivsd);
+      if (ivsd && -1 == *ivsd) m_stacked = true;
+    }
   }
 } // MfNativeExpLpf::MfNativeExpLpf
 //------------------------------------------------------------------------------
@@ -390,6 +398,12 @@ void NativeExpLpf::WriteLpfPilotPar (ParamList* list, Param* p)
     for (size_t j=0; j<p1.m_clust.size(); ++j)
     {
       p1.m_clust[j].m_mlt = p1.m_name;
+      if (m_unstructured && !m_stacked && p1.m_clust[j].m_lay > 1)
+      {
+        CStr nm;
+        nm.Format("pp%dL%d_%d", p->m_scatIndex, p1.m_clust[j].m_lay, i+1);
+        p1.m_clust[j].m_mlt = nm;
+      }
       AddToStoredLinesDesc(Line9(&p1.m_clust[j]), Desc(9));
     }
   }

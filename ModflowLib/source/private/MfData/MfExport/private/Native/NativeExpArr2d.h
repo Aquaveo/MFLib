@@ -51,7 +51,7 @@ namespace MfData
       CStr ArrayFileName(const CStr& a_fname);
       bool CheckParameters();
       void WriteZoneMultArrays(std::set<double>& a_keys, ParamList* a_list);
-      void WritePilotPointMultArrays(ParamList* a_list, Param& a_p);
+      void WritePilotPointMultArrays(ParamList* a_list, Param& a_p, int a_lay);
       CStr ParArrayName();
       void EnsureParCluster(Real a_key, ParamList* a_list);
       void SubstituteMultArray();
@@ -67,7 +67,7 @@ namespace MfData
       double*     m_dataD;
       int         m_nrow, m_ncol, m_curSp, m_tmp_iMult;
       bool        m_firstTime;
-      bool        m_unstructured;
+      bool        m_unstructured, m_stacked;
       std::vector<double> m_pilotKeys;
     };
 

@@ -1349,6 +1349,7 @@ module module_exportData
     implicit none
     integer, intent(in) :: NODES,NJAG,IVSD,IDSYMRD
 
+    call mfLibExp_SingleValInt('DISU','IVSD',IVSD)
     if (NOT(ed_getExportData())) return
     call mfLibExp_Disu1(NODES,NJAG,IVSD,IDSYMRD)
   end subroutine exp_DISU1

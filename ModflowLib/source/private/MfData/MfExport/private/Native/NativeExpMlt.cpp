@@ -109,6 +109,11 @@ CStr NativeExpMlt::Desc (int a_line)
                   " 3. RMLT(NCOL,NROW)",
                   " 4. [MLTNAM1 [op1 MLTNAM2] [op2 MLTNAM3] [op3 MLTNAM4] ... ] [IPRN]"
                  };
+  if (GetGlobal()->ModelType() == MfData::USG)
+  {
+    desc[2].Replace(" 3", "3b");
+    if (GetGlobal()->Unstructured()) desc[2] = "3a. RMLT(NDSLAY)";
+  }
   return desc[a_line-1];
 } // NativeExpMlt::Desc
 
