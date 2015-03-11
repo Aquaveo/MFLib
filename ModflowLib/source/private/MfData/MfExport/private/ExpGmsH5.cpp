@@ -22,6 +22,7 @@
 #include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\ListReader\CellIdToIJK.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
+#include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\MfPackageUtil.h>
 #include <private\MfData\Packages\MfPackage.h>
@@ -135,6 +136,25 @@ enum enumNameFileType { NF_MODFLOW, NF_MT3D, NF_SEAWAT };
 ////////////////////////////////////////////////////////////////////////////////
 /// \class WellPropertyList
 ////////////////////////////////////////////////////////////////////////////////
+class ExpGmsH5::impl
+{
+public:
+  impl() : m_nativeExp(0)
+  {}
+  ~impl()
+  {
+    if (m_nativeExp) delete(m_nativeExp);
+  }
+
+  bool ExportNative (MfGlobal* a_global,
+                     MfPackage* a_package);
+  void SetFileName (const char * const a_) { m_fname = a_; }
+  Mf2kNative* m_nativeExp;
+  CStr m_fname;
+};
+////////////////////////////////////////////////////////////////////////////////
+/// \class WellPropertyList
+////////////////////////////////////////////////////////////////////////////////
 //------------------------------------------------------------------------------
 /// \brief Class to manage list of cells and names and how they map into the
 ///        properties array
@@ -243,6 +263,7 @@ public:
   , m_NAM_maxStrLen(0)
   , m_HasBinaryExport(0)
   , m_WellPropertyList()
+  , m_NativeExp(0)
   {}
 
   virtual ~ExpGmsH5Public()
@@ -272,6 +293,7 @@ public:
   int m_NAM_maxStrLen;
   bool m_HasBinaryExport;
   WellPropertyList m_WellPropertyList;
+  Mf2kNative* m_NativeExp;
 
 };
 
@@ -305,24 +327,6 @@ static void expMultArrayFunc(MfPackage* a_package,
                              TxtExporter* a_exp);
 static void expMultFile(TxtExporter *a_exp);
 static void expZoneFile(TxtExporter *a_exp);
-static void expSolverSIP(MfPackage *a_package,
-                         TxtExporter *a_exp);
-static void expSolverDE4Line1(MfPackage *a_package,
-                              TxtExporter *a_exp);
-static void expSolverDE4Line2(MfPackage *a_package,
-                              TxtExporter *a_exp);
-static void expSolverSOR(MfPackage *a_package,
-                         TxtExporter *a_exp);
-static void expSolverPCG(MfPackage *a_package,
-                         TxtExporter *a_exp);
-static void expSolverPCGN(MfPackage *a_package,
-                          TxtExporter *a_exp);
-static void expSolverLMG(MfPackage *a_package,
-                         TxtExporter *a_exp);
-static void expSolverGMG(MfPackage *a_package,
-                         TxtExporter *a_exp);
-static void expSolverNWT(MfPackage *a_p,
-                         TxtExporter *a_exp);
 static void expDataArray(MfPackage *a_package,
                          MfGlobal *a_global,
                          TxtExporter *a_exp,
@@ -563,6 +567,7 @@ static std::set<CStr> &ExportedPackages (TxtExporter* a_exp)
 //------------------------------------------------------------------------------
 ExpGmsH5::ExpGmsH5 (bool a_compress/*=true*/) :
   MfExporterImpl("GmsH5", a_compress)
+, m_p(new ExpGmsH5::impl())
 {
 } // ExpGmsH5::ExpGmsH5
 //------------------------------------------------------------------------------
@@ -570,6 +575,7 @@ ExpGmsH5::ExpGmsH5 (bool a_compress/*=true*/) :
 //------------------------------------------------------------------------------
 ExpGmsH5::ExpGmsH5 (const char *a_fileName) : 
   MfExporterImpl("GmsH5", true)
+, m_p(new ExpGmsH5::impl())
 {
   SetFileName(a_fileName);
 } // ExpGmsH5::ExpGmsH5
@@ -578,6 +584,7 @@ ExpGmsH5::ExpGmsH5 (const char *a_fileName) :
 //------------------------------------------------------------------------------
 ExpGmsH5::~ExpGmsH5 ()
 {
+  if (m_p) delete(m_p);
 } // ExpGmsH5::~ExpGmsH5
 //------------------------------------------------------------------------------
 /// \brief Sets the filename
@@ -585,6 +592,7 @@ ExpGmsH5::~ExpGmsH5 ()
 void ExpGmsH5::SetFileName (const char *a_)
 {
   MfExporterImpl::SetFileName(a_);
+  m_p->SetFileName(a_);
   CStr base;
   util::StripExtensionFromFilename(a_, base);
   GetExp()->SetBaseFileName(base);
@@ -734,12 +742,37 @@ static void iWrite1dArray (const Real* a_,
   }
 } // iWrite1dArray
 //------------------------------------------------------------------------------
+/// \brief Uses the native exporter to write the files
+//------------------------------------------------------------------------------
+bool ExpGmsH5::impl::ExportNative (MfGlobal* a_global,
+                                   MfPackage* a_package)
+{
+    bool rval=false;
+    CStr packName(a_package->PackageName());
+    if (MfExportUtil::IsSolver(packName))
+    {
+      if (!m_nativeExp)
+      {
+        m_nativeExp = new Mf2kNative;
+        m_nativeExp->SetFileName(m_fname.c_str());
+      }
+      if (m_nativeExp)
+      {
+        rval = m_nativeExp->ExportPackage(a_global, a_package);
+      }
+    }
+    return rval;
+} // ExpGmsH5::impl::ExportNative
+//------------------------------------------------------------------------------
 /// \brief Exports the package data.
 //------------------------------------------------------------------------------
 bool ExpGmsH5::ExportPackage (MfGlobal* a_global,
                               MfPackage* a_package)
 {
+  // export package as native text
   bool rval(true);
+  if (m_p->ExportNative(a_global, a_package)) return rval;
+
   CStr packName(a_package->PackageName());
   ExportedPackages(GetExp()).insert(packName);
   if (Packages::NAM == packName)
@@ -749,42 +782,6 @@ bool ExpGmsH5::ExportPackage (MfGlobal* a_global,
   else if (Packages::DIS == packName)
   {
     expDisFile(a_global, a_package, GetExp());
-  }
-  else if (Packages::SIP == packName)
-  {
-    expSolverSIP(a_package, GetExp());
-  }
-  else if (Packages::DE4Line1 == packName)
-  {
-    expSolverDE4Line1(a_package, GetExp());
-  }
-  else if (Packages::DE4Line2 == packName)
-  {
-    expSolverDE4Line2(a_package, GetExp());
-  }
-  else if (Packages::SOR == packName)
-  {
-    expSolverSOR(a_package, GetExp());
-  }
-  else if (Packages::PCG == packName)
-  {
-    expSolverPCG(a_package, GetExp());
-  }
-  else if (Packages::PCGN == packName)
-  {
-    expSolverPCGN(a_package, GetExp());
-  }
-  else if (Packages::LMG == packName)
-  {
-    expSolverLMG(a_package, GetExp());
-  }
-  else if (Packages::GMG == packName)
-  {
-    expSolverGMG(a_package, GetExp());
-  }
-  else if (Packages::NWT == packName)
-  {
-    expSolverNWT(a_package, GetExp());
   }
   else if (Packages::BAS == packName)
   {
@@ -2290,357 +2287,6 @@ static void expZoneFile (TxtExporter *a_exp)
   }
 } // expZoneFile
 //------------------------------------------------------------------------------
-/// \brief Exports the solver file
-//------------------------------------------------------------------------------
-static void expSolverSIP (MfPackage *a_package,
-                          TxtExporter *a_exp)
-{
-  using namespace Packages;
-  const int *mxiter, *nparm, *ipcalc, *iprsip;
-  const Real *accl, *hclose, *wseed;
-
-  if (a_package->GetField(SipPack::MXITER, &mxiter) && mxiter &&
-      a_package->GetField(SipPack::NPARM, &nparm) && nparm &&
-      a_package->GetField(SipPack::IPCALC, &ipcalc) && ipcalc &&
-      a_package->GetField(SipPack::IPRSIP, &iprsip) && iprsip &&
-      a_package->GetField(SipPack::ACCL, &accl) && accl &&
-      a_package->GetField(SipPack::HCLOSE, &hclose) && hclose &&
-      a_package->GetField(SipPack::WSEED, &wseed) && wseed)
-  {
-    CStr aStr;
-    aStr.Format("%d %d ", *mxiter, *nparm);
-    a_exp->WriteLineToFile(SIP, aStr);
-    aStr.Format("%s %s %d %s %d ", STR(*accl), STR(*hclose), *ipcalc,
-                STR(*wseed), *iprsip);
-    a_exp->WriteLineToFile(SIP, aStr);
-  }
-
-} // expSolverSIP
-//------------------------------------------------------------------------------
-/// \brief Exports the solver file
-//------------------------------------------------------------------------------
-static void expSolverDE4Line1 (MfPackage *a_package,
-                               TxtExporter *a_exp)
-{
-  using namespace Packages;
-  const int *itmx, *mxup, *mxlow, *mxbw;
-
-  if (a_package->GetField(De4Pack::ITMX, &itmx) && itmx &&
-      a_package->GetField(De4Pack::MXUP, &mxup) && mxup &&
-      a_package->GetField(De4Pack::MXLOW, &mxlow) && mxlow &&
-      a_package->GetField(De4Pack::MXBW, &mxbw) && mxbw)
-  {
-    CStr aStr;
-    aStr.Format("%d %d %d %d ", *itmx, *mxup, *mxlow, *mxbw);
-    a_exp->WriteLineToFile(DE4, aStr);
-  }
-} // expSolverDE4Line1
-//------------------------------------------------------------------------------
-/// \brief Exports the solver file
-//------------------------------------------------------------------------------
-static void expSolverDE4Line2 (MfPackage *a_package,
-                               TxtExporter *a_exp)
-{
-  using namespace Packages;
-  const int *ifreq, *mutd4, *iprd4;
-  const Real *accl, *hclose;
-
-  if (a_package->GetField(De4Pack::IFREQ, &ifreq) && ifreq &&
-      a_package->GetField(De4Pack::MUTD4, &mutd4) && mutd4 &&
-      a_package->GetField(De4Pack::ACCL, &accl) && accl &&
-      a_package->GetField(De4Pack::HCLOSE, &hclose) && hclose &&
-      a_package->GetField(De4Pack::IPRD4, &iprd4) && iprd4)
-  {
-    CStr aStr;
-    aStr.Format("%d %d %s %s %d ", *ifreq, *mutd4, STR(*accl), STR(*hclose),
-                *iprd4);
-    a_exp->WriteLineToFile(DE4, aStr);
-  }
-} // expSolverDE4Line2
-//------------------------------------------------------------------------------
-/// \brief Exports the solver file
-//------------------------------------------------------------------------------
-static void expSolverSOR (MfPackage *a_package,
-                          TxtExporter *a_exp)
-{
-  using namespace Packages;
-  const int *mxiter, *iprsor;
-  const Real *accl, *hclose;
-  if (a_package->GetField(SorPack::MXITER, &mxiter) && mxiter &&
-      a_package->GetField(SorPack::ACCL, &accl) && accl &&
-      a_package->GetField(SorPack::HCLOSE, &hclose) && hclose &&
-      a_package->GetField(SorPack::IPRSOR, &iprsor) && iprsor)
-  {
-    CStr aStr;
-    aStr.Format("%d ", *mxiter);
-    a_exp->WriteLineToFile(SOR, aStr);
-    aStr.Format("%s %s %d ", STR(*accl), STR(*hclose), *iprsor);
-    a_exp->WriteLineToFile(SOR, aStr);
-  }
-} // expSolverSOR
-//------------------------------------------------------------------------------
-/// \brief Exports the solver file
-//------------------------------------------------------------------------------
-static void expSolverPCG (MfPackage *a_package,
-                          TxtExporter *a_exp)
-{
-  using namespace Packages;
-  const int *mxiter, *iter1, *npcond, *nbpol, *iprpcg, *mutpcg;
-  const Real *hclose, *rclose, *relax, *damp;
-  // For damp MODFLOW bumps 0.0 up to 1.0.  Only damping factors > 0.0 or < 1.0
-  // cause damping to be applied.
-  if (a_package->GetField(PcgPack::MXITER, &mxiter) && mxiter &&
-      a_package->GetField(PcgPack::ITER1, &iter1) && iter1 &&
-      a_package->GetField(PcgPack::NPCOND, &npcond) && npcond &&
-      a_package->GetField(PcgPack::NBPOL, &nbpol) && nbpol &&
-      a_package->GetField(PcgPack::IPRPCG, &iprpcg) && iprpcg &&
-      a_package->GetField(PcgPack::MUTPCG, &mutpcg) && mutpcg &&
-      a_package->GetField(PcgPack::HCLOSE, &hclose) && hclose &&
-      a_package->GetField(PcgPack::RCLOSE, &rclose) && rclose &&
-      a_package->GetField(PcgPack::RELAX, &relax) && relax &&
-      a_package->GetField(PcgPack::DAMP, &damp) && damp)
-  {
-    CStr aStr;
-    aStr.Format("%d %d %d ", *mxiter, *iter1, *npcond);
-    a_exp->WriteLineToFile(PCG, aStr);
-    aStr.Format("%s %s %s %d %d %d %s ", STR(*hclose), STR(*rclose), 
-                STR(*relax), *nbpol, *iprpcg, *mutpcg, STR(*damp));
-    a_exp->WriteLineToFile(PCG, aStr);
-  }
-} // expSolverPCG
-//------------------------------------------------------------------------------
-/// \brief Exports the solver file
-//------------------------------------------------------------------------------
-static void expSolverPCGN (MfPackage *a_package,
-                           TxtExporter *a_exp)
-{
-  using namespace Packages;
-  const int *iter_mo(NULL), *iter_mi(NULL), *ifill(NULL), *unit_pc(NULL),
-    *unit_ts(NULL), *adamp(NULL), *acnvg(NULL), *mcnvg(NULL), *ipunit(NULL);
-  const Real *close_r(NULL), *close_h(NULL), *relax(NULL), *damp(NULL),
-    *damp_lb(NULL), *rate_d(NULL), *chglimit(NULL), *cnvg_lb(NULL),
-    *rate_c(NULL);
-  if (a_package->GetField(PcgnPack::ITER_MO, &iter_mo) && iter_mo &&
-      a_package->GetField(PcgnPack::ITER_MI, &iter_mi) && iter_mi &&
-      a_package->GetField(PcgnPack::CLOSE_R, &close_r) && close_r &&
-      a_package->GetField(PcgnPack::CLOSE_H, &close_h) && close_h &&
-      a_package->GetField(PcgnPack::RELAX, &relax) && relax &&
-      a_package->GetField(PcgnPack::IFILL, &ifill) && ifill &&
-      a_package->GetField(PcgnPack::UNIT_PC, &unit_pc) && unit_pc &&
-      a_package->GetField(PcgnPack::UNIT_TS, &unit_ts) && unit_ts &&
-      a_package->GetField(PcgnPack::ADAMP, &adamp) && adamp &&
-      a_package->GetField(PcgnPack::DAMP, &damp) && damp &&
-      a_package->GetField(PcgnPack::DAMP_LB, &damp_lb) && damp_lb &&
-      a_package->GetField(PcgnPack::RATE_D, &rate_d) && rate_d &&
-      a_package->GetField(PcgnPack::CHGLIMIT, &chglimit) && chglimit &&
-      a_package->GetField(PcgnPack::ACNVG, &acnvg) && acnvg &&
-      a_package->GetField(PcgnPack::CNVG_LB, &cnvg_lb) && cnvg_lb &&
-      a_package->GetField(PcgnPack::MCNVG, &mcnvg) && mcnvg &&
-      a_package->GetField(PcgnPack::RATE_C, &rate_c) && rate_c &&
-      a_package->GetField(PcgnPack::IPUNIT, &ipunit) && ipunit)
-  {
-    CStr aStr;
-
-    // Line 1: ITER_MO, ITER_MI, CLOSE_R, CLOSE_H
-    aStr.Format("%d %d %s %s", *iter_mo, *iter_mi, STR(*close_r), STR(*close_h));
-    a_exp->WriteLineToFile(PCGN, aStr);
-
-    // Line 2: RELAX, IFILL, UNIT_PC, UNIT_TS
-    aStr.Format("%s %d %d %d", STR(*relax), *ifill, *unit_pc, *unit_ts);
-    a_exp->WriteLineToFile(PCGN, aStr);
-
-    if (*iter_mo > 1)
-    {
-      // Line 3: ADAMP, DAMP, DAMP_LB, RATE_D, CHGLIMIT
-      aStr.Format("%d %s %s %s %s", *adamp, STR(*damp), STR(*damp_lb),
-        STR(*rate_d), STR(*chglimit));
-      a_exp->WriteLineToFile(PCGN, aStr);
-
-      // Line 4: ACNVG, CNVG_LB, MCNVG, RATE_C, IPUNIT
-      aStr.Format("%d %s %d %s %d", *acnvg, STR(*cnvg_lb), *mcnvg, STR(*rate_c),
-        *ipunit);
-      a_exp->WriteLineToFile(PCGN, aStr);
-    }
-  }
-} // expSolverPCGN
-//------------------------------------------------------------------------------
-/// \brief Exports the solver file
-//------------------------------------------------------------------------------
-static void expSolverLMG (MfPackage *a_package,
-                          TxtExporter *a_exp)
-{
-  using namespace Packages;
-  const int *icg, *mxiter, *mxcyc, *ioutamg, *control;
-  const Real *stor1, *stor2, *stor3, *bclose, *damp, *dup, *dlow, *hclose;
-  if (a_package->GetField(LmgPack::ICG, &icg) && icg &&
-      a_package->GetField(LmgPack::MXITER, &mxiter) && mxiter &&
-      a_package->GetField(LmgPack::MXCYC, &mxcyc) && mxcyc &&
-      a_package->GetField(LmgPack::IOUTAMG, &ioutamg) && ioutamg &&
-      a_package->GetField(LmgPack::STOR1, &stor1) && stor1 &&
-      a_package->GetField(LmgPack::STOR2, &stor2) && stor2 &&
-      a_package->GetField(LmgPack::STOR3, &stor3) && stor3 &&
-      a_package->GetField(LmgPack::BCLOSE, &bclose) && bclose &&
-      a_package->GetField(LmgPack::DAMP, &damp) && damp &&
-      a_package->GetField(LmgPack::HCLOSE, &hclose) && hclose &&
-      a_package->GetField(LmgPack::CONTROL, &control) && control)
-  {
-    CStr aStr;
-    aStr.Format("%s %s %s %d ", STR(*stor1), STR(*stor2), STR(*stor3), *icg);
-    a_exp->WriteLineToFile(LMG, aStr);
-    aStr.Format("%d %d %s %s %d ", *mxiter, *mxcyc, STR(*bclose), STR(*damp),
-                *ioutamg);
-    a_exp->WriteLineToFile(LMG, aStr);
-    if (*damp == -2.0 && 
-        a_package->GetField(LmgPack::DUP, &dup) && dup &&
-        a_package->GetField(LmgPack::DLOW, &dlow) && dlow)
-    {
-      aStr.Format("%s %s ", STR(*dup), STR(*dlow));
-      a_exp->WriteLineToFile(LMG, aStr);
-    }
-    aStr.Format("%s %d", STR(*hclose), *control);
-    a_exp->WriteLineToFile(LMG, aStr);
-  }
-} // expSolverLMG
-//------------------------------------------------------------------------------
-/// \brief Exports the solver file
-//------------------------------------------------------------------------------
-static void expSolverGMG (MfPackage *a_package,
-                          TxtExporter *a_exp)
-{
-  using namespace Packages;
-  const int *iiter, *mxiter, *iadamp, *ioutgmg, *ism, *isc;
-  const Real *rclose, *hclose, *damp;
-  const double *relax;
-  if (a_package->GetField(GmgPack::RCLOSE, &rclose) && rclose &&
-      a_package->GetField(GmgPack::IITER, &iiter) && iiter &&
-      a_package->GetField(GmgPack::HCLOSE, &hclose) && hclose &&
-      a_package->GetField(GmgPack::MXITER, &mxiter) && mxiter &&
-      a_package->GetField(GmgPack::DAMP, &damp) && damp &&
-      a_package->GetField(GmgPack::IADAMP, &iadamp) && iadamp &&
-      a_package->GetField(GmgPack::IOUTGMG, &ioutgmg) && ioutgmg &&
-      a_package->GetField(GmgPack::ISM, &ism) && ism &&
-      a_package->GetField(GmgPack::ISC, &isc) && isc)
-  {
-    CStr aStr;
-    aStr.Format("%s %d %s %d ", STR(*rclose), *iiter, STR(*hclose), *mxiter);
-    a_exp->WriteLineToFile(GMG, aStr);
-    aStr.Format("%s %d %d ", STR(*damp), *iadamp, *ioutgmg);
-    a_exp->WriteLineToFile(GMG, aStr);
-    aStr.Format("%d %d ", *ism, *isc);
-    a_exp->WriteLineToFile(GMG, aStr);
-    if (*isc == 4 && a_package->GetField(GmgPack::RELAX, &relax) && relax)
-    {
-      aStr.Format("%s ", STR(*relax));
-      a_exp->WriteLineToFile(GMG, aStr);
-    }
-  }
-} // expSolverGMG
-//------------------------------------------------------------------------------
-/// \brief Exports the solver file
-//------------------------------------------------------------------------------
-static void expSolverNWT (MfPackage *a_p,
-                          TxtExporter *a_exp)
-{
-  using namespace Packages;
-  const Real* toldum(0),* ftoldum(0),* Thickdum(0),* thetadum(0),
-            * akappadum(0),* gammadum(0),* amomentdum(0),* Btoldum(0),
-            * Breducdum(0),
-            * Stop_toldum(0);
-  const Real* RRCTOLS(0),* EPSRNS(0),* HCLOSEXMDDUM(0);
-  const int* Mxiter(0),* Linmeth(0),* IPRNWT(0),* IBOTAV(0),* IFDPARAM(0),
-           * Btrack(0),* Numtrack(0),* IACL(0),* NORDER(0),* LEVEL(0),
-           * NORTH(0),* IREDSYS(0),* IDROPTOL(0),* MXITERXMD(0),
-           * Maxitr_gmres(0),* Ilu_method(0),* Lev_fill(0),* Msdr(0);
-
-  if (a_p->GetField(NWTpack::toldum, &toldum) && toldum &&
-      a_p->GetField(NWTpack::ftoldum, &ftoldum) && ftoldum &&
-      a_p->GetField(NWTpack::Thickdum, &Thickdum) && Thickdum &&
-      a_p->GetField(NWTpack::thetadum, &thetadum) && thetadum &&
-      a_p->GetField(NWTpack::akappadum, &akappadum) && akappadum &&
-      a_p->GetField(NWTpack::gammadum, &gammadum) && gammadum &&
-      a_p->GetField(NWTpack::amomentdum, &amomentdum) && amomentdum &&
-      a_p->GetField(NWTpack::Btoldum, &Btoldum) && Btoldum &&
-      a_p->GetField(NWTpack::Breducdum, &Breducdum) && Breducdum &&
-      a_p->GetField(NWTpack::Mxiter, &Mxiter) && Mxiter &&
-      a_p->GetField(NWTpack::Linmeth, &Linmeth) && Linmeth &&
-      a_p->GetField(NWTpack::IPRNWT, &IPRNWT) && IPRNWT &&
-      a_p->GetField(NWTpack::IBOTAV, &IBOTAV) && IBOTAV &&
-      a_p->GetField(NWTpack::IFDPARAM, &IFDPARAM) && IFDPARAM &&
-      a_p->GetField(NWTpack::Btrack, &Btrack) && Btrack &&
-      a_p->GetField(NWTpack::Numtrack, &Numtrack) && Numtrack)
-  {
-    int var(*IFDPARAM - 1);
-    if (var == 3)
-    {
-      if (*Linmeth == 2 &&
-          ( !a_p->GetField(NWTpack::IACL, &IACL) || !IACL ||
-            !a_p->GetField(NWTpack::NORDER, &NORDER) || !NORDER ||
-            !a_p->GetField(NWTpack::LEVEL, &LEVEL) || !LEVEL ||
-            !a_p->GetField(NWTpack::NORTH, &NORTH) || !NORTH ||
-            !a_p->GetField(NWTpack::IREDSYS, &IREDSYS) || !IREDSYS ||
-            !a_p->GetField(NWTpack::RRCTOLS, &RRCTOLS) || !RRCTOLS ||
-            !a_p->GetField(NWTpack::IDROPTOL, &IDROPTOL) || !IDROPTOL ||
-            !a_p->GetField(NWTpack::EPSRNS, &EPSRNS) || !EPSRNS ||
-            !a_p->GetField(NWTpack::HCLOSEXMDDUM, &HCLOSEXMDDUM) || !HCLOSEXMDDUM ||
-            !a_p->GetField(NWTpack::MXITERXMD, &MXITERXMD) || !MXITERXMD ) )
-      {
-        return;
-      }
-      if (*Linmeth == 1 &&
-          ( !a_p->GetField(NWTpack::Maxitr_gmres, &Maxitr_gmres) || !Maxitr_gmres ||
-            !a_p->GetField(NWTpack::Ilu_method, &Ilu_method) || !Ilu_method ||
-            !a_p->GetField(NWTpack::Lev_fill, &Lev_fill) || !Lev_fill ||
-            !a_p->GetField(NWTpack::Stop_toldum, &Stop_toldum) || !Stop_toldum ||
-            !a_p->GetField(NWTpack::Msdr, &Msdr) || !Msdr ) )
-      {
-        return;
-      }
-    }
-
-    CStr opt[4] = {"SIMPLE", "MODERATE", "COMPLEX", "SPECIFIED "};
-    CStr line;
-    line.Format("%s %s %d %s %d %d %d ",
-                STR(*toldum), STR(*ftoldum), *Mxiter, STR(*Thickdum), *Linmeth,
-                *IPRNWT, *IBOTAV);
-    if (var < 0 || var > 3)
-    {
-      ASSERT(0);
-      var = 0;
-    }
-    line += opt[var];
-    if (3 == var) // SPECIFIED
-    {
-      CStr line2;
-      line2.Format("%s %s %s %s %d %d %s %s",
-                   STR(*thetadum), STR(*akappadum), STR(*gammadum),
-                   STR(*amomentdum), *Btrack, *Numtrack,
-                   STR(*Btoldum), STR(*Breducdum));
-      line += line2;
-    }
-    a_exp->WriteLineToFile(NWT, line);
-    if (3 == var) // SPECIFIED
-    {
-      if (1 == *Linmeth)
-      {
-        line.Format("%d %d %d %s %d",
-                    *Maxitr_gmres, *Ilu_method, *Lev_fill, STR(*Stop_toldum),
-                    *Msdr);
-        a_exp->WriteLineToFile(NWT, line);
-      }
-      else
-      {
-        line.Format("%d %d %d %d %d %s %d %s %s %d",
-                    *IACL, *NORDER, *LEVEL, *NORTH, *IREDSYS,
-                    STR(*RRCTOLS), *IDROPTOL, STR(*EPSRNS),
-                    STR(*HCLOSEXMDDUM), *MXITERXMD);
-        a_exp->WriteLineToFile(NWT, line);
-      }
-    }
-
-
-  }
-} // expSolverNWT
-//------------------------------------------------------------------------------
 /// \brief Writes the array multiplier for the areal data
 //------------------------------------------------------------------------------
 template <class T>
@@ -2749,6 +2395,7 @@ static void expDataArray (MfPackage *a_package,
     name = aName;
   }
 
+  int tmpiMult;
   const int* lay(0), *iData(0), *iMult(0), *iPRN(0);
   const Real* data(0), *mult(0);
   hid_t datatype(-1);
@@ -2756,11 +2403,20 @@ static void expDataArray (MfPackage *a_package,
     return;
   a_package->GetField(Packages::Array::IPRN, &iPRN);
   // the array is either "Reals" or "Ints"
-  if (!a_package->GetField(Packages::Array::ARRAY, &data) || !data,
-      !a_package->GetField(Packages::Array::MULT, &mult) || !mult)
+  a_package->GetField(Packages::Array::MULT, &mult);
+  if (!a_package->GetField(Packages::Array::ARRAY, &data) || !data ||
+      !mult)
   {
-    if (!a_package->GetField(Packages::Array::ARRAY, &iData) || !iData,
-        !a_package->GetField(Packages::Array::MULT, &iMult) || !iMult)
+    a_package->GetField(Packages::Array::MULT, &iMult);
+    if (!iMult && mult)
+    {
+      tmpiMult = static_cast<int>(*mult);
+      iMult = &tmpiMult;
+      mult = nullptr;
+    }
+
+    if (!a_package->GetField(Packages::Array::ARRAY, &iData) || !iData ||
+        !iMult)
       return;
     else
       datatype = H5T_NATIVE_INT;
@@ -9178,410 +8834,6 @@ void ExpGmsH5T::testexpDisFile ()
   t1.GetFileContents(Packages::DIS, str1);
   TS_ASSERT_EQUALS2(str1, str);
 }
-//------------------------------------------------------------------------------
-void ExpGmsH5T::testexpSolverSIP ()
-{
-  using namespace Packages;
-  MfPackage p(Packages::SIP);
-  TxtExporter t(TESTBASE);
-  int i[4]={1,2,3,4};
-  Real r[3]={9,8,7};
-  p.SetField("MXITER", &i[0]);
-  p.SetField("NPARM", &i[1]);
-  p.SetField("IPCALC", &i[2]);
-  p.SetField("IPRSIP", &i[3]);
-  p.SetField("ACCL", &r[0]);
-  p.SetField("HCLOSE", &r[1]);
-
-  expSolverSIP(&p, &t);
-
-  CStr cStr;
-  t.GetFileContents(Packages::SIP, cStr);
-  TS_ASSERT(cStr.empty());
-
-  p.SetField("WSEED", &r[2]);
-  expSolverSIP(&p, &t);
-  t.GetFileContents(Packages::SIP, cStr);
-  CStr str1("1 2 \n9.0 8.0 3 7.0 4 \n");
-  TS_ASSERT_EQUALS2(cStr, str1);
-}
-//------------------------------------------------------------------------------
-void ExpGmsH5T::testexpSolverDE4 ()
-{
-  using namespace Packages;
-  MfPackage p(Packages::DE4);
-  TxtExporter t(TESTBASE);
-  int i[7]={1,2,3,4,5,6,7};
-  Real r[2]={9,8};
-
-  // test line 1
-  p.SetField("ITMX", &i[0]);
-  p.SetField("MXUP", &i[1]);
-  p.SetField("MXLOW", &i[2]);
-
-  expSolverDE4Line1(&p, &t);
-
-  CStr cStr;
-  t.GetFileContents(Packages::DE4, cStr);
-  TS_ASSERT(cStr.empty());
-
-  p.SetField("MXBW", &i[3]);
-
-  expSolverDE4Line1(&p, &t);
-  t.GetFileContents(Packages::DE4, cStr);
-  TS_ASSERT_EQUALS2(CStr("1 2 3 4 \n"), cStr);
-
-  // test line 2
-  p.SetField("IFREQ", &i[4]);
-  p.SetField("MUTD4", &i[5]);
-  p.SetField("IPRD4", &i[6]);
-  p.SetField("ACCL", &r[0]);
-
-  expSolverDE4Line2(&p, &t);
-  t.GetFileContents(Packages::DE4, cStr);
-  TS_ASSERT_EQUALS2(CStr("1 2 3 4 \n"), cStr);
-
-  p.SetField("HCLOSE", &r[1]);
-
-  expSolverDE4Line2(&p, &t);
-
-  t.GetFileContents(Packages::DE4, cStr);
-  TS_ASSERT_EQUALS2(CStr("1 2 3 4 \n5 6 9.0 8.0 7 \n"), cStr);
-}
-//------------------------------------------------------------------------------
-void ExpGmsH5T::testexpSolverSOR ()
-{
-  using namespace Packages;
-  MfPackage p(Packages::SOR);
-  TxtExporter t(TESTBASE);
-  int i[2]={1,2};
-  Real r[2]={9,8};
-  p.SetField("MXITER", &i[0]);
-  p.SetField("IPRSOR", &i[1]);
-  p.SetField("ACCL", &r[0]);
-
-  expSolverSOR(&p, &t);
-
-  CStr cStr;
-  t.GetFileContents(Packages::SOR, cStr);
-  TS_ASSERT(cStr.empty());
-
-  p.SetField("HCLOSE", &r[1]);
-
-  expSolverSOR(&p, &t);
-
-  t.GetFileContents(Packages::SOR, cStr);
-  CStr str1("1 \n9.0 8.0 2 \n");
-  TS_ASSERT_EQUALS2(cStr, str1);
-}
-//------------------------------------------------------------------------------
-void ExpGmsH5T::testexpSolverPCG ()
-{
-  using namespace Packages;
-  MfPackage p(Packages::PCG);
-  TxtExporter t(TESTBASE);
-  int i[6]={1,2,3,4,5,6};
-  Real r[4]={9,8,7,6};
-  p.SetField("MXITER", &i[0]);
-  p.SetField("ITER1", &i[1]);
-  p.SetField("NPCOND", &i[2]);
-  p.SetField("NBPOL", &i[3]);
-  p.SetField("IPRPCG", &i[4]);
-  p.SetField("MUTPCG", &i[5]);
-  p.SetField("HCLOSE", &r[0]);
-  p.SetField("RCLOSE", &r[1]);
-  p.SetField("RELAX", &r[2]);
-
-  expSolverPCG(&p, &t);
-
-  CStr cStr;
-  t.GetFileContents(Packages::PCG, cStr);
-  TS_ASSERT(cStr.empty());
-
-  p.SetField("DAMP", &r[3]);
-
-  expSolverPCG(&p, &t);
-
-  t.GetFileContents(Packages::PCG, cStr);
-  CStr str1("1 2 3 \n9.0 8.0 7.0 4 5 6 6.0 \n");
-  TS_ASSERT_EQUALS2(cStr, str1);
-}
-//------------------------------------------------------------------------------
-void ExpGmsH5T::testexpSolverPCGN ()
-{
-  using namespace Packages;
-  MfPackage p(Packages::PCGN);
-  int iter_mo(1), iter_mi(2), ifill(3), unit_pc(4),
-    unit_ts(5), adamp(6), acnvg(7), mcnvg(8), ipunit(9);
-  const Real close_r(10), close_h(11), relax(12), damp(13),
-    damp_lb(14), rate_d(15), chglimit(16), cnvg_lb(17),
-    rate_c(18);
-  p.SetField("ITER_MO", &iter_mo);
-  p.SetField("ITER_MI", &iter_mi);
-  p.SetField("CLOSE_R", &close_r);
-  p.SetField("CLOSE_H", &close_h);
-  p.SetField("RELAX", &relax);
-  p.SetField("IFILL", &ifill);
-  p.SetField("UNIT_PC", &unit_pc);
-  p.SetField("UNIT_TS", &unit_ts);
-  p.SetField("ADAMP", &adamp);
-  p.SetField("DAMP", &damp);
-  p.SetField("DAMP_LB", &damp_lb);
-  p.SetField("RATE_D", &rate_d);
-  p.SetField("CHGLIMIT", &chglimit);
-  p.SetField("ACNVG", &acnvg);
-  p.SetField("CNVG_LB", &cnvg_lb);
-  p.SetField("MCNVG", &mcnvg);
-  p.SetField("RATE_C", &rate_c);
-  
-  {
-    TxtExporter t(TESTBASE);
-    expSolverPCGN(&p, &t);
-
-    CStr output;
-    t.GetFileContents(Packages::PCGN, output);
-    TS_ASSERT(output.empty());
-  }
-
-  {
-    TxtExporter t(TESTBASE);
-    p.SetField("IPUNIT", &ipunit);
-    expSolverPCGN(&p, &t);
-    CStr output;
-    t.GetFileContents(Packages::PCGN, output);
-    CStr expected = 
-      "1 2 10.0 11.0\n"
-      "12.0 3 4 5\n";
-    TS_ASSERT_EQUALS2(expected, output);
-  }
-
-  {
-    TxtExporter t(TESTBASE);
-    iter_mo = 2;
-    expSolverPCGN(&p, &t);
-    CStr output;
-    t.GetFileContents(Packages::PCGN, output);
-    CStr expected = 
-      "2 2 10.0 11.0\n"
-      "12.0 3 4 5\n"
-      "6 13.0 14.0 15.0 16.0\n"
-      "7 17.0 8 18.0 9\n";
-    TS_ASSERT_EQUALS2(expected, output);
-  }
-}
-//------------------------------------------------------------------------------
-void ExpGmsH5T::testexpSolverLMG ()
-{
-  using namespace Packages;
-  MfPackage p(Packages::LMG);
-  int i[5]={1,2,3,4,5};
-  Real r[8]={9,8,7,6,5,4,3,2};
-  p.SetField("ICG", &i[0]);
-  p.SetField("MXITER", &i[1]);
-  p.SetField("MXCYC", &i[2]);
-  p.SetField("IOUTAMG", &i[3]);
-  p.SetField("CONTROL", &i[4]);
-  p.SetField("STOR1", &r[0]);
-  p.SetField("STOR2", &r[1]);
-  p.SetField("STOR3", &r[2]);
-  p.SetField("BCLOSE", &r[3]);
-  p.SetField("DUP", &r[5]);
-  p.SetField("HCLOSE", &r[7]);
-
-  CStr cStr, str1;
-  {
-    TxtExporter t(TESTBASE);
-    expSolverLMG(&p, &t);
-
-    t.GetFileContents(Packages::LMG, cStr);
-    TS_ASSERT(cStr.empty());
-    
-    p.SetField("DAMP", &r[4]);
-
-    expSolverLMG(&p, &t);
-
-    t.GetFileContents(Packages::LMG, cStr);
-    CStr str1("9.0 8.0 7.0 1 \n2 3 6.0 5.0 4 \n2.0 5\n");
-    TS_ASSERT_EQUALS2(cStr, str1);
-  }
-  // test when DAMP is -2.0
-  {
-    // one of the fields doesn't exist here
-    TxtExporter t(TESTBASE);
-    r[4] = -2.0;
-    expSolverLMG(&p, &t);
-    t.GetFileContents(Packages::LMG, cStr);
-    CStr str1("9.0 8.0 7.0 1 \n2 3 6.0 -2.0 4 \n2.0 5\n");
-    TS_ASSERT_EQUALS2(cStr, str1);
-  }
-
-  {
-    // this one should work
-    TxtExporter t(TESTBASE);
-    p.SetField("DLOW", &r[6]);
-    expSolverLMG(&p, &t);
- 
-    t.GetFileContents(Packages::LMG, cStr);
-    str1 += "9.0 8.0 7.0 1 \n2 3 6.0 -2.0 4 \n4.0 3.0 \n2.0 5\n";
-    TS_ASSERT_EQUALS2(cStr, str1);
-  }
-}
-//------------------------------------------------------------------------------
-void ExpGmsH5T::testexpSolverGMG ()
-{
-  using namespace Packages;
-  MfPackage p(Packages::GMG);
-  TxtExporter t(TESTBASE);
-  int i[6]={1,2,3,4,5,6};
-  Real r[3]={9,8,7};
-  double d = 6;
-  p.SetField("IITER", &i[0]);
-  p.SetField("MXITER", &i[1]);
-  p.SetField("IADAMP", &i[2]);
-  p.SetField("IOUTGMG", &i[3]);
-  p.SetField("ISM", &i[4]);
-  p.SetField("RCLOSE", &r[0]);
-  p.SetField("HCLOSE", &r[1]);
-  p.SetField("DAMP", &r[2]);
-
-  expSolverGMG(&p, &t);
-
-  CStr cStr;
-  t.GetFileContents(Packages::GMG, cStr);
-  TS_ASSERT(cStr.empty());
-
-  p.SetField("ISC", &i[5]);
-
-  expSolverGMG(&p, &t);
-
-  t.GetFileContents(Packages::GMG, cStr);
-  CStr str1("9.0 1 8.0 2 \n7.0 3 4 \n5 6 \n");
-  TS_ASSERT_EQUALS2(cStr, str1);
-
-  i[5]=4;
-  p.SetField("ISC", &i[5]);
-  p.SetField("RELAX", &d);
-
-  expSolverGMG(&p, &t);
-  t.GetFileContents(Packages::GMG, cStr);
-  str1 += "9.0 1 8.0 2 \n7.0 3 4 \n5 4 \n6.0 \n";
-  TS_ASSERT_EQUALS2(cStr, str1);
-}
-//------------------------------------------------------------------------------
-void ExpGmsH5T::testexpSolverNWT ()
-{
-  using namespace Packages;
-  MfPackage p(Packages::NWT);
-  TxtExporter t(TESTBASE);
-
-  std::map<CStr, int> iMap;
-  iMap["Mxiter"] = 1;
-  iMap["Linmeth"] = 2;
-  iMap["IPRNWT"] = 3;
-  iMap["IBOTAV"] = 4;
-  iMap["IFDPARAM"] = 4;
-  iMap["Btrack"] = 6;
-  iMap["Numtrack"] = 7;
-  iMap["IACL"] = 8;
-  iMap["NORDER"] = 9;
-  iMap["LEVEL"] = 10;
-  iMap["NORTH"] = 11;
-  iMap["IREDSYS"] = 12;
-  iMap["IDROPTOL"] = 13;
-  iMap["MXITERXMD"] = 14;
-  iMap["Maxitr_gmres"] = 15;
-  iMap["Ilu_method"] = 16;
-  iMap["Lev_fill"] = 17;
-  iMap["Msdr"] = 18;
-  std::map<CStr, int>::iterator it(iMap.begin());
-  for (; it != iMap.end(); ++it)
-  {
-    p.SetField(it->first, &it->second);
-  }
-
-  std::map<CStr, Real> rMap;
-  rMap["toldum"] = 1.0;
-  rMap["ftoldum"] = 2.0;
-  rMap["Thickdum"] = 3.0;
-  rMap["thetadum"] = 4.0;
-  rMap["akappadum"] = 5.0;
-  rMap["gammadum"] = 6.0;
-  rMap["amomentdum"] = 7.0;
-  rMap["Btoldum"] = 8.0;
-  rMap["Breducdum"] = 9.0;
-  rMap["RRCTOLS"] = 10.0;
-  rMap["EPSRNS"] = 11.0;
-  std::map<CStr, Real>::iterator it1(rMap.begin());
-  for (; it1 != rMap.end(); ++it1)
-  {
-    p.SetField(it1->first, &it1->second);
-  }
-  rMap["HCLOSEXMDDUM"] = 12.0;;
-  rMap["Stop_toldum"] = 13.0;
-
-  expSolverNWT(&p, &t);
-
-  CStr cStr;
-  t.GetFileContents(Packages::GMG, cStr);
-  TS_ASSERT(cStr.empty());
-
-  p.SetField("HCLOSEXMDDUM", &rMap["HCLOSEXMDDUM"]);
-  expSolverNWT(&p, &t);
-  t.GetFileContents(Packages::NWT, cStr);
-  TS_ASSERT(!cStr.empty());
-
-  CStr str1("1.0 2.0 1 3.0 2 3 4 SPECIFIED 4.0 5.0 6.0 7.0 6 7 8.0 9.0\n"
-            "8 9 10 11 12 10.0 13 11.0 12.0 14\n");
-  TS_ASSERT_EQUALS2(cStr, str1);
-
-  {
-    TxtExporter t(TESTBASE);
-    iMap["IFDPARAM"] = 1;
-    expSolverNWT(&p, &t);
-    t.GetFileContents(Packages::NWT, cStr);
-    str1 = "1.0 2.0 1 3.0 2 3 4 SIMPLE\n";
-    TS_ASSERT_EQUALS2(cStr, str1);
-  }
-
-  {
-    TxtExporter t(TESTBASE);
-    iMap["IFDPARAM"] = 2;
-    expSolverNWT(&p, &t);
-    t.GetFileContents(Packages::NWT, cStr);
-    str1 = "1.0 2.0 1 3.0 2 3 4 MODERATE\n";
-    TS_ASSERT_EQUALS2(cStr, str1);
-  }
-
-  {
-    TxtExporter t(TESTBASE);
-    iMap["IFDPARAM"] = 3;
-    expSolverNWT(&p, &t);
-    t.GetFileContents(Packages::NWT, cStr);
-    str1 = "1.0 2.0 1 3.0 2 3 4 COMPLEX\n";
-    TS_ASSERT_EQUALS2(cStr, str1);
-  }
-
-  {
-    cStr = "";
-    TxtExporter t(TESTBASE);
-    iMap["IFDPARAM"] = 4;
-    iMap["Linmeth"] = 1;
-    expSolverNWT(&p, &t);
-    t.GetFileContents(Packages::NWT, cStr);
-    str1 = "";
-    TS_ASSERT_EQUALS2(cStr, str1);
-  }
-  p.SetField("Stop_toldum", &rMap["Stop_toldum"]);
-  {
-    TxtExporter t(TESTBASE);
-    expSolverNWT(&p, &t);
-    t.GetFileContents(Packages::NWT, cStr);
-    str1 = "1.0 2.0 1 3.0 1 3 4 SPECIFIED 4.0 5.0 6.0 7.0 6 7 8.0 9.0\n"
-           "15 16 17 13.0 18\n";
-    TS_ASSERT_EQUALS2(cStr, str1);
-  }
-
-} // ExpGmsH5T::testexpSolverNWT
 //------------------------------------------------------------------------------
 void ExpGmsH5T::testGetArrayMap ()
 {

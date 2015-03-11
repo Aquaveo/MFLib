@@ -13,14 +13,6 @@ public:
   void testSupportedPackage();
   void testexpNameFile();
   void testexpDisFile();
-  void testexpSolverSIP();
-  void testexpSolverDE4();
-  void testexpSolverSOR();
-  void testexpSolverPCG();
-  void testexpSolverPCGN();
-  void testexpSolverLMG();
-  void testexpSolverGMG();
-  void testexpSolverNWT();
   void testGetArrayMap();
   void testIsDataArray();
   void testexpDataArray();

@@ -1932,9 +1932,9 @@ module module_exportData
     character*24 NAME2
     integer II, IMULT
 
+    IMULT = INT(MULT)
     if (NOT(ed_getExportData())) then
       II = 1
-      IMULT = INT(MULT)
       call mfLib_U2DINT_EXDATA(NAME,ARR,IMULT,K,JJ,II)
       return
     end if
@@ -1947,6 +1947,7 @@ module module_exportData
     call mfLibExp_SingleValFlt(NAME2,'MULT',MULT)
     call mfLibExp_ArrayValInt(NAME2,'ARR',ARR)
     call mfLibExp_ArrayValInt(NAME2,'ARRAY',ARR)
+    call mfLibExp_SingleValInt(NAME2,'IMULT',IMULT)
     call mfLibExp_ExpPack(NAME2)
   end subroutine exp_U1DINT
 
