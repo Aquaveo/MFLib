@@ -17,7 +17,6 @@ public:
   void testIsDataArray();
   void testexpDataArray();
   void testCreateDefaultMfH5File();
-  void testexpBasic();
   void testexpRecharge();
   void testexpEVT();
   void testexpETS();
