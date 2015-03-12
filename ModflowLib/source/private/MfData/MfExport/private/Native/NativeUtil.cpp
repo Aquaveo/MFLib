@@ -146,6 +146,12 @@ bool LgrPack (const CStr& type)
       Packages::LGR == type) return true;
   return false;
 } // LgrPack
+//------------------------------------------------------------------------------
+static bool& iH5Flag()
+{
+  static bool m_(false);
+  return m_;
+} // iH5Flag
 } // unnamed namespace
 //------------------------------------------------------------------------------
 /// \brief returns the right type of MfExporter.
@@ -157,9 +163,11 @@ NativePackExp* NativeUtil::CreatePackExp (Mf2kNative* a_native,
   using namespace MfData;
   NativePackExp *ret(NULL);
   if (!a_package) return ret;
+
+  bool& h5(iH5Flag());
   CStr type(a_package->PackageName());
-  if (Array2d(type, a_native))                  ret = new NativeExpArr2d();
-  else if (MfExportUtil::Is1dArray(type))       ret = new NativeExpArr1d();
+  if (Array2d(type, a_native))                  ret = new NativeExpArr2d(h5);
+  else if (MfExportUtil::Is1dArray(type))       ret = new NativeExpArr1d(h5);
   else if (MfExportUtil::IsSolver(type))        ret = new NativeExpSolver();
   else if (Packages::NAM == type)               ret = new NativeExpNam();
   else if (ClnPack(type))                       ret = new NativeExpCln();
@@ -206,8 +214,17 @@ NativePackExp* NativeUtil::CreatePackExp (Mf2kNative* a_native,
   {
     ret->SetData(a_native, a_global, a_package);
   }
+  h5 = false;
   return(ret);
 } // MfExportUtil::CreatePackExp
+//------------------------------------------------------------------------------
+/// \brief returns the right type of MfExporter.
+//------------------------------------------------------------------------------
+void NativeUtil::ExportNextToH5 ()
+{
+  iH5Flag() = true;
+} // NativeUtil::ExportNextArrayToH5
+
 
 
 #if 0

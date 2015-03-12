@@ -12,7 +12,7 @@ namespace MfData
     class NativeExpArr1d : public NativePackExp
     {
     public:
-      NativeExpArr1d();
+      NativeExpArr1d(bool a_h5);
       ~NativeExpArr1d();
       virtual bool Export();
 
@@ -22,6 +22,7 @@ namespace MfData
 
       CStr GetFname(const int* K);
       void AddLine(const int* IPRN, const Real* MULT, CStr fname);
+      bool m_h5;
 
       //------------------------------------------------------------------------
       template<typename T>

@@ -169,7 +169,9 @@ void NativeExpBas::ArrayToFile (MfData::MfPackage* p, int a_line)
   {
     AddToStoredLinesDesc(lines.at(i), Desc(a_line, lay));
     lay++;
-    if (internalArrays && lines[i].Find("CONSTANT") == -1)
+    if (internalArrays &&
+        lines[i].Find("CONSTANT") == -1 &&
+        lines[i].Find("HDF5 ") == -1)
     {
       i++;
       AddToStoredLinesDesc(lines[i], "");

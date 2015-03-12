@@ -11,10 +11,12 @@
 #include <sstream>
 
 #include <private\MfData\MfExport\private\Mf2kNative.h>
+#include <private\MfData\MfExport\private\Native\ArrToh5.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
 #include <private\MfData\Packages\MfPackStrings.h>
+#include <private\MfData\MfExport\private\Native\NativeExpArr2d.h>
 #include <private\Parameters.h>
 #include <private\Parameters\Param.h>
 #include <private\Parameters\ParamList.h>
@@ -188,7 +190,7 @@ static void RemoveLastReturn (CStr& line)
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-NativeExpArr2d::NativeExpArr2d () :
+NativeExpArr2d::NativeExpArr2d (bool a_h5) :
   m_name()
 , m_lay(0)
 , m_iData(0)
@@ -202,6 +204,7 @@ NativeExpArr2d::NativeExpArr2d () :
 , m_unstructured(0)
 , m_stacked(0)
 , m_tmp_iMult(1)
+, m_h5(a_h5)
 {
   bool usg = MfData::MfGlobal::Get().ModelType() == MfData::USG;
   if (usg)
@@ -527,7 +530,7 @@ bool NativeExpArr2d::CanDoConstant ()
 //------------------------------------------------------------------------------
 bool NativeExpArr2d::WriteInternalArray ()
 {
-  if (!GetNative()->GetArraysInternal()) return false;
+  if (!GetNative()->GetArraysInternal() || m_h5) return false;
 
   CStr str;
   str.Format("INTERNAL %s (FREE) %s", StrMult(), StrIprn());
@@ -568,6 +571,24 @@ void NativeExpArr2d::SubstituteMultArray ()
 //------------------------------------------------------------------------------
 void NativeExpArr2d::WriteToFile ()
 {
+  CStr str;
+  if (!m_h5) str = ArrayToTxtFile();
+  else       str = ArrayToH5File();
+  AddToStoredLinesDesc(str, "");
+} // NativeExpArr2d::WriteToFile
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+CStr NativeExpArr2d::ArrayToH5File ()
+{
+  ArrToh5 writer(this);
+  return writer.WriteData();
+} // NativeExpArr2d::ArrayToH5File
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+CStr NativeExpArr2d::ArrayToTxtFile ()
+{
   CStr fname = GetArrayFileName(m_name);
   if (m_dataD)
   {
@@ -584,8 +605,8 @@ void NativeExpArr2d::WriteToFile ()
   }
   CStr str;
   str.Format("OPEN/CLOSE %s %s (FREE) %s", fname, StrMult(), StrIprn());
-  AddToStoredLinesDesc(str, "");
-} // NativeExpArr2d::WriteToFile
+  return str;
+} // NativeExpArr2d::ArrayToTxtFile
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
@@ -676,7 +697,7 @@ bool NativeExpArr2d::CheckParameters ()
 
   // see if we have parameters for this array
   CStr partype = GetNative()->ParamTypeFromArrayName(m_name);
-  if (!pList->ParamOfTypeExists(partype)) return false;
+  if (partype.empty() || !pList->ParamOfTypeExists(partype)) return false;
 
   // if clusters exist for the parameters then we don't need to do anything
   if (ClustersExistForParType(pList, partype)) return false;

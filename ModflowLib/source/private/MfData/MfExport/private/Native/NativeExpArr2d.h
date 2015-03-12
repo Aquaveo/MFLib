@@ -15,7 +15,7 @@ namespace MfData
     class NativeExpArr2d : public NativePackExp
     {
     public:
-      NativeExpArr2d();
+      NativeExpArr2d(bool a_h5);
       ~NativeExpArr2d();
       virtual bool Export();
 
@@ -34,6 +34,8 @@ namespace MfData
       bool CanDoConstant();
       bool WriteInternalArray();
       void WriteToFile();
+      CStr ArrayToH5File();
+      CStr ArrayToTxtFile();
       void ArrayDataToFile(const CStr& a_fname,
                            const Real* a_data,
                            const int* a_idata);
@@ -67,7 +69,7 @@ namespace MfData
       double*     m_dataD;
       int         m_nrow, m_ncol, m_curSp, m_tmp_iMult;
       bool        m_firstTime;
-      bool        m_unstructured, m_stacked;
+      bool        m_unstructured, m_stacked, m_h5;
       std::vector<double> m_pilotKeys;
     };
 

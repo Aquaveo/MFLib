@@ -15,11 +15,13 @@ namespace MfData
     class Mf2kNative;
     class NeArealPar;
     class NativeExpSTP;
+    class ArrToh5;
 
     class NativePackExp
     {
       friend NativeExpSTP;
       friend NeArealPar;
+      friend ArrToh5;
     public:
       NativePackExp();
       virtual ~NativePackExp();

@@ -23,6 +23,7 @@
 #include <private\ListReader\CellIdToIJK.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
+#include <private\MfData\MfExport\private\Native\NativeUtil.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\MfPackageUtil.h>
 #include <private\MfData\Packages\MfPackage.h>
@@ -263,7 +264,6 @@ public:
   , m_NAM_maxStrLen(0)
   , m_HasBinaryExport(0)
   , m_WellPropertyList()
-  , m_NativeExp(0)
   {}
 
   virtual ~ExpGmsH5Public()
@@ -293,7 +293,6 @@ public:
   int m_NAM_maxStrLen;
   bool m_HasBinaryExport;
   WellPropertyList m_WellPropertyList;
-  Mf2kNative* m_NativeExp;
 
 };
 
@@ -336,9 +335,6 @@ static void expDataArray(MfPackage *a_package,
 static int  GetMultiDimArrayIndex(const CStr &a_name,
                                   TxtExporter* a_exp,
                                   int a_sp = 0);
-static void expBasic(MfPackage *a_package,
-                     MfGlobal *a_global,
-                     TxtExporter *a_exp);
 static void expRecharge(MfPackage *a_p,
                         const int a_sp,
                         TxtExporter *a_exp);
@@ -742,6 +738,51 @@ static void iWrite1dArray (const Real* a_,
   }
 } // iWrite1dArray
 //------------------------------------------------------------------------------
+/// \brief checks if package name is a DISU array
+//------------------------------------------------------------------------------
+static bool iArrayToNative (const CStr& a_, MfGlobal* a_global)
+{
+  bool rval(0);
+  if (!a_global) return rval;
+  if (a_global->ModelType() == USG)
+  {
+    if (   Packages::Disu::NODLAY == a_
+        || Packages::Disu::TOP == a_
+        || Packages::Disu::BOT == a_
+        || Packages::Disu::AREA == a_
+        || Packages::Disu::IA == a_
+        || Packages::Disu::JA == a_
+        || Packages::Disu::IVC == a_
+        || Packages::Disu::CL1 == a_
+        || Packages::Disu::CL2 == a_
+        || Packages::Disu::CL12 == a_
+        || Packages::Disu::FAHL == a_
+        ) rval = true;
+  }
+  else if (   ARR_BAS_IBND == a_
+           || ARR_BAS_SHEAD == a_)
+  {
+    NativeUtil::ExportNextToH5();
+    rval = true;
+  }
+  return rval;
+} // iArrayToNative
+//------------------------------------------------------------------------------
+/// \brief Uses the native exporter to write the files
+//------------------------------------------------------------------------------
+static bool iPackageToNativeExport (
+  const CStr& a_,
+  MfGlobal* a_global)
+{
+  bool rval = false;
+  if (MfExportUtil::IsSolver(a_))           rval = true;
+  else if (Packages::DISU == a_)            rval = true;
+  else if (Packages::BAS == a_)             rval = true;
+  else if (iArrayToNative(a_, a_global))    rval = true;
+
+  return rval;
+} // iPackageToNativeExport
+//------------------------------------------------------------------------------
 /// \brief Uses the native exporter to write the files
 //------------------------------------------------------------------------------
 bool ExpGmsH5::impl::ExportNative (MfGlobal* a_global,
@@ -749,12 +790,13 @@ bool ExpGmsH5::impl::ExportNative (MfGlobal* a_global,
 {
     bool rval=false;
     CStr packName(a_package->PackageName());
-    if (MfExportUtil::IsSolver(packName))
+    if (iPackageToNativeExport(packName, a_global))
     {
       if (!m_nativeExp)
       {
         m_nativeExp = new Mf2kNative;
         m_nativeExp->SetFileName(m_fname.c_str());
+        m_nativeExp->SetArraysInternal(true);
       }
       if (m_nativeExp)
       {
@@ -770,7 +812,7 @@ bool ExpGmsH5::ExportPackage (MfGlobal* a_global,
                               MfPackage* a_package)
 {
   // export package as native text
-  bool rval(true);
+  bool rval(true), unstructured(a_global->Unstructured() ? 1 : 0);
   if (m_p->ExportNative(a_global, a_package)) return rval;
 
   CStr packName(a_package->PackageName());
@@ -782,10 +824,6 @@ bool ExpGmsH5::ExportPackage (MfGlobal* a_global,
   else if (Packages::DIS == packName)
   {
     expDisFile(a_global, a_package, GetExp());
-  }
-  else if (Packages::BAS == packName)
-  {
-    expBasic(a_package, a_global, GetExp());
   }
   else if (Packages::RCH == packName)
   {
@@ -813,9 +851,11 @@ bool ExpGmsH5::ExportPackage (MfGlobal* a_global,
   else if ("L98" == packName)
   {
     // there are two "packages" that come thru for this package
+    MfPackage* p = a_global->GetPackage(Packages::DIS);
+    if (unstructured) p = a_global->GetPackage(Packages::DISU);
     expLPF(a_global->GetPackage(Packages::LPF),
            a_global->GetPackage("L99"),
-           a_global->GetPackage(Packages::DIS),
+           p,
            GetExp());
   }
   else if (Packages::HUF == packName)
@@ -2077,6 +2117,9 @@ static void expSuperFile (int a_model_type,
   case 4: // MODFLOW-LGR
     a_exp->WriteLineToFile("mfs", "MFLGRSUP");
     break;
+  case 5: // MODFLOW-USG
+    a_exp->WriteLineToFile("mfs", "MFUSGSUP");
+    break;
   default:
     ASSERT(0);
     break;
@@ -2705,42 +2748,6 @@ static int GetMultiDimArrayIndex (const CStr &a_name,
     rval = iGetIncrementedArrayIndex(a_name, a_sp, a_exp);
   return rval;
 } // GetMultiDimArrayIndex
-//------------------------------------------------------------------------------
-/// \brief Exports the basic package
-//------------------------------------------------------------------------------
-void expBasic (MfPackage *a_package,
-               MfGlobal *a_global,
-               TxtExporter *a_exp)
-{
-  int j;
-  const Real *fptr;
-  const char *cptr;
-  // write the IBCFCB flag
-  if (!a_package->GetField(Packages::BASpack::HNOFLO, &fptr) || !fptr ||
-      !a_package->GetField(Packages::BASpack::OPT, &cptr) || !cptr)
-    return;
-  // write the opt to the file
-  CStr opt(cptr);
-  opt.ToUpper();
-  if (opt.Find("FREE") == -1)
-    opt += " FREE";
-  a_exp->WriteLineToFile(Packages::BAS6, opt);
-  // write the ibound to file
-  CStr tag;
-  for (j=0; j<a_global->NumLay(); j++)
-  {
-    tag.Format("ibound%d", j+1);
-    a_exp->WriteLineToFile(Packages::BAS6, GetTxtLineArrayMap(a_exp)[tag]);
-  }
-  // write NOFLO
-  a_exp->WriteLineToFile(Packages::BAS6, STR(*fptr));
-  // write the starting heads
-  for (j=0; j<a_global->NumLay(); j++)
-  {
-    tag.Format("StartHead%d", j+1);
-    a_exp->WriteLineToFile(Packages::BAS6, GetTxtLineArrayMap(a_exp)[tag]);
-  }
-} // expBasic
 //------------------------------------------------------------------------------
 /// \brief Exports the use last information for the areal packages
 //------------------------------------------------------------------------------
@@ -9316,40 +9323,6 @@ void ExpGmsH5T::testCreateDefaultMfH5File ()
   TS_ASSERT(!remove(fullPath));
 }
 //------------------------------------------------------------------------------
-void ExpGmsH5T::testexpBasic ()
-{
-  using namespace Packages;
-  MfGlobal g(10, 15, 3, 2, 3, 2, 0);
-  MfPackage p(Packages::BAS);
-  TxtExporter t(TESTBASE);
-  const char *c="NO options";
-  Real r[1]={-999};
-  p.SetField(BASpack::HNOFLO, r);
-
-  expBasic(&p, &g, &t);
-
-  CStr cStr;
-  t.GetFileContents(Packages::GMG, cStr);
-  TS_ASSERT(cStr.empty());
-
-  p.SetField(BASpack::OPT, c);
-  GetTxtLineArrayMap(&t).insert(std::make_pair("ibound1", "i1"));
-  GetTxtLineArrayMap(&t).insert(std::make_pair("ibound2", "i2"));
-  GetTxtLineArrayMap(&t).insert(std::make_pair("ibound3", "i3"));
-  GetTxtLineArrayMap(&t).insert(std::make_pair("StartHead1", "h1"));
-  GetTxtLineArrayMap(&t).insert(std::make_pair("StartHead2", "h2"));
-  GetTxtLineArrayMap(&t).insert(std::make_pair("StartHead3", "h3"));
-
-  expBasic(&p, &g, &t);
-
-  CStr str, str1;
-  str = "NO OPTIONS FREE\n"
-        "i1\ni2\ni3\n"
-        "-999.0\n"
-        "h1\nh2\nh3\n";
-  t.GetFileContents(Packages::BAS6, str1);
-  TS_ASSERT_EQUALS2(str1, str);
-}
 static void iFillMap_RCH_Test (TxtExporter* a_exp)
 {
   std::map<CStr,CStr> &m(GetTxtLineArrayMap(a_exp));

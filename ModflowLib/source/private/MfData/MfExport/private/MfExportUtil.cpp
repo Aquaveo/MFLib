@@ -131,7 +131,7 @@ bool MfExportUtil::Is1dArray (const CStr &a_name)
 bool MfExportUtil::IsSolver (const CStr &a_name)
 {
   using namespace MfData::Packages;
-  if (SIP == a_name  || DE4 == a_name ||
+  if (SIP == a_name  || DE4Line2 == a_name ||
       SOR == a_name  || PCG == a_name ||
       PCGN == a_name || LMG == a_name ||
       GMG == a_name  || NWT == a_name ||

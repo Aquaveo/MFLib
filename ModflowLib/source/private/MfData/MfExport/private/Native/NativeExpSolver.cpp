@@ -34,15 +34,16 @@ NativeExpSolver::~NativeExpSolver ()
 bool NativeExpSolver::Export ()
 {
   CStr name = GetPackage()->PackageName();
-  if (Packages::SIP == name) Export_SIP();
-  else if (Packages::DE4 == name) Export_DE4();
-  else if (Packages::SOR == name) Export_SOR();
-  else if (Packages::PCG == name) Export_PCG();
-  else if (Packages::PCGN == name) Export_PCGN();
-  else if (Packages::LMG == name) Export_LMG();
-  else if (Packages::GMG == name) Export_GMG();
-  else if (Packages::NWT == name) Export_NWT();
-  else if (Packages::SMS == name) Export_SMS();
+
+  if (Packages::SIP == name)           Export_SIP();
+  else if (Packages::DE4Line2 == name) Export_DE4();
+  else if (Packages::SOR == name)      Export_SOR();
+  else if (Packages::PCG == name)      Export_PCG();
+  else if (Packages::PCGN == name)     Export_PCGN();
+  else if (Packages::LMG == name)      Export_LMG();
+  else if (Packages::GMG == name)      Export_GMG();
+  else if (Packages::NWT == name)      Export_NWT();
+  else if (Packages::SMS == name)      Export_SMS();
 
   WriteComments();
   WriteStoredLines();
@@ -169,6 +170,7 @@ CStr NativeExpSolver::Line2_SIP ()
 //------------------------------------------------------------------------------
 void NativeExpSolver::Export_DE4 ()
 {
+  TmpPackageNameChanger tmp(GetPackage(), Packages::DE4);
   AddToStoredLinesDesc(Line1_DE4(), Desc(DE4, 1));
   AddToStoredLinesDesc(Line2_DE4(), Desc(DE4, 2));
 } // NativeExpSolver::Export_DE4
@@ -180,10 +182,13 @@ CStr NativeExpSolver::Line1_DE4 ()
   CStr rval;
   const int *itmx, *mxup, *mxlow, *mxbw;
 
-  if (GetPackage()->GetField(De4Pack::ITMX, &itmx) && itmx &&
-      GetPackage()->GetField(De4Pack::MXUP, &mxup) && mxup &&
-      GetPackage()->GetField(De4Pack::MXLOW, &mxlow) && mxlow &&
-      GetPackage()->GetField(De4Pack::MXBW, &mxbw) && mxbw)
+  MfPackage* p = GetGlobal()->GetPackage(Packages::DE4Line1);
+  if (!p) return rval;
+
+  if (p->GetField(De4Pack::ITMX, &itmx) && itmx &&
+      p->GetField(De4Pack::MXUP, &mxup) && mxup &&
+      p->GetField(De4Pack::MXLOW, &mxlow) && mxlow &&
+      p->GetField(De4Pack::MXBW, &mxbw) && mxbw)
   {
     rval.Format("%d %d %d %d ", *itmx, *mxup, *mxlow, *mxbw);
   }
@@ -1062,10 +1067,12 @@ void NativeExpSolverT::testLine2_SIP ()
 void NativeExpSolverT::testLine1_DE4 ()
 {
   int itmx(11), mxup(12), mxlow(13), mxbw(14);
-  m_p->GetPackage()->SetField(De4Pack::ITMX, &itmx);
-  m_p->GetPackage()->SetField(De4Pack::MXUP, &mxup);
-  m_p->GetPackage()->SetField(De4Pack::MXLOW, &mxlow);
-  m_p->GetPackage()->SetField(De4Pack::MXBW, &mxbw);
+  MfPackage p(MfData::Packages::DE4Line1);
+  p.SetField(De4Pack::ITMX, &itmx);
+  p.SetField(De4Pack::MXUP, &mxup);
+  p.SetField(De4Pack::MXLOW, &mxlow);
+  p.SetField(De4Pack::MXBW, &mxbw);
+  m_p->GetGlobal()->AddPackage(&p);
   CStr base = "11 12 13 14 ";
   CStr str = m_p->Line1_DE4();
   TS_ASSERT_EQUALS2(base, str);

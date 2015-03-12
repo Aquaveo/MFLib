@@ -20,6 +20,7 @@ namespace MfData
       static NativePackExp *CreatePackExp(Mf2kNative* a_native,
                                           MfGlobal* a_global,
                                           MfPackage* a_package);
+      static void ExportNextToH5();
     private:
     };
   }
