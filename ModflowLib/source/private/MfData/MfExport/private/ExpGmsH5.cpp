@@ -148,7 +148,8 @@ public:
   }
 
   bool ExportNative (MfGlobal* a_global,
-                     MfPackage* a_package);
+                     MfPackage* a_package,
+                     TxtExporter* a_exp);
   void SetFileName (const char * const a_) { m_fname = a_; }
   Mf2kNative* m_nativeExp;
   CStr m_fname;
@@ -744,26 +745,43 @@ static bool iArrayToNative (const CStr& a_, MfGlobal* a_global)
 {
   bool rval(0);
   if (!a_global) return rval;
-  if (a_global->ModelType() == USG)
-  {
-    if (   Packages::Disu::NODLAY == a_
-        || Packages::Disu::TOP == a_
-        || Packages::Disu::BOT == a_
-        || Packages::Disu::AREA == a_
-        || Packages::Disu::IA == a_
-        || Packages::Disu::JA == a_
-        || Packages::Disu::IVC == a_
-        || Packages::Disu::CL1 == a_
-        || Packages::Disu::CL2 == a_
-        || Packages::Disu::CL12 == a_
-        || Packages::Disu::FAHL == a_
-        ) rval = true;
-  }
+  if (a_global->ModelType() == USG && 
+        (   Packages::Disu::NODLAY == a_
+         || Packages::Disu::TOP == a_
+         || Packages::Disu::BOT == a_
+         || Packages::Disu::AREA == a_
+         || Packages::Disu::IA == a_
+         || Packages::Disu::JA == a_
+         || Packages::Disu::IVC == a_
+         || Packages::Disu::CL1 == a_
+         || Packages::Disu::CL2 == a_
+         || Packages::Disu::CL12 == a_
+         || Packages::Disu::FAHL == a_
+        )
+      ) rval = true;
   else if (   ARR_BAS_IBND == a_
            || ARR_BAS_SHEAD == a_)
   {
     NativeUtil::ExportNextToH5();
     rval = true;
+  }
+  else if (   ARR_BAS_IBND == a_
+           || ARR_BAS_SHEAD == a_
+           || ARR_LPF_HK == a_
+           || ARR_LPF_HANI == a_
+           || ARR_LPF_VK == a_
+           || ARR_LPF_VANI == a_
+           || ARR_LPF_SS == a_
+           || ARR_LPF_SY == a_
+           || ARR_LPF_WET == a_
+           || ARR_LPF_VKCBD == a_
+           || ARR_LPF_ANGX == a_)
+  {
+    if (a_global->GetPackage(Packages::LPF))
+    {
+      NativeUtil::ExportNextToH5();
+      rval = true;
+    }
   }
   return rval;
 } // iArrayToNative
@@ -775,10 +793,15 @@ static bool iPackageToNativeExport (
   MfGlobal* a_global)
 {
   bool rval = false;
-  if (MfExportUtil::IsSolver(a_))           rval = true;
-  else if (Packages::DISU == a_)            rval = true;
-  else if (Packages::BAS == a_)             rval = true;
-  else if (iArrayToNative(a_, a_global))    rval = true;
+  if (   MfExportUtil::IsSolver(a_)
+      || Packages::DISU == a_
+      //|| Packages::DIS == a_
+      || Packages::BAS == a_
+      || "L98" == a_
+      || iArrayToNative(a_, a_global))
+  {
+     rval = true;
+  }
 
   return rval;
 } // iPackageToNativeExport
@@ -786,7 +809,8 @@ static bool iPackageToNativeExport (
 /// \brief Uses the native exporter to write the files
 //------------------------------------------------------------------------------
 bool ExpGmsH5::impl::ExportNative (MfGlobal* a_global,
-                                   MfPackage* a_package)
+                                   MfPackage* a_package,
+                                   TxtExporter* a_exp)
 {
     bool rval=false;
     CStr packName(a_package->PackageName());
@@ -800,6 +824,10 @@ bool ExpGmsH5::impl::ExportNative (MfGlobal* a_global,
       }
       if (m_nativeExp)
       {
+        m_nativeExp->GetExp()->AtLeastOneTransientSPExists() =
+          a_exp->AtLeastOneTransientSPExists();
+        m_nativeExp->GetExp()->SetOfSteadyStateStressPeriods() =
+          a_exp->SetOfSteadyStateStressPeriods();
         rval = m_nativeExp->ExportPackage(a_global, a_package);
       }
     }
@@ -813,7 +841,7 @@ bool ExpGmsH5::ExportPackage (MfGlobal* a_global,
 {
   // export package as native text
   bool rval(true), unstructured(a_global->Unstructured() ? 1 : 0);
-  if (m_p->ExportNative(a_global, a_package)) return rval;
+  if (m_p->ExportNative(a_global, a_package, GetExp())) return rval;
 
   CStr packName(a_package->PackageName());
   ExportedPackages(GetExp()).insert(packName);
