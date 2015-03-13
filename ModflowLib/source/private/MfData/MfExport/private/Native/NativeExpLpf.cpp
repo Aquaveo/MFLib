@@ -497,7 +497,8 @@ void NativeExpLpf::Line12 (int a_lay)
   p->StringsToWrite().erase(p->StringsToWrite().begin());
   AddToStoredLinesDesc(rval, Desc(12, a_lay));
   if (GetNative()->GetArraysInternal() &&
-      rval.Find("CONSTANT") == -1)
+      rval.Find("CONSTANT") == -1 &&
+      rval.Find("HDF5 ") == -1)
   {
     AddToStoredLinesDesc(p->StringsToWrite()[0], "");
     p->StringsToWrite().erase(p->StringsToWrite().begin());
@@ -513,7 +514,8 @@ void NativeExpLpf::Line10Usg ()
   p->StringsToWrite().erase(p->StringsToWrite().begin());
   AddToStoredLinesDesc(rval, Desc(17));
   if (GetNative()->GetArraysInternal() &&
-      rval.Find("CONSTANT") == -1)
+      rval.Find("CONSTANT") == -1 &&
+      rval.Find("HDF5 ") == -1)
   {
     AddToStoredLinesDesc(p->StringsToWrite()[0], "");
     p->StringsToWrite().erase(p->StringsToWrite().begin());
