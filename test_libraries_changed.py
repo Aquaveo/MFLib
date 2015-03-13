@@ -64,3 +64,4 @@ if hdf5_diff:
 print_xml_head(errors)
 print_test_xml(hdf5_diff, "testHdf5LibraryChanged")
 print_xml_tail()
+exit(errors)
