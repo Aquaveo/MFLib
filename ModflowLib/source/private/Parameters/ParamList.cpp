@@ -436,6 +436,7 @@ double ParamList::UnusedParamKey ()
 bool ParamList::ParamOfTypeExists (const char* a_type)
 {
   CStr type(a_type);
+  if (type.empty()) return false;
   Param par;
   for (size_t i=0; i<m_p->m_params.size(); ++i)
   {
