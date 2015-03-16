@@ -456,9 +456,7 @@ void NativeExpLpf::Line10to16 (int a_line, int a_lay)
   CStr rval = p->StringsToWrite().front();
   p->StringsToWrite().erase(p->StringsToWrite().begin());
   AddToStoredLinesDesc(rval, Desc(a_line, a_lay));
-  if (GetNative()->GetArraysInternal() &&
-      rval.Find("CONSTANT") == -1 &&
-      rval.Find("HDF5 ") == -1)
+  if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), rval))
   {
     AddToStoredLinesDesc(p->StringsToWrite()[0], "");
     p->StringsToWrite().erase(p->StringsToWrite().begin());
@@ -496,9 +494,7 @@ void NativeExpLpf::Line12 (int a_lay)
   rval = p->StringsToWrite().front();
   p->StringsToWrite().erase(p->StringsToWrite().begin());
   AddToStoredLinesDesc(rval, Desc(12, a_lay));
-  if (GetNative()->GetArraysInternal() &&
-      rval.Find("CONSTANT") == -1 &&
-      rval.Find("HDF5 ") == -1)
+  if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), rval))
   {
     AddToStoredLinesDesc(p->StringsToWrite()[0], "");
     p->StringsToWrite().erase(p->StringsToWrite().begin());
@@ -513,9 +509,7 @@ void NativeExpLpf::Line10Usg ()
   CStr rval = p->StringsToWrite().front();
   p->StringsToWrite().erase(p->StringsToWrite().begin());
   AddToStoredLinesDesc(rval, Desc(17));
-  if (GetNative()->GetArraysInternal() &&
-      rval.Find("CONSTANT") == -1 &&
-      rval.Find("HDF5 ") == -1)
+  if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(),rval))
   {
     AddToStoredLinesDesc(p->StringsToWrite()[0], "");
     p->StringsToWrite().erase(p->StringsToWrite().begin());

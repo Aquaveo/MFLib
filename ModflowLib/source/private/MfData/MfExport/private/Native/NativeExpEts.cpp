@@ -8,6 +8,7 @@
 #include <private\MfData\MfExport\private\Native\NativeExpEts.h>
 
 #include <private\MfData\MfExport\private\Mf2kNative.h>
+#include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
@@ -197,13 +198,13 @@ void NativeExpEts::Line10and11 ()
   for (int i=0; i<(*netseg-1); ++i)
   {
     AddToStoredLinesDesc(s[cnt], desc);
-    if (GetNative()->GetArraysInternal() && s[cnt].Find("CONSTANT") == -1)
+    if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), s[cnt]))
     {
       cnt++;
       AddToStoredLinesDesc(s[cnt], "");
     }
     AddToStoredLinesDesc(s2[cnt2], desc2);
-    if (GetNative()->GetArraysInternal() && s2[cnt2].Find("CONSTANT") == -1)
+    if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), s2[cnt2]))
     {
       cnt2++;
       AddToStoredLinesDesc(s2[cnt2], "");
@@ -221,7 +222,7 @@ void NativeExpEts::ArrayToFile (MfData::MfPackage* p, const CStr& a_desc)
 {
   CStr l = p->StringsToWrite()[0];
   AddToStoredLinesDesc(l, a_desc);
-  if (GetNative()->GetArraysInternal() && l.Find("CONSTANT") == -1)
+  if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), l))
   {
     AddToStoredLinesDesc(p->StringsToWrite()[1], "");
   }

@@ -10,6 +10,7 @@
 #include <sstream>
 
 #include <private\MfData\MfExport\private\Mf2kNative.h>
+#include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\MfData\MfExport\private\Native\NativeUtil.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\MfGlobal.h>
@@ -88,7 +89,8 @@ bool NativeExpMlt::Export ()
       func = true;
     }
     AddToStoredLinesDesc(lCopy[i+1], desc);
-    if (internalArrays && lCopy[i+1].Find("CONSTANT") == -1 && !func)
+    if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), lCopy[i+1]) &&
+        !func)
     {
       i++;
       AddToStoredLinesDesc(lCopy[i+1], "");

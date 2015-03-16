@@ -8,6 +8,7 @@
 #include <private\MfData\MfExport\private\Native\NativeExpUzf.h>
 
 #include <private\MfData\MfExport\private\Mf2kNative.h>
+#include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\MfData\MfExport\private\Native\NativeExpNam.h>
 #include <private\MfData\MfExport\private\Native\NativeUtil.h>
 #include <private\MfData\MfGlobal.h>
@@ -99,7 +100,6 @@ void NativeExpUzf::Lines2to8 ()
   using util::ForElement;
   const int *iuzlist;
   int iuzfopt, irunflg, nuzgag;
-  bool internalArrays = GetNative()->GetArraysInternal();
   MfPackage* a_pLine8=GetPackage();
   if (a_pLine8->GetField(UZFpack::IUZLIST, &iuzlist) && iuzlist)
   {
@@ -119,7 +119,7 @@ void NativeExpUzf::Lines2to8 ()
       line = "0";
     }
     AddToStoredLinesDesc(line, desc);
-    if (internalArrays && line.Find("CONSTANT") == -1)
+    if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), line))
     {
       line = p->StringsToWrite()[1];
       AddToStoredLinesDesc(line, "");
@@ -131,7 +131,7 @@ void NativeExpUzf::Lines2to8 ()
     {
       line = p->StringsToWrite().front();
       AddToStoredLinesDesc(line, desc);
-      if (internalArrays && line.Find("CONSTANT") == -1)
+      if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), line))
       {
         line = p->StringsToWrite()[1];
         AddToStoredLinesDesc(line, "");
@@ -144,7 +144,7 @@ void NativeExpUzf::Lines2to8 ()
     {
       line = p->StringsToWrite().front();
       AddToStoredLinesDesc(line, desc);
-      if (internalArrays && line.Find("CONSTANT") == -1)
+      if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), line))
       {
         line = p->StringsToWrite()[1];
         AddToStoredLinesDesc(line, "");
@@ -157,7 +157,7 @@ void NativeExpUzf::Lines2to8 ()
     {
       line = p->StringsToWrite().front();
       AddToStoredLinesDesc(line, desc);
-      if (internalArrays && line.Find("CONSTANT") == -1)
+      if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), line))
       {
         line = p->StringsToWrite()[1];
         AddToStoredLinesDesc(line, "");
@@ -170,7 +170,7 @@ void NativeExpUzf::Lines2to8 ()
     {
       line = p->StringsToWrite().front();
       AddToStoredLinesDesc(line, desc);
-      if (internalArrays && line.Find("CONSTANT") == -1)
+      if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), line))
       {
         line = p->StringsToWrite()[1];
         AddToStoredLinesDesc(line, "");
@@ -191,7 +191,7 @@ void NativeExpUzf::Lines2to8 ()
     {
       line = p->StringsToWrite().front();
       AddToStoredLinesDesc(line, desc);
-      if (internalArrays && line.Find("CONSTANT") == -1)
+      if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), line))
       {
         line = p->StringsToWrite()[1];
         AddToStoredLinesDesc(line, "");
@@ -223,7 +223,6 @@ void NativeExpUzf::Lines9to16 ()
   using namespace MfData::Packages;
   const int *nuzf1, *nuzf2, *nuzf3, *nuzf4;
   int iuzfopt, ietflg;
-  bool internalArrays = GetNative()->GetArraysInternal();
   MfPackage* a_pSP=GetPackage();
   if (a_pSP->GetField(UZFpack::NUZF1, &nuzf1) && nuzf1 &&
       a_pSP->GetField(UZFpack::NUZF2, &nuzf2) && nuzf2 &&
@@ -253,7 +252,7 @@ void NativeExpUzf::Lines9to16 ()
     {
       line = p->StringsToWrite().front();
       AddToStoredLinesDesc(line, mapDesc[10]);
-      if (internalArrays && line.Find("CONSTANT") == -1)
+      if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), line))
       {
         line = p->StringsToWrite()[1];
         AddToStoredLinesDesc(line, "");
@@ -271,7 +270,7 @@ void NativeExpUzf::Lines9to16 ()
       {
         line = p->StringsToWrite().front();
         AddToStoredLinesDesc(line, mapDesc[12]);
-        if (internalArrays && line.Find("CONSTANT") == -1)
+        if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), line))
         {
           line = p->StringsToWrite()[1];
           AddToStoredLinesDesc(line, "");
@@ -287,7 +286,7 @@ void NativeExpUzf::Lines9to16 ()
       {
         line = p->StringsToWrite().front();
         AddToStoredLinesDesc(line, mapDesc[14]);
-        if (internalArrays && line.Find("CONSTANT") == -1)
+        if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), line))
         {
           line = p->StringsToWrite()[1];
           AddToStoredLinesDesc(line, "");
@@ -305,7 +304,7 @@ void NativeExpUzf::Lines9to16 ()
         {
           line = p->StringsToWrite().front();
           AddToStoredLinesDesc(line, mapDesc[16]);
-          if (internalArrays && line.Find("CONSTANT") == -1)
+          if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), line))
           {
             line = p->StringsToWrite()[1];
             AddToStoredLinesDesc(line, "");

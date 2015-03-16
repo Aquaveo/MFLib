@@ -9,9 +9,10 @@
 
 #include <sstream>
 
-#include <private\MfData\MfGlobal.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
+#include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\MfData\MfExport\private\TxtExporter.h>
+#include <private\MfData\MfGlobal.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
 #include <private\MfData\Packages\MfPackStrings.h>
@@ -216,7 +217,7 @@ CStr NativeExpBcf::Line2 ()
 CStr NativeExpBcf::Line3 ()
 {
   CStr rval;
-  MfPackage* p = GetGlobal()->GetPackage(ARR_TRPY);
+  MfPackage* p = GetGlobal()->GetPackage(ARR_BCF_TRPY);
   if (!p || p->StringsToWrite().empty())
   {
     ASSERT(0);
@@ -233,7 +234,7 @@ void NativeExpBcf::Line4Usg ()
   if (!m_unstructured) return;
 
   {
-    MfPackage* p = GetGlobal()->GetPackage(ARR_TRPY);
+    MfPackage* p = GetGlobal()->GetPackage(ARR_BCF_TRPY);
     if (p)
     {
       const int *jj;
@@ -254,8 +255,7 @@ void NativeExpBcf::Line4Usg ()
   CStr rval = p->StringsToWrite().front();
   p->StringsToWrite().erase(p->StringsToWrite().begin());
   AddToStoredLinesDesc(rval, Desc(10));
-  if (GetNative()->GetArraysInternal() &&
-    rval.Find("CONSTANT") == -1)
+  if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), rval))
   {
     AddToStoredLinesDesc(p->StringsToWrite()[0], "");
     p->StringsToWrite().erase(p->StringsToWrite().begin());
@@ -277,7 +277,7 @@ void NativeExpBcf::Line4to9 (int a_line, int a_lay)
   CStr s = strs[m_lineCnt[a_line]];
   rval.push_back(s);
   m_lineCnt[a_line]++;
-  if (m_internalArrays && s.Find("CONSTANT") == -1)
+  if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), s))
   {
     rval.push_back(strs[m_lineCnt[a_line]]);
     m_lineCnt[a_line]++;
@@ -449,9 +449,9 @@ void NativeExpBcfT::testLine2 ()
 //------------------------------------------------------------------------------
 void NativeExpBcfT::testLine3 ()
 {
-  MfPackage p1(ARR_TRPY);
+  MfPackage p1(ARR_BCF_TRPY);
   m_p->GetGlobal()->AddPackage(&p1);
-  MfPackage* p = m_p->GetGlobal()->GetPackage(ARR_TRPY);
+  MfPackage* p = m_p->GetGlobal()->GetPackage(ARR_BCF_TRPY);
   p->StringsToWrite().push_back("CONSTANT 1.0");
   CStr base = "CONSTANT 1.0";
   CStr str = m_p->Line3();

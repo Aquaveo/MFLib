@@ -11,6 +11,7 @@
 
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
+#include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\MfData\MfExport\private\TxtExporter.h>
 #include <private\MfData\MfExport\private\MfExporterImpl.h>
 #include <private\MfData\Packages\MfPackage.h>
@@ -183,14 +184,13 @@ void NativeExpDis::Line6 ()
 
   try
   {
-    bool arrayInternal(GetNative()->GetArraysInternal());
     int cnt(0);
     std::vector<CStr>& lines(p->StringsToWrite());
     for (int c=0, i=0; i<m_nLay; ++i)
     {
       rval.push_back(lines.at(c++));
       desc.push_back(Desc(6, i+1));
-      if (arrayInternal && rval.back().Find("CONSTANT") == -1)
+      if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), rval.back()))
       {
         rval.push_back(lines.at(c++));
         desc.push_back("");
@@ -201,7 +201,7 @@ void NativeExpDis::Line6 ()
         rval.push_back(pCbd->StringsToWrite()[cnt]);
         desc.push_back(Desc(8, i+1));
         ++cnt;
-        if (arrayInternal && rval.back().Find("CONSTANT") == -1)
+        if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), rval.back()))
         {
           rval.push_back(pCbd->StringsToWrite()[cnt]);
           desc.push_back("");

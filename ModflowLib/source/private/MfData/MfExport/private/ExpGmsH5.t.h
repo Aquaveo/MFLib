@@ -12,7 +12,6 @@ public:
   void testCreateClass();
   void testSupportedPackage();
   void testexpNameFile();
-  void testexpDisFile();
   void testGetArrayMap();
   void testIsDataArray();
   void testexpDataArray();
@@ -23,9 +22,6 @@ public:
   void testexpOc();
   void testexpOct();
   void testGetMultiDimArrayIndex();
-  void testexpBCF();
-  void testexpLPF();
-  void testexpUPW();
   void testexpSEN();
   void testexpPVAL();
   void testexpRiv();
@@ -58,7 +54,6 @@ public:
   void testiGetLPFParamTypes();
   void testiCountLPFParams();
   void testiWriteLPFParameters();
-  void testexpLPFWithParam();
   void testiWriteHufLine1to5();
   void testiWriteHGUs();
   void testiGetHUFParamTypes();

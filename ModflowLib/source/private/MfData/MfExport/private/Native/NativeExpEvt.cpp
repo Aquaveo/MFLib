@@ -8,6 +8,7 @@
 #include <private\MfData\MfExport\private\Native\NativeExpEvt.h>
 
 #include <private\MfData\MfExport\private\Mf2kNative.h>
+#include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
@@ -176,7 +177,7 @@ void NativeExpEvt::ArrayToFile (MfData::MfPackage* p, const CStr& a_desc)
 {
   CStr l = p->StringsToWrite()[0];
   AddToStoredLinesDesc(l, a_desc);
-  if (GetNative()->GetArraysInternal() && l.Find("CONSTANT") == -1)
+  if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), l))
   {
     AddToStoredLinesDesc(p->StringsToWrite()[1], "");
   }

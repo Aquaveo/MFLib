@@ -203,7 +203,6 @@ void NativeExpHuf::Line5 ()
   if (!GetPackage()->GetField(Packages::HUFPack::LAYWT, &LAYWT) || !LAYWT)
     return;
 
-  bool internalArrays = GetNative()->GetArraysInternal();
   int cnt(0);
   for (int i=0; i<GetGlobal()->NumLay(); ++i)
   {
@@ -212,7 +211,7 @@ void NativeExpHuf::Line5 ()
       rval = p->StringsToWrite()[cnt];
       AddToStoredLinesDesc(rval, Desc5());
       cnt++;
-      if (internalArrays && rval.Find("CONSTANT") == -1)
+      if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), rval))
       {
         rval = p->StringsToWrite()[cnt];
         AddToStoredLinesDesc(rval, "");
@@ -254,7 +253,6 @@ void NativeExpHuf::Line6to8 ()
     names.back().Trim();
   }
 
-  bool internalArrays = GetNative()->GetArraysInternal();
   for (i=0; i<*NHUF; i++)
   {
     AddToStoredLinesDesc(names[i], desc[0]);
@@ -265,7 +263,7 @@ void NativeExpHuf::Line6to8 ()
     {
       rval = pack->StringsToWrite()[0];
       AddToStoredLinesDesc(rval, desc[1]);
-      if (internalArrays && rval.Find("CONSTANT") == -1)
+      if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), rval))
       {
         AddToStoredLinesDesc(pack->StringsToWrite()[1], "");
       }
@@ -279,7 +277,7 @@ void NativeExpHuf::Line6to8 ()
     {
       rval = pack->StringsToWrite()[0];
       AddToStoredLinesDesc(rval, desc[2]);
-      if (internalArrays && rval.Find("CONSTANT") == -1)
+      if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), rval))
       {
         AddToStoredLinesDesc(pack->StringsToWrite()[1], "");
       }

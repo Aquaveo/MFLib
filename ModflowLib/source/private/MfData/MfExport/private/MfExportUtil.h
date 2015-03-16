@@ -12,6 +12,7 @@ namespace MfData
   namespace Export
   {
     class MfExporterImpl;
+    class Mf2kNative;
 
     class MfExportUtil
     {
@@ -28,6 +29,8 @@ namespace MfData
       static void InsertSingleQuotesInName(CStr& a_name);
       static std::set<CStr> HufParamTypes();
       static std::vector<Param> GetParamsOfType(const char* const a_type);
+      static bool ArrayWriteNextLineInternal(Mf2kNative* a_native,
+                                             const CStr& a_line);
 
     private:
     };

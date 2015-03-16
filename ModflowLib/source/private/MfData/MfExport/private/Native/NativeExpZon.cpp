@@ -10,6 +10,7 @@
 #include <sstream>
 
 #include <private\MfData\MfExport\private\Mf2kNative.h>
+#include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackStrings.h>
@@ -56,7 +57,7 @@ bool NativeExpZon::Export ()
   {
     AddToStoredLinesDesc(lCopy[i], Desc(2));
     AddToStoredLinesDesc(lCopy[i+1], Desc(3));
-    if (internalArrays && lCopy[i+1].Find("CONSTANT") == -1)
+    if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), lCopy[i+1]))
     {
       i++;
       AddToStoredLinesDesc(lCopy[i+1], "");

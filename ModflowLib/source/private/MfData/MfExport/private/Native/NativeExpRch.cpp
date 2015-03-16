@@ -124,8 +124,7 @@ void NativeExpRch::Line6 ()
   //            GetGlobal()->GetCurrentPeriod());
   std::vector<CStr>& l(p->StringsToWrite());
   AddToStoredLinesDesc(l[0], desc);
-  if (GetNative()->GetArraysInternal() && l.size() > 1 && 
-      l[0].Find("CONSTANT") == -1)
+  if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), l[0]))
   {
     AddToStoredLinesDesc(l[1], "");
   }
@@ -149,8 +148,7 @@ void NativeExpRch::Line8 ()
   //            GetGlobal()->GetCurrentPeriod());
   std::vector<CStr>& l(p->StringsToWrite());
   AddToStoredLinesDesc(l[0], desc);
-  if (GetNative()->GetArraysInternal() && l.size() > 1 && 
-      l[0].Find("CONSTANT") == -1)
+  if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), l[0]))
   {
     AddToStoredLinesDesc(l[1], "");
   }

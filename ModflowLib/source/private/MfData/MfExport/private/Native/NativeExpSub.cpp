@@ -8,6 +8,7 @@
 #include <private\MfData\MfExport\private\Native\NativeExpSub.h>
 
 #include <private\MfData\MfExport\private\Mf2kNative.h>
+#include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\MfData\MfExport\private\Native\NativeExpNam.h>
 #include <private\MfData\MfExport\private\Native\NativeUtil.h>
 #include <private\MfData\MfGlobal.h>
@@ -177,7 +178,6 @@ void NativeExpSub::WriteArrays (const char* const a_name,
 {
   CStr desc;
   MfPackage* p = GetGlobal()->GetPackage(a_name);
-  bool internalArrays = GetNative()->GetArraysInternal();
   if (p)
   {
     std::vector<CStr>& lines = p->StringsToWrite();
@@ -188,7 +188,7 @@ void NativeExpSub::WriteArrays (const char* const a_name,
       {
         desc.Format("%s %d", a_desc, a_lay[i]);
         AddToStoredLinesDesc(lines[i], desc);
-        if (internalArrays && lines[i].Find("CONSTANT") == -1)
+        if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), lines[i]))
         {
           AddToStoredLinesDesc(lines[i], "");
           lines.erase(lines.begin()+i+1);
@@ -199,7 +199,7 @@ void NativeExpSub::WriteArrays (const char* const a_name,
     {
       desc.Format("%s %d", a_desc, a_lay[a_idx]);
       AddToStoredLinesDesc(lines[a_idx], desc);
-      if (internalArrays && lines[a_idx].Find("CONSTANT") == -1)
+      if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), lines[a_idx]))
       {
         AddToStoredLinesDesc(lines[a_idx+1], "");
         lines.erase(lines.begin()+a_idx+1);

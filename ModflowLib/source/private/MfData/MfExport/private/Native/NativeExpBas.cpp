@@ -10,6 +10,7 @@
 #include <sstream>
 
 #include <private\MfData\MfExport\private\Mf2kNative.h>
+#include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\MfExport\private\MfExporterImpl.h>
 #include <private\MfData\MfPackageUtil.h>
@@ -162,16 +163,13 @@ void NativeExpBas::Line4 ()
 //------------------------------------------------------------------------------
 void NativeExpBas::ArrayToFile (MfData::MfPackage* p, int a_line)
 {
-  bool internalArrays = GetNative()->GetArraysInternal();
   std::vector<CStr>& lines(p->StringsToWrite());
   int lay = 1;
   for (size_t i=0; i<lines.size(); ++i)
   {
     AddToStoredLinesDesc(lines.at(i), Desc(a_line, lay));
     lay++;
-    if (internalArrays &&
-        lines[i].Find("CONSTANT") == -1 &&
-        lines[i].Find("HDF5 ") == -1)
+    if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), lines[i]))
     {
       i++;
       AddToStoredLinesDesc(lines[i], "");

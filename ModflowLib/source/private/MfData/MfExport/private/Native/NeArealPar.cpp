@@ -420,7 +420,6 @@ void NeArealPar::RewriteFileWithParameters ()
     curLine = 2;
   }
   Lines3to4(false);
-  bool arrInside = m_pack->GetNative()->GetArraysInternal();
   for (int i=0; i<m_pack->GetGlobal()->NumPeriods(); ++i)
   {
     // add line 5 back
@@ -442,7 +441,8 @@ void NeArealPar::RewriteFileWithParameters ()
         {
           LineWithPar(i+1, line5);
           RemoveArrayFile(oldLine[curLine]);
-          if (arrInside && oldLine[curLine].Find("CONSTANT") == -1) curLine++;
+          if (MfExportUtil::ArrayWriteNextLineInternal(m_pack->GetNative(),
+                                                       oldLine[curLine])) curLine++;
           curLine++; // move to next line
         }
       }
@@ -450,7 +450,8 @@ void NeArealPar::RewriteFileWithParameters ()
       {
         // add back line 8
         m_pack->AddToStoredLinesDesc(oldLine[curLine], oldDesc[curLine]);
-        if (arrInside && oldLine[curLine].Find("CONSTANT") == -1)
+        if (MfExportUtil::ArrayWriteNextLineInternal(m_pack->GetNative(),
+                                                     oldLine[curLine]))
         {
           curLine++;
           m_pack->AddToStoredLinesDesc(oldLine[curLine], "");
@@ -459,7 +460,8 @@ void NeArealPar::RewriteFileWithParameters ()
         if ("ETS" == m_type && j+1 == nValsLine5)
         { // this is PETM
           m_pack->AddToStoredLinesDesc(oldLine[curLine], oldDesc[curLine]);
-          if (arrInside && oldLine[curLine].Find("CONSTANT") == -1)
+          if (MfExportUtil::ArrayWriteNextLineInternal(m_pack->GetNative(),
+                                                       oldLine[curLine]))
           {
             curLine++;
             m_pack->AddToStoredLinesDesc(oldLine[curLine], "");

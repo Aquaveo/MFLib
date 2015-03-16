@@ -10,6 +10,7 @@
 #include <sstream>
 
 #include <private\MfData\MfExport\private\Mf2kNative.h>
+#include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\MfData\MfExport\private\Native\NativeUtil.h>
 #include <private\MfData\MfExport\private\TxtExporter.h>
 #include <private\MfData\MfGlobal.h>
@@ -153,17 +154,15 @@ void NativeExpLak::Line5 ()
     MfPackage* p = GetGlobal()->GetPackage(ARR_LAK_ID);
     if (!p) return;
 
-    bool arrInternal(GetNative()->GetArraysInternal());
     CStr d, desc = " 5. LKARR(NCOL,NROW)    LAY ";
     std::vector<CStr>& lines(p->StringsToWrite());
     for (size_t lay=1, i=0; i<lines.size(); ++i, ++lay)
     {
       d.Format("%s%d", desc, lay);
       AddToStoredLinesDesc(lines[i], d);
-      if (arrInternal && lines.size() > i+1)
+      if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), lines[i]))
       {
-        if (lines[i+1].Find("CONSTANT") == -1)
-          AddToStoredLinesDesc(lines[++i], "");
+        AddToStoredLinesDesc(lines[++i], "");
       }
     }
     lines.clear();
@@ -182,17 +181,15 @@ void NativeExpLak::Line6 ()
     MfPackage* p = GetGlobal()->GetPackage(ARR_LAK_LEAK);
     if (!p) return;
 
-    bool arrInternal(GetNative()->GetArraysInternal());
     CStr d, desc = " 6. BDLKNC(NCOL,NROW)   LAY ";
     std::vector<CStr>& lines(p->StringsToWrite());
     for (size_t lay=1, i=0; i<lines.size(); ++i, ++lay)
     {
       d.Format("%s%d", desc, lay);
       AddToStoredLinesDesc(lines[i], d);
-      if (arrInternal && lines.size() > i+1)
+      if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), lines[i]))
       {
-        if (lines[i+1].Find("CONSTANT") == -1)
-          AddToStoredLinesDesc(lines[++i], "");
+        AddToStoredLinesDesc(lines[++i], "");
       }
     }
     lines.clear();

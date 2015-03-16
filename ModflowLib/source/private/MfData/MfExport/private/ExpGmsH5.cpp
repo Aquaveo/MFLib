@@ -315,9 +315,6 @@ static void expNameFile(MfPackage *a_package,
                         int a_write,
                         int a_modelType,
                         ExpGmsH5* a_h5);
-static void expDisFile(MfGlobal* a_global,
-                       MfPackage* a_package,
-                       TxtExporter *a_exp);
 static void expSuperFile(int a_model_type,
                          MfPackage* a_package,
                          TxtExporter *a_exp);
@@ -354,17 +351,6 @@ static void saveSEN(MfPackage *a_pSen1,
                     MfPackage *a_pSen,
                     TxtExporter* a_exp);
 static void expPES(MfPackage *a_p,
-                   TxtExporter *a_exp);
-static void expBCF(MfPackage *a_p,
-                   TxtExporter *a_exp,
-                   const std::map<CStr, CStr>& a_map);
-static void expLPF(MfPackage *a_p,
-                   MfPackage *a_p1,
-                   MfPackage *a_dis,
-                   TxtExporter *a_exp);
-static void expUPW(MfPackage *a_p,
-                   MfPackage *a_dis,
-                   int a_lay,
                    TxtExporter *a_exp);
 static void expHUF(MfPackage *a_p,
                    int a_lay,
@@ -702,43 +688,6 @@ static void WriteH5StringArray (const char *a_filePath,
   w.WriteAtt(MFBC_MAX_STR_LEN, maxLen);
 } // WriteH5StringArray
 //------------------------------------------------------------------------------
-/// \brief Inserts single quotes in a name when necessary.
-//------------------------------------------------------------------------------
-static void iWrite1dArray (const Real* a_,
-                           int a_size,
-                           const char* const a_label,
-                           TxtExporter* a_exp,
-                           const char* const a_type)
-{
-  bool constant(true);
-  // check to see if the array is constant
-  Real firstVal = a_[0];
-  for (int i=1; i<a_size && constant; i++)
-  {
-    if (firstVal != a_[i])
-      constant = false;
-  }
-  if (constant)
-  {
-    CStr line;
-    line.Format("CONSTANT %s # %s", STR(firstVal), a_label);
-    a_exp->WriteLineToFile(a_type, line);
-  }
-  else
-  {
-    CStr aStr;
-    for (int j = 0; j<a_size; j++)
-    {
-      aStr += STR(a_[j]);
-      aStr += " ";
-    }
-    CStr line("INTERNAL 1.0 (free) -1 # ");
-    line += a_label;
-    a_exp->WriteLineToFile(a_type, line);
-    a_exp->WriteLineToFile(a_type, aStr);
-  }
-} // iWrite1dArray
-//------------------------------------------------------------------------------
 /// \brief checks if package name is a DISU array
 //------------------------------------------------------------------------------
 static bool iArrayToNative (const CStr& a_, MfGlobal* a_global)
@@ -760,13 +709,21 @@ static bool iArrayToNative (const CStr& a_, MfGlobal* a_global)
         )
       ) rval = true;
   else if (   ARR_BAS_IBND == a_
-           || ARR_BAS_SHEAD == a_)
-  {
-    NativeUtil::ExportNextToH5();
-    rval = true;
-  }
-  else if (   ARR_BAS_IBND == a_
            || ARR_BAS_SHEAD == a_
+           || ARR_DIS_TOP == a_
+           || ARR_DIS_BOT == a_
+           || ARR_DIS_VCB == a_
+           || Packages::DisPack::DELR == a_
+           || Packages::DisPack::DELC == a_
+           || ARR_BCF_HY == a_
+           || ARR_BCF_TRAN == a_
+           || ARR_BCF_TRAN_U == a_
+           || ARR_BCF_HK_U == a_
+           || ARR_BCF_VCONT == a_
+           || ARR_BCF_SF1 == a_
+           || ARR_BCF_SF2 == a_
+           || ARR_BCF_WET == a_
+           || ARR_BCF_TRPY == a_
            || ARR_LPF_HK == a_
            || ARR_LPF_HANI == a_
            || ARR_LPF_VK == a_
@@ -775,13 +732,11 @@ static bool iArrayToNative (const CStr& a_, MfGlobal* a_global)
            || ARR_LPF_SY == a_
            || ARR_LPF_WET == a_
            || ARR_LPF_VKCBD == a_
-           || ARR_LPF_ANGX == a_)
+           || ARR_LPF_ANGX == a_
+           )
   {
-    if (a_global->GetPackage(Packages::LPF))
-    {
-      NativeUtil::ExportNextToH5();
-      rval = true;
-    }
+    NativeUtil::ExportNextToH5();
+    rval = true;
   }
   return rval;
 } // iArrayToNative
@@ -795,9 +750,13 @@ static bool iPackageToNativeExport (
   bool rval = false;
   if (   MfExportUtil::IsSolver(a_)
       || Packages::DISU == a_
-      //|| Packages::DIS == a_
+      || Packages::DIS == a_
+      || Packages::BCF == a_
       || Packages::BAS == a_
       || "L98" == a_
+      || Packages::UPW == a_
+      //|| Packages::OC == a_
+      //|| Packages::OCT == a_
       || iArrayToNative(a_, a_global))
   {
      rval = true;
@@ -824,10 +783,10 @@ bool ExpGmsH5::impl::ExportNative (MfGlobal* a_global,
       }
       if (m_nativeExp)
       {
-        m_nativeExp->GetExp()->AtLeastOneTransientSPExists() =
-          a_exp->AtLeastOneTransientSPExists();
-        m_nativeExp->GetExp()->SetOfSteadyStateStressPeriods() =
-          a_exp->SetOfSteadyStateStressPeriods();
+        a_exp->AtLeastOneTransientSPExists() =
+          m_nativeExp->GetExp()->AtLeastOneTransientSPExists();
+        a_exp->SetOfSteadyStateStressPeriods() =
+          m_nativeExp->GetExp()->SetOfSteadyStateStressPeriods();
         rval = m_nativeExp->ExportPackage(a_global, a_package);
       }
     }
@@ -849,10 +808,6 @@ bool ExpGmsH5::ExportPackage (MfGlobal* a_global,
   {
     expNameFile(a_package, GetExp(), false, GetModelType(), this);
   }
-  else if (Packages::DIS == packName)
-  {
-    expDisFile(a_global, a_package, GetExp());
-  }
   else if (Packages::RCH == packName)
   {
     expRecharge(a_package,
@@ -872,30 +827,9 @@ bool ExpGmsH5::ExportPackage (MfGlobal* a_global,
   {
     expOCT(a_package, GetExp());
   }
-  else if (Packages::BCF == packName)
-  {
-    expBCF(a_package, GetExp(), GetMapArrays());
-  }
-  else if ("L98" == packName)
-  {
-    // there are two "packages" that come thru for this package
-    MfPackage* p = a_global->GetPackage(Packages::DIS);
-    if (unstructured) p = a_global->GetPackage(Packages::DISU);
-    expLPF(a_global->GetPackage(Packages::LPF),
-           a_global->GetPackage("L99"),
-           p,
-           GetExp());
-  }
   else if (Packages::HUF == packName)
   {
     expHUF(a_global->GetPackage(Packages::HUF),
-           a_global->NumLay(),
-           GetExp());
-  }
-  else if (Packages::UPW == packName)
-  {
-    expUPW(a_global->GetPackage(Packages::UPW),
-           a_global->GetPackage(Packages::DIS),
            a_global->NumLay(),
            GetExp());
   }
@@ -1999,101 +1933,6 @@ static void expNameFile (MfPackage *a_package,
     }
   }
 } // expNameFile
-//------------------------------------------------------------------------------
-/// \brief Exports the discretization file
-//------------------------------------------------------------------------------
-static void expDisFile (MfGlobal* a_global,
-                        MfPackage* a_package,
-                        TxtExporter *a_exp)
-{
-  using namespace Packages;
-  int j;
-  CStr aStr, bStr;
-  aStr.Format("%d %d %d %d %d %d", a_global->NumLay(), a_global->NumRow(), 
-    a_global->NumCol(), a_global->NumPeriods(), a_global->TimeUnit(), 
-    a_global->LengthUnit());
-  a_exp->WriteLineToFile(DIS, aStr);
-
-  // write the confining beds
-  const int *laycbd;
-  if (a_package->GetField(DisPack::LAYCBD, &laycbd) && laycbd)
-  {
-    aStr = "";
-    //aStr.clear();
-    for (j = 0; j<a_global->NumLay(); j++)
-    {
-      bStr.Format("%d ", laycbd[j]);
-      aStr += bStr;
-    }
-    a_exp->WriteLineToFile(DIS, aStr);
-  }
-
-  // write the row, column offset
-  const Real *delr, *delc;
-  if (a_package->GetField(DisPack::DELR, &delr) && delr &&
-      a_package->GetField(DisPack::DELC, &delc) && delc)
-  {
-    iWrite1dArray(delr, a_global->NumCol(), "DELR", a_exp, DIS);
-    //aStr = "";
-    ////aStr.clear();
-    //for (j = 0; j<a_global->NumCol(); j++)
-    //{
-    //  aStr += STR(delr[j]);
-    //  aStr += " ";
-    //}
-    //a_exp->WriteLineToFile(DIS, "Internal 1.0 (free) -1");
-    //a_exp->WriteLineToFile(DIS, aStr);
-
-    iWrite1dArray(delc, a_global->NumRow(), "DELC", a_exp, DIS);
-    //aStr = "";
-    ////aStr.clear();
-    //for (j = 0; j<a_global->NumRow(); j++)
-    //{
-    //  aStr += STR(delc[j]);
-    //  aStr += " ";
-    //}
-    //a_exp->WriteLineToFile(DIS, "Internal 1.0 (free) -1");
-    //a_exp->WriteLineToFile(DIS, aStr);
-  }
-  // write the layer data
-  CStr s0("top1"), s1("bot1");
-  a_exp->WriteLineToFile(DIS, GetTxtLineArrayMap(a_exp)[s0]);
-  a_exp->WriteLineToFile(DIS, GetTxtLineArrayMap(a_exp)[s1]);
-  if (0 != laycbd[0])
-  {
-    s1 = "vcb1";
-    a_exp->WriteLineToFile(DIS, GetTxtLineArrayMap(a_exp)[s1]);
-  }
-  for (j=1; j<a_global->NumLay(); j++)
-  {
-    s1.Format("bot%d", j+1);
-    a_exp->WriteLineToFile(DIS, GetTxtLineArrayMap(a_exp)[s1]);
-    if (0 != laycbd[j])
-    {
-      s1.Format("vcb%d", j+1);
-      a_exp->WriteLineToFile(DIS, GetTxtLineArrayMap(a_exp)[s1]);
-    }
-  }
-  // write stress period data
-  const Real *perLen(0), *tsMult(0);
-  const int *nstps(0), *issFlag(0);
-  if (a_package->GetField(DisPack::PERLEN, &perLen) && perLen &&
-      a_package->GetField(DisPack::NSTP, &nstps) && nstps &&
-      a_package->GetField(DisPack::TSMULT, &tsMult) && tsMult &&
-      a_package->GetField(DisPack::ISSFLG, &issFlag) && issFlag)
-  {
-    for (j=0; j<a_global->NumPeriods(); j++)
-    {
-      aStr.Format("%s %d %s %s", STR(perLen[j]), nstps[j], STR(tsMult[j]),
-                  issFlag[j] ? "Ss":"Tr");
-      a_exp->WriteLineToFile(DIS, aStr);
-      if (!issFlag[j])
-        a_exp->AtLeastOneTransientSPExists() = true;
-      else
-        a_exp->SetOfSteadyStateStressPeriods().insert(j+1);
-    }
-  }
-} // expDisFile
 //------------------------------------------------------------------------------
 /// \brief Writes out the super file so we can read in the parameter file
 //------------------------------------------------------------------------------
@@ -3467,409 +3306,6 @@ static void expPES (MfPackage *a_p,
     a_exp->WriteLineToFile(PES, "0 0 0 ");
   }
 } // expPES
-//------------------------------------------------------------------------------
-/// \brief Exports part of the output control
-//------------------------------------------------------------------------------
-static void expBCF (MfPackage *a_p,
-                    TxtExporter *a_exp,
-                    const std::map<CStr,CStr>& a_map)
-{
-  const Real *hdry(0), *wetfct(0), *trpy(0);
-  const int  *nlay(0), *iwdflg(0), *iwetit(0), *ihdwet(0),
-             *layavg(0), *laycon(0);
-
-  if (!a_p->GetField(Packages::BCFpack::HDRY, &hdry) || !hdry ||
-      !a_p->GetField(Packages::BCFpack::WETFCT, &wetfct) || !wetfct ||
-      !a_p->GetField(Packages::BCFpack::TRPY, &trpy) || !trpy ||
-      !a_p->GetField(Packages::BCFpack::IWDFLG, &iwdflg) || !iwdflg ||
-      !a_p->GetField(Packages::BCFpack::IWETIT, &iwetit) || !iwetit ||
-      !a_p->GetField(Packages::BCFpack::IHDWET, &ihdwet) || !ihdwet ||
-      !a_p->GetField(Packages::BCFpack::LAYAVG, &layavg) || !layavg ||
-      !a_p->GetField(Packages::BCFpack::LAYCON, &laycon) || !laycon ||
-      !a_p->GetField(Packages::BCFpack::NLAY, &nlay) || !nlay)
-    return;
-
-  int i;
-  CStr line, str;
-  // IBCFCB HDRY IWDFLG WETFCT IWETIT IHDWET
-  line.Format("40 %s %d %s %d %d", STR(*hdry), *iwdflg, STR(*wetfct),
-              *iwetit, *ihdwet);
-  a_exp->WriteLineToFile(Packages::BCF, line);
-  // Ltype(NLAY)
-  line = "";
-  for (i=0; i<*nlay; i++)
-  {
-    str.Format("%d%d ", layavg[i], laycon[i]);
-    line += str;
-    if (line.length() >= 78)
-    {
-      a_exp->WriteLineToFile(Packages::BCF, line);
-      line = "";
-    }
-  }
-  if (!line.empty())
-    a_exp->WriteLineToFile(Packages::BCF, line);
-  // TRPY(NLAY)
-  line = "";
-  for (i=0; i<*nlay; i++)
-  {
-    line += STR(trpy[i]);
-    line += " ";
-  }
-  a_exp->WriteLineToFile(Packages::BCF, "Internal 1.0 (free) -1");
-  a_exp->WriteLineToFile(Packages::BCF, line);
-
-  CStr tag;
-  for (i=0; i<*nlay; i++)
-  {
-    if (a_exp->AtLeastOneTransientSPExists()) // write SF1
-    {
-      tag.Format("%s%d", a_map.find(ARR_BCF_SF1)->second, i+1);
-      a_exp->WriteLineToFile(Packages::BCF, GetTxtLineArrayMap(a_exp)[tag]);
-    }
-    if (laycon[i] == 0 || laycon[i] == 2) // write TRAN
-    {
-      tag.Format("%s%d", a_map.find(ARR_BCF_TRAN)->second, i+1);
-      a_exp->WriteLineToFile(Packages::BCF, GetTxtLineArrayMap(a_exp)[tag]);
-    }
-    if (laycon[i] == 1 || laycon[i] == 3) // write HY
-    {
-      tag.Format("%s%d", a_map.find(ARR_BCF_HY)->second, i+1);
-      a_exp->WriteLineToFile(Packages::BCF, GetTxtLineArrayMap(a_exp)[tag]);
-    }
-    if (i < (*nlay-1)) // VCONT
-    {
-      tag.Format("%s%d", a_map.find(ARR_BCF_VCONT)->second, i+1);
-      a_exp->WriteLineToFile(Packages::BCF, GetTxtLineArrayMap(a_exp)[tag]);
-    }
-    if (a_exp->AtLeastOneTransientSPExists() &&
-        (laycon[i] == 2 || laycon[i] == 3)) // write SF2
-    {
-      tag.Format("%s%d", a_map.find(ARR_BCF_SF2)->second, i+1);
-      a_exp->WriteLineToFile(Packages::BCF, GetTxtLineArrayMap(a_exp)[tag]);
-    }
-    if (*iwdflg != 0 && (laycon[i] == 1 || laycon[i] == 3)) // WETDRY
-    {
-      tag.Format("%s%d", a_map.find(ARR_BCF_WET)->second, i+1);
-      a_exp->WriteLineToFile(Packages::BCF, GetTxtLineArrayMap(a_exp)[tag]);
-    }
-  }
-} // expBCF
-//------------------------------------------------------------------------------
-/// \brief Exports part of the output control
-//------------------------------------------------------------------------------
-static void iWriteLpf_UPWOpt (const char *a_pckName,
-                              const int a_nlay,
-                              const int *a_,
-                              TxtExporter *a_exp)
-{
-  CStr line, str;
-  for (int i=0; i<a_nlay; i++)
-  {
-    str.Format("%d ", a_[i]);
-    line += str;
-  }
-  a_exp->WriteLineToFile(a_pckName, line);
-} // iWriteLpf_UPWOpt
-//------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
-static void iWriteLpf_UPWOpt (const char* a_pckName,
-                              const int a_nlay,
-                              const Real *a_,
-                              TxtExporter *a_exp)
-{
-  CStr line, str;
-  for (int i=0; i<a_nlay; i++)
-  {
-    str.Format("%s ", STR(a_[i]));
-    line += str;
-  }
-  a_exp->WriteLineToFile(a_pckName, line);
-} // iWriteLpf_UPWOpt
-//------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
-static void iWriteLPFParameters (ParamList *a_list,
-                                 TxtExporter *a_exp,
-                                 std::map<CStr, std::set<int> >& a_pUsed)
-{
-  std::set<CStr> lpfParTypes = MfExportUtil::LpfParamTypes();
-
-  Param p;
-  CStr pType, line, ln;
-  for (size_t i=0; i<a_list->Size(); i++)
-  {
-    a_list->At(i, &p);
-    pType = p.m_type;
-    pType.ToLower();
-    if (lpfParTypes.find(pType) != lpfParTypes.end())
-    {
-      CStr pname(p.m_name);
-      MfExportUtil::InsertSingleQuotesInName(pname);
-      line.Format("%s %s %s %d",
-                  pname,
-                  p.m_type,
-                  STR(p.m_value), // use m_value in case there was a SEN file with a 
-                                  // different param value than the LPF
-                  p.m_clust.size());
-      a_exp->WriteLineToFile(Packages::LPF, line);
-      for (size_t j=0; j < p.m_clust.size(); j++)
-      {
-        line.Format("%d %s %s ",
-                    p.m_clust[j].m_lay,
-                    p.m_clust[j].m_mlt,
-                    p.m_clust[j].m_zon);
-        a_pUsed[pType].insert(p.m_clust[j].m_lay);
-        for (size_t k=0; k < p.m_clust[j].m_iz.size(); k++)
-        {
-          ln.Format("%d ", p.m_clust[j].m_iz[k]);
-          line += ln;
-        }
-        a_exp->WriteLineToFile(Packages::LPF, line);
-      }
-    }
-  }
-} // iWriteLPFParameters
-//------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
-static void iWriteLPF_UPWArrays (const char *const a_pckgName,
-                                 int nlay,
-                                 std::map<CStr, std::set<int> >& a_pUsed,
-                                 const Real* chani,
-                                 const int* layvka,
-                                 const int* laytyp,
-                                 const int* laycbd,
-                                 const int* laywet,
-                                 TxtExporter *a_exp)
-{
-  // write the arrays
-  CStr tag, pack(a_pckgName);
-  std::map<CStr,CStr> &m(GetTxtLineArrayMap(a_exp));
-  for (int i=0; i<nlay; i++)
-  {
-    tag.Format("HK%d", i+1);
-    if (a_pUsed.find("hk") != a_pUsed.end() &&
-        a_pUsed["hk"].find(i+1) != a_pUsed["hk"].end())
-    {
-      a_exp->WriteLineToFile(a_pckgName, "0");
-    }
-    else
-      a_exp->WriteLineToFile(a_pckgName, m[tag]);
-    if (chani[i] <= 0)
-    {
-      tag.Format("HANI%d", i+1);
-      if (a_pUsed.find("hani") != a_pUsed.end() &&
-          a_pUsed["hani"].find(i+1) != a_pUsed["hani"].end())
-      {
-        a_exp->WriteLineToFile(a_pckgName, "0");
-      }
-      else
-        a_exp->WriteLineToFile(a_pckgName, m[tag]);
-    }
-    if (layvka[i] == 0)
-    {
-      tag.Format("VK%d", i+1);
-      if (a_pUsed.find("vk") != a_pUsed.end() &&
-          a_pUsed["vk"].find(i+1) != a_pUsed["vk"].end())
-      {
-        a_exp->WriteLineToFile(a_pckgName, "0");
-      }
-      else
-        a_exp->WriteLineToFile(a_pckgName, m[tag]);
-    }
-    else
-    {
-      tag.Format("VANI%d", i+1);
-      if (a_pUsed.find("vani") != a_pUsed.end() &&
-          a_pUsed["vani"].find(i+1) != a_pUsed["vani"].end())
-      {
-        a_exp->WriteLineToFile(a_pckgName, "0");
-      }
-      else
-        a_exp->WriteLineToFile(a_pckgName, m[tag]);
-    }
-
-    if (a_exp->AtLeastOneTransientSPExists())
-    {
-      tag.Format("SS%d", i+1);
-      if (a_pUsed.find("ss") != a_pUsed.end() &&
-          a_pUsed["ss"].find(i+1) != a_pUsed["ss"].end())
-      {
-        a_exp->WriteLineToFile(a_pckgName, "0");
-      }
-      else
-        a_exp->WriteLineToFile(a_pckgName, m[tag]);
-      if ( (pack == Packages::LPF && laytyp[i] != 0) ||
-           (pack == Packages::UPW && laytyp[i] > 0) )
-      {
-        tag.Format("SY%d", i+1);
-        if (a_pUsed.find("sy") != a_pUsed.end() &&
-            a_pUsed["sy"].find(i+1) != a_pUsed["sy"].end())
-        {
-          a_exp->WriteLineToFile(a_pckgName, "0");
-        }
-        else
-          a_exp->WriteLineToFile(a_pckgName, m[tag]);
-      }
-    }
-    if (laycbd[i] != 0) //Confining bed VK
-    {
-      tag.Format("QUASIVK%d", i+1);
-      if (a_pUsed.find("vkcb") != a_pUsed.end() &&
-          a_pUsed["vkcb"].find(i+1) != a_pUsed["vkcb"].end())
-      {
-        a_exp->WriteLineToFile(a_pckgName, "0");
-      }
-      else
-      a_exp->WriteLineToFile(a_pckgName, m[tag]);
-    }
-    if (laywet[i] != 0)
-    {
-      tag.Format("WET%d", i+1);
-      a_exp->WriteLineToFile(Packages::LPF, m[tag]);
-    }
-  }
-} // iWriteLPF_UPWArrays
-//------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
-static void expLPF (MfPackage *a_p,
-                    MfPackage *a_p1,
-                    MfPackage *a_dis,
-                    TxtExporter *a_exp)
-{
-  const Real *hdry(0), *chani(0);
-  const int  *nlay(0), *laytyp(0), *layavg(0), *layvka(0), *laywet(0),
-             *laycbd(0), *vleak(0), *mf2k5(0);
-  const int  *ISFAC(0), *ICONCV(0), *ITHFLG(0), *NOCVCO(0), *NOVFC(0);
-
-  if (!a_p->GetField(Packages::LPFpack::HDRY, &hdry) || !hdry ||
-      !a_p->GetField(Packages::LPFpack::NLAY, &nlay) || !nlay ||
-      !a_p->GetField(Packages::LPFpack::LAYTYP, &laytyp) || !laytyp ||
-      !a_p->GetField(Packages::LPFpack::LAYAVG, &layavg) || !layavg ||
-      !a_p->GetField(Packages::LPFpack::CHANI, &chani) || !chani ||
-      !a_p->GetField(Packages::LPFpack::LAYVKA, &layvka) || !layvka ||
-      !a_p->GetField(Packages::LPFpack::LAYWET, &laywet) || !laywet ||
-      !a_p->GetField(Packages::LPFpack::VERTLEAKFLAG, &vleak) || !vleak ||
-      !a_p->GetField(Packages::LPFpack::MF2K5, &mf2k5) || !mf2k5 ||
-      !a_dis->GetField(Packages::DisPack::LAYCBD, &laycbd) || !laycbd)
-   return;
-  a_p->GetField(Packages::LPFpack::ISFAC, &ISFAC);
-  a_p->GetField(Packages::LPFpack::ICONCV, &ICONCV);
-  a_p->GetField(Packages::LPFpack::ITHFLG, &ITHFLG);
-  a_p->GetField(Packages::LPFpack::NOCVCO, &NOCVCO);
-  a_p->GetField(Packages::LPFpack::NOVFC, &NOVFC);
-
-  int  i, npar(0);
-  CStr line, str;
-
-  ParamList *list;
-  Parameters::GetParameterList(&list);
-  npar = MfExportUtil::CountLpfParams(list, true);
-
-  // ILPFCB HDRY NPLPF VERTLEAKFLAG
-  line.Format("40 %s %d", STR(*hdry), npar);
-  if (!(*mf2k5))
-  {
-    CStr mystr;
-    mystr.Format(" %d", *vleak);
-    line += mystr;
-  }
-  else if ((*vleak))
-  {
-    line += " NOVFC";
-  }
-
-  if (ISFAC && *ISFAC) { line += " STORAGECOEFFICIENT"; }
-  if (ICONCV && *ICONCV) { line += " CONSTANTCV"; }
-  if (ITHFLG && *ITHFLG) { line += " THICKSTRT"; }
-  if (NOCVCO && *NOCVCO) { line += " NOCVCORRECTION"; }
-  if (NOVFC && *NOVFC) { line += " NOVFC"; }
-
-  a_exp->WriteLineToFile(Packages::LPF, line);
-  //  LAYTYP(NLAY), LAYAVG(NLAY), CHANI(NLAY), LAYVKA(NLAY), LAYWET(NLAY)
-  iWriteLpf_UPWOpt(Packages::LPF, *nlay, laytyp, a_exp);
-  iWriteLpf_UPWOpt(Packages::LPF, *nlay, layavg, a_exp);
-  iWriteLpf_UPWOpt(Packages::LPF, *nlay, chani, a_exp);
-  iWriteLpf_UPWOpt(Packages::LPF, *nlay, layvka, a_exp);
-  iWriteLpf_UPWOpt(Packages::LPF, *nlay, laywet, a_exp);
-  // [WETFCT IWETIT IHDWET]
-  line = "";
-  for (i=0; a_p1 && i<*nlay && line.empty(); i++)
-  {
-    if (laywet[i] != 0)
-    {
-      const int *iwetit(0), *ihdwet(0);
-      const Real *wetfct(0);
-      if (a_p1->GetField("WETFCT", &wetfct) && wetfct &&
-          a_p1->GetField("IWETIT", &iwetit) && iwetit &&
-          a_p1->GetField("IHDWET", &ihdwet) && ihdwet)
-      {
-        line.Format("%s %d %d", STR(*wetfct), *iwetit, *ihdwet);
-        a_exp->WriteLineToFile(Packages::LPF, line);
-      }
-    }
-  }
-  // write the parameters
-  std::map<CStr, std::set<int> > pUsed;
-  if (npar > 0)
-  {
-    iWriteLPFParameters(list, a_exp, pUsed);
-  }
-  iWriteLPF_UPWArrays(Packages::LPF, *nlay, pUsed, chani, layvka, laytyp,
-                      laycbd, laywet, a_exp);
-} // expLPF
-//------------------------------------------------------------------------------
-/// \brief Exports the HUF package
-//------------------------------------------------------------------------------
-static void expUPW (MfPackage *a_p,
-                    MfPackage *a_dis,
-                    int a_nlay,
-                    TxtExporter *a_exp)
-{
-  using namespace Packages;
-  const int* IUPWCB(0),* IPHDRY(0),* LAYTYPUPW(0),* LAYAVG(0),
-           * LAYVKAUPW(0),* LAYWET(0), * LAYCBD(0);
-  const Real* HDRY(0),* CHANI(0);
-  if (!a_p->GetField(UPWpack::IUPWCB, &IUPWCB) || !IUPWCB ||
-      !a_p->GetField(UPWpack::HDRY, &HDRY) || !HDRY ||
-      !a_p->GetField(UPWpack::IPHDRY, &IPHDRY) || !IPHDRY ||
-      !a_p->GetField(UPWpack::LAYTYPUPW, &LAYTYPUPW) || !LAYTYPUPW ||
-      !a_p->GetField(UPWpack::LAYAVG, &LAYAVG) || !LAYAVG ||
-      !a_p->GetField(UPWpack::CHANI, &CHANI) || !CHANI ||
-      !a_p->GetField(UPWpack::LAYVKAUPW, &LAYVKAUPW) || !LAYVKAUPW ||
-      !a_p->GetField(UPWpack::LAYWET, &LAYWET) || !LAYWET ||
-      !a_dis->GetField(Packages::DisPack::LAYCBD, &LAYCBD) || !LAYCBD)
-  {
-    return;
-  }
-
-  ParamList *list;
-  Parameters::GetParameterList(&list);
-  int npar = MfExportUtil::CountLpfParams(list, true);
-
-  // IUPWCB HDRY NPUPW IPHDRY
-  CStr line;
-  line.Format("%d %s %d %d", *IUPWCB, STR(*HDRY), npar, *IPHDRY);
-  a_exp->WriteLineToFile(Packages::UPW, line);
-  //  LAYTYPUPW(NLAY), LAYAVG(NLAY), CHANI(NLAY), LAYVKAUPW(NLAY), LAYWET(NLAY)
-  iWriteLpf_UPWOpt(Packages::UPW, a_nlay, LAYTYPUPW, a_exp);
-  iWriteLpf_UPWOpt(Packages::UPW, a_nlay, LAYAVG, a_exp);
-  iWriteLpf_UPWOpt(Packages::UPW, a_nlay, CHANI, a_exp);
-  iWriteLpf_UPWOpt(Packages::UPW, a_nlay, LAYVKAUPW, a_exp);
-  iWriteLpf_UPWOpt(Packages::UPW, a_nlay, LAYWET, a_exp);
-  // write the parameters
-  std::map<CStr, std::set<int> > pUsed;
-  if (npar > 0)
-  {
-    iWriteLPFParameters(list, a_exp, pUsed);
-  }
-  std::vector<int> laywet(a_nlay, 0);
-  iWriteLPF_UPWArrays(Packages::UPW, a_nlay, pUsed, CHANI, LAYVKAUPW, LAYTYPUPW,
-                      LAYCBD, &laywet[0], a_exp);
-} // expUPW
 //------------------------------------------------------------------------------
 /// \brief Exports the HUF package
 //------------------------------------------------------------------------------
@@ -8794,82 +8230,6 @@ void ExpGmsH5T::testexpNameFile ()
   TS_ASSERT(!remove(gcgFile));
 }
 //------------------------------------------------------------------------------
-void ExpGmsH5T::testexpDisFile ()
-{
-  using namespace Packages;
-  MfGlobal g(10, 15, 3, 2, 3, 2, 0);
-  MfPackage p(Packages::DIS);
-  TxtExporter t(TESTBASE), t1(TESTBASE);
-
-  int laycbd[3]={1,1,0},
-      nstps[2]={50,60},
-      issFlag[2]={1,0};
-  p.SetField("LAYCBD", laycbd);
-  Real delr[15]={1,2,3,4,5,6,7,8,9,0,1,2,3,4,5},
-       delc[10]={0,9,8,7,6,5,4,3,2,1},
-       perLen[2]={5,6},
-       tsMult[2]={7,8};
-  p.SetField(DisPack::DELR, delr);
-  p.SetField(DisPack::DELC, delc);
-  p.SetField(DisPack::PERLEN, perLen);
-  p.SetField(DisPack::TSMULT, tsMult);
-  p.SetField(DisPack::NSTP, nstps);
-  p.SetField(DisPack::ISSFLG, issFlag);
-  GetTxtLineArrayMap(&t).insert(std::make_pair("top1", "sometext0"));
-  GetTxtLineArrayMap(&t).insert(std::make_pair("bot1", "sometext1"));
-  GetTxtLineArrayMap(&t).insert(std::make_pair("vcb1", "vcb_sometext1"));
-  GetTxtLineArrayMap(&t).insert(std::make_pair("bot2", "sometext2"));
-  GetTxtLineArrayMap(&t).insert(std::make_pair("vcb2", "vcb_sometext2"));
-  GetTxtLineArrayMap(&t).insert(std::make_pair("bot3", "sometext3"));
-
-  expDisFile(&g, &p, &t);
-
-  CStr str, str1;
-  str = "3 10 15 2 3 2\n"
-        "1 1 0 \n"
-        "INTERNAL 1.0 (free) -1 # DELR\n"
-        "1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 0.0 1.0 2.0 3.0 4.0 5.0 \n"
-        "INTERNAL 1.0 (free) -1 # DELC\n"
-        "0.0 9.0 8.0 7.0 6.0 5.0 4.0 3.0 2.0 1.0 \n"
-        "sometext0\n"
-        "sometext1\n"
-        "vcb_sometext1\n"
-        "sometext2\n"
-        "vcb_sometext2\n"
-        "sometext3\n"
-        "5.0 50 7.0 Ss\n"
-        "6.0 60 8.0 Tr\n";
-  t.GetFileContents(Packages::DIS, str1);
-  TS_ASSERT_EQUALS2(str1, str);
-
-  for (int i=0; i<15; i++)
-    delr[i] = (Real)5.2;
-  for (int i=0; i<10; i++)
-    delc[i] = 2.5;
-  GetTxtLineArrayMap(&t1).insert(std::make_pair("top1", "sometext0"));
-  GetTxtLineArrayMap(&t1).insert(std::make_pair("bot1", "sometext1"));
-  GetTxtLineArrayMap(&t1).insert(std::make_pair("vcb1", "vcb_sometext1"));
-  GetTxtLineArrayMap(&t1).insert(std::make_pair("bot2", "sometext2"));
-  GetTxtLineArrayMap(&t1).insert(std::make_pair("vcb2", "vcb_sometext2"));
-  GetTxtLineArrayMap(&t1).insert(std::make_pair("bot3", "sometext3"));
-  expDisFile(&g, &p, &t1);
-  str = "3 10 15 2 3 2\n"
-        "1 1 0 \n"
-        "CONSTANT 5.2 # DELR\n"
-        "CONSTANT 2.5 # DELC\n"
-        "sometext0\n"
-        "sometext1\n"
-        "vcb_sometext1\n"
-        "sometext2\n"
-        "vcb_sometext2\n"
-        "sometext3\n"
-        "5.0 50 7.0 Ss\n"
-        "6.0 60 8.0 Tr\n";
-  str1 = "";
-  t1.GetFileContents(Packages::DIS, str1);
-  TS_ASSERT_EQUALS2(str1, str);
-}
-//------------------------------------------------------------------------------
 void ExpGmsH5T::testGetArrayMap ()
 {
   ExpGmsH5 ex;
@@ -10499,366 +9859,6 @@ static void iFillMap_BCF_Test (TxtExporter* a_exp)
   m.insert(std::make_pair("WET_1", "w1"));
   m.insert(std::make_pair("WET_2", "w2"));
   m.insert(std::make_pair("WET_3", "w3"));
-}
-//------------------------------------------------------------------------------
-void ExpGmsH5T::testexpBCF ()
-{
-  using namespace Packages;
-  MfGlobal g(10, 15, 3, 2, 3, 2, 0);
-  MfPackage p(Packages::BCF);
-
-
-  Real hdry(-888), wetfct(1), trpy[3]={(Real)1.1,(Real)1.2,(Real)1.3};
-  int  nlay(3), iwdflg(0), iwetit(1), ihdwet(0),
-       layavg[3]={0,1,0},
-       laycon[3]={1,2,3};
-  CStr cStr, str;
-  {
-    ExpGmsH5 h5;
-    TxtExporter t(TESTBASE);
-    t.AtLeastOneTransientSPExists() = false;
-    iFillMap_BCF_Test(&t);
-
-    expBCF(&p, &t, h5.GetMapArrays());
-    t.GetFileContents(Packages::BCF, cStr);
-    TS_ASSERT(cStr.empty());
-
-    p.SetField(Packages::BCFpack::HDRY, &hdry);
-    p.SetField(Packages::BCFpack::WETFCT, &wetfct);
-    p.SetField(Packages::BCFpack::TRPY, trpy);
-    p.SetField(Packages::BCFpack::IWDFLG, &iwdflg);
-    p.SetField(Packages::BCFpack::IWETIT, &iwetit);
-    p.SetField(Packages::BCFpack::IHDWET, &ihdwet);
-    p.SetField(Packages::BCFpack::LAYAVG, layavg);
-    p.SetField(Packages::BCFpack::LAYCON, laycon);
-    p.SetField(Packages::BCFpack::NLAY, &nlay);
-
-    expBCF(&p, &t, h5.GetMapArrays());
-
-    str = "40 -888.0 0 1.0 1 0\n"
-          "01 12 03 \n"
-          "Internal 1.0 (free) -1\n"
-          "1.1 1.2 1.3 \n"
-          "h1\n"
-          "l1\n"
-          "t2\n"
-          "l2\n"
-          "h3\n";
-    t.GetFileContents(Packages::BCF, cStr);
-    TS_ASSERT_EQUALS2(str, cStr);
-  }
-
-  {
-    iwdflg = 1;
-    iwetit = 2;
-    ihdwet = 2;
-
-    ExpGmsH5 h5;
-    TxtExporter t(TESTBASE);
-    t.AtLeastOneTransientSPExists() = true;
-    iFillMap_BCF_Test(&t);
-
-    expBCF(&p, &t, h5.GetMapArrays());
-    str = "40 -888.0 1 1.0 2 2\n"
-          "01 12 03 \n"
-          "Internal 1.0 (free) -1\n"
-          "1.1 1.2 1.3 \n"
-          "sf11\n"
-          "h1\n"
-          "l1\n"
-          "w1\n"
-          "sf12\n"
-          "t2\n"
-          "l2\n"
-          "sf22\n"
-          "sf13\n"
-          "h3\n"
-          "sf23\n"
-          "w3\n";
-    t.GetFileContents(Packages::BCF, cStr);
-    TS_ASSERT_EQUALS2(str, cStr);
-  }
-
-  {
-    ExpGmsH5 h5;
-    TxtExporter t(TESTBASE);
-    iFillMap_BCF_Test(&t);
-    t.AtLeastOneTransientSPExists() = false;
-    iwdflg = 0;
-    nlay = 41;
-    int laycon1[41] = { 1,1,1,1,1,1,1,1,1,1,
-                        1,1,1,1,1,1,1,1,1,1,
-                        1,1,1,1,1,1,1,1,1,1,
-                        1,1,1,1,1,1,1,1,1,1,1};
-    int layavg1[41] = { 0,0,0,0,0,0,0,0,0,0,
-                        0,0,0,0,0,0,0,0,0,0,
-                        0,0,0,0,0,0,0,0,0,0,
-                        0,0,0,0,0,0,0,0,0,0,0};
-    Real trpy1[41]= {1,1,1,1,1,1,1,1,1,1,
-                     1,1,1,1,1,1,1,1,1,1,
-                     1,1,1,1,1,1,1,1,1,1,
-                     1,1,1,1,1,1,1,1,1,1,1};
-    p.SetField(Packages::BCFpack::LAYAVG, layavg1);
-    p.SetField(Packages::BCFpack::LAYCON, laycon1);
-    p.SetField(Packages::BCFpack::TRPY, trpy1);
-
-    expBCF(&p, &t, h5.GetMapArrays());
-    str = "40 -888.0 0 1.0 2 2\n"
-          "01 01 01 01 01 01 01 01 01 01 "
-          "01 01 01 01 01 01 01 01 01 01 "
-          "01 01 01 01 01 01 \n"
-          "01 01 01 01 01 01 01 01 01 01 "
-          "01 01 01 01 01 \n"
-          "Internal 1.0 (free) -1\n"
-          "1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 "
-          "1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 "
-          "1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 "
-          "1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 "
-          "1.0 \n"
-          "h1\n"
-          "l1\n"
-          "h2\n"
-          "l2\n"
-          "h3\n"
-          "l3\n" // layer 3
-          "\n\n\n\n\n\n\n\n\n\n" //10 lines - layer 8
-          "\n\n\n\n\n\n\n\n\n\n" //10 lines - layer 13
-          "\n\n\n\n\n\n\n\n\n\n" //10 lines - layer 18
-          "\n\n\n\n\n\n\n\n\n\n" //10 lines - layer 23
-          "\n\n\n\n\n\n\n\n\n\n" //10 lines - layer 28
-          "\n\n\n\n\n\n\n\n\n\n" //10 lines - layer 33
-          "\n\n\n\n\n\n\n\n\n\n" //10 lines - layer 38
-          "\n\n\n\n\n"; //5 lines - layer 41
-    t.GetFileContents(Packages::BCF, cStr);
-    TS_ASSERT_EQUALS2(str, cStr);
-  }
-}
-static void iFillMap_LPF_Test (TxtExporter* a_exp)
-{
-  std::map<CStr,CStr> &m(GetTxtLineArrayMap(a_exp));
-  m.insert(std::make_pair("HK1", "h1"));
-  m.insert(std::make_pair("HK2", "h2"));
-  m.insert(std::make_pair("HK3", "h3"));
-  m.insert(std::make_pair("HANI1", "ha1"));
-  m.insert(std::make_pair("HANI2", "ha2"));
-  m.insert(std::make_pair("HANI3", "ha3"));
-  m.insert(std::make_pair("VK1", "v1"));
-  m.insert(std::make_pair("VK2", "v2"));
-  m.insert(std::make_pair("VK3", "v3"));
-  m.insert(std::make_pair("VANI1", "va1"));
-  m.insert(std::make_pair("VANI2", "va2"));
-  m.insert(std::make_pair("VANI3", "va3"));
-  m.insert(std::make_pair("SS1", "ss1"));
-  m.insert(std::make_pair("SS2", "ss2"));
-  m.insert(std::make_pair("SS3", "ss3"));
-  m.insert(std::make_pair("SY1", "sy1"));
-  m.insert(std::make_pair("SY2", "sy2"));
-  m.insert(std::make_pair("SY3", "sy3"));
-  m.insert(std::make_pair("WET1", "w1"));
-  m.insert(std::make_pair("WET2", "w2"));
-  m.insert(std::make_pair("WET3", "w3"));
-  m.insert(std::make_pair("QUASIVK1", "q1"));
-  m.insert(std::make_pair("QUASIVK2", "q2"));
-  m.insert(std::make_pair("QUASIVK3", "q3"));
-}
-//------------------------------------------------------------------------------
-void ExpGmsH5T::testexpLPF ()
-{
-  MfPackage p(Packages::LPF);
-  MfPackage p1("L99");
-  MfPackage p2(Packages::DIS);
-
-  const int iwetit(1), ihdwet(0);
-  const Real wetfct(1.0);
-  const Real hdry(-888), chani[3]={0,-1,1};
-  const int  nlay(3), laytyp[3]={0,-1,1}, layavg[3]={0,1,2}, layvka[3]={0,1,3},
-             laywet[3]={0,1,0}, laycbd[3]={0,1,0}, vleak(0), mf2k5(0);
-  MfGlobal g(10, 15, 3, 2, 3, 2, laycbd);
-  CStr cStr, str;
-  {
-    TxtExporter t(TESTBASE);
-    iFillMap_LPF_Test(&t);
-    t.AtLeastOneTransientSPExists() = false;
-
-    expLPF(&p, &p1, &p2, &t);
-    t.GetFileContents(Packages::BCF, cStr);
-    TS_ASSERT(cStr.empty());
-
-    p.SetField(Packages::LPFpack::HDRY, &hdry);
-    p.SetField(Packages::LPFpack::NLAY, &nlay);
-    p.SetField(Packages::LPFpack::LAYTYP, laytyp);
-    p.SetField(Packages::LPFpack::LAYAVG, layavg);
-    p.SetField(Packages::LPFpack::CHANI, chani);
-    p.SetField(Packages::LPFpack::LAYVKA, layvka);
-    p.SetField(Packages::LPFpack::LAYWET, laywet);
-    p.SetField(Packages::LPFpack::VERTLEAKFLAG, &vleak);
-    p.SetField(Packages::LPFpack::MF2K5, &mf2k5);
-    p2.SetField(Packages::DisPack::LAYCBD, laycbd);
-    p1.SetField("WETFCT", &wetfct);
-    p1.SetField("IWETIT", &iwetit);
-    p1.SetField("IHDWET", &ihdwet);
-
-    expLPF(&p, &p1, &p2, &t);
-
-    str = "40 -888.0 0 0\n"
-          "0 -1 1 \n"
-          "0 1 2 \n"
-          "0.0 -1.0 1.0 \n"
-          "0 1 3 \n"
-          "0 1 0 \n"
-          "1.0 1 0\n"
-          "h1\n"
-          "ha1\n"
-          "v1\n"
-          "h2\n"
-          "ha2\n"
-          "va2\n"
-          "q2\n"
-          "w2\n"
-          "h3\n"
-          "va3\n";
-
-    t.GetFileContents(Packages::LPF, cStr);
-    TS_ASSERT_EQUALS2(str, cStr);
-  }
-  {
-    TxtExporter t(TESTBASE);
-    iFillMap_LPF_Test(&t);
-    t.AtLeastOneTransientSPExists() = true;
-    expLPF(&p, &p1, &p2, &t);
-    str = "40 -888.0 0 0\n"
-          "0 -1 1 \n"
-          "0 1 2 \n"
-          "0.0 -1.0 1.0 \n"
-          "0 1 3 \n"
-          "0 1 0 \n"
-          "1.0 1 0\n"
-          "h1\n"
-          "ha1\n"
-          "v1\n"
-          "ss1\n"
-          "h2\n"
-          "ha2\n"
-          "va2\n"
-          "ss2\n"
-          "sy2\n"
-          "q2\n"
-          "w2\n"
-          "h3\n"
-          "va3\n"
-          "ss3\n"
-          "sy3\n";
-
-    t.GetFileContents(Packages::LPF, cStr);
-    TS_ASSERT_EQUALS2(str, cStr);
-  }
-}
-static void iFillMap_UPW_Test (TxtExporter* a_exp)
-{
-  std::map<CStr,CStr> &m(GetTxtLineArrayMap(a_exp));
-  m.insert(std::make_pair("HK1", "h1"));
-  m.insert(std::make_pair("HK2", "h2"));
-  m.insert(std::make_pair("HK3", "h3"));
-  m.insert(std::make_pair("HANI1", "ha1"));
-  m.insert(std::make_pair("HANI2", "ha2"));
-  m.insert(std::make_pair("HANI3", "ha3"));
-  m.insert(std::make_pair("VK1", "v1"));
-  m.insert(std::make_pair("VK2", "v2"));
-  m.insert(std::make_pair("VK3", "v3"));
-  m.insert(std::make_pair("VANI1", "va1"));
-  m.insert(std::make_pair("VANI2", "va2"));
-  m.insert(std::make_pair("VANI3", "va3"));
-  m.insert(std::make_pair("SS1", "ss1"));
-  m.insert(std::make_pair("SS2", "ss2"));
-  m.insert(std::make_pair("SS3", "ss3"));
-  m.insert(std::make_pair("SY1", "sy1"));
-  m.insert(std::make_pair("SY2", "sy2"));
-  m.insert(std::make_pair("SY3", "sy3"));
-}
-//------------------------------------------------------------------------------
-void ExpGmsH5T::testexpUPW ()
-{
-  MfPackage p(Packages::UPW);
-  MfPackage dis(Packages::DIS);
-
-  const int NLAY(3);
-  const int IUPWCB(22),
-            IPHDRY(0),
-            LAYTYPUPW[NLAY]={0,5,-8},
-            LAYAVG[NLAY]={0,1,2},
-            LAYVKAUPW[NLAY]={-3,0,3},
-            LAYWET[NLAY]={0,0,0},
-            LAYCBD[NLAY]={0,0,0};
-  const Real HDRY(-55),
-             CHANI[NLAY]={-2,0,(Real)3.2};
-  CStr cStr, str;
-  {
-    TxtExporter t(TESTBASE);
-    iFillMap_UPW_Test(&t);
-    t.AtLeastOneTransientSPExists() = false;
-
-    expUPW(&p, &dis, NLAY, &t);
-    t.GetFileContents(Packages::UPW, cStr);
-    TS_ASSERT(cStr.empty());
-
-    p.SetField(Packages::UPWpack::IUPWCB, &IUPWCB);
-    p.SetField(Packages::UPWpack::IPHDRY, &IPHDRY);
-    p.SetField(Packages::UPWpack::LAYTYPUPW, LAYTYPUPW);
-    p.SetField(Packages::UPWpack::LAYAVG, LAYAVG);
-    p.SetField(Packages::UPWpack::LAYAVG, LAYAVG);
-    p.SetField(Packages::UPWpack::LAYVKAUPW, LAYVKAUPW);
-    p.SetField(Packages::UPWpack::LAYWET, LAYWET);
-    p.SetField(Packages::UPWpack::HDRY, &HDRY);
-    p.SetField(Packages::UPWpack::CHANI, CHANI);
-    dis.SetField(Packages::DisPack::LAYCBD, LAYCBD);
-
-    expUPW(&p, &dis, NLAY, &t);
-
-    str = "22 -55.0 0 0\n"
-          "0 5 -8 \n"
-          "0 1 2 \n"
-          "-2.0 0.0 3.2 \n"
-          "-3 0 3 \n"
-          "0 0 0 \n"
-          "h1\n"
-          "ha1\n"
-          "va1\n"
-          "h2\n"
-          "ha2\n"
-          "v2\n"
-          "h3\n"
-          "va3\n";
-
-    t.GetFileContents(Packages::UPW, cStr);
-    TS_ASSERT_EQUALS2(str, cStr);
-  }
-  {
-    TxtExporter t(TESTBASE);
-    iFillMap_UPW_Test(&t);
-    t.AtLeastOneTransientSPExists() = true;
-    expUPW(&p, &dis, NLAY, &t);
-    str = "22 -55.0 0 0\n"
-          "0 5 -8 \n"
-          "0 1 2 \n"
-          "-2.0 0.0 3.2 \n"
-          "-3 0 3 \n"
-          "0 0 0 \n"
-          "h1\n"
-          "ha1\n"
-          "va1\n"
-          "ss1\n"
-          "h2\n"
-          "ha2\n"
-          "v2\n"
-          "ss2\n"
-          "sy2\n"
-          "h3\n"
-          "va3\n"
-          "ss3\n";
-
-    t.GetFileContents(Packages::UPW, cStr);
-    TS_ASSERT_EQUALS2(str, cStr);
-  }
 }
 //------------------------------------------------------------------------------
 void ExpGmsH5T::testexpHFB ()
@@ -14470,110 +13470,6 @@ static void iTestMakePar (ParamList *list)
     p.m_clust.push_back(pc);
     list->PushBack(&p);
   }
-}
-void ExpGmsH5T::testexpLPFWithParam ()
-{
-  ParamList *list(0);
-  Parameters::GetParameterList(&list);
-  list->Clear();
-  iTestMakePar(list);
-
-  MfPackage p(Packages::LPF);
-  MfPackage p1("L99");
-  MfPackage p2(Packages::DIS);
-  MfGlobal g(10, 15, 3, 2, 3, 2, 0);
-
-  const int iwetit(1), ihdwet(0);
-  const Real wetfct(1.0);
-  const Real hdry(-888), chani[3]={0,-1,1};
-  const int  nlay(3), laytyp[3]={0,-1,1}, layavg[3]={0,1,2}, layvka[3]={0,1,3},
-             laywet[3]={0,1,0}, laycbd[3]={0,1,0}, vleak(0), mf2k5(0);
-  CStr cStr, str;
-  {
-    p.SetField(Packages::LPFpack::HDRY, &hdry);
-    p.SetField(Packages::LPFpack::NLAY, &nlay);
-    p.SetField(Packages::LPFpack::LAYTYP, laytyp);
-    p.SetField(Packages::LPFpack::LAYAVG, layavg);
-    p.SetField(Packages::LPFpack::CHANI, chani);
-    p.SetField(Packages::LPFpack::LAYVKA, layvka);
-    p.SetField(Packages::LPFpack::LAYWET, laywet);
-    p.SetField(Packages::LPFpack::VERTLEAKFLAG, &vleak);
-    p.SetField(Packages::LPFpack::MF2K5, &mf2k5);
-    p2.SetField(Packages::DisPack::LAYCBD, laycbd);
-    p1.SetField("WETFCT", &wetfct);
-    p1.SetField("IWETIT", &iwetit);
-    p1.SetField("IHDWET", &ihdwet);
-
-    TxtExporter t(TESTBASE);
-    t.AtLeastOneTransientSPExists() = true;
-    std::map<CStr,CStr> &m(GetTxtLineArrayMap(&t));
-    //m.insert(std::make_pair("HK1", "h1"));
-    //m.insert(std::make_pair("HK2", "h2"));
-    m.insert(std::make_pair("HK3", "h3"));
-    m.insert(std::make_pair("HANI1", "ha1"));
-    //m.insert(std::make_pair("HANI2", "ha2"));
-    m.insert(std::make_pair("HANI3", "ha3"));
-    //m.insert(std::make_pair("VK1", "v1"));
-    m.insert(std::make_pair("VK2", "v2"));
-    m.insert(std::make_pair("VK3", "v3"));
-    m.insert(std::make_pair("VANI1", "va1"));
-    m.insert(std::make_pair("VANI2", "va2"));
-    m.insert(std::make_pair("VANI3", "va3"));
-    m.insert(std::make_pair("SS1", "ss1"));
-    //m.insert(std::make_pair("SS2", "ss2"));
-    //m.insert(std::make_pair("SS3", "ss3"));
-    m.insert(std::make_pair("SY1", "sy1"));
-    m.insert(std::make_pair("SY2", "sy2"));
-    m.insert(std::make_pair("SY3", "sy3"));
-    m.insert(std::make_pair("WET1", "w1"));
-    m.insert(std::make_pair("WET2", "w2"));
-    m.insert(std::make_pair("WET3", "w3"));
-    m.insert(std::make_pair("QUASIVK1", "q1"));
-    m.insert(std::make_pair("QUASIVK2", "q2"));
-    m.insert(std::make_pair("QUASIVK3", "q3"));
-
-    expLPF(&p, &p1, &p2, &t);
-    str = "40 -888.0 6 0\n"
-          "0 -1 1 \n"
-          "0 1 2 \n"
-          "0.0 -1.0 1.0 \n"
-          "0 1 3 \n"
-          "0 1 0 \n"
-          "1.0 1 0\n"
-          "p1 hk 5.0 1\n"
-          "1 m1 z1 2 3 \n"
-          "p3 hk 6.0 2\n"
-          "1 m4 z4 5 \n"
-          "2 m2 z4 5 \n"
-          "p4 ss 6.0 2\n"
-          "3 m3 z2 5 \n"
-          "2 m2 z2 5 8 \n"
-          "vk5 vk 2.0 1\n"
-          "1 m3 z2 5 \n"
-          "hani6 hani 3.0 1\n"
-          "2 m3 z2 2 \n"
-          "sy7 sy 4.0 1\n"
-          "3 m3 z2 2 \n"
-          "0\n"
-          "ha1\n"
-          "0\n"
-          "ss1\n"
-          "0\n"
-          "0\n"
-          "va2\n"
-          "0\n"
-          "sy2\n"
-          "q2\n"
-          "w2\n"
-          "h3\n"
-          "va3\n"
-          "0\n"
-          "0\n";
-
-    t.GetFileContents(Packages::LPF, cStr);
-    TS_ASSERT_EQUALS2(str, cStr);
-  }
-  list->Clear();
 }
 //------------------------------------------------------------------------------
 void ExpGmsH5T::testiWriteHufLine1to5 ()

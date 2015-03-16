@@ -242,6 +242,21 @@ std::vector<Param> MfExportUtil::GetParamsOfType (const char * const a_type)
   }
   return params;
 } // MfExportUtil::GetParamsOfType
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+bool MfExportUtil::ArrayWriteNextLineInternal (
+  Mf2kNative* a_native
+, const CStr& a_line)
+{
+  if (a_native->GetArraysInternal() &&
+      a_line.Find("CONSTANT") == -1 &&
+      a_line.Find("HDF5 ") == -1)
+  {
+    return true;
+  }
+  return false;
+} // bool MfExportUtil::ArrayWriteNextLineInternal
 
 ///////////////////////////////////////////////////////////////////////////////
 // TESTS
