@@ -9838,28 +9838,6 @@ void ExpGmsH5T::testGetMultiDimArrayIndex ()
   iArrayCountMap(&t).clear();
   TS_ASSERT_EQUALS(0, GetMultiDimArrayIndex(str, &t));
 }
-static void iFillMap_BCF_Test (TxtExporter* a_exp)
-{
-  std::map<CStr,CStr> &m(GetTxtLineArrayMap(a_exp));
-  m.insert(std::make_pair("HY_1", "h1"));
-  m.insert(std::make_pair("HY_2", "h2"));
-  m.insert(std::make_pair("HY_3", "h3"));
-  m.insert(std::make_pair("TRAN_1", "t1"));
-  m.insert(std::make_pair("TRAN_2", "t2"));
-  m.insert(std::make_pair("TRAN_3", "t3"));
-  m.insert(std::make_pair("LEAK_1", "l1"));
-  m.insert(std::make_pair("LEAK_2", "l2"));
-  m.insert(std::make_pair("LEAK_3", "l3"));
-  m.insert(std::make_pair("SF1_1", "sf11"));
-  m.insert(std::make_pair("SF1_2", "sf12"));
-  m.insert(std::make_pair("SF1_3", "sf13"));
-  m.insert(std::make_pair("SF2_1", "sf21"));
-  m.insert(std::make_pair("SF2_2", "sf22"));
-  m.insert(std::make_pair("SF2_3", "sf23"));
-  m.insert(std::make_pair("WET_1", "w1"));
-  m.insert(std::make_pair("WET_2", "w2"));
-  m.insert(std::make_pair("WET_3", "w3"));
-}
 //------------------------------------------------------------------------------
 void ExpGmsH5T::testexpHFB ()
 {
@@ -13349,63 +13327,6 @@ void ExpGmsH5T::testiCountLPFParams ()
   npar = MfExportUtil::CountLpfParams(list, true);
   TS_ASSERT_EQUALS(npar, 7);
 
-  list->Clear();
-}
-//------------------------------------------------------------------------------
-void ExpGmsH5T::testiWriteLPFParameters ()
-{
-  ParamList *list(0);
-  Parameters::GetParameterList(&list);
-  list->Clear();
-
-  {
-    PClust pc("m1", "z1", 1);
-    pc.m_iz.push_back(2);
-    pc.m_iz.push_back(3);
-    Param p("p1", -1, "hk", 5);
-    p.m_clust.push_back(pc);
-    pc.m_mlt = "m2";
-    p.m_clust.push_back(pc);
-    list->PushBack(&p);
-  }
-  {
-    PClust pc("m4", "z4", 4);
-    pc.m_iz.push_back(5);
-    Param p("p3", -3, "hk", 6);
-    p.m_clust.push_back(pc);
-    pc.m_lay = 2;
-    pc.m_mlt = "m2";
-    p.m_clust.push_back(pc);
-    pc.m_lay = 4;
-    pc.m_zon = "z5";
-    pc.m_iz.push_back(8);
-    p.m_clust.push_back(pc);
-    list->PushBack(&p);
-  }
-
-  CStr f, output, line;
-  util::GetTempDirectory(f);
-  f += "\\parameters.mfs";
-  {
-    std::map<CStr, std::set<int> > pUsed;
-    TxtExporter t(f);
-    iWriteLPFParameters(list, &t, pUsed);
-    CStr out;
-    t.GetFileContents(Packages::LPF, out);
-    CStr base("p1 hk 5.0 2\n"
-              "1 m1 z1 2 3 \n"
-              "1 m2 z1 2 3 \n"
-              "p3 hk 6.0 3\n"
-              "4 m4 z4 5 \n"
-              "2 m2 z4 5 \n"
-              "4 m2 z5 5 8 \n");
-    TS_ASSERT_EQUALS2(base, out);
-    TS_ASSERT(pUsed.size() == 1);
-    TS_ASSERT(pUsed.find("hk") != pUsed.end());
-    TS_ASSERT(pUsed["hk"].find(1) != pUsed["hk"].end());
-    TS_ASSERT(pUsed["hk"].find(2) != pUsed["hk"].end());
-    TS_ASSERT(pUsed["hk"].find(4) != pUsed["hk"].end());
-  }
   list->Clear();
 }
 //------------------------------------------------------------------------------

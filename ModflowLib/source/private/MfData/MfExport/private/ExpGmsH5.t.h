@@ -53,7 +53,6 @@ public:
   void testexpParamFile();
   void testiGetLPFParamTypes();
   void testiCountLPFParams();
-  void testiWriteLPFParameters();
   void testiWriteHufLine1to5();
   void testiWriteHGUs();
   void testiGetHUFParamTypes();
