@@ -722,7 +722,6 @@ static bool iArrayToNative (const CStr& a_, MfGlobal* a_global)
            || ARR_BCF_VCONT == a_
            || ARR_BCF_SF1 == a_
            || ARR_BCF_SF2 == a_
-           || ARR_BCF_WET == a_
            || ARR_BCF_TRPY == a_
            || ARR_LPF_HK == a_
            || ARR_LPF_HANI == a_
@@ -730,13 +729,23 @@ static bool iArrayToNative (const CStr& a_, MfGlobal* a_global)
            || ARR_LPF_VANI == a_
            || ARR_LPF_SS == a_
            || ARR_LPF_SY == a_
-           || ARR_LPF_WET == a_
            || ARR_LPF_VKCBD == a_
            || ARR_LPF_ANGX == a_
            )
   {
     NativeUtil::ExportNextToH5();
     rval = true;
+  }
+  else if (   ARR_BCF_WET == a_
+           || ARR_LPF_WET == a_
+           )
+  {
+    if (a_global->GetPackage(Packages::LPF) || 
+        a_global->GetPackage(Packages::BCF) )
+    {
+      NativeUtil::ExportNextToH5();
+      rval = true;
+    }
   }
   return rval;
 } // iArrayToNative
