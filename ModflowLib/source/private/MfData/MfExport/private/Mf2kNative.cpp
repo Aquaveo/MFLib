@@ -25,6 +25,7 @@ MfData::Export::Mf2kNative::Mf2kNative () :
   MfExporterImpl("mf2knative")
 , m_arraysInFolder(false)
 , m_arraysInternal(false)
+, m_StpPackFlag(false)
 {
 } // Mf2kNative::Mf2kNative
 //------------------------------------------------------------------------------

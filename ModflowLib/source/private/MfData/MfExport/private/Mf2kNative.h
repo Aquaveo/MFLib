@@ -23,6 +23,9 @@ namespace MfData
       bool GetArraysInFolder() const {return m_arraysInFolder;}
       void SetArraysInternal(bool a_);
       bool GetArraysInternal() const {return m_arraysInternal;}
+
+      // this is temporary
+      bool& StpFlag() { return m_StpPackFlag; }
 #pragma warning(disable : 4100)
       //virtual bool ExportArray(MfGlobal *a_global,
       //                         MfPackage *a_package) {return false;}
@@ -33,6 +36,7 @@ namespace MfData
 
       bool m_arraysInFolder;
       bool m_arraysInternal;
+      bool m_StpPackFlag;
     };
   }
 }
