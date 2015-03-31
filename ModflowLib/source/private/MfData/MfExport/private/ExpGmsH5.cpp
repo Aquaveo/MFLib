@@ -2116,8 +2116,18 @@ static void expMultArrayFunc (MfPackage* a_package,
   CStr cName("m");
   cName += name;
 
-  MultArrayMap(a_exp).insert(std::make_pair(cName, func));
-  GetArrayOrderVector(a_exp).push_back(cName);
+  std::vector<CStr>& v = GetArrayOrderVector(a_exp);
+  std::map<CStr, CStr>& m = MultArrayMap(a_exp);
+  if (m.find(cName) == m.end())
+  {
+    m.insert(std::make_pair(cName, func));
+    v.push_back(cName);
+  }
+  else
+  {
+    // ignore and don't export any duplicates
+    // MODFLOW takes first MULT item found
+  }
 } // expMultArrayFunc
 //------------------------------------------------------------------------------
 /// \brief Exports the multiplier file
