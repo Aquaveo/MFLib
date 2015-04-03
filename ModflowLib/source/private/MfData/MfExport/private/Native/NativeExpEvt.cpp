@@ -9,6 +9,7 @@
 
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
+#include <private\MfData\MfExport\private\Native\H5UseLastWriter.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
@@ -97,6 +98,17 @@ void NativeExpEvt::Line5 ()
   CStr ln;
   ln.Format("%5d %5d %5d %5d", *insurf, *inevtr, *inexdp, ievt);
   AddToStoredLinesDesc(ln, " 5. INSURF INEVTR INEXDP INIEVT");
+  if (GetNative()->GetArealUseLastToh5())
+  {
+    std::vector<int> vDat(4,0);
+    vDat[0] = *insurf < 0 ? 1 : 0;
+    vDat[1] = *inevtr < 0 ? 1 : 0;
+    vDat[2] = *inexdp < 0 ? 1 : 0;
+    if (*nevtop == 2)
+      vDat[3] = *inievt < 0 ? 1: 0;
+    H5UseLastWriter w(this);
+    w.WriteData(vDat);
+  }
 } // NativeExpEvt::Line5
 //------------------------------------------------------------------------------
 /// \brief

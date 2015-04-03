@@ -307,7 +307,10 @@
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpSwi.cpp">
       <Filter>source\private\MfData\MfExport\private\Native</Filter>
     </ClCompile>
-    <ClCompile Include="source\private\MfData\MfExport\private\Native\ArrToh5.cpp">
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\H5ArrayWriter.cpp">
+      <Filter>source\private\MfData\MfExport\private\Native</Filter>
+    </ClCompile>
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\H5UseLastWriter.cpp">
       <Filter>source\private\MfData\MfExport\private\Native</Filter>
     </ClCompile>
   </ItemGroup>
@@ -864,7 +867,10 @@
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpSwi.t.h">
       <Filter>source\private\MfData\MfExport\private\Native</Filter>
     </ClInclude>
-    <ClInclude Include="source\private\MfData\MfExport\private\Native\ArrToh5.h">
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\H5ArrayWriter.h">
+      <Filter>source\private\MfData\MfExport\private\Native</Filter>
+    </ClInclude>
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\H5UseLastWriter.h">
       <Filter>source\private\MfData\MfExport\private\Native</Filter>
     </ClInclude>
   </ItemGroup>

@@ -11,6 +11,7 @@
 
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
+#include <private\MfData\MfExport\private\Native\H5UseLastWriter.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
@@ -102,6 +103,15 @@ void NativeExpRch::Line5 ()
   CStr ln;
   ln.Format("%5d %5d", *inrech, irch);
   AddToStoredLinesDesc(ln, desc);
+  if (GetNative()->GetArealUseLastToh5())
+  {
+    std::vector<int> vDat(2,0);
+    vDat[0] = *inrech < 0 ? 1 : 0;
+    if (*nrchop == 2)
+      vDat[1] = *inirch < 0 ? 1 : 0;
+    H5UseLastWriter w(this);
+    w.WriteData(vDat);
+  }
 } // NativeExpRch::Line5
 //------------------------------------------------------------------------------
 /// \brief
@@ -116,10 +126,18 @@ void NativeExpRch::Line6 ()
   // get parameters with RCH type
   if (m_par.WriteStressPar(GetGlobal()->GetCurrentPeriod())) return;
 
-  MfPackage* p = GetGlobal()->GetPackage(ARR_RCH_RCH);
-  if (!p) return;
-
   CStr desc = " 6. RECH(NCOL,NROW)";
+  MfPackage* p = GetGlobal()->GetPackage(ARR_RCH_RCH);
+  //if (!p) return;
+  // it is possible that we have rch params defined by GMS (no "real" clusters)
+  // and so we need a line here for stuff to work when this file gets written
+  // with parameters
+  if (!p)
+  {
+    if (m_par.NumPar() > 0) AddToStoredLinesDesc("CONSTANT 1.0", desc);
+    return;
+  }
+
   //desc.Format("%s%d", " 6. RECH(NCOL,NROW)   SP ",
   //            GetGlobal()->GetCurrentPeriod());
   std::vector<CStr>& l(p->StringsToWrite());

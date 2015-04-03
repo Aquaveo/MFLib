@@ -22,15 +22,75 @@
 using namespace MfData::Export;
 namespace
 {
-  CStr LineWithParDesc (CStr a_type)
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+CStr LineWithParDesc (CStr a_type)
+{
+  CStr desc;
+  int lineNum = 7;
+  if ("EVT" == a_type) lineNum = 8;
+  desc.Format(" %d. [Pname [Iname] [I%sPF]]", lineNum, a_type);
+  return desc;
+}
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+std::vector<CStr> iParameterNames (Param& a_p, ParamList* a_pList)
+{
+  std::vector<CStr> pnames;
+  if (a_p.m_pilotPoints)
   {
-    CStr desc;
-    int lineNum = 7;
-    if ("EVT" == a_type) lineNum = 8;
-    desc.Format(" %d. [Pname [Iname] [I%sPF]]", lineNum, a_type);
-    return desc;
+    std::vector<double> vals;
+    a_pList->GetPilotPtValues(a_p.m_scatIndex, vals);
+    for (size_t q=1; q<=vals.size(); ++q)
+    {
+      CStr nm; nm.Format("pp%d_%d", a_p.m_scatIndex, q);
+      pnames.push_back(nm);
+    }
   }
+  else pnames.push_back(a_p.m_name);
+  return pnames;
+} // ParameterNames
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+std::vector<CStr> iParamNamesForLine7 (
+  std::vector<CStr>& a_pnames
+, Param& a_p
+, CStr& a_iName)
+{
+  CStr iName(a_iName);
+  std::vector<CStr> lines;
+  for (size_t i=0; i<a_pnames.size(); ++i)
+  {
+    CStr pname(a_pnames[i]), nameToWrite;
+    MfExportUtil::InsertSingleQuotesInName(pname);
+    while (pname.GetLength() < 12) pname += " ";
+    if (a_p.m_instNames.size() < 2) // only do instances if more than 1
+    {
+      nameToWrite = pname;
+    }
+    else
+    {
+      for (size_t i=0; nameToWrite.IsEmpty() && i<a_p.m_instNames.size(); ++i)
+      {
+        if (iName.CompareNoCase(a_p.m_instNames[i]) == 0)
+        {
+          iName = a_p.m_instNames[i];
+          MfExportUtil::InsertSingleQuotesInName(iName);
+          nameToWrite = pname + " " + iName;
+        }
+      }
+    }
+    lines.push_back(nameToWrite);
+  }
+  return lines;
+} // iParamNamesForLine7
+
 } // unnamed namespace
+
+
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
@@ -153,7 +213,13 @@ void NeArealPar::Lines3to4 (bool beginExport)
 
           while (clst.m_zon.GetLength() < 10) clst.m_zon += " ";
 
-          ln.Format("%s %s %5d", mltName, clst.m_zon, clst.m_iz.front());
+          ln.Format("%s %s ", mltName, clst.m_zon);
+          for (size_t i=0; i<clst.m_iz.size(); ++i)
+          {
+            CStr s;
+            s.Format("%5d ", clst.m_iz[i]);
+            ln += s;
+          }
           desc = "4b. [Mltarr Zonarr IZ]";
           if (m_type == "ETS") desc.Replace("4b", "3b");
           m_pack->AddToStoredLinesDesc(ln, desc);
@@ -162,6 +228,45 @@ void NeArealPar::Lines3to4 (bool beginExport)
     }
   }
 } // NeArealPar::Lines3to4
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+CStr NeArealPar::GetParInstanceFromSpIdx (
+  Param& a_p
+, int a_sp)
+{
+  CStr iName;
+  bool found = false;
+  std::map<CStr, std::vector<int> >::iterator it(a_p.m_instStress.begin());
+  for (; iName.empty() && it != a_p.m_instStress.end(); ++it)
+  {
+    for (size_t i=0; !found && i<it->second.size(); ++i)
+    {
+      if (it->second[i] == a_sp)
+      {
+        iName = it->first;
+      }
+    }
+  }
+  return iName;
+} // NeArealPar::GetParInstanceFromSpIdx
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+bool NeArealPar::ParNamesFromInstanceData (
+  Param& a_p
+, int a_sp
+, ParamList* a_pList
+, std::vector<CStr>& a_pnames)
+{
+  CStr iName = GetParInstanceFromSpIdx(a_p, a_sp);
+  if (iName.empty()) return false;
+
+  std::vector<CStr> pnames = iParameterNames(a_p, a_pList);
+  pnames = iParamNamesForLine7(pnames, a_p, iName);
+  a_pnames.insert(a_pnames.end(), pnames.begin(), pnames.end());
+  return true;
+} // NeArealPar::ParNamesFromInstanceData
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
@@ -175,46 +280,9 @@ void NeArealPar::LineWithPar (int a_sp, CStr& a_line5)
   for (size_t i=0; i<params.size(); ++i)
   {
     Param& p = params[i];
-    if (p.m_clust.empty()) continue;
-
-    // see if a cluster for this par is used in this stress period
-    bool found(0);
-    for (size_t i=0; !found && i<p.m_clust.size(); ++i)
-    {
-      if (p.m_clust[i].m_lay == a_sp)
-      {
-        found = true;
-
-        std::vector<CStr> names;
-        if (p.m_pilotPoints)
-        {
-          std::vector<double> vals;
-          pList->GetPilotPtValues(p.m_scatIndex, vals);
-          for (size_t q=1; q<=vals.size(); ++q)
-          {
-            CStr nm; nm.Format("pp%d_%d", p.m_scatIndex, q);
-            names.push_back(nm);
-          }
-        }
-        else
-        {
-          names.push_back(p.m_name);
-        }
-
-        for (size_t j=0; j<names.size(); ++j)
-        {
-          pnames.push_back(names[j]);
-          MfExportUtil::InsertSingleQuotesInName(pnames.back());
-          while (pnames.back().GetLength() < 12) pnames.back() += " ";
-          if (p.m_clust.size() > 1)
-          {
-            CStr iNam;
-            iNam.Format(" SP_%d", a_sp);
-            pnames.back() += iNam;
-          }
-        }
-      }
-    }
+    // check if "m_instStress" has data. If so then we can just write the
+    // info there
+    ParNamesFromInstanceData(p, a_sp, pList, pnames);
   }
 
   CStr ln, desc, tmpStr;

@@ -15,13 +15,15 @@ namespace MfData
     class Mf2kNative;
     class NeArealPar;
     class NativeExpSTP;
-    class ArrToh5;
+    class H5ArrayWriter;
+    class H5UseLastWriter;
 
     class NativePackExp
     {
       friend NativeExpSTP;
       friend NeArealPar;
-      friend ArrToh5;
+      friend H5ArrayWriter;
+      friend H5UseLastWriter;
     public:
       NativePackExp();
       virtual ~NativePackExp();

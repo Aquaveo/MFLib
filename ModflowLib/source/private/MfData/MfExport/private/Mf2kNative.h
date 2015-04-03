@@ -23,6 +23,8 @@ namespace MfData
       bool GetArraysInFolder() const {return m_arraysInFolder;}
       void SetArraysInternal(bool a_);
       bool GetArraysInternal() const {return m_arraysInternal;}
+      void ArealUseLastToh5(bool a_) {m_arealUseLastToh5 = a_;}
+      bool GetArealUseLastToh5() {return m_arealUseLastToh5;}
 
       // this is temporary
       bool& StpFlag() { return m_StpPackFlag; }
@@ -37,6 +39,7 @@ namespace MfData
       bool m_arraysInFolder;
       bool m_arraysInternal;
       bool m_StpPackFlag;
+      bool m_arealUseLastToh5;
     };
   }
 }

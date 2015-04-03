@@ -26,6 +26,7 @@ MfData::Export::Mf2kNative::Mf2kNative () :
 , m_arraysInFolder(false)
 , m_arraysInternal(false)
 , m_StpPackFlag(false)
+, m_arealUseLastToh5(false)
 {
 } // Mf2kNative::Mf2kNative
 //------------------------------------------------------------------------------

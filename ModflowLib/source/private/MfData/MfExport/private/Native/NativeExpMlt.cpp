@@ -50,6 +50,7 @@ bool NativeExpMlt::Export ()
       p = GetGlobal()->GetPackage(Packages::MLT);
     }
     p->StringsToWrite().push_back(name);
+    p->StringsToWrite().back() += " FUNCTION";
     p->StringsToWrite().push_back(func);
     return false;
   }
@@ -68,9 +69,11 @@ bool NativeExpMlt::Export ()
     for (size_t i=0; i<lCopy.size(); i+=2)
     {
       nMlt++;
-      CStr l = lCopy[i+1];
-      l.ToLower();
-      if (l.Find("function") == -1 && l.Find("constant") == -1) i++;
+      if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), lCopy[i+1])
+          && lCopy[i].find("FUNCTION") == -1)
+      {
+        i++;
+      }
     }
   }
   CStr str;
@@ -79,7 +82,7 @@ bool NativeExpMlt::Export ()
   for (size_t i=0; i<lCopy.size(); i+=2)
   {
     AddToStoredLinesDesc(lCopy[i], Desc(2));
-    CStr line = lCopy[i+1];
+    CStr line = lCopy[i];
     line.ToLower();
     CStr desc = Desc(3);
     bool func(false);

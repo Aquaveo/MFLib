@@ -32,21 +32,34 @@ NativeExpSTP::~NativeExpSTP ()
 //------------------------------------------------------------------------------
 bool NativeExpSTP::Export ()
 {
+  // write zone file
+  MfPackage* zn = GetGlobal()->GetPackage(MfData::Packages::ZON);
+  NativePackExp* exZn = NativeUtil::CreatePackExp(GetNative(), GetGlobal(), zn);
+  if (exZn) exZn->Export(); delete(exZn);
+  // write mult file
+  MfPackage* mlt = GetGlobal()->GetPackage(MfData::Packages::MLT);
+  NativePackExp* exMlt = NativeUtil::CreatePackExp(GetNative(), GetGlobal(), mlt);
+  if (exMlt) exMlt->Export(); delete(exMlt);
+  // write the pval file
+  GetGlobal()->SetIntVar("Write PVAL", 1);
+  MfPackage* pvl = GetGlobal()->GetPackage(MfData::Packages::PVAL);
+  NativePackExp* exPvl = NativeUtil::CreatePackExp(GetNative(), GetGlobal(), pvl);
+  if (exPvl) exPvl->Export(); delete(exPvl);
   if (!GetNative()->StpFlag())
   {
     // write zone file
-    MfPackage* zn = GetGlobal()->GetPackage(MfData::Packages::ZON);
-    NativePackExp* exZn = NativeUtil::CreatePackExp(GetNative(), GetGlobal(), zn);
-    if (exZn) exZn->Export(); delete(exZn);
+    //MfPackage* zn = GetGlobal()->GetPackage(MfData::Packages::ZON);
+    //NativePackExp* exZn = NativeUtil::CreatePackExp(GetNative(), GetGlobal(), zn);
+    //if (exZn) exZn->Export(); delete(exZn);
     // write mult file
-    MfPackage* mlt = GetGlobal()->GetPackage(MfData::Packages::MLT);
-    NativePackExp* exMlt = NativeUtil::CreatePackExp(GetNative(), GetGlobal(), mlt);
-    if (exMlt) exMlt->Export(); delete(exMlt);
+    //MfPackage* mlt = GetGlobal()->GetPackage(MfData::Packages::MLT);
+    //NativePackExp* exMlt = NativeUtil::CreatePackExp(GetNative(), GetGlobal(), mlt);
+    //if (exMlt) exMlt->Export(); delete(exMlt);
     // write the pval file
-    GetGlobal()->SetIntVar("Write PVAL", 1);
-    MfPackage* pvl = GetGlobal()->GetPackage(MfData::Packages::PVAL);
-    NativePackExp* exPvl = NativeUtil::CreatePackExp(GetNative(), GetGlobal(), pvl);
-    if (exPvl) exPvl->Export(); delete(exPvl);
+    //GetGlobal()->SetIntVar("Write PVAL", 1);
+    //MfPackage* pvl = GetGlobal()->GetPackage(MfData::Packages::PVAL);
+    //NativePackExp* exPvl = NativeUtil::CreatePackExp(GetNative(), GetGlobal(), pvl);
+    //if (exPvl) exPvl->Export(); delete(exPvl);
     // write MNW2
     MfPackage* mnw2 = GetGlobal()->GetPackage(MfData::Packages::MNW2);
     if (mnw2)
@@ -56,12 +69,12 @@ bool NativeExpSTP::Export ()
       if (exMnw2) exMnw2->Export(); delete(exMnw2);
     }
 
-    ForcePackageWrite(MfData::Packages::RCH);
-    ForcePackageWrite(MfData::Packages::EVT);
-    ForcePackageWrite(MfData::Packages::ETS);
-    ForcePackageWrite(MfData::Packages::LAK);
+    //ForcePackageWrite(MfData::Packages::RCH);
+    //ForcePackageWrite(MfData::Packages::EVT);
+    //ForcePackageWrite(MfData::Packages::ETS);
+    //ForcePackageWrite(MfData::Packages::LAK);
     ForcePackageWrite(MfData::Packages::MNW);
-    ForcePackageWrite(MfData::Packages::LGR);
+    //ForcePackageWrite(MfData::Packages::LGR);
 
     // write the name file
     MfPackage* nm = GetGlobal()->GetPackage(MfData::Packages::NAM);
@@ -70,6 +83,12 @@ bool NativeExpSTP::Export ()
     if (exNm) exNm->WriteFileStp(); delete(exNm);
 
   }
+
+  ForcePackageWrite(MfData::Packages::RCH);
+  ForcePackageWrite(MfData::Packages::EVT);
+  ForcePackageWrite(MfData::Packages::ETS);
+  ForcePackageWrite(MfData::Packages::LAK);
+  ForcePackageWrite(MfData::Packages::LGR);
   // write the oc file
   MfPackage* oc = GetGlobal()->GetPackage(MfData::Packages::OC);
   if (oc)

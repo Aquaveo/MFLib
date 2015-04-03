@@ -9,6 +9,7 @@
 
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
+#include <private\MfData\MfExport\private\Native\H5UseLastWriter.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
@@ -66,6 +67,11 @@ void NativeExpEts::Line1 ()
   ln.Format("%5d %5d %5d %5d", *nevtop, *ietscb, npar, *netseg);
   CStr desc = " 1. NETSOP IETSCB NPETS NETSEG";
   AddToStoredLinesDesc(ln, desc);
+  if (GetNative()->GetArealUseLastToh5())
+  {
+    H5UseLastWriter w(this);
+    w.WriteEtsNetSeg(*netseg);
+  }
 } // NativeExpEts::Line1
 //------------------------------------------------------------------------------
 /// \brief
@@ -101,6 +107,21 @@ void NativeExpEts::Line4 ()
 
   CStr desc = " 4. INETSS INETSR INETSX [INIETS [INSGDF]]";
   AddToStoredLinesDesc(ln, desc);
+  if (GetNative()->GetArealUseLastToh5())
+  {
+    std::vector<int> vDat(5,0);
+    vDat[0] = *insurf < 0 ? 1 : 0;
+    vDat[1] = *inevtr < 0 ? 1 : 0;
+    vDat[2] = *inexdp < 0 ? 1 : 0;
+    if (*nevtop == 2)
+      vDat[3] = *inievt < 0 ? 1: 0;
+    int insgdfOut = 0;
+    if (*netseg > 1)
+      insgdfOut = *insgdf;
+    vDat[4] = insgdfOut < 0 ? 1 : 0;
+    H5UseLastWriter w(this);
+    w.WriteData(vDat);
+  }
 } // NativeExpEts::Line4
 //------------------------------------------------------------------------------
 /// \brief

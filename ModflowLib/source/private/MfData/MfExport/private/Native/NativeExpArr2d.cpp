@@ -11,7 +11,7 @@
 #include <sstream>
 
 #include <private\MfData\MfExport\private\Mf2kNative.h>
-#include <private\MfData\MfExport\private\Native\ArrToh5.h>
+#include <private\MfData\MfExport\private\Native\H5ArrayWriter.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
@@ -516,10 +516,16 @@ bool NativeExpArr2d::CanDoConstant ()
       if (m_mult && !m_dataD)     str.Format("CONSTANT %s", STR(m_data[0]));
       else if (m_mult && m_dataD) str.Format("CONSTANT %s", STR(m_dataD[0]));
       else                        str.Format("CONSTANT %d", m_iData[0]);
-      AddToStoredLinesDesc(str, "");
-      
+
       SubstituteMultArray();
 
+      H5ArrayWriter writer(this);
+      if (m_h5 && writer.ForceToH5File())
+      {
+        writer.WriteData();
+      }
+
+      AddToStoredLinesDesc(str, "");
       return true;
     }
   }
@@ -581,7 +587,7 @@ void NativeExpArr2d::WriteToFile ()
 //------------------------------------------------------------------------------
 CStr NativeExpArr2d::ArrayToH5File ()
 {
-  ArrToh5 writer(this);
+  H5ArrayWriter writer(this);
   return writer.WriteData();
 } // NativeExpArr2d::ArrayToH5File
 //------------------------------------------------------------------------------

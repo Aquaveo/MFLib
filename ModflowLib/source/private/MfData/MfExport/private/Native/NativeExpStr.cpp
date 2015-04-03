@@ -416,7 +416,7 @@ void NativeExpStr::CheckParameters ()
       std::vector<Real>& vec = StrCondFact((int)GetGlobal()->CurModIdx());
       if ((int)vec.size() != cnt)
       {
-        ASSERT(0);
+        //ASSERT(0);
         vec.resize(cnt);
       }
       fwrite(&vec[0], sizeof(Real), cnt, fp);

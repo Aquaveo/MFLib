@@ -2497,14 +2497,17 @@ module module_exportData
   !-----------------------------------------------------------------------------
   ! BRIEF:  
   !-----------------------------------------------------------------------------
-  subroutine exp_MultFunction (NAME,LINE)
+  subroutine exp_MultFunction (NAME,LINE,ISTART)
     implicit none
     character*10, intent(in)   ::NAME
     character*200, intent(in)  ::LINE
+    integer, intent(in)        ::ISTART
+    character*200              ::tmpLine
 
     if (NOT(ed_getExportData())) return
+    tmpLine = LINE(1:ISTART-1)
     call mfLibExp_SingleValStr('FNC', 'NAME     ', NAME, 10);
-    call mfLibExp_SingleValStr('FNC', 'FUNC     ', LINE, 200);
+    call mfLibExp_SingleValStr('FNC', 'FUNC     ', tmpLine, 200);
     call mfLibExp_ExpPack('FNC')
   end subroutine exp_MultFunction
 

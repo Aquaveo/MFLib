@@ -47,7 +47,7 @@ bool NativeExpZon::Export ()
     for (size_t i=0; i<lCopy.size(); i+=2)
     {
       nzones++;
-      if (lCopy[i+1].Find("CONSTANT") == -1) i++;
+      if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), lCopy[i+1])) i++;
     }
   }
   CStr str;

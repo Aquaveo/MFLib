@@ -145,7 +145,10 @@ void NativeExpLgr::Lgr_2 ()
 void NativeExpLgr::WriteFile ()
 {
   if (Lines().empty()) return;
-  TxtExporter txt(GetGlobal()->LgrName());
+  CStr fname = GetGlobal()->LgrName();
+  util::StripExtensionFromFilename(fname, fname);
+  fname += ".lgr";
+  TxtExporter txt(fname);
   txt.WriteLinesAndDescriptionsToFile("", Lines(), Desc());
   Lines().clear();
   Desc().clear();
