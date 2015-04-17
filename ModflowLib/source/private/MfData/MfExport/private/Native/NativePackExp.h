@@ -17,6 +17,7 @@ namespace MfData
     class NativeExpSTP;
     class H5ArrayWriter;
     class H5UseLastWriter;
+    class H5BcList;
 
     class NativePackExp
     {
@@ -24,6 +25,7 @@ namespace MfData
       friend NeArealPar;
       friend H5ArrayWriter;
       friend H5UseLastWriter;
+      friend H5BcList;
     public:
       NativePackExp();
       virtual ~NativePackExp();

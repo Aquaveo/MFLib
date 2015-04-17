@@ -929,7 +929,10 @@ build_test_runner.bat
     <ClCompile Include="source\private\ListReaderStr.cpp" />
     <ClCompile Include="source\private\MfData.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\H5ArrayWriter.cpp" />
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\H5BcList.cpp" />
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\H5LstPack.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\H5UseLastWriter.cpp" />
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\Mnw1PropList.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpCln.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpDisu.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpGnc.cpp" />
@@ -1049,7 +1052,11 @@ build_test_runner.bat
     <ClInclude Include="source\private\MfData.h" />
     <ClInclude Include="source\private\MfData.t.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\H5ArrayWriter.h" />
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\H5BcList.h" />
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\H5LstPack.h" />
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\H5Strings.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\H5UseLastWriter.h" />
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\Mnw1PropList.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpCln.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpCln.t.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpDisu.h" />

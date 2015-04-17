@@ -8,19 +8,28 @@
 #include <private\MfData\MfExport\private\Native\NativeExpMnw1.h>
 
 #include <private\ListReader\CellIdToIJK.h>
+#include <private\MfData.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
+#include <private\MfData\MfExport\private\Native\H5BcList.h>
 #include <private\MfData\MfExport\private\Native\NativeUtil.h>
+#include <private/MfData/MfExport/private/TxtExporter.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
 #include <private\MfData\Packages\MfPackStrings.h>
 #include <private\MNWReader.h>
 
+#define MFBC_KSPREF    "21. Stress Period Ref"
+#define MFBC_LOSSTYPE  "22. Loss Type"
+#define MFBC_IOWELL2   "23. Well IO"
+
+
 using namespace MfData::Export;
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-NativeExpMnw1::NativeExpMnw1 ()
+NativeExpMnw1::NativeExpMnw1 (bool a_h5) :
+m_h5(a_h5)
 {
 } // MfNativeExpMnw1::MfNativeExpMnw1
 //------------------------------------------------------------------------------
@@ -36,6 +45,10 @@ bool NativeExpMnw1::Export ()
 {
   if (Packages::MNWSetup == GetPackage()->PackageName())
   {
+    if (m_h5)
+    {
+      AddToStoredLinesDesc("#GMS_HDF5_01", "");
+    }
     Line1to3();
   }
   else
@@ -109,6 +122,7 @@ void NativeExpMnw1::Line1to3 ()
       desc = "3a. FILE:filename WEL1:iunw1";
       ln.Format("FILE:MNW-WEL1.out WEL1:%d", abs(auxiliaryUnits["WEL1"]));
       AddToStoredLinesDesc(ln, desc);
+      iowell2Sorted[0] = auxiliaryUnits["WEL1"];
     }
 
     if (auxiliaryUnits["BYNODE"] != 0)
@@ -118,6 +132,7 @@ void NativeExpMnw1::Line1to3 ()
       if (auxiliaryUnits["BYNODE"] < 0)
         ln += " ALLTIME";
       AddToStoredLinesDesc(ln, desc);
+      iowell2Sorted[1] = auxiliaryUnits["BYNODE"];
     }
 
     if (auxiliaryUnits["QSUM"] != 0)
@@ -127,9 +142,27 @@ void NativeExpMnw1::Line1to3 ()
       if (auxiliaryUnits["QSUM"] < 0)
         ln += " ALLTIME";
       AddToStoredLinesDesc(ln, desc);
+      iowell2Sorted[2] = auxiliaryUnits["QSUM"];
+    }
+    if (m_h5)
+    {
+      H5BcList h5(this);
+      const char *type = "Multi-Node Well";
+      CStr path, f(GetNative()->GetExp()->GetBaseFileName());
+      f += ".h5";
+      // update "21. Stress Period Ref"
+      path.Format("%s/%s", type, MFBC_KSPREF);
+      h5.WriteSingleH5IntValue(f, path, *kspref);
+
+      // update "22. Loss Type"
+      path.Format("%s/%s", type, MFBC_LOSSTYPE);
+      h5.WriteSingleH5DoubleValue(f, path, *ploss);
+
+      // update "23. Well IO"
+      path.Format("%s/%s", type, MFBC_IOWELL2);
+      h5.Write1DIntArray(f, path, &iowell2Sorted[0], 3);
     }
   }
-
 } // NativeExpMnw1::Line1
 //------------------------------------------------------------------------------
 /// \brief
@@ -154,6 +187,17 @@ void NativeExpMnw1::Line4 ()
 //------------------------------------------------------------------------------
 void NativeExpMnw1::Line5 ()
 {
+  if (m_h5)
+  {
+    H5BcList h5(this);
+    CStr l = h5.Mnw1();
+    if (!l.IsEmpty())
+    {
+      AddToStoredLinesDesc(l, " 5. Layer Row Column Qdes [MN] QWval Rw Skin ");
+    }
+    return;
+  }
+
   using namespace MfData::Packages;
   const int *itmp(0), *nwell2(0);
   const double *well2(0), *mnwflgs(0);
@@ -290,7 +334,6 @@ void NativeExpMnw1::Line5 ()
       AddToStoredLinesDesc(ln, desc);
       wellid = wellNum;
     }
-
   }
 } // NativeExpMnw1::Line5
 //------------------------------------------------------------------------------

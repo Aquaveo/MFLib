@@ -23,6 +23,7 @@
 #include <private/H5DataReader/H5DataSetWriter.h>
 #include <private/H5DataReader/H5DataSetWriterSetup.h>
 #include <private/MfData/MfExport/private/Mf2kNative.h>
+#include <private/MfData/MfExport/private/Native/H5Strings.h>
 #include <private/MfData/MfExport/private/Native/NativePackExp.h>
 #include <private/MfData/MfExport/private/TxtExporter.h>
 #include <private/MfData/MfGlobal.h>
@@ -37,8 +38,6 @@
 using namespace MfData::Export;
 
 //----- Constants / Enumerations -----------------------------------------------
-#define MFBC_USELAST   "01. Use Last"
-#define MFBC_NETSEG    "20. Number of Segments"
 
 //----- Classes / Structs ------------------------------------------------------
 

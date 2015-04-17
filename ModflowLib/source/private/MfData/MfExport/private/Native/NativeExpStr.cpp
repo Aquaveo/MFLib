@@ -48,8 +48,9 @@ CStr Desc2 ()
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-NativeExpStr::NativeExpStr () :
-  m_mapParKeyVal()
+NativeExpStr::NativeExpStr (bool a_h5)
+: m_h5(a_h5)
+, m_mapParKeyVal()
 , m_mapParSegKey()
 , m_mapParSegInstances()
 , m_usg(false)
@@ -81,6 +82,7 @@ bool NativeExpStr::Export ()
 
   if (1 == GetGlobal()->GetCurrentPeriod())
   {
+    if (m_h5) AddToStoredLinesDesc("#GMS_HDF5_01", "");
     Line2();
   }
   Lines5to6();

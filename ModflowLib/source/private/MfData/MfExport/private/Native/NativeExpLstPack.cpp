@@ -11,6 +11,7 @@
 
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
+#include <private\MfData\MfExport\private\Native\H5BcList.h>
 #include <private\MfData\MfExport\private\TxtExporter.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\MfPackageUtil.h>
@@ -26,8 +27,9 @@ using namespace MfData::Export;
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-NativeExpLstPack::NativeExpLstPack ()
-: m_usg(false)
+NativeExpLstPack::NativeExpLstPack (bool a_h5)
+: m_h5(a_h5)
+, m_usg(false)
 , m_unstructured(false)
 , m_nBcs(0)
 , m_nAux(0)
@@ -41,6 +43,8 @@ NativeExpLstPack::NativeExpLstPack ()
 , m_nI(0)
 , m_nJ(0)
 , m_nK(0)
+, m_par(0)
+, m_h5Bc(0)
 {
   m_usg = MfData::MfGlobal::Get().ModelType() == MfData::USG;
   if (m_usg)
@@ -50,12 +54,14 @@ NativeExpLstPack::NativeExpLstPack ()
     m_nJ = MfData::MfGlobal::Get().NumCol();
     m_unstructured = MfData::MfGlobal::Get().Unstructured() ? 1 : 0;
   }
+  if (m_h5) m_h5Bc = new H5BcList(this);
 } // MfNativeExpLstPack::MfNativeExpLstPack
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
 NativeExpLstPack::~NativeExpLstPack ()
 {
+  if (m_h5Bc) delete(m_h5Bc);
 } // MfNativeExpLstPack::~MfNativeExpLstPack
 //------------------------------------------------------------------------------
 /// \brief
@@ -89,6 +95,7 @@ bool NativeExpLstPack::Export ()
 {
   if (1 == GetGlobal()->GetCurrentPeriod())
   {
+    if (m_h5) AddToStoredLinesDesc("#GMS_HDF5_01", "");
     Line1();
     Line2();
 
@@ -109,7 +116,7 @@ bool NativeExpLstPack::Export ()
 //------------------------------------------------------------------------------
 void NativeExpLstPack::Line1 ()
 {
-  if (Packages::DRT == GetPackage()->PackageName()) return;
+  if (m_h5 || Packages::DRT == GetPackage()->PackageName()) return;
 
   CStr desc = " 1. [PARAMETER ";
   desc += "NP";
@@ -119,8 +126,9 @@ void NativeExpLstPack::Line1 ()
   CStr ln;
 
   const int* np(0);
-  if (!GetPackage()->GetField(Packages::ListPack::NP, &np) || !np ||
-      *np < 1)
+  if (!m_h5 &&
+      (!GetPackage()->GetField(Packages::ListPack::NP, &np) || !np ||
+       *np < 1))
     return;
 
   AddToStoredLinesDesc(ln, desc);
@@ -192,10 +200,12 @@ void NativeExpLstPack::Line2 ()
     if (GetPackage()->GetField(Packages::ListPack::NP, &np) && np &&
         GetPackage()->GetField("MXL", &mxl) && mxl)
     {
+      int tmpNp(*np);
+      if (m_h5) tmpNp = 0;
       int imxl = *mxl;
-      if (0 == *np) imxl = 0;
+      if (0 == tmpNp) imxl = 0;
       CStr ln2;
-      ln2.Format("%5d %5d ", *np, imxl);
+      ln2.Format("%5d %5d ", tmpNp, imxl);
       ln += ln2;
       if (m_returnFlow) ln += "RETURNFLOW ";
     }
@@ -238,8 +248,14 @@ void NativeExpLstPack::Line5 ()
       !GetPackage()->GetField(Packages::ListPack::NP , &np) || !np)
     return;
 
+  int tmpItmp(*itmp), tmpNp(*np);
+  if (m_h5)
+  {
+    m_h5BcStr = m_h5Bc->LstPack(tmpItmp);
+    tmpNp = 0;
+  }
   CStr ln;
-  ln.Format("%5d %5d", *itmp, *np);
+  ln.Format("%5d %5d", tmpItmp, tmpNp);
   AddToStoredLinesDesc(ln, desc);
 } // NativeExpLstPack::Line5
 //------------------------------------------------------------------------------
@@ -271,6 +287,14 @@ void NativeExpLstPack::Line6 ()
   const int *itmp(0);
   if (!GetPackage()->GetField(Packages::ListPack::ITMP, &itmp) || !itmp) return;
 
+  CStr ln;
+  if (m_h5)
+  {
+    ln = m_h5BcStr;
+    if (!ln.empty()) AddToStoredLinesDesc(ln, desc);
+    return;
+  }
+
   std::vector<CStr> lns;
   if (ParametersUsed(*itmp, lns))
   {
@@ -278,7 +302,6 @@ void NativeExpLstPack::Line6 ()
     return;
   }
 
-  CStr ln;
   for (int i=0; i<*itmp; ++i)
   {
     ln = IjkToStr(i);

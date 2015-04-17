@@ -8,12 +8,11 @@
 #include <private\MfData\MfExport\private\Native\NativeExpMnw2.h>
 
 #include <sstream>
-//#include <private\MfData\MfExport\private\Native\NativeExpNam.h>
-//#include <private\MfData\MfExport\private\Native\NativeUtil.h>
+
+#include <private\MfData\MfExport\private\Native\H5BcList.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
-//#include <private\MfData\Packages\MfPackStrings.h>
 
 using namespace MfData::Export;
 namespace
@@ -37,7 +36,8 @@ namespace
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-NativeExpMnw2::NativeExpMnw2 ()
+NativeExpMnw2::NativeExpMnw2 (bool a_h5) :
+  m_h5(a_h5)
 {
 } // MfNativeExpMnw2::MfNativeExpMnw2
 //------------------------------------------------------------------------------
@@ -522,6 +522,17 @@ void NativeExpMnw2::Lines34 ()
   line.Format("%d", *ITMP);
   desc.Format("   3. ITMP (SP%d)", a_sp);
   AddToStoredLinesDesc(line, desc);
+
+  if (m_h5)
+  {
+    H5BcList h5(this);
+    line = h5.Mnw2();
+    if (!line.IsEmpty())
+    {
+      AddToStoredLinesDesc(line, Desc(4));
+    }
+    return;
+  }
 
   if (*ITMP > 0)
   { // get the data from the MNW2 array

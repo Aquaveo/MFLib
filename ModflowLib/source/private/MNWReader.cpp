@@ -7,11 +7,13 @@
 //------------------------------------------------------------------------------
 #include <private/MNWReader.h>
 
+#include <math.h>
+#include <sstream>
+
 #include <private/H5DataReader/H5DataSetReader.h>
 #include <private/H5DataReader/H5VecCStrReader.h>
 #include <private/util/util.h>
 
-#include <math.h>
 
 #define NUMBC     "00. Number of BCs"
 #define CELLIDS   "02. Cell IDs"
@@ -49,13 +51,17 @@ bool mnw::ReadH5Data(std::vector<int>& a_cellids,
   CStr file(iGetFileFromLine(a_line)), pathBase("Multi-Node Well/"), path;
   int numberH5Wells(0);
 
-  // get stress period
-  size_t stressPeriodStart = a_line.find_last_of(" ");
+  std::stringstream ss;
+  ss << a_line;
+  CStr gmsCard, h5file, h5path;
   int sp(1);
-  if (stressPeriodStart != std::string::npos)
-    sscanf(a_line.c_str() + stressPeriodStart, "%d", &sp);
-  else
-    return false;
+  ss >> gmsCard >> h5file >> h5path >> h5path >> sp;
+  // get stress period
+  //size_t stressPeriodStart = a_line.find_last_of(" ");
+  //if (stressPeriodStart != std::string::npos)
+  //  sscanf(a_line.c_str() + stressPeriodStart, "%d", &sp);
+  //else
+  //  return false;
 
   std::pair<int, int> myPair(0,1);
   VEC_INT_PAIR indices(1, myPair);
@@ -208,13 +214,17 @@ bool mnw::ReadMnw2H5Data(double* MNW2,
   CStr file(iGetFileFromLine(a_line)), pathBase("MNW2/"), path;
   int numberH5Wells(0);
 
-  // get stress period
-  size_t stressPeriodStart = a_line.find_last_of(" ");
+  std::stringstream ss;
+  ss << a_line;
+  CStr gmsCard, h5file, h5path;
   int sp(1);
-  if (stressPeriodStart != std::string::npos)
-    sscanf(a_line.c_str() + stressPeriodStart, "%d", &sp);
-  else
-    return false;
+  ss >> gmsCard >> h5file >> h5path >> sp;
+  // get stress period
+  //size_t stressPeriodStart = a_line.find_last_of(" ");
+  //if (stressPeriodStart != std::string::npos)
+  //  sscanf(a_line.c_str() + stressPeriodStart, "%d", &sp);
+  //else
+  //  return false;
 
   std::pair<int, int> myPair(0,1);
   VEC_INT_PAIR indices(1, myPair);
@@ -280,7 +290,7 @@ void MNWReaderT::testGetWellData ()
   file = util::GetTestFilesDirectory() + "\\Gms2Mf2k\\mnw\\mnw1\\mnw1.h5";
 
   CStr line, file1;
-  line.Format("GMS_HDF5_MNW \"%s\" \"MNW1\" 3", file);
+  line.Format("GMS_HDF5_MNW \"%s\" \"Multi-Node Well\" 3", file);
 
   int itmp(16);
   std::vector<double> well2(18*17, 0);

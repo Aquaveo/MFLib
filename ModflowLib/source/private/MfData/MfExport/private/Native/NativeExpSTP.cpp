@@ -8,6 +8,7 @@
 #include <private\MfData\MfExport\private\Native\NativeExpSTP.h>
 
 #include <private\MfData\MfExport\private\Mf2kNative.h>
+#include <private\MfData\MfExport\private\Native\H5BcList.h>
 #include <private\MfData\MfExport\private\Native\NativeExpNam.h>
 #include <private\MfData\MfExport\private\Native\NativeUtil.h>
 #include <private\MfData\MfGlobal.h>
@@ -45,6 +46,14 @@ bool NativeExpSTP::Export ()
   MfPackage* pvl = GetGlobal()->GetPackage(MfData::Packages::PVAL);
   NativePackExp* exPvl = NativeUtil::CreatePackExp(GetNative(), GetGlobal(), pvl);
   if (exPvl) exPvl->Export(); delete(exPvl);
+  // write MNW2
+  MfPackage* mnw2 = GetGlobal()->GetPackage(MfData::Packages::MNW2);
+  if (mnw2)
+  {
+    mnw2->SetLineNumber("Export Final");
+    NativePackExp* exMnw2 = NativeUtil::CreatePackExp(GetNative(), GetGlobal(), mnw2);
+    if (exMnw2) exMnw2->Export(); delete(exMnw2);
+  }
   if (!GetNative()->StpFlag())
   {
     // write zone file
@@ -61,19 +70,19 @@ bool NativeExpSTP::Export ()
     //NativePackExp* exPvl = NativeUtil::CreatePackExp(GetNative(), GetGlobal(), pvl);
     //if (exPvl) exPvl->Export(); delete(exPvl);
     // write MNW2
-    MfPackage* mnw2 = GetGlobal()->GetPackage(MfData::Packages::MNW2);
-    if (mnw2)
-    {
-      mnw2->SetLineNumber("Export Final");
-      NativePackExp* exMnw2 = NativeUtil::CreatePackExp(GetNative(), GetGlobal(), mnw2);
-      if (exMnw2) exMnw2->Export(); delete(exMnw2);
-    }
+    //MfPackage* mnw2 = GetGlobal()->GetPackage(MfData::Packages::MNW2);
+    //if (mnw2)
+    //{
+    //  mnw2->SetLineNumber("Export Final");
+    //  NativePackExp* exMnw2 = NativeUtil::CreatePackExp(GetNative(), GetGlobal(), mnw2);
+    //  if (exMnw2) exMnw2->Export(); delete(exMnw2);
+    //}
 
     //ForcePackageWrite(MfData::Packages::RCH);
     //ForcePackageWrite(MfData::Packages::EVT);
     //ForcePackageWrite(MfData::Packages::ETS);
     //ForcePackageWrite(MfData::Packages::LAK);
-    ForcePackageWrite(MfData::Packages::MNW);
+    //ForcePackageWrite(MfData::Packages::MNW);
     //ForcePackageWrite(MfData::Packages::LGR);
 
     // write the name file
@@ -88,6 +97,7 @@ bool NativeExpSTP::Export ()
   ForcePackageWrite(MfData::Packages::EVT);
   ForcePackageWrite(MfData::Packages::ETS);
   ForcePackageWrite(MfData::Packages::LAK);
+  ForcePackageWrite(MfData::Packages::MNW);
   ForcePackageWrite(MfData::Packages::LGR);
   // write the oc file
   MfPackage* oc = GetGlobal()->GetPackage(MfData::Packages::OC);
@@ -97,6 +107,8 @@ bool NativeExpSTP::Export ()
     if (exOc) exOc->WriteComments(); exOc->WriteStoredLines(); delete(exOc);
   }
 
+  H5BcList h(this);
+  h.WriteMapIdsForListBcs();
   return true;
 } // MfNativeExpSTP::Export
 //------------------------------------------------------------------------------

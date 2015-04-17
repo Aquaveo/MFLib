@@ -18,8 +18,6 @@ public:
   void testCreateDefaultMfH5File();
   void testGetMultiDimArrayIndex();
   void testexpSEN();
-  void testexpRiv();
-  void testexpDRT();
   void testiGetBcIndex();
   void testiSizeBcDataArray();
   void testexpSTR();
@@ -28,15 +26,11 @@ public:
   void testexpSFRLine5();
   void testexpSFRLine6();
   void testWellPropertyList();
-  void testexpMNWSetup();
-  void testexpMNWStressPeriod();
-  void testiGetListPackTypeFromPtr();
   void testexpUseLastAreal();
   void testexpGetAllArealUseLast();
   void testexpArealPropFromUseLast();
   void testexpArealLayFromUseLast();
   void testexpEtSegFromUseLast();
-  void testexpListParameterData();
   void testexpSuperFile();
   void testexpParamFile();
   void testexpUZFLine1();

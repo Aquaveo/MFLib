@@ -12,13 +12,14 @@ namespace MfData
   namespace Export
   {
     class NeLstPar;
+    class H5BcList;
 
     class NativeExpLstPack : public NativePackExp
     {
       friend NativeExpLstPackT;
       friend NeLstPar;
     public:
-      NativeExpLstPack();
+      NativeExpLstPack(bool a_h5);
       ~NativeExpLstPack();
       virtual bool Export();
 
@@ -86,7 +87,7 @@ namespace MfData
       void Line7(FILE* a_fp, int a_sp);
       void BufferTheLineForComments(CStr& a_line);
 
-      bool                m_usg, m_unstructured;
+      bool                m_h5, m_usg, m_unstructured;
       const int          *m_nBcs, *m_nAux, *m_nDataFields;
       int                 m_nFields, m_nI, m_nJ, m_nK;
       const Real         *m_data;
@@ -97,6 +98,8 @@ namespace MfData
       std::vector< std::vector<CStr> > m_parSp;
 
       NeLstPar *m_par;
+      H5BcList *m_h5Bc;
+      CStr      m_h5BcStr;
     };
 
   }

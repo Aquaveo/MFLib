@@ -1,0 +1,76 @@
+//  (C) Copyright Aquaveo 2014. Distributed under the ModflowLib
+//  Software License, Version 1.0. (See accompanying file
+//  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
+#ifndef H5STRINGS_H
+#define H5STRINGS_H
+
+#define FILE_VERSION   "File Version"
+#define MFBC_VERSION   "MFH5 Version"
+#define MFBC_NUMBC     "00. Number of BCs"
+#define MFBC_USELAST   "01. Use Last"
+#define MFBC_CELLIDS   "02. Cell IDs"
+#define MFBC_NAME      "03. Name"
+#define MFBC_MAPIDSTR  "04. Map ID"
+#define MFBC_FACTOR    "05. Factor"
+#define MFBC_IFACE     "06. IFACE"
+#define MFBC_DATA      "07. Property"
+#define MFBC_DATAMULT  "08. Property Multiplier"
+#define MFBC_LAY       "09. Layer"
+#define MFBC_LAYMULT   "10. Layer Multiplier"
+// stream
+#define MFBC_STRSEGID  "08. Str reach segment ID"
+#define MFBC_SEGID     "09. Segment ID"
+#define MFBC_SEGFLW    "10. Segment Flow"
+#define MFBC_ITRIB     "11. ITRIB"
+#define MFBC_UPID      "12. Upstream ID"
+#define MFBC_NSEG      "13. Number of Segments"
+#define MFBC_SEGP      "14. Segment Property"
+#define MFBC_SEGFLWT   "15. Segment Flow Table"
+// ets
+#define MFBC_PXDP      "16. Ext Depth"
+#define MFBC_PXDPMULT  "17. Ext Depth Multiplier"
+#define MFBC_PETM      "18. Evap Rate"
+#define MFBC_PETMMULT  "19. Evap Rate Multiplier"
+#define MFBC_NETSEG    "20. Number of Segments"
+// mnw
+#define MFBC_KSPREF    "21. Stress Period Ref"
+#define MFBC_LOSSTYPE  "22. Loss Type"
+#define MFBC_IOWELL2   "23. Well IO"
+// uzf
+#define MFBC_IUZFBND     "12. IUZFBND"
+#define MFBC_IUZFBNDMULT "13. IUZFBND Multiplier"
+#define MFBC_IRUNBND     "14. IRUNBND"
+#define MFBC_IRUNBNDMULT "15. IRUNBND Multiplier"
+#define MFBC_VKS         "16. VKS"
+#define MFBC_VKSMULT     "17. VKS Multiplier"
+#define MFBC_EPS         "18. EPS"
+#define MFBC_EPSMULT     "19. EPS Multiplier"
+#define MFBC_THTS        "20. THTS"
+#define MFBC_THTSMULT    "21. THTS Multiplier"
+#define MFBC_THTI        "22. THTI"
+#define MFBC_THTIMULT    "23. THTI Multiplier"
+// sub
+#define MFBC_RNB         "12. RNB"
+#define MFBC_RNBMULT     "13. RNB Multiplier"
+#define MFBC_HC          "14. HC"
+#define MFBC_HCMULT      "15. HC Multiplier"
+#define MFBC_SFE         "16. Sfe"
+#define MFBC_SFEMULT     "17. Sfe Multiplier"
+#define MFBC_SFV         "18. Sfv"
+#define MFBC_SFVMULT     "19. Sfv Multiplier"
+#define MFBC_COM         "20. Com"
+#define MFBC_COMMULT     "21. Com Multiplier"
+#define MFBC_DSTART      "22. Dstart"
+#define MFBC_DSTARTMULT  "23. Dstart Multiplier"
+#define MFBC_DHC         "24. DHC"
+#define MFBC_DHCMULT     "25. DHC Multiplier"
+#define MFBC_DCOM        "26. DCOM"
+#define MFBC_DCOMMULT    "27. DCOM Multiplier"
+#define MFBC_DZ          "28. DZ"
+#define MFBC_DZMULT      "29. DZ Multiplier"
+#define MFBC_NZ          "30. NZ"
+#define MFBC_NZMULT      "31. NZ Multiplier"
+
+#define MFBC_MAX_STR_LEN "Max. String Length"
+
+#endif
