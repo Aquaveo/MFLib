@@ -8,6 +8,8 @@
 
 #include <private\MfData\MfGlobal.h>
 
+#include <memory> // for shared_ptr
+
 #include <private\util\util.h>
 #include <private\MfData\MfExport\MfExporter.h>
 #include <private\MfData\Packages\MfPackage.h>
