@@ -325,7 +325,7 @@
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpVdf.cpp">
       <Filter>source\private\MfData\MfExport\private\Native</Filter>
     </ClCompile>
-    <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExportVsc.cpp">
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpVsc.cpp">
       <Filter>source\private\MfData\MfExport\private\Native</Filter>
     </ClCompile>
   </ItemGroup>

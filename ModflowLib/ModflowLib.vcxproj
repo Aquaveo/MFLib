@@ -937,7 +937,7 @@ build_test_runner.bat
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpDisu.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpGnc.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpLgr.cpp" />
-    <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExportVsc.cpp" />
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpVsc.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpSwi.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpVdf.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NeArealPar.cpp" />
