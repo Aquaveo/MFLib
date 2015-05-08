@@ -85,7 +85,7 @@ H5BcList::~H5BcList ()
 /// \brief
 //------------------------------------------------------------------------------
 void H5BcList::WriteList (
-  const int a_sp
+    const int a_sp
   , const int a_start
   , CStr& a_type
   , CStr& a_f
@@ -290,12 +290,36 @@ void H5BcList::LstPar ()
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-CStr H5BcList::Str ()
+CStr H5BcList::Str (int& a_itmp)
 {
   CStr rval;
-
+  H5LstPack h(m_pack->GetGlobal(), m_pack->GetPackage(),
+              m_pack->GetNative(), this);
+  rval = h.StrPack(a_itmp);
   return rval;
 } // H5BcList::Str
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+CStr H5BcList::SfrLn2 ()
+{
+  CStr rval;
+  H5LstPack h(m_pack->GetGlobal(), m_pack->GetPackage(),
+              m_pack->GetNative(), this);
+  rval = h.SfrLn2();
+  return rval;
+} // H5BcList::SfrLn2
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+CStr H5BcList::SfrLn6 (int& a_itmp)
+{
+  CStr rval;
+  H5LstPack h(m_pack->GetGlobal(), m_pack->GetPackage(),
+              m_pack->GetNative(), this);
+  rval = h.SfrLn6(a_itmp);
+  return rval;
+} // H5BcList::SfrLn2
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------

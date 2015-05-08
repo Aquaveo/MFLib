@@ -68,12 +68,24 @@ public:
   int  GetMultiplierIdx0();
   int  GetMultiplierIdx1();
 
+  void WriteUzfFirstSp();
+  void WriteDataSetWithZeros(hsize_t dim[3], hsize_t start[3]);
+
+  void Extend3dDblArray (
+    const char* a_path,
+    int a_sp,
+    int a_nCells);
+  void Extend2dDblArray (
+    const char* a_path,
+    int a_sp,
+    int a_nCells);
+
 
   NativePackExp* m_pack;
   const double*  m_dData;
   const Real    *m_rData, *m_rMult;
   const int     *m_iData, *m_iMult, *m_iPRN;
-  int            m_nVal, m_tmp_iMult;
+  int            m_nVal, m_tmp_iMult, m_layer;
   CStr           m_multStr, m_dimStr;
   std::vector<hsize_t> m_start, m_n2write;
 
@@ -110,6 +122,34 @@ static bool iRchEtEtsLayerData (const CStr& a_)
       && a_.Find("09. Layer") != -1) return true;
   return false;
 } // iRchEtEtsLayerData
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+static bool iUzfPackData (const CStr& a_)
+{
+  if (   a_.Find("UZF/") != -1
+     ) return true;
+  return false;
+} // iUzfPackData
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+static bool iUzfStressData (const CStr& a_)
+{
+  if (   a_.Find("UZF/07. Property") != -1
+    ) return true;
+  return false;
+} // iUzfStressData
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+static bool iSeawatData (const CStr& a_)
+{
+  if (   a_.Find("VDF/") != -1
+      || a_.Find("VSC/") != -1
+    ) return true;
+  return false;
+} // iUzfPackData
 //------------------------------------------------------------------------------
 /// \brief Gets the index of a multidimensional array like RCH or ET so we know
 /// where to write the data
@@ -172,6 +212,29 @@ bool H5ArrayWriter::ForceToH5File ()
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
+void H5ArrayWriter::Extend3dDblArray (
+  const char* a_path
+, int a_sp
+, int a_nCells
+)
+{
+  m_p->Extend3dDblArray(a_path, a_sp, a_nCells);
+} // H5ArrayWriter::Extend3dDblArray
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void H5ArrayWriter::Extend2dDblArray (
+  const char* a_path
+, int a_sp
+, int a_nCells
+)
+{
+  m_p->Extend2dDblArray(a_path, a_sp, a_nCells);
+} // H5ArrayWriter::Extend2dDblArray
+
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
 H5ArrayWriter::impl::impl (NativePackExp* a_) :
   m_pack(a_)
 , m_dData(nullptr)
@@ -182,6 +245,7 @@ H5ArrayWriter::impl::impl (NativePackExp* a_) :
 , m_iPRN(nullptr)
 , m_nVal(0)
 , m_tmp_iMult(0)
+, m_layer(-1)
 , m_start(2,0)
 , m_n2write(2,1)
 {
@@ -257,6 +321,22 @@ void H5ArrayWriter::impl::SetH5DimensionsForWriting (H5DataSetWriter& a_h)
       start[1] = (hsize_t)spIdx;
       n2write[0] = (hsize_t)m_nVal;
     }
+  }
+  else if (iUzfStressData(path))
+  {
+    useDimArrays = true;
+    start[0] = (hsize_t)(iPackNameToArrayIndex(packName));
+    start[2] = (hsize_t)spIdx;
+    n2write[1] = (hsize_t)m_nVal;
+  }
+  else if (iSeawatData(path))
+  {
+    useDimArrays = true;
+    int start1 = m_nVal*(m_layer-1);
+    if (start1 < 0) { ASSERT(0); start1 = 0; }
+    start[1] = (hsize_t)(start1);
+    start[2] = (hsize_t)spIdx;
+    n2write[1] = (hsize_t)m_nVal;
   }
 
   if (!useDimArrays) m_dimStr.Format("1 0 %d", m_nVal);
@@ -349,6 +429,7 @@ CStr H5ArrayWriter::impl::H5Path ()
   CStr path, packName(p->PackageName());
   const int* layer(0);
   p->GetField(Packages::Array::LAYER, &layer);
+  if (layer) m_layer = *layer;
 
   if (packName.find("ZONE ARRAY:") != -1 ||
       packName.Find("MULT. ARRAY:") != -1)
@@ -403,6 +484,18 @@ int H5ArrayWriter::impl::GetNumDim ()
   {
     if (iRchEtEtsLayerData(path)) nDim = 2;
     else                          nDim = 3;
+  }
+  else if (iUzfPackData(path))
+  {
+    if (iUzfStressData(path))
+    {
+      nDim = 3;
+      WriteUzfFirstSp();
+    }
+  }
+  else if (iSeawatData(path))
+  {
+    nDim = 3;
   }
   return nDim;
 } // H5ArrayWriter::GetNumDim 
@@ -532,7 +625,98 @@ int H5ArrayWriter::impl::GetMultiplierIdx1 ()
   int   rval(m_pack->GetGlobal()->GetCurrentPeriod()-1);
   return rval;
 } // H5ArrayWriter::impl::GetMultiplierIdx1
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void H5ArrayWriter::impl::WriteUzfFirstSp ()
+{
+  int flag(1);
+  if (!m_pack->GetGlobal()->GetIntVar("UZF_ARRAY_FIRST_TIME", flag))
+  {
+    flag = 0;
+    m_pack->GetGlobal()->SetIntVar("UZF_ARRAY_FIRST_TIME", flag);
+    std::vector<hsize_t> tmpDim(3, 1), tmpStart(3, 0);
+    tmpDim[0] = 4;
+    tmpDim[1] = static_cast<hsize_t>(GetNumValsToWrite());
+    tmpDim[2] = static_cast<hsize_t>(m_pack->GetGlobal()->NumPeriods());
+    WriteDataSetWithZeros(&tmpDim[0], &tmpStart[0]);
+  }
+} // H5ArrayWriter::impl::WriteUzfFirstSp
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void H5ArrayWriter::impl::WriteDataSetWithZeros (
+  hsize_t dim[3]
+, hsize_t start[3]
+)
+{
+  // we don't want num to be bigger than ~75MB when num is about 10 million
+  CStr f(H5Filename());
+  CStr path(H5Path());
+  int nSp = 10000000 / (int)(dim[0] * dim[1]);
+  int dim2 = nSp;
+  if (dim[2] < nSp) dim2 = (int)dim[2];
+  CAR_DBL3D dat;
+  dat.SetSize(static_cast<int>(dim[0]),
+              static_cast<int>(dim[1]),
+              dim2, 0);
 
-
+  for (int start2 = 0; start2 < (int)dim[2]; start2 += nSp)
+  {
+    H5DataSetWriterSetup s(f, path, H5T_NATIVE_DOUBLE, 3);
+    std::vector<hsize_t> start1(&start[0], &start[3]),
+                          n2write(&dim[0], &dim[3]);
+    start1[2] += start2;
+    if (start2 + dim2 > (int)dim[2]) dim2 = (int)dim[2] - start2;
+    n2write[2] = (hsize_t)dim2;
+    H5DSWriterDimInfo dim1(start1, n2write);
+    H5DataSetWriter w(&s);
+    w.SetDimInfoForWriting(&dim1);
+    size_t num1(static_cast<size_t>(dim[0] * dim[1] * dim2));
+    w.WriteData(&dat.at(0,0,0), num1);
+  }
+} // H5ArrayWriter::impl::WriteDataSetWithZeros
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void H5ArrayWriter::impl::Extend3dDblArray (
+  const char* a_path
+, int a_sp
+, int a_nCells
+)
+{
+  CStr fname(H5Filename());
+  H5DataSetWriterSetup setup(fname, a_path, H5T_NATIVE_DOUBLE , 3);
+  H5DataSetWriter h(&setup);
+  h.AllowTypeConversions(true);
+  std::vector<hsize_t> start(3, 0), n2write(3, 1);
+  start[2] = a_sp - 1;
+  n2write[1] = a_nCells;
+  H5DSWriterDimInfo dim(start, n2write);
+  h.SetDimInfoForWriting(&dim);
+  std::vector<double> data(a_nCells, 0);
+  h.WriteData(&data[0], data.size());
+} // H5ArrayWriter::impl::Extend3dDblArray
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void H5ArrayWriter::impl::Extend2dDblArray (
+  const char* a_path
+, int a_sp
+, int a_nLayers
+)
+{
+  CStr fname(H5Filename());
+  H5DataSetWriterSetup setup(fname, a_path, H5T_NATIVE_DOUBLE , 2);
+  H5DataSetWriter h(&setup);
+  h.AllowTypeConversions(true);
+  std::vector<hsize_t> start(2, 0), n2write(2, 1);
+  start[1] = a_sp - 1;
+  n2write[0] = a_nLayers;
+  H5DSWriterDimInfo dim(start, n2write);
+  h.SetDimInfoForWriting(&dim);
+  std::vector<double> data(a_nLayers, 0);
+  h.WriteData(&data[0], data.size());
+} // H5ArrayWriter::impl::Extend2dDblArray
 
 

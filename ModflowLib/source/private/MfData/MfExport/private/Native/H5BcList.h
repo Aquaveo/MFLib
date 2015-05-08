@@ -42,12 +42,14 @@ namespace MfData
                                const char *a_h5Path,
                                const std::vector<CStr>& a_array);
 
-      void WriteMapIdsForListBcs();
-      CStr LstPack(int& a_maxBc);
-      void LstPar();
-      CStr Str();
-      CStr Mnw2();
-      CStr Mnw1();
+      void WriteMapIdsForListBcs ();
+      CStr LstPack (int& a_maxBc);
+      void LstPar ();
+      CStr Str (int& a_itmp);
+      CStr SfrLn2 ();
+      CStr SfrLn6 (int& a_itmp);
+      CStr Mnw2 ();
+      CStr Mnw1 ();
 
     private:
       NativePackExp* m_pack;

@@ -379,7 +379,8 @@ bool NeArealPar::ClustersDefinedFromStart ()
   if (!pFile.IsEmpty()) return clstInFile;
 
   // if there is no GMS parameter file we should have clusters
-  if (pFile.IsEmpty() && !clstExist) ASSERT(0);
+  // not anymore because we use this to do H5 also
+  //if (pFile.IsEmpty() && !clstExist) ASSERT(0);
   return true;
 } // NeArealPar::ClustersDefinedFromStart
 //------------------------------------------------------------------------------

@@ -2027,6 +2027,7 @@ bool MfData::Packages::GetBcData (MfData::MfPackage* a_package,
                                   std::vector<CStr> &a_names)
 {
   const char          *auxNames(0);
+  int                  nAux(0);
   char                 tmpAux[17];
   std::vector<CStr>    bcFieldNames;
 
@@ -2035,16 +2036,17 @@ bool MfData::Packages::GetBcData (MfData::MfPackage* a_package,
   a_package->GetField(MfData::Packages::ListPack::DATA, a_data);
   a_package->GetField(MfData::Packages::ListPack::NAUX, a_nAux);
   a_package->GetField(MfData::Packages::ListPack::AUX, &auxNames);
-  if (!a_nBcs || !a_dataFields || !a_data || !a_nAux || !auxNames)
+  if (*a_nAux) nAux = **a_nAux;
+  if (!a_nBcs || !a_dataFields || !a_data/* || !a_nAux || !auxNames*/)
     return false;
 
   MfData::Packages::GetBcFieldNames(a_packName, bcFieldNames);
-  if (a_packName == CStr("DRT") && **a_dataFields - **a_nAux < 9)
+  if (a_packName == CStr("DRT") && **a_dataFields - nAux < 9)
   {
     // if using DRT without return flow then remove last four fields
     bcFieldNames.resize(2);
   }
-  *a_nFields = (int)bcFieldNames.size() + 3 + **a_nAux;
+  *a_nFields = (int)bcFieldNames.size() + 3 + nAux;
 
   a_names.assign(*a_nFields, CStr());
   a_names.at(0) = "k";
@@ -2059,7 +2061,7 @@ bool MfData::Packages::GetBcData (MfData::MfPackage* a_package,
   int start, i, j, cnt(0);
   tmpAux[16] = '\0';
   start = static_cast<int>(3 + bcFieldNames.size());
-  for (i=0; i<**a_nAux; i++)
+  for (i=0; i<nAux; i++)
   {
     for (j=0; j<16; j++)
     {

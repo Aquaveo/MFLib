@@ -15,7 +15,7 @@ namespace MfData
     {
       friend NativeExpUzfT;
     public:
-      NativeExpUzf();
+      NativeExpUzf(bool a_h5);
       ~NativeExpUzf();
       virtual bool Export();
 
@@ -27,6 +27,7 @@ namespace MfData
       void Lines2to8();
       void Lines9to16();
 
+      bool m_h5;
       int m_iuzfopt, m_irunflg, m_ietflg, m_nuzgag;
     };
 

@@ -11,6 +11,7 @@
 
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
+#include <private\MfData\MfExport\private\Native\H5BcList.h>
 #include <private\MfData\MfExport\private\Native\NativeUtil.h>
 #include <private\MfData\MfExport\private\TxtExporter.h>
 #include <private\MfData\MfGlobal.h>
@@ -32,6 +33,7 @@ namespace
   const CStr SFR_NPARSEG       = "SFR_NPARSEG";
   const CStr SFR_NO_PARAM      = "SFR_00";
   const CStr SFR_LINE5         = "SFR_LINE5";
+  const CStr SFR_H5_LINE_5     = "SFR_H5_LINE_5";
 
 //------------------------------------------------------------------------------
 /// \brief
@@ -75,8 +77,9 @@ std::vector<Real>& SfrCondFact2 (int a_idx)
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-NativeExpSfr::NativeExpSfr () :
-  m_iseg(0)
+NativeExpSfr::NativeExpSfr (bool a_h5) :
+  m_h5(a_h5)
+, m_iseg(0)
 , m_iotsg(0)
 , m_idivar(0)
 , m_segOrig(0)
@@ -121,6 +124,7 @@ bool NativeExpSfr::Export ()
   }
   else if (Packages::SFRLine1 == nm)
   {
+    if (m_h5) AddToStoredLinesDesc("#GMS_HDF5_01", "");
     Line1();
     WriteCommentsSfr();
   }
@@ -136,7 +140,7 @@ bool NativeExpSfr::Export ()
   {
     Line6();
     WriteStoredLinesSfr();
-    if (GetGlobal()->GetCurrentPeriod() == GetGlobal()->NumPeriods())
+    if (!m_h5 && GetGlobal()->GetCurrentPeriod() == GetGlobal()->NumPeriods())
     {
       LastChanceBeforeWriting();
     }
@@ -194,6 +198,15 @@ void NativeExpSfr::Line1 ()
 //------------------------------------------------------------------------------
 void NativeExpSfr::Line2 ()
 {
+  CStr desc = " 2. KRCH IRCH JRCH ISEG IREACH RCHLEN ";
+  if (m_usg) desc.Replace(" 2", "2a");
+  if (m_h5)
+  {
+    H5BcList h(this);
+    CStr line = h.SfrLn2();
+    if (!line.empty()) AddToStoredLinesDesc(line, desc);
+    return;
+  }
   using namespace MfData::Packages;
   const int *nstrm(0), *nss(0), *isfropt(0), *istrm(0), *nistrmd(0), *nstrmd(0);
   const Real *strm(0), *uhc(0);
@@ -222,9 +235,7 @@ void NativeExpSfr::Line2 ()
     CStr ln;
     for (int i = 0; i < numReaches; i++)
     {
-      CStr desc = " 2. KRCH IRCH JRCH ISEG IREACH RCHLEN ";
       int nrch;
-      if (m_usg) desc.Replace(" 2", "2a");
       int ck = istrm[i*(*nistrmd)+0];
       int ci = istrm[i*(*nistrmd)+1];
       int cj = istrm[i*(*nistrmd)+2];
@@ -290,7 +301,8 @@ void NativeExpSfr::Line5 ()
   {
     CStr ln;
     ln.Format("%5d %5d %5d", *itmp, *irdflg, *iptflg);
-    AddToStoredLinesDesc(ln, Desc5());
+    if (!m_h5) AddToStoredLinesDesc(ln, Desc5());
+    GetGlobal()->SetStrVar(SFR_H5_LINE_5, ln);
     CStr tmp;
     GetGlobal()->GetStrVar(SFR_LINE5, tmp);
     if (tmp.IsEmpty()) tmp += "\n";
@@ -303,6 +315,22 @@ void NativeExpSfr::Line5 ()
 //------------------------------------------------------------------------------
 void NativeExpSfr::Line6 ()
 {
+  if (m_h5)
+  {
+    CStr line6, line5, desc = "6a. NSEG ICALC OUTSEG IUPSEG";
+    GetGlobal()->GetStrVar(SFR_H5_LINE_5, line5);
+    H5BcList h(this);
+    int irdflg, iptflg, itmp, tmpItmp;
+    std::stringstream ss;
+    ss << line5;
+    ss >> itmp >> irdflg >> iptflg;
+    tmpItmp = itmp;
+    line6 = h.SfrLn6(tmpItmp);
+    if (itmp != tmpItmp) line5.Format("%5d %5d %5d", tmpItmp, irdflg, iptflg);
+    AddToStoredLinesDesc(line5, Desc5());
+    if (!line6.empty()) AddToStoredLinesDesc(line6, desc);
+    return;
+  }
   using namespace MfData::Packages;
   using util::ForElement;
   const int *nstrm(0), *nss(0), *isfropt(0);
@@ -921,6 +949,7 @@ void NativeExpSfr::LastChanceBeforeWriting ()
   }
 
   CStr tmpF = CopySfrFile();
+  GetNative()->GetExp()->ClearFile(Packages::SFR);
   RewriteLines1and2(tmpF, NparToWrite());
   std::vector< std::vector<CStr> > vecParSp;
   WriteLines3and4(vecParSp);

@@ -13,11 +13,20 @@ namespace MfData
     class H5ArrayWriter
     {
     public:
-      H5ArrayWriter(NativePackExp* a_);
-      ~H5ArrayWriter();
+      H5ArrayWriter (NativePackExp* a_);
+      ~H5ArrayWriter ();
 
-      CStr WriteData();
-      bool ForceToH5File();
+      CStr WriteData ();
+      bool ForceToH5File ();
+
+      void Extend3dDblArray (
+        const char* a_path,
+        int a_sp,
+        int a_nCells);
+      void Extend2dDblArray (
+        const char* a_path,
+        int a_sp,
+        int a_nCells);
 
     private:
       class impl;

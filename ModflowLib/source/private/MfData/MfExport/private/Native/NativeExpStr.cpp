@@ -11,6 +11,7 @@
 
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
+#include <private\MfData\MfExport\private\Native\H5BcList.h>
 #include <private\MfData\MfExport\private\Native\NativeExpNam.h>
 #include <private\MfData\MfExport\private\Native\NativeUtil.h>
 #include <private\MfData\MfExport\private\TxtExporter.h>
@@ -152,9 +153,15 @@ void NativeExpStr::Lines5to6 ()
       a_p->GetField(Packages::STRpack::ITRBAR, &itrbar) && itrbar &&
       a_p->GetField(Packages::STRpack::IDIVAR, &idivar) && idivar)
   {
-    CStr line;
+    CStr line, line2;
     CStr desc = " 5. ITMP IRDFLG IPTFLG";
-    line.Format("%9d %9d %9d", *itmp, *irdflg, *iptflg);
+    int tmpItmp(*itmp);
+    if (m_h5)
+    {
+      H5BcList h(this);
+      line2 = h.Str(tmpItmp);
+    }
+    line.Format("%9d %9d %9d", tmpItmp, *irdflg, *iptflg);
     AddToStoredLinesDesc(line, desc);
     // store variables
     std::stringstream ss;
@@ -170,10 +177,18 @@ void NativeExpStr::Lines5to6 ()
       desc.Replace(" 6", "6a");
       if (m_unstructured) desc.Replace("6a. Layer Row Col", "6b. Node");
     }
-    for (int i=1; i<=*itmp; ++i)
+
+    if (m_h5)
     {
-      line = Line6FromData(i, istrm, strm);
-      AddToStoredLinesDesc(line, desc);
+      if (!line2.empty()) AddToStoredLinesDesc(line2, " 6 to 10");
+    }
+    else
+    {
+      for (int i=1; i<=*itmp; ++i)
+      {
+        line = Line6FromData(i, istrm, strm);
+        AddToStoredLinesDesc(line, desc);
+      }
     }
   }
 } // NativeExpStr::Lines5to6
@@ -234,6 +249,7 @@ CStr NativeExpStr::Line6FromData (int i,
 //------------------------------------------------------------------------------
 void NativeExpStr::Lines8to10 ()
 {
+  if (m_h5) return;
   const int *istrpb(0), *nss(0), *ntrib(0), *ndiv(0), *icalc(0), *istcb1(0),
             *istcb2(0), *itmp(0), *irdflg(0), *iptflg(0), *istrm(0),
             *nstrem(0), *mxstrm(0), *itrbar(0), *idivar(0);

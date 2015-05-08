@@ -15,7 +15,7 @@ namespace MfData
     {
       friend NativeExpSfrT;
     public:
-      NativeExpSfr();
+      NativeExpSfr(bool a_h5);
       ~NativeExpSfr();
       virtual bool Export();
 
@@ -47,6 +47,7 @@ namespace MfData
       CStr Xsec (int a_indexTwo, int a_indexOneFrom, int a_indexOneTo);
       CStr Qstage (int a_indexTwo, int a_indexOneFrom, int a_indexOneTo);
 
+      bool        m_h5;
       const int  *m_iseg, *m_iotsg, *m_idivar;
       const Real *m_segOrig, *m_xsec, *m_qstage;
       bool        m_writingPar;
@@ -87,7 +88,7 @@ namespace MfData
 
       std::map<int, CStr> m_mapKeyName;
       std::map<int, Real> m_mapKeyVal;
-      bool m_usg, m_unstructured;
+      bool                m_usg, m_unstructured;
     };
 
   }

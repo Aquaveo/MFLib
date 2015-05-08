@@ -35,7 +35,9 @@
 #include <private/MfData/Packages/MfPackage.h>
 #include <private/MfData/Packages/MfPackFields.h>
 #include <private/MfData/Packages/MfPackStrings.h>
+#include <private/Parameters.h>
 #include <private/Parameters/Param.h>
+#include <private/Parameters/ParamList.h>
 #include <private/util/EReadAsciiFile.h>
 
 //----- Forward declarations ---------------------------------------------------
@@ -52,59 +54,101 @@ using namespace MfData::Export;
 //----- Internal functions -----------------------------------------------------
 
 //----- Class / Function definitions -------------------------------------------
-class H5LstPack::impl
+
+//------------------------------------------------------------------------------
+class H5SfrPack
 {
 public:
-  impl (
-     MfData::MfGlobal* a_g
-   , MfData::MfPackage* a_p
-   , Mf2kNative* a_n
-   , H5BcList* a_lbc)
-    : m_glob(a_g)
-    , m_p(a_p)
-    , m_native(a_n)
-    , m_lbc(a_lbc)
-    , m_itmp(0)
-    , m_maxBc(0)
-    , m_np(0)
-    , m_vCellids(0)
-    , m_vIface(0)
-    , m_vCellgrp(0)
-    , m_nBcs(0)
-    , m_nAux(0)
-    , m_nDataFields(0)
-    , m_data(0)
-    , m_PHIRAMP(0)
-    , m_ifaceIdx(-1)
-    , m_cellgrpIdx(-1)
-    , m_seawatIdx0(-1)
-    , m_seawatIdx1(-1)
-    , m_condfactIdx(-1)
-    , m_qfactIdx(-1)
-    , m_maxBcSoFar(0)
-    , m_prevSpNumBc(0)
-    , m_grid(a_g->NumRow(),a_g->NumCol())
-  {}
-  ~impl() {}
+  H5SfrPack (H5LstPack::impl& a_) :
+     m_p(a_)
+   , m_nstrm(0), m_nss(0), m_isfropt(0), m_istrm(0), m_nistrmd(0), m_nstrmd(0)
+   , m_strm(0), m_iseg(0), m_iotsg(0), m_idivar(0), m_seg(0), m_xsec(0)
+   , m_qstage(0)
+      {}
 
-  CStr Write(int& a_maxBc);
-  bool Init();
-  bool SetupForWrite();
-  void SetType();
-  void SetParamType();
-  void SetAuxFieldIdx();
-  void FillBcData();
-  void ExistingBcData(int a_start);
-  int  GetBcIndex(int a_cellid);
-  void GetArrayOfUsedBcIndices(std::vector<char>& a_vAlreadyUsed);
-  void WriteUseLast();
-  void GetBcDataFromPar();
-  void HandleUseLast();
-  void FillData();
-  void GetSeawatBcIdx(int& a_seawatBcIdx0, int& a_seawatBcIdx1);
-  CStr WriteBcData();
-  void LstPar();
-  void WriteMapIds();
+  bool Init ();
+  CStr Ln2 ();
+  CStr Ln6 (int& a_itmp);
+  void WriteReach ();
+  void WriteUseLast ();
+  void WriteSegData ();
+  void WriteSegFlow ();
+
+  H5LstPack::impl& m_p;
+  const int *m_nstrm, *m_nss, *m_isfropt, *m_istrm, *m_nistrmd, *m_nstrmd;
+  const Real *m_strm;
+  const int *m_iseg, *m_iotsg, *m_idivar;
+  const Real *m_seg, *m_xsec, *m_qstage;
+  int m_numReaches;
+};
+
+//------------------------------------------------------------------------------
+class H5StrPack
+{
+public:
+  H5StrPack (H5LstPack::impl& a_) :
+      m_p(a_),
+        m_istrpb(0), m_nss(0), m_ntrib(0), m_ndiv(0), m_icalc(0),
+        m_istcb1(0), m_istcb2(0), m_itmp(0), m_irdflg(0), m_iptflg(0),
+        m_istrm(0), m_nstrem(0), m_mxstrm(0), m_itrbar(0), m_idivar(0),
+        m_constv(0), m_strm(0), m_streamFields(11)
+      {
+      }
+
+      CStr Write (int& a_itmp);
+      bool Init ();
+      void FillBcData ();
+      void WriteSegData ();
+      void SegTribToh5 ();
+
+      H5LstPack::impl& m_p;
+      const int  *m_istrpb, *m_nss, *m_ntrib, *m_ndiv, *m_icalc, *m_istcb1,
+                 *m_istcb2, *m_itmp, *m_irdflg, *m_iptflg, *m_istrm,
+                 *m_nstrem, *m_mxstrm, *m_itrbar, *m_idivar;
+      const Real *m_constv, *m_strm;
+      int         m_streamFields;
+
+};
+
+//------------------------------------------------------------------------------
+class H5LstPack::impl
+{
+  friend H5StrPack;
+  friend H5SfrPack;
+
+public:
+  impl (  MfData::MfGlobal* a_g
+        , MfData::MfPackage* a_p
+        , Mf2kNative* a_n
+        , H5BcList* a_lbc
+        )
+    :   m_glob(a_g), m_p(a_p), m_native(a_n), m_lbc(a_lbc), m_itmp(0)
+      , m_maxBc(0), m_np(0), m_vCellids(0), m_vIface(0), m_vCellgrp(0)
+      , m_nBcs(0), m_nAux(0), m_nDataFields(0), m_istrm(0), m_data(0)
+      , m_PHIRAMP(0), m_ifaceIdx(-1), m_cellgrpIdx(-1), m_seawatIdx0(-1)
+      , m_seawatIdx1(-1), m_condfactIdx(-1), m_qfactIdx(-1), m_maxBcSoFar(0)
+      , m_prevSpNumBc(0), m_grid(a_g->NumRow(),a_g->NumCol()), m_istrmSize(5)
+  {}
+  ~impl () {}
+
+  CStr Write (int& a_maxBc);
+  bool Init ();
+  bool SetupForWrite ();
+  void SetType ();
+  void SetParamType ();
+  void SetAuxFieldIdx ();
+  void FillBcData ();
+  void ExistingBcData (int a_start);
+  int  GetBcIndex (int a_cellid);
+  void GetArrayOfUsedBcIndices (std::vector<char>& a_vAlreadyUsed);
+  void WriteUseLast ();
+  void GetBcDataFromPar ();
+  void HandleUseLast ();
+  void FillData ();
+  void GetSeawatBcIdx (int& a_seawatBcIdx0, int& a_seawatBcIdx1);
+  CStr WriteBcData ();
+  void LstPar ();
+  void WriteMapIds ();
   bool ReadListBcMapIdComments (
       const CStr& a_fname
     , const CStr& a_ftype
@@ -117,6 +161,9 @@ public:
       TxtExporter *a_exp
     , const std::vector<CStr>& a_mapids
     , const CStr& a_type);
+  CStr StrPack (int& a_itmp);
+  CStr SfrLn2 ();
+  CStr SfrLn6 (int& a_itmp);
 
   MfData::MfPackage* m_p;
   MfData::MfGlobal*  m_glob;
@@ -126,8 +173,9 @@ public:
   CStr                m_type, m_ptype, m_file, m_packName;
   const int          *m_itmp, *m_maxBc, *m_np;
   std::vector<int>   *m_vCellids, *m_vIface, *m_vCellgrp, m_idxs;
-  const int          *m_nBcs, *m_nAux, *m_nDataFields;
-  int                 m_nFields, m_modIdx, m_sp, m_maxIdx, m_minIdx, m_dSize;
+  const int          *m_nBcs, *m_nAux, *m_nDataFields, *m_istrm;
+  int                 m_nFields, m_modIdx, m_sp, m_maxIdx, m_minIdx, m_dSize,
+                      m_istrmSize;
   const Real         *m_data, *m_PHIRAMP;
   std::vector<CStr>   m_fieldStrings;
   int                 m_ifaceIdx, m_cellgrpIdx, m_seawatIdx0, m_seawatIdx1,
@@ -138,11 +186,27 @@ public:
   CAR_DBL2D           m_bcData;
 };
 
+
 typedef std::vector< std::pair<int, int> > VEC_INT_PAIR;
 typedef stdext::hash_map<int, VEC_INT_PAIR> HMAP;
 //------------------------------------------------------------------------------
 namespace
 {
+  enum sfr2SegFds_enum {
+    SFR2S_ICALC=0, SFR2S_OUTSEG,SFR2S_IUPSEG,
+    SFR2S_IPRIOR, SFR2S_FLOW,
+    SFR2S_RUNOFF, SFR2S_ETSW, SFR2S_PPTSW, SFR2S_ROUGHCH,
+    SFR2S_ROUGHBK, SFR2S_CDPTH, SFR2S_FDPTH, SFR2S_AWDPTH,
+    SFR2S_BWDTH, SFR2S_HCOND1, SFR2S_THICKM1, SFR2S_ELEVUP,
+    SFR2S_WIDTH1, SFR2S_DEPTH1, SFR2S_HCOND2,SFR2S_THICKM2,
+    SFR2S_ELEVDN, SFR2S_WIDTH2, SFR2S_DEPTH2,
+    SFR2S_XSECT,
+    SFR2S_XS02,SFR2S_XS03,SFR2S_XS04,SFR25_XS05,SFR2S_XS06,
+    SFR2S_XS07,SFR2S_XS08,SFR2S_XS09,SFR25_XS10,SFR2S_XS11,
+    SFR2S_XS12,SFR2S_XS13,SFR2S_XS14,SFR25_XS15,
+    SFR2S_XSECT_END,
+    SFR2S_COND1FACT, SFR2S_COND2FACT,
+    SFR2S_NPROP };
 
 //------------------------------------------------------------------------------
 /// \brief writes an int attribute to a dataset
@@ -289,6 +353,27 @@ CStr H5LstPack::Write (int& a_maxBc)
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
+CStr H5LstPack::StrPack (int& a_itmp)
+{
+  return m_p->StrPack(a_itmp);
+} // H5LstPack::StrPack
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+CStr H5LstPack::SfrLn2 ()
+{
+  return m_p->SfrLn2();
+} // H5LstPack::SfrLn2
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+CStr H5LstPack::SfrLn6 (int& a_itmp)
+{
+  return m_p->SfrLn6(a_itmp);
+} // H5LstPack::SfrLn6
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
 void H5LstPack::LstPar ()
 {
  m_p->LstPar();
@@ -323,6 +408,8 @@ bool H5LstPack::impl::Init ()
   using namespace MfData::Packages;
   m_packName = m_p->PackageName();
   if (LPRM == m_packName) GetPackNameFromParameter(m_p, m_packName);
+  if (SFRLine1 == m_packName || SFRLine2 == m_packName ||
+      SFRLine5 == m_packName || SFRLine6 == m_packName) m_packName = SFR;
   SetType();
   SetParamType();
   m_sp = m_glob->GetCurrentPeriod();
@@ -357,12 +444,14 @@ bool H5LstPack::impl::SetupForWrite ()
 void H5LstPack::impl::SetType ()
 {
   using namespace MfData::Packages;
-  if (DRN == m_packName)      m_type = "Drain";
-  else if (DRT == m_packName) m_type = "Drain Return";
-  else if (RIV == m_packName) m_type = "River";
-  else if (WEL == m_packName) m_type = "Well";
-  else if (GHB == m_packName) m_type = "General Head";
-  else if (CHD == m_packName) m_type = "Specified Head";
+  if (DRN == m_packName)        m_type = "Drain";
+  else if (DRT == m_packName)   m_type = "Drain Return";
+  else if (RIV == m_packName)   m_type = "River";
+  else if (WEL == m_packName)   m_type = "Well";
+  else if (GHB == m_packName)   m_type = "General Head";
+  else if (CHD == m_packName)   m_type = "Specified Head";
+  else if (STRSP == m_packName) m_type = "Stream";
+  else if (SFR == m_packName)   m_type = "Stream (SFR2)";
   else m_type = "";
 } // H5LstPack::impl::SetType
 //------------------------------------------------------------------------------
@@ -371,13 +460,15 @@ void H5LstPack::impl::SetType ()
 void H5LstPack::impl::SetParamType ()
 {
   using namespace MfData::Packages;
-  if (DRN == m_packName)      m_ptype = "DRN";
-  else if (DRT == m_packName) m_ptype = "DRT";
-  else if (RIV == m_packName) m_ptype = "RIV";
-  else if (WEL == m_packName) m_ptype = "Q";
-  else if (GHB == m_packName) m_ptype = "GHB";
-  else if (CHD == m_packName) m_ptype = "CHD";
-  else                        m_ptype = "";
+  if (DRN == m_packName)        m_ptype = "DRN";
+  else if (DRT == m_packName)   m_ptype = "DRT";
+  else if (RIV == m_packName)   m_ptype = "RIV";
+  else if (WEL == m_packName)   m_ptype = "Q";
+  else if (GHB == m_packName)   m_ptype = "GHB";
+  else if (CHD == m_packName)   m_ptype = "CHD";
+  else if (STRSP == m_packName) m_ptype = "STR";
+  else if (SFR == m_packName)   m_ptype = "SFR";
+  else                          m_ptype = "";
   m_pList = MfExportUtil::GetParamsOfType(m_ptype);
 } // H5LstPack::impl::SetParamType
 //------------------------------------------------------------------------------
@@ -451,9 +542,18 @@ void H5LstPack::impl::ExistingBcData (int a_start)
   int ck, ci, cj, cellId;
   for (int i=a_start; i<(*m_nBcs+a_start) && *m_itmp > -1; i++)
   {
-    ck = static_cast<int>(m_data[i*(*m_nDataFields)+0]);
-    ci = static_cast<int>(m_data[i*(*m_nDataFields)+1]);
-    cj = static_cast<int>(m_data[i*(*m_nDataFields)+2]);
+    if (m_istrm)
+    {
+      ck = m_istrm[i*(m_istrmSize)+0];
+      ci = m_istrm[i*(m_istrmSize)+1];
+      cj = m_istrm[i*(m_istrmSize)+2];
+    }
+    else
+    {
+      ck = static_cast<int>(m_data[i*(*m_nDataFields)+0]);
+      ci = static_cast<int>(m_data[i*(*m_nDataFields)+1]);
+      cj = static_cast<int>(m_data[i*(*m_nDataFields)+2]);
+    }
     cellId = m_grid.IdFromIJK(ci, cj, ck);
     m_idxs.push_back(GetBcIndex(cellId));
     if (m_idxs.back() > m_maxIdx)
@@ -987,6 +1087,546 @@ void H5LstPack::impl::WriteListBcMapIdsToH5 (
     H5Dclose(dataId);
   }
 } // H5LstPack::impl::WriteListBcMapIdsToH5
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+CStr H5LstPack::impl::StrPack (int& a_itmp)
+{
+  CStr rval;
+  H5StrPack s(*this); 
+  rval = s.Write(a_itmp);
+  return rval;
+} // H5LstPack::impl::StrPack
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+CStr H5LstPack::impl::SfrLn2 ()
+{
+  CStr rval;
+  H5SfrPack s(*this); 
+  rval = s.Ln2();
+  return rval;
+} // H5LstPack::impl::SfrLn2
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+CStr H5LstPack::impl::SfrLn6 (int& a_itmp)
+{
+  CStr rval;
+  H5SfrPack s(*this); 
+  rval = s.Ln6(a_itmp);
+  return rval;
+} // H5LstPack::impl::SfrLn6
+
+////////////////////////////////////////////////////////////////////////////////
+/// \class H5StrPack
+////////////////////////////////////////////////////////////////////////////////
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+CStr H5StrPack::Write (int& a_itmp)
+{
+  CStr rval; 
+  if (Init())
+  {
+    m_p.WriteUseLast();
+    m_p.ExistingBcData(0);
+    iSizeBcDataArray(m_p.m_type, m_p.m_maxIdx, m_p.m_bcData);
+    FillBcData();
+    rval = m_p.WriteBcData();
+    WriteSegData();
+    if (*m_itmp > 0 || !m_p.m_pList.empty())
+    {
+      a_itmp = (int)m_p.m_vCellids->size();
+    }
+  }
+  return rval;
+} // H5StrPack::Write
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+bool H5StrPack::Init ()
+{
+  using namespace MfData;
+  using namespace MfData::Packages;
+  MfPackage* a_p = m_p.m_p;
+  if (a_p->GetField(STRpack::MXACTS, &m_istrpb) && m_istrpb &&
+      a_p->GetField(STRpack::NSS, &m_nss) && m_nss &&
+      a_p->GetField(STRpack::NTRIB, &m_ntrib) && m_ntrib &&
+      a_p->GetField(STRpack::NDIV, &m_ndiv) && m_ndiv &&
+      a_p->GetField(STRpack::ICALC, &m_icalc) && m_icalc &&
+      a_p->GetField(STRpack::CONSTV, &m_constv) && m_constv &&
+      a_p->GetField(STRpack::ISTCB1, &m_istcb1) && m_istcb1 &&
+      a_p->GetField(STRpack::ISTCB2, &m_istcb2) && m_istcb2 &&
+      a_p->GetField(STRpack::ITMP, &m_itmp) && m_itmp &&
+      a_p->GetField(STRpack::IRDFLG, &m_irdflg) && m_irdflg &&
+      a_p->GetField(STRpack::IPTFLG, &m_iptflg) && m_iptflg &&
+      a_p->GetField(STRpack::STRM, &m_strm) && m_strm &&
+      a_p->GetField(STRpack::ISTRM, &m_istrm) && m_istrm &&
+      a_p->GetField(STRpack::NSTREM, &m_nstrem) && m_nstrem &&
+      a_p->GetField(STRpack::MXSTRM, &m_mxstrm) && m_mxstrm &&
+      a_p->GetField(STRpack::ITRBAR, &m_itrbar) && m_itrbar &&
+      a_p->GetField(STRpack::IDIVAR, &m_idivar) && m_idivar &&
+      a_p->GetField(ListPack::ITMP, &m_p.m_itmp) && m_p.m_itmp)
+  {
+    m_p.Init();
+    m_p.m_maxBc = m_mxstrm;
+    m_p.m_data = m_strm;
+    m_p.m_nBcs = m_nstrem;
+    m_p.m_nFields = m_streamFields;
+    m_p.m_istrm = m_istrm;
+    return true;
+  }
+  return false;
+} // H5StrPack::Init
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void H5StrPack::FillBcData ()
+{
+  int nBcFields = 7;
+  for (int i=0; i<*m_p.m_nBcs; i++)
+  {
+    for (int j=0; j<nBcFields; j++)
+    {
+      m_p.m_bcData.at(j, m_p.m_idxs.at(i)) =
+        static_cast<double>(m_p.m_data[i*(m_p.m_nFields)+1+j]);
+    }
+    // CONDFACT
+    m_p.m_bcData.at(7, i) = 1.0;
+  }
+  // handle any stream parameters
+  {
+    ParamList *list(0);
+    Parameters::GetParameterList(&list);
+    Param p;
+    for (size_t ii=0; ii<list->Size(); ii++)
+    {
+      list->At(ii, &p);
+      if (p.m_type == "STR")
+      { // move the current conductance value to the condfact
+        // and set conductance to the key value
+        int stop = p.m_str_start + p.m_str_nbc;
+        for (int i=p.m_str_start; i<stop; i++)
+        {
+          m_p.m_bcData.at(7, i) = m_p.m_bcData.at(1, i);
+          m_p.m_bcData.at(1, i) = p.m_key;
+        }
+        p.m_str_start = -1;
+        p.m_str_nbc = -1;
+        list->UpdateParameter(&p);
+      }
+    }
+  }
+} // H5StrPack::FillBcData
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void H5StrPack::WriteSegData ()
+{
+  SegTribToh5(); // only on 1st stress period
+
+  { // write the segment ids and flow
+    std::vector<int> segmentIds;
+    std::vector<Real> flow;
+    int lastSegmentId = m_istrm[3] - 1;
+    segmentIds.assign(*m_nss, 0);
+    flow.assign(*m_nss, 0);
+    for (int i=0; i<*m_nss; ++i) segmentIds[i] = i+1;
+    for (int i = 0; i<*m_p.m_nBcs; ++i)
+    {
+      int segmentId = m_istrm[i*5+3];
+      if (segmentId != lastSegmentId)
+      {
+        flow[segmentId-1] = m_strm[i*(m_p.m_nFields)+0];
+        lastSegmentId = segmentId;
+      }
+    }
+
+    CStr path;
+    path.Format("%s/%s", m_p.m_type, MFBC_SEGFLW);
+    H5DataSetWriterSetup s(m_p.m_file, path, H5T_NATIVE_DOUBLE, 2);
+    std::vector<hsize_t> start(2, 0), n2write(2, flow.size());
+    start[1] = m_p.m_sp - 1;
+    n2write[0] = flow.size();
+    n2write[1] = 1;
+    H5DSWriterDimInfo dim(start, n2write);
+    H5DataSetWriter w(&s);
+    w.SetDimInfoForWriting(&dim);
+    w.AllowTypeConversions(true);
+    w.WriteData(&flow.at(0), flow.size());
+  }
+
+} // H5StrPack::WriteSegData
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void H5StrPack::SegTribToh5 ()
+{
+  if (m_p.m_sp != 1) return;
+  CStr path;
+  {
+    path.Format("%s/%s", m_p.m_type, MFBC_NSEG);
+    H5DataSetWriterSetup s(m_p.m_file, path, H5T_NATIVE_INT, 1);
+    std::vector<hsize_t> start(1, 0), n2write(1,1);
+    H5DSWriterDimInfo dim(start, n2write);
+    H5DataSetWriter w(&s);
+    w.SetDimInfoForWriting(&dim);
+    w.WriteData(m_nss, 1);
+  }
+  { // write the str reach segment ids
+    std::vector<int> reachIds;
+    for (int i=0; i<*m_p.m_nBcs; i++) reachIds.push_back(m_istrm[i*5+3]);
+    path.Format("%s/%s", m_p.m_type, MFBC_STRSEGID);
+    H5DataSetWriterSetup s(m_p.m_file, path, H5T_NATIVE_INT, 1);
+    std::vector<hsize_t> start(1, 0), n2write(1, reachIds.size());
+    H5DSWriterDimInfo dim(start, n2write);
+    H5DataSetWriter w(&s);
+    w.SetDimInfoForWriting(&dim);
+    w.WriteData(&reachIds.at(0), reachIds.size());
+  }
+  { // write the segment ids
+    std::vector<int> segmentIds;
+    segmentIds.assign(*m_nss, 0);
+    for (int i=0; i<*m_nss; ++i) segmentIds[i] = i+1;
+    path.Format("%s/%s", m_p.m_type, MFBC_SEGID);
+    H5DataSetWriterSetup s(m_p.m_file, path, H5T_NATIVE_INT, 1);
+    std::vector<hsize_t> start(1, 0), n2write(1, segmentIds.size());
+    H5DSWriterDimInfo dim(start, n2write);
+    H5DataSetWriter w(&s);
+    w.SetDimInfoForWriting(&dim);
+    w.WriteData(&segmentIds.at(0), segmentIds.size());
+  }
+  { // write the tributaries
+    CAR_INT2D itrib;
+    itrib.SetSize(*m_nss, 10, 0);
+    for (int segment = 0; segment < *m_nss; ++segment)
+    {
+      for (int trib = 0; trib < *m_ntrib; ++trib)
+      {
+        itrib.at(segment, trib) = m_itrbar[trib*(*m_nss) + segment];
+      }
+    }
+    path.Format("%s/%s", m_p.m_type, MFBC_ITRIB);
+    H5DataSetWriterSetup s(m_p.m_file, path, H5T_NATIVE_INT, 2);
+    std::vector<hsize_t> start(2, 0), n2write(2, 0);
+    n2write[0] = *m_nss;
+    n2write[1] = 10;
+    H5DSWriterDimInfo dim(start, n2write);
+    H5DataSetWriter w(&s);
+    w.SetDimInfoForWriting(&dim);
+    w.WriteData(&itrib.at(0,0), *m_nss*10);
+  }
+  { // write the upstream segment ids
+    path.Format("%s/%s", m_p.m_type, MFBC_UPID);
+    H5DataSetWriterSetup s(m_p.m_file, path, H5T_NATIVE_INT, 1);
+    std::vector<hsize_t> start(1, 0), n2write(1, *m_nss);
+    H5DSWriterDimInfo dim(start, n2write);
+    H5DataSetWriter w(&s);
+    w.SetDimInfoForWriting(&dim);
+    w.WriteData(m_idivar, *m_nss);
+  }
+} // H5StrPack::SegTribToh5
+
+////////////////////////////////////////////////////////////////////////////////
+/// \class H5SfrPack
+////////////////////////////////////////////////////////////////////////////////
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+bool H5SfrPack::Init ()
+{
+  using namespace MfData::Packages;
+  if (m_p.Init())
+  {
+    MfData::MfPackage* a_pSFRLine1 = m_p.m_glob->GetPackage(SFRLine1);
+    MfData::MfPackage* a_pSFRLine2 = m_p.m_glob->GetPackage(SFRLine2);
+    MfData::MfPackage* a_pSFRLine5 = m_p.m_glob->GetPackage(SFRLine5);
+    MfData::MfPackage* a_pSFRLine6 = m_p.m_glob->GetPackage(SFRLine6);
+    if (a_pSFRLine5 &&
+        a_pSFRLine5->GetField(SFRpack::ITMP, &m_p.m_itmp) && m_p.m_itmp &&
+        a_pSFRLine6 &&
+        a_pSFRLine6->GetField(SFRpack::ISEG, &m_iseg) && m_iseg &&
+        a_pSFRLine6->GetField(SFRpack::IOTSG, &m_iotsg) && m_iotsg &&
+        a_pSFRLine6->GetField(SFRpack::IDIVAR, &m_idivar) && m_idivar &&
+        a_pSFRLine6->GetField(SFRpack::SEG, &m_seg) && m_seg &&
+        a_pSFRLine6->GetField(SFRpack::XSEC, &m_xsec) && m_xsec &&
+        a_pSFRLine6->GetField(SFRpack::QSTAGE, &m_qstage) && m_qstage)
+    {
+    }
+
+    if (a_pSFRLine1->GetField(SFRpack::NSTRM, &m_nstrm) && m_nstrm &&
+        a_pSFRLine1->GetField(SFRpack::NSS, &m_nss) && m_nss &&
+        a_pSFRLine1->GetField(SFRpack::ISFROPT, &m_isfropt) && m_isfropt &&
+
+        a_pSFRLine2->GetField(SFRpack::ISTRM, &m_istrm) && m_istrm &&
+        a_pSFRLine2->GetField(SFRpack::NISTRMD, &m_nistrmd) && m_nistrmd &&
+        a_pSFRLine2->GetField(SFRpack::STRM, &m_strm) && m_strm &&
+        a_pSFRLine2->GetField(SFRpack::NSTRMD, &m_nstrmd) && m_nstrmd)
+    {
+      m_numReaches = *m_nstrm;
+      if (m_numReaches < 0) m_numReaches *= -1;
+      m_p.m_istrm = m_istrm;
+      m_p.m_nBcs = &m_numReaches;
+      m_p.m_istrmSize = *m_nistrmd;
+      return true;
+    }
+  }
+  return false;
+} // H5SfrPack::Init
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+CStr H5SfrPack::Ln2 ()
+{
+  CStr rval;
+  if (Init())
+  {
+    int itmp(1);
+    m_p.m_itmp = &itmp;
+    CStr file1;
+    util::StripPathFromFilename(m_p.m_file, file1);
+    rval.Format("GMS_HDF5_SFR2_REACH \"%s\" \"SFR2\"", file1);
+    m_p.ExistingBcData(0);
+    iSizeBcDataArray(m_p.m_type, m_p.m_maxIdx, m_p.m_bcData);
+    for (int i = 0; i < m_numReaches; ++i)
+    { // fill in the bcData
+      m_p.m_bcData.at(0, m_p.m_idxs.at(i)) =
+        static_cast<double>(m_strm[i*(*m_nstrmd)]);
+    }
+    m_p.WriteBcData();
+    WriteReach();
+  }
+  return rval;
+} // H5SfrPack::Ln2
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void H5SfrPack::WriteReach ()
+{
+  CStr path;
+  { // 08. Str reach segment ID (size: NSTRM)
+    std::vector<int> reachIds;
+    for (int i = 0; i < m_numReaches; ++i)
+    {
+      reachIds.push_back(m_istrm[i*(*m_nistrmd)+3]);
+    }
+    path.Format("%s/%s", m_p.m_type, MFBC_STRSEGID);
+    H5DataSetWriterSetup s(m_p.m_file, path, H5T_NATIVE_INT, 1);
+    std::vector<hsize_t> start(1, 0), n2write(1, reachIds.size());
+    H5DSWriterDimInfo dim(start, n2write);
+    H5DataSetWriter w(&s);
+    w.SetDimInfoForWriting(&dim);
+    w.WriteData(&reachIds.at(0), reachIds.size());
+  }
+  { // 13. Number of Segments (NSS)
+    path.Format("%s/%s", m_p.m_type, MFBC_NSEG);
+    H5DataSetWriterSetup s(m_p.m_file, path, H5T_NATIVE_INT, 1);
+    std::vector<hsize_t> start(1, 0), n2write(1,1);
+    H5DSWriterDimInfo dim(start, n2write);
+    H5DataSetWriter w(&s);
+    w.SetDimInfoForWriting(&dim);
+    w.WriteData(m_nss, 1);
+  }
+} // H5SfrPack::WriteReach
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+CStr H5SfrPack::Ln6 (int& a_itmp)
+{
+  CStr rval;
+  if (Init())
+  {
+    WriteUseLast();
+    WriteSegData();
+    WriteSegFlow();
+    CStr file1;
+    util::StripPathFromFilename(m_p.m_file, file1);
+    if (*m_p.m_itmp > 0 || !m_p.m_pList.empty())
+    {
+      if (*m_p.m_itmp < 1) a_itmp = *m_nss;
+      rval.Format("GMS_HDF5_01 \"%s\" \"SFR2\" %d", file1, m_p.m_sp);
+    }
+  }
+  return rval;
+} // H5SfrPack::Ln6
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void H5SfrPack::WriteUseLast ()
+{
+  CStr path;
+  path.Format("%s/%s", m_p.m_type, MFBC_USELAST);
+  H5DataSetWriterSetup s(m_p.m_file, path, H5T_NATIVE_INT, 1);
+  std::vector<hsize_t> start(1, m_p.m_sp-1), n2write(1,1);
+  H5DSWriterDimInfo dim(start, n2write);
+  H5DataSetWriter w(&s);
+  w.SetDimInfoForWriting(&dim);
+  int itmpToWrite = *m_p.m_itmp > 0 ? 0 : 1;
+  w.WriteData(&itmpToWrite, 1);
+} // H5SfrPack::WriteUseLast
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void H5SfrPack::WriteSegData ()
+{
+  using util::ForElement;
+  int sz=26;
+  m_p.m_glob->GetIntVar("SFR_SEG_SIZE", sz);
+  // 14. Segment Property
+  CAR_DBL2D v;
+  v.SetSize(SFR2S_NPROP, *m_nss, 0.0);
+
+  for (int i = 0; i < *m_nss; ++i)
+  {
+    int segnum = i + 1;
+    v.at(SFR2S_ICALC, i)   = ForElement(m_iseg, 1, segnum, 4);
+    v.at(SFR2S_OUTSEG, i)  = m_iotsg[i];
+    v.at(SFR2S_IUPSEG, i)  = ForElement(m_idivar, 1, segnum, 2);
+    v.at(SFR2S_IPRIOR, i)  = ForElement(m_idivar, 2, segnum, 2);
+    v.at(SFR2S_FLOW, i)    = ForElement(m_seg, 2, segnum, sz);
+    v.at(SFR2S_RUNOFF, i)  = ForElement(m_seg, 3, segnum, sz);
+    v.at(SFR2S_ETSW, i)    = ForElement(m_seg, 4, segnum, sz);
+    v.at(SFR2S_PPTSW, i)   = ForElement(m_seg, 5, segnum, sz);
+    v.at(SFR2S_ROUGHCH, i) = ForElement(m_seg, 16, segnum, sz);
+    v.at(SFR2S_ROUGHBK, i) = ForElement(m_seg, 17, segnum, sz);
+    v.at(SFR2S_CDPTH, i)   = ForElement(m_seg, 9, segnum, sz);
+    v.at(SFR2S_FDPTH, i)   = ForElement(m_seg, 10, segnum, sz);
+    v.at(SFR2S_AWDPTH, i)  = ForElement(m_seg, 14, segnum, sz);
+    v.at(SFR2S_BWDTH, i)   = ForElement(m_seg, 15, segnum, sz);
+    v.at(SFR2S_HCOND1, i)  = ForElement(m_seg, 6, segnum, sz);
+    v.at(SFR2S_THICKM1, i) = ForElement(m_seg, 7, segnum, sz);
+    v.at(SFR2S_ELEVUP, i)  = ForElement(m_seg, 8, segnum, sz);
+    v.at(SFR2S_WIDTH1, i)  = ForElement(m_seg, 9, segnum, sz);
+    v.at(SFR2S_DEPTH1, i)  = ForElement(m_seg, 10, segnum, sz);
+    v.at(SFR2S_HCOND2, i)  = ForElement(m_seg, 11, segnum, sz);
+    v.at(SFR2S_THICKM2, i) = ForElement(m_seg, 12, segnum, sz);
+    v.at(SFR2S_ELEVDN, i)  = ForElement(m_seg, 13, segnum, sz);
+    v.at(SFR2S_WIDTH2, i)  = ForElement(m_seg, 14, segnum, sz);
+    v.at(SFR2S_DEPTH2, i)  = ForElement(m_seg, 15, segnum, sz);
+      
+    for (int j = 0; j < 16; ++j)
+    {
+      int jj = j + 1;
+      v.at(SFR2S_XSECT+j, i) = ForElement(m_xsec, jj, segnum, 16);
+    }
+      
+    v.at(SFR2S_COND1FACT, i) = 1.0;
+    v.at(SFR2S_COND2FACT, i) = 1.0;
+  }
+
+  // handle any sfr parameters
+  {
+    ParamList *list(0);
+    Parameters::GetParameterList(&list);
+    Param p;
+    for (size_t ii=0; ii<list->Size(); ii++)
+    {
+      list->At(ii, &p);
+      if (p.m_type == "SFR")
+      { // Move the current conductance value to the condfact
+        // and set conductance to the key value.
+        // Must be done for both Hc1fact and Hc2fact.
+        int stop = p.m_str_start + p.m_str_nbc;
+        for (int i = p.m_str_start; i < stop; i++)
+        {
+          int nseg = ForElement(m_iseg, 3, i, 4);
+          v.at(SFR2S_COND1FACT, nseg-1) = ForElement(m_seg, 6, i, sz);
+          v.at(SFR2S_HCOND1, nseg-1) = p.m_key;
+
+          v.at(SFR2S_COND2FACT, nseg-1) = ForElement(m_seg, 11, i, sz);
+          v.at(SFR2S_HCOND2, nseg-1) = p.m_key;
+        }
+        p.m_str_start = -1;
+        p.m_str_nbc = -1;
+        list->UpdateParameter(&p);
+      }
+    }
+  }
+
+  { // write data for 14. Segment Property
+    CStr path;
+    path.Format("%s/%s", m_p.m_type, MFBC_SEGP);
+    H5DataSetWriterSetup s(m_p.m_file, path, H5T_NATIVE_DOUBLE, 3);
+    std::vector<hsize_t> start(3, 0), n2write(3,1);
+    n2write[0] = v.GetSize1();
+    n2write[1] = v.GetSize2();
+    start[2] = m_p.m_sp - 1;
+    H5DSWriterDimInfo dim(start, n2write);
+    H5DataSetWriter w(&s);
+    w.SetDimInfoForWriting(&dim);
+    w.WriteData(&v.at(0,0), static_cast<size_t>(v.GetSize1()*v.GetSize2()));
+  }
+} // H5SfrPack::WriteSegData
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void H5SfrPack::WriteSegFlow ()
+{
+  using util::ForElement;
+  // get the number of QSTAGE items for this stress period to size array
+  int numQstage(0);
+  for (int i = 0; i < *m_nss; ++i)
+  {
+    int segnum = i + 1;
+    int icalc = ForElement(m_iseg, 1, segnum, 4);
+
+    // when ICALC == 4 add NSTRPTS items
+    if (icalc == 4)
+      numQstage += ForElement(m_iseg, 2, segnum, 4);
+  }
+  if (numQstage > 0)
+  {
+    CAR_DBL2D v;
+    v.SetSize(5, numQstage, 0.0);
+
+    int entryNum = 0;
+    for (int i = 0; i < *m_nss; ++i)
+    {
+      int segnum = i + 1;
+      if (ForElement(m_iseg, 1, segnum, 4) == 4)
+      {
+        int nstrpts = ForElement(m_iseg, 2, segnum, 4);
+        for (int j = 0; j < nstrpts; ++j)
+        {
+          int jj = j + 1;
+          v.at(0, entryNum+j) = segnum;
+          v.at(1, entryNum+j) = m_p.m_sp;
+          v.at(2, entryNum+j) = ForElement(m_qstage, jj, segnum, 150);
+
+          jj += nstrpts;
+          v.at(3, entryNum+j) = ForElement(m_qstage, jj, segnum, 150);
+
+          jj += nstrpts;
+          v.at(4, entryNum+j) = ForElement(m_qstage, jj, segnum, 150);
+        }
+        entryNum++;
+      }
+    }
+    { // 15. Segment Flow Table
+      CStr path;
+      path.Format("%s/%s", m_p.m_type, MFBC_SEGFLWT);
+
+      // get size of existing data
+      H5DataSetReader r(m_p.m_file, path);
+      int tmpNrow(0);
+      r.GetAtt("NumRows", tmpNrow);
+
+      // write to end of existing data
+      H5DataSetWriterSetup s(m_p.m_file, path, H5T_NATIVE_DOUBLE, 2);
+      std::vector<hsize_t> start(2, 0), n2write(2, 1);
+      n2write[0] = v.GetSize1();
+      n2write[1] = v.GetSize2();
+      start[1] = tmpNrow;
+      H5DSWriterDimInfo dim(start, n2write);
+      H5DataSetWriter w(&s);
+      w.SetDimInfoForWriting(&dim);
+      w.WriteData(&v.at(0,0), static_cast<size_t>(v.GetSize1()*v.GetSize2()));
+      int numRows = tmpNrow + numQstage;
+      w.WriteAtt("NumRows", numRows);
+    }
+  }
+} // H5SfrPack::WriteSegFlow
 
 
 

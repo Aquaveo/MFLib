@@ -46,6 +46,7 @@
 #include <private\MfData\MfExport\private\Native\NativeExpSub.h>
 #include <private\MfData\MfExport\private\Native\NativeExpSwi.h>
 #include <private\MfData\MfExport\private\Native\NativeExpUzf.h>
+#include <private\MfData\MfExport\private\Native\NativeExpVdf.h>
 #include <private\MfData\MfExport\private\Native\NativeExpZon.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\Packages\MfPackage.h>
@@ -147,6 +148,13 @@ bool LgrPack (const CStr& type)
   return false;
 } // LgrPack
 //------------------------------------------------------------------------------
+bool VdfPack (const CStr& type)
+{
+  if (Packages::VDFLine5 == type || Packages::VDFStressPeriod == type)
+    return true;
+  return false;
+} // VdfPack
+//------------------------------------------------------------------------------
 static bool& iH5Flag()
 {
   static bool m_(false);
@@ -197,15 +205,16 @@ NativePackExp* NativeUtil::CreatePackExp (Mf2kNative* a_native,
   else if (Mnw1Pack(type))                      ret = new NativeExpMnw1(h5);
   else if (Packages::MNW2 == type)              ret = new NativeExpMnw2(h5);
   else if (Packages::MNWI == type)              ret = new NativeExpMnwi();
-  else if (SfrPack(type))                       ret = new NativeExpSfr();
+  else if (SfrPack(type))                       ret = new NativeExpSfr(h5);
   else if (HobPack(type))                       ret = new NativeExpObs();
   else if (IsFlowObsPackage(type))              ret = new NativeExpLstObs();
   else if (SubPack(type))                       ret = new NativeExpSub();
-  else if (UzfPack(type))                       ret = new NativeExpUzf();
+  else if (UzfPack(type))                       ret = new NativeExpUzf(h5);
   else if (StrPack(type))                       ret = new NativeExpStr(h5);
   else if (LgrPack(type))                       ret = new NativeExpLgr();
   else if (Packages::GNC == type)               ret = new NativeExpGnc();
   else if (Packages::SWI == type)               ret = new NativeExpSwi();
+  else if (VdfPack(type))                       ret = new NativeExpVdf(h5);
 
   // leave at end. This is the last "package" processed
   else if ("STP" == type)                       ret = new NativeExpSTP();

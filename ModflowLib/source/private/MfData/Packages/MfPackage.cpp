@@ -324,12 +324,12 @@ bool MfPackage::impl::GetField (const char *a_field,
 //------------------------------------------------------------------------------
 TmpPackageNameChanger::TmpPackageNameChanger (MfPackage* a_pack,
                                               const char *a_tmpName) :
-m_pack(0)
+m_pack(a_pack)
 {
-  if (a_pack)
+  if (m_pack)
   {
-    m_origName = a_pack->PackageName();
-    a_pack->m_p->m_packName = a_tmpName;
+    m_origName = m_pack->PackageName();
+    m_pack->m_p->m_packName = a_tmpName;
   }
 } // TmpPackageNameChanger::TmpPackageNameChanger
 //------------------------------------------------------------------------------

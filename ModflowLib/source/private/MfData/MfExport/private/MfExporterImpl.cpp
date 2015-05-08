@@ -258,8 +258,7 @@ void MfExporterImpl::InitExtensions ()
   m_types.insert(std::make_pair(SOR, SOR));
   m_types.insert(std::make_pair(STRSP, STRSP));
   m_types.insert(std::make_pair(SUB, SUB));
-  // SWI is only supported for native text. See NativeExpNam::WriteFileStp
-  //m_types.insert(std::make_pair(SWI, SWI));
+  m_types.insert(std::make_pair(SWI, SWI));
   m_types.insert(std::make_pair(UPW, UPW));
   m_types.insert(std::make_pair(UZF, UZF));
   m_types.insert(std::make_pair(WEL, WEL));
