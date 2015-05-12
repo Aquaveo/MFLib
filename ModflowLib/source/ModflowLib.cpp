@@ -160,11 +160,13 @@ DLLEXPORT void MFLIB_CLOSEALLH5FILES ()
 DLLEXPORT void MFLIB_SETPARFNAME (const char* a_fName,
                                   int a_fNameLen)
 {
-  CStr line = util::GetStr(a_fName, a_fNameLen);
+  CStr line1 = util::GetStr(a_fName, a_fNameLen);
+  CStr line = line1;
 
   imfLib_StripExtension(line);
   line += ".param";
   Parameters::SetFileName(line);
+  MfData::MfGlobal::Get().SetStrVar("NAME_FILE_STR", line1);
 } // MFLIB_SETPARAMFILENAME
 //------------------------------------------------------------------------------
 /// \brief This is called to set the filename of the modflow parameter file.

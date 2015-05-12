@@ -8,6 +8,7 @@
 #include <private\MfData\MfExport\private\Native\NativeExpSTP.h>
 
 #include <private\MfData\MfExport\private\Mf2kNative.h>
+#include <private\MfData\MfExport\private\TxtExporter.h>
 #include <private\MfData\MfExport\private\Native\H5BcList.h>
 #include <private\MfData\MfExport\private\Native\NativeExpNam.h>
 #include <private\MfData\MfExport\private\Native\NativeUtil.h>
@@ -54,6 +55,7 @@ bool NativeExpSTP::Export ()
     NativePackExp* exMnw2 = NativeUtil::CreatePackExp(GetNative(), GetGlobal(), mnw2);
     if (exMnw2) exMnw2->Export(); delete(exMnw2);
   }
+
   if (!GetNative()->StpFlag())
   {
     // write the name file
@@ -106,6 +108,28 @@ void NativeExpSTP::ForcePackageWrite (const char* const a_)
 //------------------------------------------------------------------------------
 void NativeExpSTP::CopyMfwPrjFiles ()
 {
+  CStr nf, base, outBase, mwf, prj, outMwf, outPrj;
+  outBase = GetNative()->GetExp()->GetBaseFileName();
+  GetGlobal()->GetStrVar("NAME_FILE_STR", nf);
+  util::StripExtensionFromFilename(nf.c_str(), base);
+  mwf = base + ".mfw";
+  prj = base + ".prj";
+  outMwf = outBase + ".mfw";
+  outPrj = outBase + ".prj";
+  FILE* fp = fopen(mwf.c_str(), "r");
+  if (fp)
+  {
+    fclose(fp);
+    fp = NULL;
+    util::FileCopy(mwf, outMwf);
+  }
+  fp = fopen(prj.c_str(), "r");
+  if (fp)
+  {
+    fclose(fp);
+    fp = NULL;
+    util::FileCopy(prj, outPrj);
+  }
 } // NativeExpSTP::CopyMfwPrjFiles
 
 
