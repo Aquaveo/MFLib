@@ -154,9 +154,7 @@ static bool iSeawatData (const CStr& a_)
 /// \brief Gets the index of a multidimensional array like RCH or ET so we know
 /// where to write the data
 //------------------------------------------------------------------------------
-static int iPackNameToArrayIndex (const CStr &a_name)//,
-//                                  TxtExporter* a_exp,
-//                                  int a_sp /* = 0*/)
+static int iPackNameToArrayIndex (const CStr &a_name)
 {
   int rval(0);
   if (a_name.CompareNoCase(ARR_EVT_RATE) == 0 ||
@@ -169,13 +167,6 @@ static int iPackNameToArrayIndex (const CStr &a_name)//,
     rval = 2;
   else if (a_name.CompareNoCase(ARR_UZF_EXTWC) == 0)
     rval = 3;
-  //else if (a_name.CompareNoCase(ARR_ETS_PXDP) == 0 ||
-  //         a_name.CompareNoCase(ARR_ETS_PETM) == 0 ||
-  //         a_name.CompareNoCase(ARR_VDF_DENS) == 0 ||
-  //         a_name.CompareNoCase(ARR_VDF_CONC) == 0 ||
-  //         a_name.CompareNoCase(ARR_VSC_VSC) == 0 ||
-  //         a_name.CompareNoCase(ARR_VSC_CONC) == 0)
-  //  rval = iGetIncrementedArrayIndex(a_name, a_sp, a_exp);
   return rval;
 } // iPackNameToArrayIndex
 } // unnamed namespace
@@ -593,6 +584,7 @@ int H5ArrayWriter::impl::GetMultiplierNumDim ()
   {
     if (!iRchEtEtsLayerData(path)) rval = 2;
   }
+  else if (iUzfStressData(path)) rval = 2;
   return rval;
 } // H5ArrayWriter::impl::GetMultiplierNumDim
 //------------------------------------------------------------------------------
@@ -600,7 +592,7 @@ int H5ArrayWriter::impl::GetMultiplierNumDim ()
 //------------------------------------------------------------------------------
 int H5ArrayWriter::impl::GetMultiplierIdx0 ()
 {
-  int   rval(1);
+  int   rval(0);
   CStr  path(H5Path());
 
   if (iSubPackData(path))
@@ -613,6 +605,11 @@ int H5ArrayWriter::impl::GetMultiplierIdx0 ()
     CStr packName(m_pack->GetPackage()->PackageName());
     if (iRchEtEtsLayerData(path)) rval = spIdx;
     else                          rval = iPackNameToArrayIndex(packName);
+  }
+  else if (iUzfPackData(path))
+  {
+    CStr packName(m_pack->GetPackage()->PackageName());
+    rval = iPackNameToArrayIndex(packName);
   }
 
   return rval;

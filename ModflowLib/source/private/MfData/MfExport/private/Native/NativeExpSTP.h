@@ -24,6 +24,7 @@ namespace MfData
       const NativeExpSTP& operator=(const NativeExpSTP& rhs);
 
       void ForcePackageWrite(const char* const a_);
+      void CopyMfwPrjFiles();
     };
 
   }

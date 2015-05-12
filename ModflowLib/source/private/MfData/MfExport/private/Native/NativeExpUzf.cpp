@@ -9,6 +9,7 @@
 
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
+#include <private\MfData\MfExport\private\Native\H5UseLastWriter.h>
 #include <private\MfData\MfExport\private\Native\NativeExpNam.h>
 #include <private\MfData\MfExport\private\Native\NativeUtil.h>
 #include <private\MfData\MfGlobal.h>
@@ -312,6 +313,20 @@ void NativeExpUzf::Lines9to16 ()
           p->StringsToWrite().clear();
         }
       }
+    }
+
+    if (m_h5)
+    {
+      std::vector<int> vDat(4, 1);
+      vDat[0] = *nuzf1 < 0 ? 1 : 0;
+      if (ietflg)
+      {
+        vDat[1] = *nuzf2 < 0 ? 1 : 0;
+        vDat[2] = *nuzf3 < 0 ? 1 : 0;
+        vDat[2] = *nuzf4 < 0 ? 1 : 0;
+      }
+      H5UseLastWriter h(this);
+      h.WriteData(vDat);
     }
   }
 } // NativeExpUzf::Lines9to16

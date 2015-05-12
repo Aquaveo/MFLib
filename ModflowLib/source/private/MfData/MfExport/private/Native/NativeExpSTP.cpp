@@ -56,41 +56,11 @@ bool NativeExpSTP::Export ()
   }
   if (!GetNative()->StpFlag())
   {
-    // write zone file
-    //MfPackage* zn = GetGlobal()->GetPackage(MfData::Packages::ZON);
-    //NativePackExp* exZn = NativeUtil::CreatePackExp(GetNative(), GetGlobal(), zn);
-    //if (exZn) exZn->Export(); delete(exZn);
-    // write mult file
-    //MfPackage* mlt = GetGlobal()->GetPackage(MfData::Packages::MLT);
-    //NativePackExp* exMlt = NativeUtil::CreatePackExp(GetNative(), GetGlobal(), mlt);
-    //if (exMlt) exMlt->Export(); delete(exMlt);
-    // write the pval file
-    //GetGlobal()->SetIntVar("Write PVAL", 1);
-    //MfPackage* pvl = GetGlobal()->GetPackage(MfData::Packages::PVAL);
-    //NativePackExp* exPvl = NativeUtil::CreatePackExp(GetNative(), GetGlobal(), pvl);
-    //if (exPvl) exPvl->Export(); delete(exPvl);
-    // write MNW2
-    //MfPackage* mnw2 = GetGlobal()->GetPackage(MfData::Packages::MNW2);
-    //if (mnw2)
-    //{
-    //  mnw2->SetLineNumber("Export Final");
-    //  NativePackExp* exMnw2 = NativeUtil::CreatePackExp(GetNative(), GetGlobal(), mnw2);
-    //  if (exMnw2) exMnw2->Export(); delete(exMnw2);
-    //}
-
-    //ForcePackageWrite(MfData::Packages::RCH);
-    //ForcePackageWrite(MfData::Packages::EVT);
-    //ForcePackageWrite(MfData::Packages::ETS);
-    //ForcePackageWrite(MfData::Packages::LAK);
-    //ForcePackageWrite(MfData::Packages::MNW);
-    //ForcePackageWrite(MfData::Packages::LGR);
-
     // write the name file
     MfPackage* nm = GetGlobal()->GetPackage(MfData::Packages::NAM);
     NativePackExp* ex = NativeUtil::CreatePackExp(GetNative(), GetGlobal(), nm);
     NativeExpNam* exNm = dynamic_cast<NativeExpNam*>(ex);
     if (exNm) exNm->WriteFileStp(); delete(exNm);
-
   }
 
   ForcePackageWrite(MfData::Packages::RCH);
@@ -109,6 +79,9 @@ bool NativeExpSTP::Export ()
 
   H5BcList h(this);
   h.WriteMapIdsForListBcs();
+
+  // copy world file and prj file if they exist
+  CopyMfwPrjFiles();
   return true;
 } // MfNativeExpSTP::Export
 //------------------------------------------------------------------------------
@@ -128,6 +101,12 @@ void NativeExpSTP::ForcePackageWrite (const char* const a_)
     }
   }
 } // NativeExpSTP::ForcePackageWrite
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void NativeExpSTP::CopyMfwPrjFiles ()
+{
+} // NativeExpSTP::CopyMfwPrjFiles
 
 
 ///////////////////////////////////////////////////////////////////////////////
