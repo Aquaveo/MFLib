@@ -8,6 +8,8 @@
 #include <private\MfData\MfExport\private\ExpGeoDb.h>
 #include <private\MfData\MfExport\private\Gdb.h>
 
+//#include <cmath>  // for lrint, but it's actually in private/util/util.h
+//#include <math.h> // for lrint, but it's actually in private/util/util.h
 #include <hash_map>
 #include <map>
 #include <set>
@@ -2901,7 +2903,7 @@ static bool ExportMNWStressPeriod (MfData::MfPackage* a_package,
     std::set<int> mnIds, tmp;
     for (i=1; i<count; i++)
     {
-      wellId = lrint(ForElement(well2, mnw::W2_ID, i, mnw::W2_SIZE));
+      wellId = util::lrint(ForElement(well2, mnw::W2_ID, i, mnw::W2_SIZE));
       if (tmp.find(wellId) != tmp.end())
       {
         mnIds.insert(wellId);
@@ -2916,8 +2918,8 @@ static bool ExportMNWStressPeriod (MfData::MfPackage* a_package,
     {
       q = ForElement(mnwflgs, mnw::MNWFLGS_QDES, i, mnw::MNWFLGS_SIZE);
 
-      cellId = lrint(ForElement(well2, mnw::W2_NODE, i, mnw::W2_SIZE));
-      wellId = lrint(ForElement(well2, mnw::W2_ID, i, mnw::W2_SIZE));
+      cellId = util::lrint(ForElement(well2, mnw::W2_NODE, i, mnw::W2_SIZE));
+      wellId = util::lrint(ForElement(well2, mnw::W2_ID, i, mnw::W2_SIZE));
       if (mnIds.find(wellId) == mnIds.end())
         wellId = 0;
       Qdes = q;
@@ -2926,19 +2928,19 @@ static bool ExportMNWStressPeriod (MfData::MfPackage* a_package,
       Skin = ForElement(well2, mnw::W2_SKIN, i, mnw::W2_SIZE);
       Hlim = ForElement(mnwflgs, mnw::MNWFLGS_HLIM, i, mnw::MNWFLGS_SIZE);
       Href = ForElement(mnwflgs, mnw::MNWFLGS_HLIM, i, mnw::MNWFLGS_SIZE);
-      Iwgrp = lrint(ForElement(well2, mnw::W2_IWGRP, i, mnw::W2_SIZE));
+      Iwgrp = util::lrint(ForElement(well2, mnw::W2_IWGRP, i, mnw::W2_SIZE));
       CpC = ForElement(well2, mnw::W2_C, i, mnw::W2_SIZE);
       Qfrcmn = ForElement(well2, mnw::W2_QFRCMN, i, mnw::W2_SIZE);
       Qfrcmx = ForElement(well2, mnw::W2_QFRCMX, i, mnw::W2_SIZE);
 
-      DD = lrint(ForElement(mnwflgs, mnw::MNWFLGS_DD, i, mnw::MNWFLGS_SIZE));
+      DD = util::lrint(ForElement(mnwflgs, mnw::MNWFLGS_DD, i, mnw::MNWFLGS_SIZE));
       if (DD == mnw::DD_NONE)
       {
         Hlim = 0.0;
         Href = 0.0;
       }
 
-      QCUT = lrint(ForElement(mnwflgs, mnw::MNWFLGS_QCUT, i, mnw::MNWFLGS_SIZE));
+      QCUT = util::lrint(ForElement(mnwflgs, mnw::MNWFLGS_QCUT, i, mnw::MNWFLGS_SIZE));
       if (/*Qdes == 0 ||*/ QCUT == 0) // this needs to be looked at again
       {
         Qfrcmn = 0;
@@ -2955,7 +2957,7 @@ static bool ExportMNWStressPeriod (MfData::MfPackage* a_package,
         Qfrcmx *= 100;
       }
 
-      if (lrint(ForElement(mnwflgs, mnw::MNWFLGS_IERR, i,
+      if (util::lrint(ForElement(mnwflgs, mnw::MNWFLGS_IERR, i,
                            mnw::MNWFLGS_SIZE)) >= 1)
       {
         Iwgrp = -1;
