@@ -323,7 +323,7 @@ void NativeExpUzf::Lines9to16 ()
       {
         vDat[1] = *nuzf2 < 0 ? 1 : 0;
         vDat[2] = *nuzf3 < 0 ? 1 : 0;
-        vDat[2] = *nuzf4 < 0 ? 1 : 0;
+        vDat[3] = *nuzf4 < 0 ? 1 : 0;
       }
       H5UseLastWriter h(this);
       h.WriteData(vDat);
