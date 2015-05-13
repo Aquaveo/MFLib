@@ -217,7 +217,7 @@ NativePackExp* NativeUtil::CreatePackExp (Mf2kNative* a_native,
   else if (VdfPack(type))                       ret = new NativeExpVdf(h5);
 
   // leave at end. This is the last "package" processed
-  else if ("STP" == type)                       ret = new NativeExpSTP();
+  else if ("STP" == type)                       ret = new NativeExpSTP(h5);
 
   if (ret)
   {

@@ -27,6 +27,11 @@ namespace MfData
         const char* a_path,
         int a_sp,
         int a_nCells);
+      static void WriteDataSetWithZeros (
+        const char* a_file,
+        const char* a_path,
+        hsize_t dim[3],
+        hsize_t start[3]);
 
     private:
       class impl;

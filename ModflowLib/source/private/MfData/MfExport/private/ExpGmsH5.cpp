@@ -123,7 +123,6 @@ public:
   , m_NAM_fname()
   , m_NAM_niu()
   , m_NAM_maxStrLen(0)
-  , m_HasBinaryExport(0)
   {}
 
   virtual ~ExpGmsH5Public()
@@ -142,7 +141,6 @@ public:
   std::vector<CStr> m_NAM_fname;
   std::vector<int> m_NAM_niu;
   int m_NAM_maxStrLen;
-  bool m_HasBinaryExport;
 
 };
 
@@ -173,10 +171,7 @@ static void saveSEN(MfPackage *a_pSen1,
 static void expFinalize(MfGlobal* a_global,
                         TxtExporter *a_exp);
 static void showWarnings(TxtExporter* a_exp);
-static void expCheckArealFromUseLast(int a_nCells,
-                                     const char * a_baseName);
 static bool& iNeedsSENFile();
-static bool& iHasBinaryExport(TxtExporter* a_exp);
 static void WriteDataSetWithZeros (CStr& f, CStr& path, hsize_t dim[3],
                                    hsize_t start[3]);
 
@@ -527,7 +522,7 @@ bool ExpGmsH5::ExportPackage (MfGlobal* a_global,
   }
   else if (Packages::BIN == packName)
   {
-    iHasBinaryExport(GetExp()) = true;
+    MfData::MfGlobal::Get().SetIntVar("HAS_BINARY_ARRAYS", 1);
   }
   else if ("STP" == packName) // this comes at the very end
   {
@@ -536,7 +531,7 @@ bool ExpGmsH5::ExportPackage (MfGlobal* a_global,
     expSEN(GetExp());
     expNameFile(0, GetExp(), true, GetModelType(), this);
     expSuperFile(a_global->ModelType(), a_global->GetPackage("NAM1"), GetExp());
-    expFinalize(a_global, GetExp());
+    //expFinalize(a_global, GetExp());
   }
   else
   {
@@ -1207,13 +1202,6 @@ static CStr iGetTypeExtension (const CStr& a_type,
   }
 } // iGetTypeExtension
 //------------------------------------------------------------------------------
-/// \brief 
-//------------------------------------------------------------------------------
-bool& iHasBinaryExport (TxtExporter* a_exp)
-{
-  return a_exp->m_public->m_HasBinaryExport;
-} // iHasBinaryExport
-//------------------------------------------------------------------------------
 /// \brief Exports the name file
 //------------------------------------------------------------------------------
 static void expNameFile (MfPackage *a_package,
@@ -1503,49 +1491,6 @@ static void expParamFile (MfPackage* a_package,
   }
 } // expParamFile
 //------------------------------------------------------------------------------
-/// \brief Writes the array multiplier for the areal data
-//------------------------------------------------------------------------------
-template <class T>
-static void expArealArrayMultiplier (const char *a_file,
-                                     const char *a_path,
-                                     const int a_spIdx,
-                                     const hid_t a_datatype,
-                                     const int a_idx,
-                                     const int a_nDim,
-                                     const T a_val)
-{
-  CStr path(a_path);
-  path += " Multiplier";
-  path.Replace("07.", "08.");
-  path.Replace("09.", "10.");
-
-  path.Replace("12.", "13.");
-  path.Replace("14.", "15.");
-  path.Replace("16.", "17.");
-  path.Replace("18.", "19.");
-  path.Replace("20.", "21.");
-  path.Replace("22.", "23.");
-  path.Replace("24.", "25.");
-  path.Replace("26.", "27.");
-  path.Replace("28.", "29.");
-  path.Replace("30.", "31.");
-
-  H5DataSetWriterSetup s(a_file, path, a_datatype, a_nDim);
-  H5DataSetWriter h(&s);
-  h.AllowTypeConversions(true);
-  std::vector<hsize_t> start(a_nDim,0), n2write(a_nDim,1);
-  if (a_nDim == 1)
-    start[0] = a_spIdx;
-  else if (a_nDim == 2)
-  {
-    start[0] = a_idx;
-    start[1] = a_spIdx;
-  }
-  H5DSWriterDimInfo dim(start, n2write);
-  h.SetDimInfoForWriting(&dim);
-  h.WriteData(&a_val, 1);
-} // expArealArrayMultiplier
-//------------------------------------------------------------------------------
 /// \brief Exports the use last information for the areal packages
 //------------------------------------------------------------------------------
 static void expUseLastAreal (const char * a_file,
@@ -1685,63 +1630,12 @@ static void expSEN (TxtExporter *a_exp)
   }
 } // expSEN
 //------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
-void iGetSeawatBcIdx (const CStr& a_type,
-                      int& a_seawatBcIdx0,
-                      int& a_seawatBcIdx1)
-{
-  a_seawatBcIdx0 = a_seawatBcIdx1 = -1;
-  if (a_type == "River")
-  {
-    // stage, cond, elev, factor, RBDTHK, RIVDEN
-    a_seawatBcIdx0 = 4;
-    a_seawatBcIdx1 = 5;
-  }
-  else if (a_type == "Specified Head")
-  {
-    // startHead, endHead, factor1, factor2, CHDDENSOPT, CHDDEN
-    a_seawatBcIdx0 = 4;
-    a_seawatBcIdx1 = 5;
-  }
-  else if (a_type == "Drain")
-  {
-    // elev, cond, factor, DRNBELEV
-    a_seawatBcIdx0 = 3;
-  }
-  else if (a_type == "General Head")
-  {
-    // head, cond, factor, GHBELEV, GHBDENS
-    a_seawatBcIdx0 = 3;
-    a_seawatBcIdx1 = 4;
-  }
-  else if (a_type == "Drain Return")
-  {
-    // elev, cond, layR, rowR, colR, Rfprop, factor
-  }
-  else if (a_type == "Well")
-  {
-    // Q, factor, WELDENS
-    a_seawatBcIdx0 = 2;
-  }
-  else if (a_type == "Stream")
-  {
-    // stage, cond, bot. elev., top elev., width, slope, rough, factor
-  }
-  else if (a_type == "Stream (SFR2)")
-  {
-    // RCHLEN
-  }
-} // iGetSeawatBcIdx
-//------------------------------------------------------------------------------
 /// \brief This function does any final things that need to be done before
 /// shutting down the program.
 //------------------------------------------------------------------------------
 static void expFinalize (MfGlobal* a_global,
                          TxtExporter *a_exp)
 {
-  expCheckArealFromUseLast(a_global->NumRow()*a_global->NumCol(),
-                           a_exp->GetBaseFileName());
   H5DataReader::CloseAllH5FilesOpenForWriting();
 } // expFinalize
 //------------------------------------------------------------------------------
@@ -1749,7 +1643,9 @@ static void expFinalize (MfGlobal* a_global,
 //------------------------------------------------------------------------------
 static void showWarnings (TxtExporter* a_exp)
 {
-  if (iHasBinaryExport(a_exp))
+  int flag(0);
+  MfData::MfGlobal::Get().GetIntVar("HAS_BINARY_ARRAYS", flag);
+  if (flag)
   {
     printf("\nGMS Binary Array Warning:: This model conatins binary arrays. "
       "The binary format could possibly differ from GMS MODFLOW. The array "
@@ -2011,40 +1907,6 @@ static void expArealLayFromUseLast (CAR_INT2D& a_flags,
     w.WriteData(&mult.at(0), static_cast<size_t>(dim[1]));
   }
 } // expArealLayFromUseLast
-//------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
-static void expCheckArealFromUseLast (int a_nCells,
-                                      const char * a_baseName)
-{
-  // read all of the use last flags on the data
-  CAR_INT2D flags;
-  expGetAllArealUseLast(flags, "Recharge/", a_baseName);
-  // update the areal data
-  expArealPropFromUseLast(flags, a_nCells, "Recharge/", a_baseName);
-  // update the areal layer
-  expArealLayFromUseLast(flags, a_nCells, "Recharge/", a_baseName);
-
-  expGetAllArealUseLast(flags, "ET/", a_baseName);
-  // update the areal data
-  expArealPropFromUseLast(flags, a_nCells, "ET/", a_baseName);
-  // update the areal layer
-  expArealLayFromUseLast(flags, a_nCells, "ET/", a_baseName);
-
-  expGetAllArealUseLast(flags, "ETS/", a_baseName);
-  // update the areal data
-  expArealPropFromUseLast(flags, a_nCells, "ETS/", a_baseName);
-  // update the areal layer
-  expArealLayFromUseLast(flags, a_nCells, "ETS/", a_baseName);
-  // update the extinction depth proportion
-  expEtSegFromUseLast(flags, a_nCells, a_baseName, MFBC_PXDP, MFBC_PXDPMULT);
-  // update the extinction rate proportion
-  expEtSegFromUseLast(flags, a_nCells, a_baseName, MFBC_PETM, MFBC_PETMMULT);
-
-  expGetAllArealUseLast(flags, "UZF/", a_baseName);
-  // update the areal data
-  expArealPropFromUseLast(flags, a_nCells, "UZF/", a_baseName);
-} // expCheckArealFromUseLast
 
 ///////////////////////////////////////////////////////////////////////////////
 // TESTS
@@ -2396,6 +2258,7 @@ static bool testCheckGroupExists (hid_t fid,
   H5Gclose(g);
   return rval;
 }
+//------------------------------------------------------------------------------
 static bool testCheckDatasetExists (hid_t fid,
                                     const char *a_)
 {
@@ -2405,6 +2268,7 @@ static bool testCheckDatasetExists (hid_t fid,
   H5Dclose(d);
   return rval;
 }
+//------------------------------------------------------------------------------
 void ExpGmsH5T::testCreateDefaultMfH5File ()
 {
   CStr basePath;
@@ -2582,149 +2446,6 @@ void ExpGmsH5T::testexpSEN ()
   t.GetFileContents(Packages::SEN, output);
   TS_ASSERT_EQUALS2(expected, output);
   t.m_public->m_SensitivityItems.clear();
-}
-//------------------------------------------------------------------------------
-void ExpGmsH5T::testWellPropertyList()
-{
-  Mnw1PropList wpl;
-
-  int cells[]   = { 0, 1, 0, 3, 4, 5, 6, 7, 8, 9, 10 };
-  int expectedCellIds[] = { 0, 1, 0, 3, 0, 1, 0, 1, 1, 0, 1 };
-  int expectedProps[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-  vector<int> expectedPropsVec;
-  const int NUM_NAMES = 11;
-  char *names[NUM_NAMES] = { "Site-1", "Site-1", "Site-2", "Site-2", "Well-3",
-                             "Well-3", "Well-4", "Well-4", "Well-5", "Well-5",
-                             "Well-6" };
-  vector<CStr> namesVec(names, names+NUM_NAMES);
-  CStr *expectedNames = &namesVec[0];
-  int expectedWellIds[] = { 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 0 };
-  char expectedIsSite[] = { true, true, true, true, false, false, false, false,
-                            false, false, false };
-  vector<int> cellIds;
-  vector<int> properties;
-
-  cellIds.insert(cellIds.begin(), cells, cells+2);
-  properties = wpl.GetPropIndicees("Site-1", cellIds);
-  TS_ASSERT_EQUALS_AVEC(expectedProps, 2, properties);
-  TS_ASSERT_EQUALS_AVEC(expectedCellIds, 2, wpl.GetCellIds());
-  TS_ASSERT_EQUALS_AVEC(expectedNames, 2, wpl.GetWellNames());
-  TS_ASSERT_EQUALS_AVEC(expectedWellIds, 2, wpl.GetWellIds());
-  TS_ASSERT_EQUALS_AVEC(expectedIsSite, 2, wpl.GetIsSiteName());
-
-  // second site entry with different name moves on to new properties position
-  cellIds.clear();
-  cellIds.insert(cellIds.begin(), cells+2, cells+4);
-  properties = wpl.GetPropIndicees("Site-2", cellIds);
-  TS_ASSERT_EQUALS_AVEC(expectedProps+2, 2, properties);
-  TS_ASSERT_EQUALS_AVEC(expectedCellIds, 4, wpl.GetCellIds());
-  TS_ASSERT_EQUALS_AVEC(expectedNames, 4, wpl.GetWellNames());
-  TS_ASSERT_EQUALS_AVEC(expectedWellIds, 4, wpl.GetWellIds());
-  TS_ASSERT_EQUALS_AVEC(expectedIsSite, 4, wpl.GetIsSiteName());
-
-  // second site entry with same name and cells moves on to new position
-  cellIds.clear();
-  cellIds.insert(cellIds.begin(), cells, cells+2);
-  properties = wpl.GetPropIndicees("Site-1", cellIds);
-  TS_ASSERT_EQUALS_AVEC(expectedProps+4, 2, properties);
-  TS_ASSERT_EQUALS_AVEC(expectedCellIds, 6, wpl.GetCellIds());
-  TS_ASSERT_EQUALS_AVEC(expectedNames, 6, wpl.GetWellNames());
-  TS_ASSERT_EQUALS_AVEC(expectedWellIds, 6, wpl.GetWellIds());
-  TS_ASSERT_EQUALS_AVEC(expectedIsSite, 6, wpl.GetIsSiteName());
-
-  // new well entry moves on to new properties position
-  properties = wpl.GetPropIndicees("", cellIds);
-  TS_ASSERT_EQUALS_AVEC(expectedProps+6, 2, properties);
-  TS_ASSERT_EQUALS_AVEC(expectedCellIds, 8, wpl.GetCellIds());
-  TS_ASSERT_EQUALS_AVEC(expectedNames, 8, wpl.GetWellNames());
-  TS_ASSERT_EQUALS_AVEC(expectedWellIds, 8, wpl.GetWellIds());
-  TS_ASSERT_EQUALS_AVEC(expectedIsSite, 8, wpl.GetIsSiteName());
-
-  // new well entry with same cellid moves on to new properties position
-  cellIds[0] = 1;
-  cellIds[1] = 0;
-  properties = wpl.GetPropIndicees("", cellIds);
-  TS_ASSERT_EQUALS_AVEC(expectedProps+8, 2, properties);
-  TS_ASSERT_EQUALS_AVEC(expectedCellIds, 10, wpl.GetCellIds());
-  TS_ASSERT_EQUALS_AVEC(expectedNames, 10, wpl.GetWellNames());
-  TS_ASSERT_EQUALS_AVEC(expectedWellIds, 10, wpl.GetWellIds());
-  TS_ASSERT_EQUALS_AVEC(expectedIsSite, 10, wpl.GetIsSiteName());
-
-  // new single cell well entry uses zero for wellid
-  cellIds.clear();
-  cellIds.push_back(1);
-  properties = wpl.GetPropIndicees("", cellIds);
-  TS_ASSERT_EQUALS_AVEC(expectedProps+10, 1, properties);
-  TS_ASSERT_EQUALS_AVEC(expectedCellIds, 11, wpl.GetCellIds());
-  TS_ASSERT_EQUALS_AVEC(expectedNames, 11, wpl.GetWellNames());
-  TS_ASSERT_EQUALS_AVEC(expectedWellIds, 11, wpl.GetWellIds());
-  TS_ASSERT_EQUALS_AVEC(expectedIsSite, 11, wpl.GetIsSiteName());
-
-  // new stess period should find the same places
-  // also reversing cellIds above should reverse properties returned
-  wpl.NewStressPeriod();
-  cellIds.resize(2);
-  cellIds[0] = 1;
-  cellIds[1] = 0;
-  properties = wpl.GetPropIndicees("Site-1", cellIds);
-  expectedPropsVec.clear();
-  expectedPropsVec.insert(expectedPropsVec.begin(), expectedProps, expectedProps+2);
-  std::reverse(expectedPropsVec.begin(), expectedPropsVec.end());
-  TS_ASSERT_EQUALS_VEC(expectedPropsVec, properties);
-  TS_ASSERT_EQUALS_AVEC(expectedCellIds, 11, wpl.GetCellIds());
-  TS_ASSERT_EQUALS_AVEC(expectedNames, 11, wpl.GetWellNames());
-  TS_ASSERT_EQUALS_AVEC(expectedWellIds, 11, wpl.GetWellIds());
-  TS_ASSERT_EQUALS_AVEC(expectedIsSite, 11, wpl.GetIsSiteName());
-
-  // second site entry with different name moves on to new properties position
-  cellIds[0] = 3;
-  cellIds[1] = 0;
-  properties = wpl.GetPropIndicees("Site-2", cellIds);
-  expectedPropsVec.clear();
-  expectedPropsVec.insert(expectedPropsVec.begin(), expectedProps+2, expectedProps+4);
-  std::reverse(expectedPropsVec.begin(), expectedPropsVec.end());
-  TS_ASSERT_EQUALS_VEC(expectedPropsVec, properties);
-  TS_ASSERT_EQUALS_AVEC(expectedCellIds, 11, wpl.GetCellIds());
-  TS_ASSERT_EQUALS_AVEC(expectedNames, 11, wpl.GetWellNames());
-  TS_ASSERT_EQUALS_AVEC(expectedWellIds, 11, wpl.GetWellIds());
-  TS_ASSERT_EQUALS_AVEC(expectedIsSite, 11, wpl.GetIsSiteName());
-
-  // second site entry with same name moves on to new properties position
-  cellIds[0] = 1;
-  cellIds[1] = 0;
-  properties = wpl.GetPropIndicees("Site-1", cellIds);
-  expectedPropsVec.clear();
-  expectedPropsVec.insert(expectedPropsVec.begin(), expectedProps+4, expectedProps+6);
-  std::reverse(expectedPropsVec.begin(), expectedPropsVec.end());
-  TS_ASSERT_EQUALS_VEC(expectedPropsVec, properties);
-  TS_ASSERT_EQUALS_AVEC(expectedCellIds, 11, wpl.GetCellIds());
-  TS_ASSERT_EQUALS_AVEC(expectedNames, 11, wpl.GetWellNames());
-  TS_ASSERT_EQUALS_AVEC(expectedWellIds, 11, wpl.GetWellIds());
-  TS_ASSERT_EQUALS_AVEC(expectedIsSite, 11, wpl.GetIsSiteName());
-
-  // new well entry moves on to new properties position
-  properties = wpl.GetPropIndicees("", cellIds);
-  expectedPropsVec.clear();
-  expectedPropsVec.insert(expectedPropsVec.begin(), expectedProps+6, expectedProps+8);
-  std::reverse(expectedPropsVec.begin(), expectedPropsVec.end());
-  TS_ASSERT_EQUALS_VEC(expectedPropsVec, properties);
-  TS_ASSERT_EQUALS_AVEC(expectedCellIds, 11, wpl.GetCellIds());
-  TS_ASSERT_EQUALS_AVEC(expectedNames, 11, wpl.GetWellNames());
-  TS_ASSERT_EQUALS_AVEC(expectedWellIds, 11, wpl.GetWellIds());
-  TS_ASSERT_EQUALS_AVEC(expectedIsSite, 11, wpl.GetIsSiteName());
-
-  // new well entry with same cellid moves on to new properties position
-  cellIds[0] = 0;
-  cellIds[1] = 1;
-  properties = wpl.GetPropIndicees("", cellIds);
-  expectedPropsVec.clear();
-  expectedPropsVec.insert(expectedPropsVec.begin(), expectedProps+8, expectedProps+10);
-  std::reverse(expectedPropsVec.begin(), expectedPropsVec.end());
-  TS_ASSERT_EQUALS_VEC(expectedPropsVec, properties);
-  TS_ASSERT_EQUALS_AVEC(expectedCellIds, 11, wpl.GetCellIds());
-  TS_ASSERT_EQUALS_AVEC(expectedNames, 11, wpl.GetWellNames());
-  TS_ASSERT_EQUALS_AVEC(expectedWellIds, 11, wpl.GetWellIds());
-  TS_ASSERT_EQUALS_AVEC(expectedIsSite, 11, wpl.GetIsSiteName());
 }
 //------------------------------------------------------------------------------
 void ExpGmsH5T::testexpGetAllArealUseLast ()

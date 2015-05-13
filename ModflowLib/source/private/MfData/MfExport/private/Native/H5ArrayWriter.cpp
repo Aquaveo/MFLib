@@ -69,7 +69,6 @@ public:
   int  GetMultiplierIdx1();
 
   void WriteUzfFirstSp();
-  void WriteDataSetWithZeros(hsize_t dim[3], hsize_t start[3]);
 
   void Extend3dDblArray (
     const char* a_path,
@@ -147,7 +146,8 @@ static bool iSeawatData (const CStr& a_)
 {
   if (   a_.Find("VDF/") != -1
       || a_.Find("VSC/") != -1
-    ) return true;
+    )
+    return true;
   return false;
 } // iUzfPackData
 //------------------------------------------------------------------------------
@@ -222,6 +222,42 @@ void H5ArrayWriter::Extend2dDblArray (
 {
   m_p->Extend2dDblArray(a_path, a_sp, a_nCells);
 } // H5ArrayWriter::Extend2dDblArray
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void H5ArrayWriter::WriteDataSetWithZeros (
+  const char* a_file
+, const char* a_path
+, hsize_t dim[3]
+, hsize_t start[3]
+)
+{
+  // we don't want num to be bigger than ~75MB when num is about 10 million
+  CStr f(a_file);
+  CStr path(a_path);
+  int nSp = 10000000 / (int)(dim[0] * dim[1]);
+  int dim2 = nSp;
+  if (dim[2] < nSp) dim2 = (int)dim[2];
+  CAR_DBL3D dat;
+  dat.SetSize(static_cast<int>(dim[0]),
+    static_cast<int>(dim[1]),
+    dim2, 0);
+
+  for (int start2 = 0; start2 < (int)dim[2]; start2 += nSp)
+  {
+    H5DataSetWriterSetup s(f, path, H5T_NATIVE_DOUBLE, 3);
+    std::vector<hsize_t> start1(&start[0], &start[3]),
+      n2write(&dim[0], &dim[3]);
+    start1[2] += start2;
+    if (start2 + dim2 > (int)dim[2]) dim2 = (int)dim[2] - start2;
+    n2write[2] = (hsize_t)dim2;
+    H5DSWriterDimInfo dim1(start1, n2write);
+    H5DataSetWriter w(&s);
+    w.SetDimInfoForWriting(&dim1);
+    size_t num1(static_cast<size_t>(dim[0] * dim[1] * dim2));
+    w.WriteData(&dat.at(0,0,0), num1);
+  }
+} // H5ArrayWriter::WriteDataSetWithZeros
 
 //------------------------------------------------------------------------------
 /// \brief
@@ -585,6 +621,7 @@ int H5ArrayWriter::impl::GetMultiplierNumDim ()
     if (!iRchEtEtsLayerData(path)) rval = 2;
   }
   else if (iUzfStressData(path)) rval = 2;
+  else if (iSeawatData(path))    rval = 2;
   return rval;
 } // H5ArrayWriter::impl::GetMultiplierNumDim
 //------------------------------------------------------------------------------
@@ -611,6 +648,10 @@ int H5ArrayWriter::impl::GetMultiplierIdx0 ()
     CStr packName(m_pack->GetPackage()->PackageName());
     rval = iPackNameToArrayIndex(packName);
   }
+  else if (iSeawatData(path))
+  {
+    rval = m_layer - 1;
+  }
 
   return rval;
 } // H5ArrayWriter::impl::GetMultiplierIdx
@@ -636,43 +677,10 @@ void H5ArrayWriter::impl::WriteUzfFirstSp ()
     tmpDim[0] = 4;
     tmpDim[1] = static_cast<hsize_t>(GetNumValsToWrite());
     tmpDim[2] = static_cast<hsize_t>(m_pack->GetGlobal()->NumPeriods());
-    WriteDataSetWithZeros(&tmpDim[0], &tmpStart[0]);
+    H5ArrayWriter::WriteDataSetWithZeros(
+      H5Filename().c_str(), H5Path().c_str(), &tmpDim[0], &tmpStart[0]);
   }
 } // H5ArrayWriter::impl::WriteUzfFirstSp
-//------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
-void H5ArrayWriter::impl::WriteDataSetWithZeros (
-  hsize_t dim[3]
-, hsize_t start[3]
-)
-{
-  // we don't want num to be bigger than ~75MB when num is about 10 million
-  CStr f(H5Filename());
-  CStr path(H5Path());
-  int nSp = 10000000 / (int)(dim[0] * dim[1]);
-  int dim2 = nSp;
-  if (dim[2] < nSp) dim2 = (int)dim[2];
-  CAR_DBL3D dat;
-  dat.SetSize(static_cast<int>(dim[0]),
-              static_cast<int>(dim[1]),
-              dim2, 0);
-
-  for (int start2 = 0; start2 < (int)dim[2]; start2 += nSp)
-  {
-    H5DataSetWriterSetup s(f, path, H5T_NATIVE_DOUBLE, 3);
-    std::vector<hsize_t> start1(&start[0], &start[3]),
-                          n2write(&dim[0], &dim[3]);
-    start1[2] += start2;
-    if (start2 + dim2 > (int)dim[2]) dim2 = (int)dim[2] - start2;
-    n2write[2] = (hsize_t)dim2;
-    H5DSWriterDimInfo dim1(start1, n2write);
-    H5DataSetWriter w(&s);
-    w.SetDimInfoForWriting(&dim1);
-    size_t num1(static_cast<size_t>(dim[0] * dim[1] * dim2));
-    w.WriteData(&dat.at(0,0,0), num1);
-  }
-} // H5ArrayWriter::impl::WriteDataSetWithZeros
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------

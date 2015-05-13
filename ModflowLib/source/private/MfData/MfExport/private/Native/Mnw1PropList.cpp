@@ -20,16 +20,6 @@
 // 5. Shared code headers
 
 // 6. Non-shared code headers
-//#include <private/H5DataReader/H5DataSetReader.h>
-//#include <private/H5DataReader/H5DataSetWriter.h>
-//#include <private/H5DataReader/H5DataSetWriterSetup.h>
-//#include <private/MfData/MfExport/private/Mf2kNative.h>
-//#include <private/MfData/MfExport/private/Native/NativePackExp.h>
-//#include <private/MfData/MfExport/private/TxtExporter.h>
-//#include <private/MfData/MfGlobal.h>
-//#include <private/MfData/Packages/MfPackage.h>
-//#include <private/MfData/Packages/MfPackFields.h>
-//#include <private/MfData/Packages/MfPackStrings.h>
 
 //----- Forward declarations ---------------------------------------------------
 
@@ -308,5 +298,170 @@ void Mnw1PropList::AppendItem (
     m_used.push_back(false);
 } // Mnw1PropList::AppendItem
 
+///////////////////////////////////////////////////////////////////////////////
+// TESTS
+///////////////////////////////////////////////////////////////////////////////
+#ifdef CXX_TEST
 
+#include <private\MfData\MfExport\private\Native\Mnw1PropList.t.h>
+#include <private/MfLibAsserts.h>
+//------------------------------------------------------------------------------
+void Mnw1PropListT::setUp ()
+{
+} // Mnw1PropListT::setUp
+//------------------------------------------------------------------------------
+void Mnw1PropListT::tearDown ()
+{
+} // Mnw1PropListT::setUp
+//------------------------------------------------------------------------------
+void Mnw1PropListT::testCreateClass ()
+{
+  Mnw1PropList *p = new Mnw1PropList();
+  TS_ASSERT(p);
+  if (p) delete(p);
+} // Mnw1PropListT::testCreateClass
+//------------------------------------------------------------------------------
+void Mnw1PropListT::testIt ()
+{
+  Mnw1PropList wpl;
 
+  int cells[]   = { 0, 1, 0, 3, 4, 5, 6, 7, 8, 9, 10 };
+  int expectedCellIds[] = { 0, 1, 0, 3, 0, 1, 0, 1, 1, 0, 1 };
+  int expectedProps[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+  std::vector<int> expectedPropsVec;
+  const int NUM_NAMES = 11;
+  char *names[NUM_NAMES] = { "Site-1", "Site-1", "Site-2", "Site-2", "Well-3",
+    "Well-3", "Well-4", "Well-4", "Well-5", "Well-5",
+    "Well-6" };
+  std::vector<CStr> namesVec(names, names+NUM_NAMES);
+  CStr *expectedNames = &namesVec[0];
+  int expectedWellIds[] = { 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 0 };
+  char expectedIsSite[] = { true, true, true, true, false, false, false, false,
+    false, false, false };
+  std::vector<int> cellIds;
+  std::vector<int> properties;
+
+  cellIds.insert(cellIds.begin(), cells, cells+2);
+  properties = wpl.GetPropIndicees("Site-1", cellIds);
+  TS_ASSERT_EQUALS_AVEC(expectedProps, 2, properties);
+  TS_ASSERT_EQUALS_AVEC(expectedCellIds, 2, wpl.GetCellIds());
+  TS_ASSERT_EQUALS_AVEC(expectedNames, 2, wpl.GetWellNames());
+  TS_ASSERT_EQUALS_AVEC(expectedWellIds, 2, wpl.GetWellIds());
+  TS_ASSERT_EQUALS_AVEC(expectedIsSite, 2, wpl.GetIsSiteName());
+
+  // second site entry with different name moves on to new properties position
+  cellIds.clear();
+  cellIds.insert(cellIds.begin(), cells+2, cells+4);
+  properties = wpl.GetPropIndicees("Site-2", cellIds);
+  TS_ASSERT_EQUALS_AVEC(expectedProps+2, 2, properties);
+  TS_ASSERT_EQUALS_AVEC(expectedCellIds, 4, wpl.GetCellIds());
+  TS_ASSERT_EQUALS_AVEC(expectedNames, 4, wpl.GetWellNames());
+  TS_ASSERT_EQUALS_AVEC(expectedWellIds, 4, wpl.GetWellIds());
+  TS_ASSERT_EQUALS_AVEC(expectedIsSite, 4, wpl.GetIsSiteName());
+
+  // second site entry with same name and cells moves on to new position
+  cellIds.clear();
+  cellIds.insert(cellIds.begin(), cells, cells+2);
+  properties = wpl.GetPropIndicees("Site-1", cellIds);
+  TS_ASSERT_EQUALS_AVEC(expectedProps+4, 2, properties);
+  TS_ASSERT_EQUALS_AVEC(expectedCellIds, 6, wpl.GetCellIds());
+  TS_ASSERT_EQUALS_AVEC(expectedNames, 6, wpl.GetWellNames());
+  TS_ASSERT_EQUALS_AVEC(expectedWellIds, 6, wpl.GetWellIds());
+  TS_ASSERT_EQUALS_AVEC(expectedIsSite, 6, wpl.GetIsSiteName());
+
+  // new well entry moves on to new properties position
+  properties = wpl.GetPropIndicees("", cellIds);
+  TS_ASSERT_EQUALS_AVEC(expectedProps+6, 2, properties);
+  TS_ASSERT_EQUALS_AVEC(expectedCellIds, 8, wpl.GetCellIds());
+  TS_ASSERT_EQUALS_AVEC(expectedNames, 8, wpl.GetWellNames());
+  TS_ASSERT_EQUALS_AVEC(expectedWellIds, 8, wpl.GetWellIds());
+  TS_ASSERT_EQUALS_AVEC(expectedIsSite, 8, wpl.GetIsSiteName());
+
+  // new well entry with same cellid moves on to new properties position
+  cellIds[0] = 1;
+  cellIds[1] = 0;
+  properties = wpl.GetPropIndicees("", cellIds);
+  TS_ASSERT_EQUALS_AVEC(expectedProps+8, 2, properties);
+  TS_ASSERT_EQUALS_AVEC(expectedCellIds, 10, wpl.GetCellIds());
+  TS_ASSERT_EQUALS_AVEC(expectedNames, 10, wpl.GetWellNames());
+  TS_ASSERT_EQUALS_AVEC(expectedWellIds, 10, wpl.GetWellIds());
+  TS_ASSERT_EQUALS_AVEC(expectedIsSite, 10, wpl.GetIsSiteName());
+
+  // new single cell well entry uses zero for wellid
+  cellIds.clear();
+  cellIds.push_back(1);
+  properties = wpl.GetPropIndicees("", cellIds);
+  TS_ASSERT_EQUALS_AVEC(expectedProps+10, 1, properties);
+  TS_ASSERT_EQUALS_AVEC(expectedCellIds, 11, wpl.GetCellIds());
+  TS_ASSERT_EQUALS_AVEC(expectedNames, 11, wpl.GetWellNames());
+  TS_ASSERT_EQUALS_AVEC(expectedWellIds, 11, wpl.GetWellIds());
+  TS_ASSERT_EQUALS_AVEC(expectedIsSite, 11, wpl.GetIsSiteName());
+
+  // new stess period should find the same places
+  // also reversing cellIds above should reverse properties returned
+  wpl.NewStressPeriod();
+  cellIds.resize(2);
+  cellIds[0] = 1;
+  cellIds[1] = 0;
+  properties = wpl.GetPropIndicees("Site-1", cellIds);
+  expectedPropsVec.clear();
+  expectedPropsVec.insert(expectedPropsVec.begin(), expectedProps, expectedProps+2);
+  std::reverse(expectedPropsVec.begin(), expectedPropsVec.end());
+  TS_ASSERT_EQUALS_VEC(expectedPropsVec, properties);
+  TS_ASSERT_EQUALS_AVEC(expectedCellIds, 11, wpl.GetCellIds());
+  TS_ASSERT_EQUALS_AVEC(expectedNames, 11, wpl.GetWellNames());
+  TS_ASSERT_EQUALS_AVEC(expectedWellIds, 11, wpl.GetWellIds());
+  TS_ASSERT_EQUALS_AVEC(expectedIsSite, 11, wpl.GetIsSiteName());
+
+  // second site entry with different name moves on to new properties position
+  cellIds[0] = 3;
+  cellIds[1] = 0;
+  properties = wpl.GetPropIndicees("Site-2", cellIds);
+  expectedPropsVec.clear();
+  expectedPropsVec.insert(expectedPropsVec.begin(), expectedProps+2, expectedProps+4);
+  std::reverse(expectedPropsVec.begin(), expectedPropsVec.end());
+  TS_ASSERT_EQUALS_VEC(expectedPropsVec, properties);
+  TS_ASSERT_EQUALS_AVEC(expectedCellIds, 11, wpl.GetCellIds());
+  TS_ASSERT_EQUALS_AVEC(expectedNames, 11, wpl.GetWellNames());
+  TS_ASSERT_EQUALS_AVEC(expectedWellIds, 11, wpl.GetWellIds());
+  TS_ASSERT_EQUALS_AVEC(expectedIsSite, 11, wpl.GetIsSiteName());
+
+  // second site entry with same name moves on to new properties position
+  cellIds[0] = 1;
+  cellIds[1] = 0;
+  properties = wpl.GetPropIndicees("Site-1", cellIds);
+  expectedPropsVec.clear();
+  expectedPropsVec.insert(expectedPropsVec.begin(), expectedProps+4, expectedProps+6);
+  std::reverse(expectedPropsVec.begin(), expectedPropsVec.end());
+  TS_ASSERT_EQUALS_VEC(expectedPropsVec, properties);
+  TS_ASSERT_EQUALS_AVEC(expectedCellIds, 11, wpl.GetCellIds());
+  TS_ASSERT_EQUALS_AVEC(expectedNames, 11, wpl.GetWellNames());
+  TS_ASSERT_EQUALS_AVEC(expectedWellIds, 11, wpl.GetWellIds());
+  TS_ASSERT_EQUALS_AVEC(expectedIsSite, 11, wpl.GetIsSiteName());
+
+  // new well entry moves on to new properties position
+  properties = wpl.GetPropIndicees("", cellIds);
+  expectedPropsVec.clear();
+  expectedPropsVec.insert(expectedPropsVec.begin(), expectedProps+6, expectedProps+8);
+  std::reverse(expectedPropsVec.begin(), expectedPropsVec.end());
+  TS_ASSERT_EQUALS_VEC(expectedPropsVec, properties);
+  TS_ASSERT_EQUALS_AVEC(expectedCellIds, 11, wpl.GetCellIds());
+  TS_ASSERT_EQUALS_AVEC(expectedNames, 11, wpl.GetWellNames());
+  TS_ASSERT_EQUALS_AVEC(expectedWellIds, 11, wpl.GetWellIds());
+  TS_ASSERT_EQUALS_AVEC(expectedIsSite, 11, wpl.GetIsSiteName());
+
+  // new well entry with same cellid moves on to new properties position
+  cellIds[0] = 0;
+  cellIds[1] = 1;
+  properties = wpl.GetPropIndicees("", cellIds);
+  expectedPropsVec.clear();
+  expectedPropsVec.insert(expectedPropsVec.begin(), expectedProps+8, expectedProps+10);
+  std::reverse(expectedPropsVec.begin(), expectedPropsVec.end());
+  TS_ASSERT_EQUALS_VEC(expectedPropsVec, properties);
+  TS_ASSERT_EQUALS_AVEC(expectedCellIds, 11, wpl.GetCellIds());
+  TS_ASSERT_EQUALS_AVEC(expectedNames, 11, wpl.GetWellNames());
+  TS_ASSERT_EQUALS_AVEC(expectedWellIds, 11, wpl.GetWellIds());
+  TS_ASSERT_EQUALS_AVEC(expectedIsSite, 11, wpl.GetIsSiteName());
+} // Mnw1PropListT::testIt
+
+#endif

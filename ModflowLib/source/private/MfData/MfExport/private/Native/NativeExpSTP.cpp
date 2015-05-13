@@ -7,9 +7,11 @@
 //------------------------------------------------------------------------------
 #include <private\MfData\MfExport\private\Native\NativeExpSTP.h>
 
+#include <private\H5DataReader\H5DataSetWriter.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\TxtExporter.h>
 #include <private\MfData\MfExport\private\Native\H5BcList.h>
+#include <private\MfData\MfExport\private\Native\H5UseLastWriter.h>
 #include <private\MfData\MfExport\private\Native\NativeExpNam.h>
 #include <private\MfData\MfExport\private\Native\NativeUtil.h>
 #include <private\MfData\MfGlobal.h>
@@ -20,7 +22,7 @@ using namespace MfData::Export;
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-NativeExpSTP::NativeExpSTP ()
+NativeExpSTP::NativeExpSTP (bool a_h5) : m_h5(a_h5)
 {
 } // MfNativeExpSTP::MfNativeExpSTP
 //------------------------------------------------------------------------------
@@ -79,8 +81,14 @@ bool NativeExpSTP::Export ()
     if (exOc) exOc->WriteComments(); exOc->WriteStoredLines(); delete(exOc);
   }
 
-  H5BcList h(this);
-  h.WriteMapIdsForListBcs();
+  if (m_h5)
+  {
+    H5BcList h(this);
+    h.WriteMapIdsForListBcs();
+    H5UseLastWriter ul(this);
+    ul.CheckArealFromUseLast();
+    H5DataReader::CloseAllH5FilesOpenForWriting();
+  }
 
   // copy world file and prj file if they exist
   CopyMfwPrjFiles();

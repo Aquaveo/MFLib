@@ -19,6 +19,8 @@ namespace MfData
       void WriteData(std::vector<int>& a_);
       void WriteEtsNetSeg(int a_);
 
+      void CheckArealFromUseLast();
+
     private:
       class impl;
       impl* m_p;
