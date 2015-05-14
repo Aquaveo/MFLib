@@ -123,6 +123,7 @@ public:
   , m_NAM_fname()
   , m_NAM_niu()
   , m_NAM_maxStrLen(0)
+  , m_HasBinaryExport(0)
   {}
 
   virtual ~ExpGmsH5Public()
@@ -141,6 +142,7 @@ public:
   std::vector<CStr> m_NAM_fname;
   std::vector<int> m_NAM_niu;
   int m_NAM_maxStrLen;
+  bool m_HasBinaryExport;
 
 };
 
@@ -171,7 +173,10 @@ static void saveSEN(MfPackage *a_pSen1,
 static void expFinalize(MfGlobal* a_global,
                         TxtExporter *a_exp);
 static void showWarnings(TxtExporter* a_exp);
+static void expCheckArealFromUseLast(int a_nCells,
+                                     const char * a_baseName);
 static bool& iNeedsSENFile();
+static bool& iHasBinaryExport(TxtExporter* a_exp);
 static void WriteDataSetWithZeros (CStr& f, CStr& path, hsize_t dim[3],
                                    hsize_t start[3]);
 
@@ -522,7 +527,7 @@ bool ExpGmsH5::ExportPackage (MfGlobal* a_global,
   }
   else if (Packages::BIN == packName)
   {
-    MfData::MfGlobal::Get().SetIntVar("HAS_BINARY_ARRAYS", 1);
+    iHasBinaryExport(GetExp()) = true;
   }
   else if ("STP" == packName) // this comes at the very end
   {
@@ -531,7 +536,7 @@ bool ExpGmsH5::ExportPackage (MfGlobal* a_global,
     expSEN(GetExp());
     expNameFile(0, GetExp(), true, GetModelType(), this);
     expSuperFile(a_global->ModelType(), a_global->GetPackage("NAM1"), GetExp());
-    //expFinalize(a_global, GetExp());
+    expFinalize(a_global, GetExp());
   }
   else
   {
@@ -1202,6 +1207,13 @@ static CStr iGetTypeExtension (const CStr& a_type,
   }
 } // iGetTypeExtension
 //------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+bool& iHasBinaryExport (TxtExporter* a_exp)
+{
+  return a_exp->m_public->m_HasBinaryExport;
+} // iHasBinaryExport
+//------------------------------------------------------------------------------
 /// \brief Exports the name file
 //------------------------------------------------------------------------------
 static void expNameFile (MfPackage *a_package,
@@ -1491,6 +1503,49 @@ static void expParamFile (MfPackage* a_package,
   }
 } // expParamFile
 //------------------------------------------------------------------------------
+/// \brief Writes the array multiplier for the areal data
+//------------------------------------------------------------------------------
+template <class T>
+static void expArealArrayMultiplier (const char *a_file,
+                                     const char *a_path,
+                                     const int a_spIdx,
+                                     const hid_t a_datatype,
+                                     const int a_idx,
+                                     const int a_nDim,
+                                     const T a_val)
+{
+  CStr path(a_path);
+  path += " Multiplier";
+  path.Replace("07.", "08.");
+  path.Replace("09.", "10.");
+
+  path.Replace("12.", "13.");
+  path.Replace("14.", "15.");
+  path.Replace("16.", "17.");
+  path.Replace("18.", "19.");
+  path.Replace("20.", "21.");
+  path.Replace("22.", "23.");
+  path.Replace("24.", "25.");
+  path.Replace("26.", "27.");
+  path.Replace("28.", "29.");
+  path.Replace("30.", "31.");
+
+  H5DataSetWriterSetup s(a_file, path, a_datatype, a_nDim);
+  H5DataSetWriter h(&s);
+  h.AllowTypeConversions(true);
+  std::vector<hsize_t> start(a_nDim,0), n2write(a_nDim,1);
+  if (a_nDim == 1)
+    start[0] = a_spIdx;
+  else if (a_nDim == 2)
+  {
+    start[0] = a_idx;
+    start[1] = a_spIdx;
+  }
+  H5DSWriterDimInfo dim(start, n2write);
+  h.SetDimInfoForWriting(&dim);
+  h.WriteData(&a_val, 1);
+} // expArealArrayMultiplier
+//------------------------------------------------------------------------------
 /// \brief Exports the use last information for the areal packages
 //------------------------------------------------------------------------------
 static void expUseLastAreal (const char * a_file,
@@ -1630,12 +1685,63 @@ static void expSEN (TxtExporter *a_exp)
   }
 } // expSEN
 //------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void iGetSeawatBcIdx (const CStr& a_type,
+                      int& a_seawatBcIdx0,
+                      int& a_seawatBcIdx1)
+{
+  a_seawatBcIdx0 = a_seawatBcIdx1 = -1;
+  if (a_type == "River")
+  {
+    // stage, cond, elev, factor, RBDTHK, RIVDEN
+    a_seawatBcIdx0 = 4;
+    a_seawatBcIdx1 = 5;
+  }
+  else if (a_type == "Specified Head")
+  {
+    // startHead, endHead, factor1, factor2, CHDDENSOPT, CHDDEN
+    a_seawatBcIdx0 = 4;
+    a_seawatBcIdx1 = 5;
+  }
+  else if (a_type == "Drain")
+  {
+    // elev, cond, factor, DRNBELEV
+    a_seawatBcIdx0 = 3;
+  }
+  else if (a_type == "General Head")
+  {
+    // head, cond, factor, GHBELEV, GHBDENS
+    a_seawatBcIdx0 = 3;
+    a_seawatBcIdx1 = 4;
+  }
+  else if (a_type == "Drain Return")
+  {
+    // elev, cond, layR, rowR, colR, Rfprop, factor
+  }
+  else if (a_type == "Well")
+  {
+    // Q, factor, WELDENS
+    a_seawatBcIdx0 = 2;
+  }
+  else if (a_type == "Stream")
+  {
+    // stage, cond, bot. elev., top elev., width, slope, rough, factor
+  }
+  else if (a_type == "Stream (SFR2)")
+  {
+    // RCHLEN
+  }
+} // iGetSeawatBcIdx
+//------------------------------------------------------------------------------
 /// \brief This function does any final things that need to be done before
 /// shutting down the program.
 //------------------------------------------------------------------------------
 static void expFinalize (MfGlobal* a_global,
                          TxtExporter *a_exp)
 {
+  expCheckArealFromUseLast(a_global->NumRow()*a_global->NumCol(),
+                           a_exp->GetBaseFileName());
   H5DataReader::CloseAllH5FilesOpenForWriting();
 } // expFinalize
 //------------------------------------------------------------------------------
@@ -1643,9 +1749,7 @@ static void expFinalize (MfGlobal* a_global,
 //------------------------------------------------------------------------------
 static void showWarnings (TxtExporter* a_exp)
 {
-  int flag(0);
-  MfData::MfGlobal::Get().GetIntVar("HAS_BINARY_ARRAYS", flag);
-  if (flag)
+  if (iHasBinaryExport(a_exp))
   {
     printf("\nGMS Binary Array Warning:: This model conatins binary arrays. "
       "The binary format could possibly differ from GMS MODFLOW. The array "
@@ -1907,6 +2011,40 @@ static void expArealLayFromUseLast (CAR_INT2D& a_flags,
     w.WriteData(&mult.at(0), static_cast<size_t>(dim[1]));
   }
 } // expArealLayFromUseLast
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+static void expCheckArealFromUseLast (int a_nCells,
+                                      const char * a_baseName)
+{
+  // read all of the use last flags on the data
+  CAR_INT2D flags;
+  expGetAllArealUseLast(flags, "Recharge/", a_baseName);
+  // update the areal data
+  expArealPropFromUseLast(flags, a_nCells, "Recharge/", a_baseName);
+  // update the areal layer
+  expArealLayFromUseLast(flags, a_nCells, "Recharge/", a_baseName);
+
+  expGetAllArealUseLast(flags, "ET/", a_baseName);
+  // update the areal data
+  expArealPropFromUseLast(flags, a_nCells, "ET/", a_baseName);
+  // update the areal layer
+  expArealLayFromUseLast(flags, a_nCells, "ET/", a_baseName);
+
+  expGetAllArealUseLast(flags, "ETS/", a_baseName);
+  // update the areal data
+  expArealPropFromUseLast(flags, a_nCells, "ETS/", a_baseName);
+  // update the areal layer
+  expArealLayFromUseLast(flags, a_nCells, "ETS/", a_baseName);
+  // update the extinction depth proportion
+  expEtSegFromUseLast(flags, a_nCells, a_baseName, MFBC_PXDP, MFBC_PXDPMULT);
+  // update the extinction rate proportion
+  expEtSegFromUseLast(flags, a_nCells, a_baseName, MFBC_PETM, MFBC_PETMMULT);
+
+  expGetAllArealUseLast(flags, "UZF/", a_baseName);
+  // update the areal data
+  expArealPropFromUseLast(flags, a_nCells, "UZF/", a_baseName);
+} // expCheckArealFromUseLast
 
 ///////////////////////////////////////////////////////////////////////////////
 // TESTS
@@ -2258,7 +2396,6 @@ static bool testCheckGroupExists (hid_t fid,
   H5Gclose(g);
   return rval;
 }
-//------------------------------------------------------------------------------
 static bool testCheckDatasetExists (hid_t fid,
                                     const char *a_)
 {
@@ -2268,7 +2405,6 @@ static bool testCheckDatasetExists (hid_t fid,
   H5Dclose(d);
   return rval;
 }
-//------------------------------------------------------------------------------
 void ExpGmsH5T::testCreateDefaultMfH5File ()
 {
   CStr basePath;

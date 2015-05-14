@@ -85,9 +85,9 @@ bool NativeExpSTP::Export ()
   {
     H5BcList h(this);
     h.WriteMapIdsForListBcs();
-    H5UseLastWriter ul(this);
-    ul.CheckArealFromUseLast();
-    H5DataReader::CloseAllH5FilesOpenForWriting();
+    //H5UseLastWriter ul(this);
+    //ul.CheckArealFromUseLast();
+    //H5DataReader::CloseAllH5FilesOpenForWriting();
   }
 
   // copy world file and prj file if they exist
