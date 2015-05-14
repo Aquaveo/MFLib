@@ -460,6 +460,7 @@ static bool iPackageToNativeExport (
       || iSfrPack(packName)
       || iUzfPack(packName)
       || iLstPack(packName)
+      || "STP" == packName
      )  NativeUtil::ExportNextToH5();
 
   return rval;
