@@ -47,6 +47,7 @@
 #include <private\MfData\MfExport\private\Native\NativeExpSwi.h>
 #include <private\MfData\MfExport\private\Native\NativeExpUzf.h>
 #include <private\MfData\MfExport\private\Native\NativeExpVdf.h>
+#include <private\MfData\MfExport\private\Native\NativeExpVsc.h>
 #include <private\MfData\MfExport\private\Native\NativeExpZon.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\Packages\MfPackage.h>
@@ -155,6 +156,13 @@ bool VdfPack (const CStr& type)
   return false;
 } // VdfPack
 //------------------------------------------------------------------------------
+bool VscPack (const CStr& type)
+{
+  if (Packages::VSCLine3 == type || Packages::VSCStressPeriod == type)
+    return true;
+  return false;
+} // VscPack
+//------------------------------------------------------------------------------
 static bool& iH5Flag()
 {
   static bool m_(false);
@@ -215,6 +223,7 @@ NativePackExp* NativeUtil::CreatePackExp (Mf2kNative* a_native,
   else if (Packages::GNC == type)               ret = new NativeExpGnc();
   else if (Packages::SWI == type)               ret = new NativeExpSwi();
   else if (VdfPack(type))                       ret = new NativeExpVdf(h5);
+  else if (VscPack(type))                       ret = new NativeExpVsc(h5);
 
   // leave at end. This is the last "package" processed
   else if ("STP" == type)                       ret = new NativeExpSTP(h5);

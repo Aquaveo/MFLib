@@ -139,6 +139,8 @@ void NativeExpVdf::Lines6to7 ()
     std::vector<CStr>& l(a_pLine5->StringsToWrite());
     std::vector<CStr>& d(a_pLine5->StringDescriptions());
     for (size_t i=0; i<l.size(); ++i) AddToStoredLinesDesc(l[i], d[i]);
+    l.clear();
+    d.clear();
     bool arrayWritten = false;
     if (*mt3drhoflg == 0)
     {

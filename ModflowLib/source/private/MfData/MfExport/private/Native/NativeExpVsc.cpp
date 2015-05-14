@@ -34,14 +34,14 @@ NativeExpVsc::~NativeExpVsc ()
 //------------------------------------------------------------------------------
 bool NativeExpVsc::Export ()
 {
-  if (Packages::VDFLine5 == GetPackage()->PackageName())
+  if (Packages::VSCLine3 == GetPackage()->PackageName())
   {
     Lines1to3();
   }
-  else if (Packages::VDFStressPeriod == GetPackage()->PackageName())
+  else if (Packages::VSCStressPeriod == GetPackage()->PackageName())
   {
     Lines4to5();
-    TmpPackageNameChanger tmp(GetPackage(), Packages::VDF);
+    TmpPackageNameChanger tmp(GetPackage(), Packages::VSC);
     WriteComments();
     WriteStoredLines();
   }
@@ -139,6 +139,11 @@ void NativeExpVsc::Lines4to5 ()
       a_pLine3->GetField(VSCpack::MT3DMUFLG, &mt3dmuflg) && mt3dmuflg &&
       a_pSP->GetField(VSCpack::INVISC, &invisc) && invisc)
   {
+    std::vector<CStr>& l(a_pLine3->StringsToWrite());
+    std::vector<CStr>& d(a_pLine3->StringDescriptions());
+    for (size_t i=0; i<l.size(); ++i) AddToStoredLinesDesc(l[i], d[i]);
+    l.clear();
+    d.clear();
     bool arrayWritten = false;
     if (*mt3dmuflg == 0)
     {
