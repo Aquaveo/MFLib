@@ -55,6 +55,13 @@ public:
   size_t CurModIdx() { return m_curModIdx; }
   CStr& LgrName() { return m_LgrName; }
   int& Unstructured () { return m_unstructured; }
+  int NumNodesUnstructured ()
+  {
+    int rval(-1);
+    if (iVars().find("DISU_NODES") != iVars().end())
+      rval = iVars()["DISU_NODES"];
+    return rval;
+  }
 
   std::vector<MfData::Export::MfExporter*>& vExporter() { return m_export; }
 
@@ -438,6 +445,13 @@ int MfGlobal::Unstructured () const
 {
   return m_p->Unstructured();
 }
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+int MfGlobal::NumNodesUnstructured () const
+{
+  return m_p->NumNodesUnstructured();
+} // MfGlobal::NumNodesUnstructured
 //------------------------------------------------------------------------------
 /// \brief Sets an integer variable by name
 //------------------------------------------------------------------------------

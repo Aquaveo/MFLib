@@ -241,6 +241,9 @@ void NativeExpLstPack::Line5 ()
   CStr desc = " 5. ITMP NP";
   CStr stress;
   stress.Format("          Stress Period %3d", GetGlobal()->GetCurrentPeriod());
+  const int* itmpcln(0);
+  GetPackage()->GetField(Packages::ListPack::ITMPCLN , &itmpcln);
+  if (itmpcln && 0 < *itmpcln) desc += " ITMPCLN";
   desc += stress;
 
   const int *itmp(0), *np(0);
@@ -256,6 +259,11 @@ void NativeExpLstPack::Line5 ()
   }
   CStr ln;
   ln.Format("%5d %5d", tmpItmp, tmpNp);
+  if (itmpcln && 0 < *itmpcln)
+  {
+    CStr ln1; ln1.Format(" %5d", *itmpcln);
+    ln += ln1;
+  }
   AddToStoredLinesDesc(ln, desc);
 } // NativeExpLstPack::Line5
 //------------------------------------------------------------------------------

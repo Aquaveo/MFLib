@@ -113,6 +113,7 @@ void NativeExpNam::WriteFileStp ()
   setNativeSupported.insert("SWI2");
 
   CStr file, baseName = exp->GetBaseFileName();
+  std::vector<CStr> types, extensions;
   util::StripPathFromFilename(baseName, baseName);
   for (size_t i=0; i<ftype.size(); ++i)
   {

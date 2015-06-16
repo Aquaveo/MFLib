@@ -111,39 +111,26 @@ class ExpGmsH5Public
 public:
   ExpGmsH5Public() :
     m_paramFileWasExported(0)
-  , m_MultArrayMap()
-  , m_ArrayOrderVector()
-  , m_ZoneArrayMap()
   , m_ExportedPackages()
-  , m_SubPackageArrayCounts()
-  , m_needsSENFile(0)
   , m_SensitivityHeader()
   , m_SensitivityItems()
   , m_NAM_ftype()
   , m_NAM_fname()
   , m_NAM_niu()
   , m_NAM_maxStrLen(0)
-  , m_HasBinaryExport(0)
   {}
 
   virtual ~ExpGmsH5Public()
   {}
 
   bool m_paramFileWasExported;
-  std::map<CStr, CStr> m_MultArrayMap;
-  std::vector<CStr> m_ArrayOrderVector;
-  std::map<CStr, CStr> m_ZoneArrayMap;
   std::set<CStr> m_ExportedPackages;
-  std::map<CStr, int> m_SubPackageArrayCounts;
-  bool m_needsSENFile;
   SensitivityHeader m_SensitivityHeader;
   std::vector<SensitivityItem> m_SensitivityItems;
   std::vector<CStr> m_NAM_ftype;
   std::vector<CStr> m_NAM_fname;
   std::vector<int> m_NAM_niu;
   int m_NAM_maxStrLen;
-  bool m_HasBinaryExport;
-
 };
 
 static void CreateH5Dataset(const CStr &a_file,
@@ -156,7 +143,8 @@ static bool CreateDefaultMfH5File(const char *a_,
                                   int a_modelType=1,
                                   bool a_compress=false);
 static std::map<CStr,std::vector<int> > &GetChunkMap();
-static void expNameFile(MfPackage *a_package,
+static void expNameFile(MfGlobal* a_global,
+                        MfPackage *a_package,
                         TxtExporter *a_exp,
                         int a_write,
                         int a_modelType,
@@ -166,17 +154,14 @@ static void expSuperFile(int a_model_type,
                          TxtExporter *a_exp);
 static void expParamFile(MfPackage* a_package,
                          TxtExporter *a_exp);
-static void expSEN(TxtExporter *a_exp);
+static void expSEN(MfGlobal* a_global, TxtExporter *a_exp);
 static void saveSEN(MfPackage *a_pSen1,
                     MfPackage *a_pSen,
                     TxtExporter* a_exp);
-static void expFinalize(MfGlobal* a_global,
-                        TxtExporter *a_exp);
-static void showWarnings(TxtExporter* a_exp);
+static void showWarnings(MfGlobal* a_global);
 static void expCheckArealFromUseLast(int a_nCells,
                                      const char * a_baseName);
 static bool& iNeedsSENFile();
-static bool& iHasBinaryExport(TxtExporter* a_exp);
 static void WriteDataSetWithZeros (CStr& f, CStr& path, hsize_t dim[3],
                                    hsize_t start[3]);
 
@@ -285,6 +270,9 @@ static bool iArrayToNative (const CStr& a_, MfGlobal* a_global)
          || Packages::Disu::CL2 == a_
          || Packages::Disu::CL12 == a_
          || Packages::Disu::FAHL == a_
+         || Packages::Cln::NNDCLN == a_
+         || Packages::Cln::IBOUND == a_
+         || Packages::Cln::STRT == a_
         )
       ) rval = true;
   else if (   ARR_BAS_IBND == a_
@@ -447,6 +435,9 @@ static bool iPackageToNativeExport (
       || Packages::VDFStressPeriod == packName
       || Packages::VSCLine3 == packName
       || Packages::VSCStressPeriod == packName
+      || Packages::CLNLine1 == packName
+      || Packages::CLN == packName
+      || Packages::GNC == packName
      )
   {
      rval = true;
@@ -518,7 +509,7 @@ bool ExpGmsH5::ExportPackage (MfGlobal* a_global,
   ExportedPackages(GetExp()).insert(packName);
   if (Packages::NAM == packName)
   {
-    expNameFile(a_package, GetExp(), false, GetModelType(), this);
+    expNameFile(a_global, a_package, GetExp(), false, GetModelType(), this);
   }
   else if (Packages::SEN1 == packName)
   {
@@ -528,16 +519,16 @@ bool ExpGmsH5::ExportPackage (MfGlobal* a_global,
   }
   else if (Packages::BIN == packName)
   {
-    iHasBinaryExport(GetExp()) = true;
+    int hasBinary = 1;
+    a_global->SetIntVar("BINARY_EXPORT", hasBinary);
   }
   else if ("STP" == packName) // this comes at the very end
   {
     ASSERT(_CrtCheckMemory());
     expParamFile(a_global->GetPackage("NAM1"), GetExp());
-    expSEN(GetExp());
-    expNameFile(0, GetExp(), true, GetModelType(), this);
+    expSEN(a_global, GetExp());
+    expNameFile(a_global, 0, GetExp(), true, GetModelType(), this);
     expSuperFile(a_global->ModelType(), a_global->GetPackage("NAM1"), GetExp());
-    expFinalize(a_global, GetExp());
   }
   else
   {
@@ -562,7 +553,7 @@ bool ExpGmsH5::ExportPackage (MfGlobal* a_global,
   {
     printf("Writing data for package: %s\n", packName.c_str());
     if ("STP" == packName)
-      showWarnings(GetExp());
+      showWarnings(a_global);
     fflush(stdout);
   }
   return rval;
@@ -899,6 +890,17 @@ static std::map<CStr, std::vector<int> >& GetChunkMap ()
 //------------------------------------------------------------------------------
 /// \brief Creates a default modflow h5 file
 //------------------------------------------------------------------------------
+void expGmsH5_CreateDefaultH5File (
+  const char *a_
+, int a_modelType
+, bool a_compress
+)
+{
+  CreateDefaultMfH5File(a_, a_modelType, a_compress);
+} // expGmsH5_CreateDefaultH5File
+//------------------------------------------------------------------------------
+/// \brief Creates a default modflow h5 file
+//------------------------------------------------------------------------------
 static bool CreateDefaultMfH5File (const char *a_,
                                    int a_modelType/*=1*/,
                                    bool a_compress/*=false*/)
@@ -1125,13 +1127,6 @@ static bool CreateDefaultMfH5File (const char *a_,
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-static bool& iNeedsSENFile (TxtExporter* a_exp)
-{
-  return a_exp->m_public->m_needsSENFile;
-} // iNeedsSENFile
-//------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
 bool iIsSeawatType (const CStr& a_type)
 {
   return a_type == "VDF" || a_type == "VSC";
@@ -1157,9 +1152,15 @@ bool iIsMt3dType (const CStr& a_type)
 static bool iIsTypeFiltered (const CStr& a_type,
                              int a_namefileType,
                              int a_modelType,
-                             TxtExporter* a_exp)
+                             TxtExporter* a_exp,
+                             MfGlobal* a_global)
 {
-  if (a_type == "sen" && !iNeedsSENFile(a_exp))
+  int needsSenFile(0), pval(0);
+  a_global->GetIntVar("NEEDS_SEN_FILE", needsSenFile);
+  a_global->GetIntVar("PVAL_Exported", pval);
+  if (a_type == "sen" && needsSenFile)
+    return true;
+  else if (a_type.CompareNoCase("pval") == 0 && !pval) 
     return true;
   else if (a_modelType == MfData::SEAWAT)
   {
@@ -1204,20 +1205,15 @@ static CStr iGetTypeExtension (const CStr& a_type,
   {
     CStr lowerType(a_type);
     lowerType.ToLower();
+    if (lowerType.find("data") != -1) return "";
     return lowerType;
   }
 } // iGetTypeExtension
 //------------------------------------------------------------------------------
-/// \brief 
-//------------------------------------------------------------------------------
-bool& iHasBinaryExport (TxtExporter* a_exp)
-{
-  return a_exp->m_public->m_HasBinaryExport;
-} // iHasBinaryExport
-//------------------------------------------------------------------------------
 /// \brief Exports the name file
 //------------------------------------------------------------------------------
-static void expNameFile (MfPackage *a_package,
+static void expNameFile (MfGlobal* a_global,
+                         MfPackage *a_package,
                          TxtExporter *a_exp,
                          int a_write,
                          int a_modelType,
@@ -1261,7 +1257,11 @@ static void expNameFile (MfPackage *a_package,
 
     for (int nfType = NF_MODFLOW; nfType <= lastType; ++nfType)
     {
-      std::set<CStr> uniqueNames;
+      std::set<CStr> uniqueNames, setExt;
+      for (size_t i=0; i<ftype.size(); ++i)
+      {
+        setExt.insert(iGetTypeExtension(ftype.at(i), a_exp));
+      }
       CStr file, type, baseName(a_exp->GetBaseFileName());
       util::StripPathFromFilename(baseName, baseName);
       std::ostringstream oStream;
@@ -1270,12 +1270,17 @@ static void expNameFile (MfPackage *a_package,
       {
         type = ftype.at(i);
         type.ToLower();
-        if (!iIsTypeFiltered(ftype.at(i), nfType, a_modelType, a_exp))
+        if (!iIsTypeFiltered(ftype.at(i), nfType, a_modelType, a_exp, a_global))
         {
           if (type.find("data") != -1 && nfType != NF_MT3D)
           {
             CStr extension(fname.at(i));
             util::StripAllButExtension(extension, extension);
+            if (setExt.find(extension) != setExt.end())
+            {
+              CStr tmpExt; tmpExt.Format("%s_UNIT_%d", extension, niu.at(i));
+              extension = tmpExt;
+            }
             a_h5->BuildUniqueName(baseName, extension, niu.at(i),
                                   uniqueNames, file);
           }
@@ -1289,7 +1294,7 @@ static void expNameFile (MfPackage *a_package,
                                     uniqueNames,
                                     file);
             }
-            else if (!iIsTypeFiltered(ftype.at(i), nfType, a_modelType, a_exp))
+            else if (!iIsTypeFiltered(ftype.at(i), nfType, a_modelType, a_exp, a_global))
             {
               a_h5->BuildUniqueName(baseName, type, niu.at(i),
                                     uniqueNames, file);
@@ -1504,71 +1509,6 @@ static void expParamFile (MfPackage* a_package,
   }
 } // expParamFile
 //------------------------------------------------------------------------------
-/// \brief Writes the array multiplier for the areal data
-//------------------------------------------------------------------------------
-template <class T>
-static void expArealArrayMultiplier (const char *a_file,
-                                     const char *a_path,
-                                     const int a_spIdx,
-                                     const hid_t a_datatype,
-                                     const int a_idx,
-                                     const int a_nDim,
-                                     const T a_val)
-{
-  CStr path(a_path);
-  path += " Multiplier";
-  path.Replace("07.", "08.");
-  path.Replace("09.", "10.");
-
-  path.Replace("12.", "13.");
-  path.Replace("14.", "15.");
-  path.Replace("16.", "17.");
-  path.Replace("18.", "19.");
-  path.Replace("20.", "21.");
-  path.Replace("22.", "23.");
-  path.Replace("24.", "25.");
-  path.Replace("26.", "27.");
-  path.Replace("28.", "29.");
-  path.Replace("30.", "31.");
-
-  H5DataSetWriterSetup s(a_file, path, a_datatype, a_nDim);
-  H5DataSetWriter h(&s);
-  h.AllowTypeConversions(true);
-  std::vector<hsize_t> start(a_nDim,0), n2write(a_nDim,1);
-  if (a_nDim == 1)
-    start[0] = a_spIdx;
-  else if (a_nDim == 2)
-  {
-    start[0] = a_idx;
-    start[1] = a_spIdx;
-  }
-  H5DSWriterDimInfo dim(start, n2write);
-  h.SetDimInfoForWriting(&dim);
-  h.WriteData(&a_val, 1);
-} // expArealArrayMultiplier
-//------------------------------------------------------------------------------
-/// \brief Exports the use last information for the areal packages
-//------------------------------------------------------------------------------
-static void expUseLastAreal (const char * a_file,
-                             const char * a_path,
-                             int a_sp,
-                             std::vector<int> &a_data)
-{
-  CStr f(a_file), path(a_path);
-  f += ".h5";
-  path += MFBC_USELAST;
-  H5DataSetWriterSetup setup(f, path, H5T_NATIVE_INT, 2);
-  H5DataSetWriter h(&setup);
-  h.AllowTypeConversions(true);
-  // do multidim stuff if needed
-  std::vector<hsize_t> start(2,0), n2write(2,1);
-  start[1] = a_sp - 1;
-  n2write[0] = a_data.size();
-  H5DSWriterDimInfo dim(start, n2write);
-  h.SetDimInfoForWriting(&dim);
-  h.WriteData(&a_data[0], a_data.size());
-} // expUseLastAreal
-//------------------------------------------------------------------------------
 /// \brief Saves sensitivity process input file values until the type is known
 //         so they can be exported
 //------------------------------------------------------------------------------
@@ -1634,7 +1574,7 @@ static void saveSEN (MfPackage *a_pSen,
 //------------------------------------------------------------------------------
 /// \brief Exports sensitivity process input file
 //------------------------------------------------------------------------------
-static void expSEN (TxtExporter *a_exp)
+static void expSEN (MfGlobal* a_global, TxtExporter *a_exp)
 {
   using namespace MfData::Packages;
   vector<SensitivityItem>& si = a_exp->m_public->m_SensitivityItems;
@@ -1657,7 +1597,9 @@ static void expSEN (TxtExporter *a_exp)
     }
   }
 
-  iNeedsSENFile(a_exp) = nonKeyedCount != 0;
+  //iNeedsSENFile(a_exp) = nonKeyedCount != 0;
+  bool needsSenFile = nonKeyedCount != 0 ? 1 : 0;
+  a_global->SetIntVar("NEEDS_SEN_FILE", needsSenFile);
   if (!si.empty() && nonKeyedCount)
   {
     if (sh.nplist > 0)
@@ -1688,364 +1630,17 @@ static void expSEN (TxtExporter *a_exp)
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-void iGetSeawatBcIdx (const CStr& a_type,
-                      int& a_seawatBcIdx0,
-                      int& a_seawatBcIdx1)
+static void showWarnings (MfGlobal* a_global)
 {
-  a_seawatBcIdx0 = a_seawatBcIdx1 = -1;
-  if (a_type == "River")
-  {
-    // stage, cond, elev, factor, RBDTHK, RIVDEN
-    a_seawatBcIdx0 = 4;
-    a_seawatBcIdx1 = 5;
-  }
-  else if (a_type == "Specified Head")
-  {
-    // startHead, endHead, factor1, factor2, CHDDENSOPT, CHDDEN
-    a_seawatBcIdx0 = 4;
-    a_seawatBcIdx1 = 5;
-  }
-  else if (a_type == "Drain")
-  {
-    // elev, cond, factor, DRNBELEV
-    a_seawatBcIdx0 = 3;
-  }
-  else if (a_type == "General Head")
-  {
-    // head, cond, factor, GHBELEV, GHBDENS
-    a_seawatBcIdx0 = 3;
-    a_seawatBcIdx1 = 4;
-  }
-  else if (a_type == "Drain Return")
-  {
-    // elev, cond, layR, rowR, colR, Rfprop, factor
-  }
-  else if (a_type == "Well")
-  {
-    // Q, factor, WELDENS
-    a_seawatBcIdx0 = 2;
-  }
-  else if (a_type == "Stream")
-  {
-    // stage, cond, bot. elev., top elev., width, slope, rough, factor
-  }
-  else if (a_type == "Stream (SFR2)")
-  {
-    // RCHLEN
-  }
-} // iGetSeawatBcIdx
-//------------------------------------------------------------------------------
-/// \brief This function does any final things that need to be done before
-/// shutting down the program.
-//------------------------------------------------------------------------------
-static void expFinalize (MfGlobal* a_global,
-                         TxtExporter *a_exp)
-{
-  expCheckArealFromUseLast(a_global->NumRow()*a_global->NumCol(),
-                           a_exp->GetBaseFileName());
-  H5DataReader::CloseAllH5FilesOpenForWriting();
-} // expFinalize
-//------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
-static void showWarnings (TxtExporter* a_exp)
-{
-  if (iHasBinaryExport(a_exp))
+  int binaryExport(0);
+  a_global->GetIntVar("BINARY_EXPORT", binaryExport);
+  if (binaryExport)
   {
     printf("\nGMS Binary Array Warning:: This model conatins binary arrays. "
       "The binary format could possibly differ from GMS MODFLOW. The array "
       "values need to be manually verified in GMS.\n\n");
   }
 } // showWarnings
-//------------------------------------------------------------------------------
-/// \brief This function updates the areal BC data from the use last flags
-//------------------------------------------------------------------------------
-static void expGetAllArealUseLast (CAR_INT2D& a_flags,
-                                   const char *a_path,
-                                   const char *a_baseName)
-{
-  CStr f(a_baseName), path(a_path);
-  f += ".h5";
-  path += MFBC_USELAST;
-  std::vector<hsize_t> dims;
-
-  {
-    VEC_INT_PAIR indices;
-    H5DataSetReader r(f, path, indices);
-    r.GetDataSetDimensions(dims);
-    //printf("crash");
-    //printf("dims size %d", dims.size());
-    //if (!dims.empty())
-      a_flags.SetSize(static_cast<int>(dims[0]), static_cast<int>(dims[1]), 0);
-    //else
-    //  return;
-  }
-  {
-    std::pair<int, int> p(0,0);
-    VEC_INT_PAIR indices(2, p);
-    indices[0].second = a_flags.GetSize1();
-    indices[1].second = a_flags.GetSize2();
-    H5DataSetReader r(f, path, indices);
-    r.GetData(&a_flags.at(0,0), a_flags.GetSize1()*a_flags.GetSize2());
-  }
-} // expGetAllArealUseLast
-//------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
-static void WriteDataSetWithZeros (CStr& f, CStr& path, hsize_t dim[3],
-                                   hsize_t start[3])
-{
-  // we don't want num to be bigger than ~75MB when num is about 10 million
-  int nSp = 10000000 / (int)(dim[0] * dim[1]);
-  int dim2 = nSp;
-  if (dim[2] < nSp) dim2 = (int)dim[2];
-  CAR_DBL3D dat;
-  dat.SetSize(static_cast<int>(dim[0]),
-              static_cast<int>(dim[1]),
-              dim2, 0);
-
-  for (int start2 = 0; start2 < (int)dim[2]; start2 += nSp)
-  {
-    H5DataSetWriterSetup s(f, path, H5T_NATIVE_DOUBLE, 3);
-    std::vector<hsize_t> start1(&start[0], &start[3]),
-                          n2write(&dim[0], &dim[3]);
-    start1[2] += start2;
-    if (start2 + dim2 > (int)dim[2]) dim2 = (int)dim[2] - start2;
-    n2write[2] = (hsize_t)dim2;
-    H5DSWriterDimInfo dim1(start1, n2write);
-    H5DataSetWriter w(&s);
-    w.SetDimInfoForWriting(&dim1);
-    size_t num1(static_cast<size_t>(dim[0] * dim[1] * dim2));
-    w.WriteData(&dat.at(0,0,0), num1);
-  }
-} // WriteDataSetWithZeros
-//------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
-static void expArealPropFromUseLast (CAR_INT2D& a_flags,
-                                     int a_nCells,
-                                     const char *a_path,
-                                     const char *a_baseName)
-{
-  CStr f(a_baseName), path(a_path);
-  f += ".h5";
-  path += MFBC_DATA;
-  std::vector<hsize_t> dims;
-  // get the current dimensions
-  {
-    VEC_INT_PAIR indices;
-    H5DataSetReader r(f, path, indices);
-    r.GetDataSetDimensions(dims);
-    if (dims.size() < 3)
-    {
-      ASSERT(0);
-      return;
-    }
-  }
-
-  hsize_t start[3] = {0,0,0};
-  hsize_t dim[3] = {a_flags.GetSize1() - 1, a_nCells, a_flags.GetSize2()};
-  if (dims[0] != 1 ||
-      dims[1] != 1 ||
-      dims[2] != 1)
-  {
-    if (CStr(a_path) == "ETS/")
-      dim[0] = 3;
-    dim[2] = a_flags.GetSize2() - dims[2];
-    start[2] = dims[2];
-  }
-
-  if (dim[0] < 1 ||
-      dim[1] < 1 ||
-      dim[2] < 1)
-    return;
-
-  // write the data set
-  {
-    WriteDataSetWithZeros(f, path, dim, start);
-  }
-  {
-    CAR_DBL2D mult;
-    mult.SetSize(static_cast<int>(dim[0]),
-                 static_cast<int>(dim[2]), 1);
-    path = a_path;
-    path += MFBC_DATAMULT;
-    H5DataSetWriterSetup s(f, path, H5T_NATIVE_DOUBLE, 2);
-    std::vector<hsize_t> start1(2, 0),
-                         n2write(2, 0);
-    start1[1] = start[2];
-    n2write[0] = dim[0];
-    n2write[1] = dim[2];
-    H5DSWriterDimInfo dim1(start1, n2write);
-    H5DataSetWriter w(&s);
-    w.SetDimInfoForWriting(&dim1);
-    w.WriteData(&mult.at(0,0), static_cast<size_t>(n2write[0]*n2write[1]));
-  }
-} // expArealPropFromUseLast
-//------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
-static void expEtSegFromUseLast (CAR_INT2D& a_flags,
-                                 int a_nCells,
-                                 const char *a_baseName,
-                                 const char *a_dataPath,
-                                 const char *a_multPath)
-{
-  if (a_flags.GetSize1() <= 1)
-    return;
-
-  CStr f(a_baseName), path("ETS/");
-  f += ".h5";
-  path += a_dataPath;
-  std::vector<hsize_t> dims;
-  // get the current dimensions
-  {
-    VEC_INT_PAIR indices;
-    H5DataSetReader r(f, path, indices);
-    r.GetDataSetDimensions(dims);
-    if (dims.size() < 3)
-    {
-      ASSERT(0);
-      return;
-    }
-  }
-
-  hsize_t start[3] = {0,0,0};
-  hsize_t dim[3] = {dims[0], a_nCells, a_flags.GetSize2()};
-  if (dims[0] != 1 ||
-      dims[1] != 1 ||
-      dims[2] != 1)
-  {
-    dim[2] = a_flags.GetSize2() - dims[2];
-    start[2] = dims[2];
-  }
-
-  if (dim[0] < 1 ||
-      dim[1] < 1 ||
-      dim[2] < 1)
-    return;
-
-  // write the data set
-  {
-    WriteDataSetWithZeros(f, path, dim, start);
-  }
-  {
-    CAR_DBL2D mult;
-    mult.SetSize(static_cast<int>(dim[0]),
-                 static_cast<int>(dim[2]), 1);
-    path = "ETS/";
-    path += a_multPath;
-    H5DataSetWriterSetup s(f, path, H5T_NATIVE_DOUBLE, 2);
-    std::vector<hsize_t> start1(2, 0),
-                         n2write(2, 0);
-    start1[1] = start[2];
-    n2write[0] = dim[0];
-    n2write[1] = dim[2];
-    H5DSWriterDimInfo dim1(start1, n2write);
-    H5DataSetWriter w(&s);
-    w.SetDimInfoForWriting(&dim1);
-    w.WriteData(&mult.at(0,0), static_cast<size_t>(n2write[0]*n2write[1]));
-  }
-} // expEtSegFromUseLast
-//------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
-static void expArealLayFromUseLast (CAR_INT2D& a_flags,
-                                    int a_nCells,
-                                    const char *a_path,
-                                    const char *a_baseName)
-{
-  if (a_flags.GetSize1() <= 1)
-    return;
-
-  CStr f(a_baseName), path(a_path);
-  f += ".h5";
-  path += MFBC_LAY;
-  std::vector<hsize_t> dims;
-  // get the current dimensions
-  {
-    VEC_INT_PAIR indices;
-    H5DataSetReader r(f, path, indices);
-    r.GetDataSetDimensions(dims);
-    if (dims.size() < 2)
-    {
-      ASSERT(0);
-      return;
-    }
-  }
-
-  hsize_t start[2] = {0,0};
-  hsize_t dim[2] = {a_nCells, a_flags.GetSize2()};
-  if (dims[0] != 1 ||
-      dims[1] != 1)
-  {
-    dim[1] = a_flags.GetSize2() - dims[1];
-    start[1] = dims[1];
-  }
-
-  CAR_INT2D dat;
-  dat.SetSize(static_cast<int>(dim[0]),
-              static_cast<int>(dim[1]), 1);
-  // write the data set
-  if (dim[0] > 0 && dim[1] > 0)
-  {
-    H5DataSetWriterSetup s(f, path, H5T_NATIVE_INT, 2);
-    std::vector<hsize_t> start1(&start[0], &start[2]),
-                         n2write(&dim[0], &dim[2]);
-    H5DSWriterDimInfo dim1(start1, n2write);
-    H5DataSetWriter w(&s);
-    w.SetDimInfoForWriting(&dim1);
-    size_t num(static_cast<size_t>(dim[0] * dim[1]));
-    w.WriteData(&dat.at(0,0), num);
-  }
-  if (dim[0] > 0 && dim[1] > 0)
-  {
-    std::vector<int> mult(static_cast<size_t>(dim[1]), 1);
-    path = a_path;
-    path += MFBC_LAYMULT;
-    H5DataSetWriterSetup s(f, path, H5T_NATIVE_INT, 1);
-    std::vector<hsize_t> start1(1, start[1]),
-                         n2write(1, dim[1]);
-    H5DSWriterDimInfo dim1(start1, n2write);
-    H5DataSetWriter w(&s);
-    w.SetDimInfoForWriting(&dim1);
-    w.WriteData(&mult.at(0), static_cast<size_t>(dim[1]));
-  }
-} // expArealLayFromUseLast
-//------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
-static void expCheckArealFromUseLast (int a_nCells,
-                                      const char * a_baseName)
-{
-  // read all of the use last flags on the data
-  CAR_INT2D flags;
-  expGetAllArealUseLast(flags, "Recharge/", a_baseName);
-  // update the areal data
-  expArealPropFromUseLast(flags, a_nCells, "Recharge/", a_baseName);
-  // update the areal layer
-  expArealLayFromUseLast(flags, a_nCells, "Recharge/", a_baseName);
-
-  expGetAllArealUseLast(flags, "ET/", a_baseName);
-  // update the areal data
-  expArealPropFromUseLast(flags, a_nCells, "ET/", a_baseName);
-  // update the areal layer
-  expArealLayFromUseLast(flags, a_nCells, "ET/", a_baseName);
-
-  expGetAllArealUseLast(flags, "ETS/", a_baseName);
-  // update the areal data
-  expArealPropFromUseLast(flags, a_nCells, "ETS/", a_baseName);
-  // update the areal layer
-  expArealLayFromUseLast(flags, a_nCells, "ETS/", a_baseName);
-  // update the extinction depth proportion
-  expEtSegFromUseLast(flags, a_nCells, a_baseName, MFBC_PXDP, MFBC_PXDPMULT);
-  // update the extinction rate proportion
-  expEtSegFromUseLast(flags, a_nCells, a_baseName, MFBC_PETM, MFBC_PETMMULT);
-
-  expGetAllArealUseLast(flags, "UZF/", a_baseName);
-  // update the areal data
-  expArealPropFromUseLast(flags, a_nCells, "UZF/", a_baseName);
-} // expCheckArealFromUseLast
 
 ///////////////////////////////////////////////////////////////////////////////
 // TESTS
@@ -2182,6 +1777,7 @@ void ExpGmsH5T::testexpNameFile ()
   int units[SW_FILE_NUMBER] = {1, 3, 4, 30, 18, 201, 23, 301, 302,
                                401, 402, 501, 502};
 
+  MfGlobal g(1,2,2,1,1,1,0);
   CStr outPath;
   util::GetTempDirectory(outPath);
   CStr nameFile(outPath + "\\testname.mfn");
@@ -2200,10 +1796,10 @@ void ExpGmsH5T::testexpNameFile ()
       p.SetField(Packages::NameFile::FNAME, nm[i]);
       p.SetField(Packages::NameFile::FTYPE, type[i]);
       p.SetField(Packages::NameFile::NIU, &units[i]);
-      expNameFile(&p, t, false, MfData::MF2K, &exp);
+      expNameFile(&g, &p, t, false, MfData::MF2K, &exp);
     }
 
-    expNameFile(0, t, true, MfData::MF2K, &exp);
+    expNameFile(&g, 0, t, true, MfData::MF2K, &exp);
 
     CStr expected;
     expected = "GLOBAL 1 testname.glo\n"
@@ -2231,17 +1827,17 @@ void ExpGmsH5T::testexpNameFile ()
     TxtExporter* t = exp.GetExp();
 
     // clear out the static variables in expNameFile
-    expNameFile(&p, t, 2, 0, &exp);
+    expNameFile(&g, &p, t, 2, 0, &exp);
 
     for (int i=0; i<SW_FILE_NUMBER; i++)
     {
       p.SetField(Packages::NameFile::FNAME, nm[i]);
       p.SetField(Packages::NameFile::FTYPE, type[i]);
       p.SetField(Packages::NameFile::NIU, &units[i]);
-      expNameFile(&p, t, false, MfData::MF2K, &exp);
+      expNameFile(&g, &p, t, false, MfData::MF2K, &exp);
     }
 
-    expNameFile(0, t, true, MfData::SEAWAT, &exp);
+    expNameFile(&g, 0, t, true, MfData::SEAWAT, &exp);
 
     // MODFLOW name file shouldn't have SEAWAT and MT3D packages
     CStr expected;
@@ -2397,6 +1993,7 @@ static bool testCheckGroupExists (hid_t fid,
   H5Gclose(g);
   return rval;
 }
+//------------------------------------------------------------------------------
 static bool testCheckDatasetExists (hid_t fid,
                                     const char *a_)
 {
@@ -2406,6 +2003,7 @@ static bool testCheckDatasetExists (hid_t fid,
   H5Dclose(d);
   return rval;
 }
+//------------------------------------------------------------------------------
 void ExpGmsH5T::testCreateDefaultMfH5File ()
 {
   CStr basePath;
@@ -2515,6 +2113,7 @@ void ExpGmsH5T::testCreateDefaultMfH5File ()
 void ExpGmsH5T::testexpSEN ()
 {
   using namespace MfData::Packages;
+  MfData::MfGlobal g(1,2,2,1,1,1,0);
   MfData::MfPackage pSen(Packages::SEN);
   MfData::MfPackage pSen1(Packages::SEN1);
   int i[6]={1,2,3,4,5,6};
@@ -2549,7 +2148,7 @@ void ExpGmsH5T::testexpSEN ()
   CStr expected, output;
 
   saveSEN(&pSen, &pSen1, &t);
-  expSEN(&t);
+  expSEN(&g, &t);
   t.GetFileContents(Packages::OCT, output);
   TS_ASSERT(output.empty());
   t.m_public->m_SensitivityItems.clear();
@@ -2557,7 +2156,7 @@ void ExpGmsH5T::testexpSEN ()
   pSen1.SetField("BSCAL", bscal);
 
   saveSEN(&pSen, &pSen1, &t);
-  expSEN(&t);
+  expSEN(&g, &t);
   t.GetFileContents(Packages::OCT, output);
   TS_ASSERT(output.empty());
   t.m_public->m_SensitivityItems.clear();
@@ -2571,7 +2170,7 @@ void ExpGmsH5T::testexpSEN ()
   list->PushBack(&pRCH3);
   list->PushBack(&pQ);
   saveSEN(&pSen, &pSen1, &t);
-  expSEN(&t);
+  expSEN(&g, &t);
   list->Clear();
   t.m_public->m_SensitivityItems.clear();
 
@@ -2583,341 +2182,6 @@ void ExpGmsH5T::testexpSEN ()
   t.GetFileContents(Packages::SEN, output);
   TS_ASSERT_EQUALS2(expected, output);
   t.m_public->m_SensitivityItems.clear();
-}
-//------------------------------------------------------------------------------
-void ExpGmsH5T::testexpGetAllArealUseLast ()
-{
-  CStr f, f1, path, path1;
-  util::GetTempDirectory(f);
-  f += "\\tmp";
-  f1 = f;
-  f1 += ".h5";
-
-  CreateDefaultMfH5File(f);
-
-  path = "Recharge/";
-  path1 = path;
-  path1 += MFBC_USELAST;
-  std::vector<int> dat(2, 0);
-  expUseLastAreal(f, path, 1, dat);
-  dat[0] = dat[1] = 1;
-  expUseLastAreal(f, path, 2, dat);
-
-  CAR_INT2D flags;
-  expGetAllArealUseLast(flags, "Recharge/", f);
-  TS_ASSERT_EQUALS(flags.GetSize1(), 2);
-  TS_ASSERT_EQUALS(flags.GetSize2(), 2);
-  TS_ASSERT_EQUALS(flags.at(0,0), 0);
-  TS_ASSERT_EQUALS(flags.at(0,1), 1);
-  TS_ASSERT_EQUALS(flags.at(1,0), 0);
-  TS_ASSERT_EQUALS(flags.at(1,1), 1);
-  H5DataReader::CloseAllH5FilesOpenForWriting();
-
-  TS_ASSERT(!remove(f1));
-}
-//------------------------------------------------------------------------------
-void ExpGmsH5T::testexpArealPropFromUseLast ()
-{
-  CStr f, f1, path, path1, path2;
-  util::GetTempDirectory(f);
-  f += "\\tmp";
-  f1 = f;
-  f1 += ".h5";
-
-  CreateDefaultMfH5File(f);
-
-  path = "Recharge/";
-  path1 = path;
-  path1 += MFBC_DATA;
-  path2 = path;
-  path2 += MFBC_DATAMULT;
-  std::vector<int> dat(2, 0);
-  expUseLastAreal(f, path, 1, dat);
-  dat[0] = dat[1] = 1;
-  expUseLastAreal(f, path, 2, dat);
-
-  CAR_INT2D flags;
-  expGetAllArealUseLast(flags, "Recharge/", f);
-  expArealPropFromUseLast(flags, 10, "Recharge/", f);
-  {
-    CAR_DBL3D dat;
-    dat.SetSize(1, 10, 2, 1);
-    std::pair<int, int> p(0,1);
-    VEC_INT_PAIR indices(3,p);
-    indices[1].second = 10;
-    indices[2].second = 2;
-    H5DataSetReader r(f1, path1, indices);
-    r.GetData(&dat.at(0,0,0), 20);
-    TS_ASSERT_EQUALS(dat.at(0,0,0), 0);
-    TS_ASSERT_EQUALS(dat.at(0,9,1), 0);
-  }
-  {
-    CAR_DBL2D dat;
-    dat.SetSize(1, 2, 0);
-    std::pair<int, int> p(0,1);
-    VEC_INT_PAIR indices(2,p);
-    indices[1].second = 2;
-    H5DataSetReader r(f1, path2, indices);
-    r.GetData(&dat.at(0,0), 2);
-    TS_ASSERT_EQUALS(dat.at(0,0), 1);
-    TS_ASSERT_EQUALS(dat.at(0,1), 1);
-  }
-  H5DataReader::CloseAllH5FilesOpenForWriting();
-  TS_ASSERT(!remove(f1));
-
-  CreateDefaultMfH5File(f);
-
-  path = "Recharge/";
-  path1 = path;
-  path1 += MFBC_DATA;
-  dat[0] = dat[1] = 0;
-  expUseLastAreal(f, path, 1, dat);
-  dat[0] = dat[1] = 1;
-  expUseLastAreal(f, path, 2, dat);
-  expGetAllArealUseLast(flags, "Recharge/", f);
-  // write some data and then call the function
-  {
-    std::vector<double> vd(10, 2);
-    H5DataSetWriterSetup s(f1, path1, H5T_NATIVE_DOUBLE, 3);
-    std::vector<hsize_t> start1(3, 0), n2write(3, 1);
-    n2write[1] = 10;
-    H5DSWriterDimInfo dim1(start1, n2write);
-    H5DataSetWriter w(&s);
-    w.SetDimInfoForWriting(&dim1);
-    w.WriteData(&vd[0], 10);
-  }
-  {
-    CAR_DBL2D mult;
-    mult.SetSize(1,1,2);
-    H5DataSetWriterSetup s(f1, path2, H5T_NATIVE_DOUBLE, 2);
-    std::vector<hsize_t> start1(2, 0),
-                         n2write(2, 1);
-    H5DSWriterDimInfo dim1(start1, n2write);
-    H5DataSetWriter w(&s);
-    w.SetDimInfoForWriting(&dim1);
-    w.WriteData(&mult.at(0,0), 1);
-  }
-
-  expArealPropFromUseLast(flags, 10, "Recharge/", f);
-  {
-    CAR_DBL3D dat;
-    dat.SetSize(1, 10, 2, 1);
-    std::pair<int, int> p(0,1);
-    VEC_INT_PAIR indices(3,p);
-    indices[1].second = 10;
-    indices[2].second = 2;
-    H5DataSetReader r(f1, path1, indices);
-    r.GetData(&dat.at(0,0,0), 20);
-    TS_ASSERT_EQUALS(dat.at(0,0,0), 2);
-    TS_ASSERT_EQUALS(dat.at(0,9,0), 2);
-    TS_ASSERT_EQUALS(dat.at(0,9,1), 0);
-    TS_ASSERT_EQUALS(dat.at(0,9,1), 0);
-  }
-  {
-    CAR_DBL2D dat;
-    dat.SetSize(1, 2, 0);
-    std::pair<int, int> p(0,1);
-    VEC_INT_PAIR indices(2,p);
-    indices[1].second = 2;
-    H5DataSetReader r(f1, path2, indices);
-    r.GetData(&dat.at(0,0), 2);
-    TS_ASSERT_EQUALS(dat.at(0,0), 2);
-    TS_ASSERT_EQUALS(dat.at(0,1), 1);
-  }
-  H5DataReader::CloseAllH5FilesOpenForWriting();
-  TS_ASSERT(!remove(f1));
-}
-//------------------------------------------------------------------------------
-void ExpGmsH5T::testexpEtSegFromUseLast ()
-{
-  CStr f, f1, path, path1, path2;
-  util::GetTempDirectory(f);
-  f += "\\tmp";
-  f1 = f;
-  f1 += ".h5";
-
-  CreateDefaultMfH5File(f);
-
-  path = "ETS/";
-  path1 = path;
-  path1 += MFBC_PXDP;
-  path2 = path;
-  path2 += MFBC_PXDPMULT;
-
-  // shouldn't add items from Use Last when ETS package not enabled
-  CAR_INT2D flags;
-  expGetAllArealUseLast(flags, "ETS/", f);
-  // update the areal data
-  expArealPropFromUseLast(flags, 10, "ETS/", f);
-  // update the areal layer
-  expArealLayFromUseLast(flags, 10, "ETS/", f);
-  // update the extinction depth proportion
-  expEtSegFromUseLast(flags, 10, f, MFBC_PXDP, MFBC_PXDPMULT);
-  {
-    vector<hsize_t> size;
-
-    // property
-    H5DataSetReader propertyReader(f1, path + MFBC_DATA);
-    propertyReader.GetDataSetDimensions(size);
-    TS_ASSERT(size.size() == 3);
-    TS_ASSERT_EQUALS2(1, size.at(0));
-    TS_ASSERT_EQUALS2(1, size.at(1));
-    TS_ASSERT_EQUALS2(1, size.at(2));
-
-    // layer
-    H5DataSetReader layerReader(f1, path + MFBC_LAY);
-    layerReader.GetDataSetDimensions(size);
-    TS_ASSERT(size.size() == 2);
-    TS_ASSERT_EQUALS2(1, size.at(0));
-    TS_ASSERT_EQUALS2(1, size.at(1));
-
-    // extinction depth
-    H5DataSetReader extDepthReader(f1, path + MFBC_PXDP);
-    extDepthReader.GetDataSetDimensions(size);
-    TS_ASSERT(size.size() == 3);
-    TS_ASSERT_EQUALS2(1, size.at(0));
-    TS_ASSERT_EQUALS2(1, size.at(1));
-    TS_ASSERT_EQUALS2(1, size.at(2));
-  }
-
-  std::vector<int> dat(2, 0);
-  expUseLastAreal(f, path, 1, dat);
-  dat[0] = dat[1] = 1;
-  expUseLastAreal(f, path, 2, dat);
-
-  expGetAllArealUseLast(flags, "ETS/", f);
-  expEtSegFromUseLast(flags, 10, f, MFBC_PXDP, MFBC_PXDPMULT);
-  {
-    CAR_DBL3D dat;
-    dat.SetSize(1, 10, 2, 1);
-    std::pair<int, int> p(0,1);
-    VEC_INT_PAIR indices(3,p);
-    indices[1].second = 10;
-    indices[2].second = 2;
-    H5DataSetReader r(f1, path1, indices);
-    r.GetData(&dat.at(0,0,0), 20);
-    TS_ASSERT_EQUALS(dat.at(0,0,0), 0);
-    TS_ASSERT_EQUALS(dat.at(0,9,1), 0);
-  }
-  {
-    CAR_DBL2D dat;
-    dat.SetSize(1, 2, 0);
-    std::pair<int, int> p(0,1);
-    VEC_INT_PAIR indices(2,p);
-    indices[1].second = 2;
-    H5DataSetReader r(f1, path2, indices);
-    r.GetData(&dat.at(0,0), 2);
-    TS_ASSERT_EQUALS(dat.at(0,0), 1);
-    TS_ASSERT_EQUALS(dat.at(0,1), 1);
-  }
-  H5DataReader::CloseAllH5FilesOpenForWriting();
-  TS_ASSERT(!remove(f1));
-}
-//------------------------------------------------------------------------------
-void ExpGmsH5T::testexpArealLayFromUseLast ()
-{
-  CStr f, f1, path, path1, path2;
-  util::GetTempDirectory(f);
-  f += "\\tmp";
-  f1 = f;
-  f1 += ".h5";
-
-  CreateDefaultMfH5File(f);
-
-  path = "Recharge/";
-  path1 = path;
-  path1 += MFBC_LAY;
-  path2 = path;
-  path2 += MFBC_LAYMULT;
-  std::vector<int> dat(2, 0);
-  expUseLastAreal(f, path, 1, dat);
-  dat[0] = dat[1] = 1;
-  expUseLastAreal(f, path, 2, dat);
-
-  CAR_INT2D flags;
-  expGetAllArealUseLast(flags, "Recharge/", f);
-  expArealLayFromUseLast(flags, 10, "Recharge/", f);
-  {
-    CAR_INT2D dat;
-    dat.SetSize(10, 2, 2);
-    std::pair<int, int> p(0,10);
-    VEC_INT_PAIR indices(2,p);
-    indices[1].second = 2;
-    H5DataSetReader r(f1, path1, indices);
-    r.GetData(&dat.at(0,0), 20);
-    TS_ASSERT_EQUALS(dat.at(0,0), 1);
-    TS_ASSERT_EQUALS(dat.at(9,1), 1);
-  }
-  {
-    std::vector<int> dat(2, 0);
-    std::pair<int, int> p(0,2);
-    VEC_INT_PAIR indices(1,p);
-    H5DataSetReader r(f1, path2, indices);
-    r.GetData(&dat.at(0), 2);
-    TS_ASSERT_EQUALS(dat.at(0), 1);
-    TS_ASSERT_EQUALS(dat.at(1), 1);
-  }
-  H5DataReader::CloseAllH5FilesOpenForWriting();
-  TS_ASSERT(!remove(f1));
-
-
-  CreateDefaultMfH5File(f);
-
-  path = "Recharge/";
-  path1 = path;
-  path1 += MFBC_LAY;
-  dat[0] = dat[1] = 0;
-  expUseLastAreal(f, path, 1, dat);
-  dat[0] = dat[1] = 1;
-  expUseLastAreal(f, path, 2, dat);
-  expGetAllArealUseLast(flags, "Recharge/", f);
-  // write some data and then call the function
-  {
-    std::vector<int> vd(10, 2);
-    H5DataSetWriterSetup s(f1, path1, H5T_NATIVE_INT, 2);
-    std::vector<hsize_t> start1(2, 0), n2write(2, 1);
-    n2write[0] = 10;
-    H5DSWriterDimInfo dim1(start1, n2write);
-    H5DataSetWriter w(&s);
-    w.SetDimInfoForWriting(&dim1);
-    w.WriteData(&vd[0], 10);
-  }
-  {
-    int mult(2);
-    H5DataSetWriterSetup s(f1, path2, H5T_NATIVE_INT, 1);
-    std::vector<hsize_t> start1(1, 0),
-                         n2write(1, 1);
-    H5DSWriterDimInfo dim1(start1, n2write);
-    H5DataSetWriter w(&s);
-    w.SetDimInfoForWriting(&dim1);
-    w.WriteData(&mult, 1);
-  }
-
-  expArealLayFromUseLast(flags, 10, "Recharge/", f);
-  {
-    CAR_INT2D dat;
-    dat.SetSize(10, 2, 2);
-    std::pair<int, int> p(0,10);
-    VEC_INT_PAIR indices(2,p);
-    indices[1].second = 2;
-    H5DataSetReader r(f1, path1, indices);
-    r.GetData(&dat.at(0,0), 20);
-    TS_ASSERT_EQUALS(dat.at(0,0), 2);
-    TS_ASSERT_EQUALS(dat.at(9,0), 2);
-    TS_ASSERT_EQUALS(dat.at(0,1), 1);
-    TS_ASSERT_EQUALS(dat.at(9,1), 1);
-  }
-  {
-    std::vector<int> dat(2, 0);
-    std::pair<int, int> p(0,2);
-    VEC_INT_PAIR indices(1,p);
-    H5DataSetReader r(f1, path2, indices);
-    r.GetData(&dat.at(0), 2);
-    TS_ASSERT_EQUALS(dat.at(0), 2);
-    TS_ASSERT_EQUALS(dat.at(1), 1);
-  }
-  H5DataReader::CloseAllH5FilesOpenForWriting();
-  TS_ASSERT(!remove(f1));
 }
 //------------------------------------------------------------------------------
 void ExpGmsH5T::testexpSuperFile ()

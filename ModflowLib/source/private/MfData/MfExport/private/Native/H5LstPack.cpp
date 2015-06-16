@@ -70,7 +70,7 @@ public:
   CStr Ln2 ();
   CStr Ln6 (int& a_itmp);
   void WriteReach ();
-  void WriteUseLast ();
+  void WriteUseLast (int a_itmp);
   void WriteSegData ();
   void WriteSegFlow ();
 
@@ -91,7 +91,7 @@ public:
         m_istrpb(0), m_nss(0), m_ntrib(0), m_ndiv(0), m_icalc(0),
         m_istcb1(0), m_istcb2(0), m_itmp(0), m_irdflg(0), m_iptflg(0),
         m_istrm(0), m_nstrem(0), m_mxstrm(0), m_itrbar(0), m_idivar(0),
-        m_constv(0), m_strm(0), m_streamFields(11)
+        m_constv(0), m_strm(0), m_streamFields(11), m_npstr(0)
       {
       }
 
@@ -104,7 +104,7 @@ public:
       H5LstPack::impl& m_p;
       const int  *m_istrpb, *m_nss, *m_ntrib, *m_ndiv, *m_icalc, *m_istcb1,
                  *m_istcb2, *m_itmp, *m_irdflg, *m_iptflg, *m_istrm,
-                 *m_nstrem, *m_mxstrm, *m_itrbar, *m_idivar;
+                 *m_nstrem, *m_mxstrm, *m_itrbar, *m_idivar, *m_npstr;
       const Real *m_constv, *m_strm;
       int         m_streamFields;
 
@@ -128,16 +128,23 @@ public:
       , m_PHIRAMP(0), m_ifaceIdx(-1), m_cellgrpIdx(-1), m_seawatIdx0(-1)
       , m_seawatIdx1(-1), m_condfactIdx(-1), m_qfactIdx(-1), m_maxBcSoFar(0)
       , m_prevSpNumBc(0), m_grid(a_g->NumRow(),a_g->NumCol()), m_istrmSize(5)
-  {}
+      , m_usg(0), m_unstructured(0)
+      , m_istrmCellIdIdx(0)
+  {
+    m_usg = a_g->ModelType() == MfData::USG;
+    m_unstructured = a_g->Unstructured() ? 1 : 0;
+  } // impl
   ~impl () {}
 
   CStr Write (int& a_maxBc);
   bool Init ();
   bool SetupForWrite ();
+  void SetupForWriteEnd ();
   void SetType ();
   void SetParamType ();
   void SetAuxFieldIdx ();
   void FillBcData ();
+  void Set_dSize ();
   void ExistingBcData (int a_start);
   int  GetBcIndex (int a_cellid);
   void GetArrayOfUsedBcIndices (std::vector<char>& a_vAlreadyUsed);
@@ -175,7 +182,7 @@ public:
   std::vector<int>   *m_vCellids, *m_vIface, *m_vCellgrp, m_idxs;
   const int          *m_nBcs, *m_nAux, *m_nDataFields, *m_istrm;
   int                 m_nFields, m_modIdx, m_sp, m_maxIdx, m_minIdx, m_dSize,
-                      m_istrmSize;
+                      m_istrmSize, m_istrmCellIdIdx;
   const Real         *m_data, *m_PHIRAMP;
   std::vector<CStr>   m_fieldStrings;
   int                 m_ifaceIdx, m_cellgrpIdx, m_seawatIdx0, m_seawatIdx1,
@@ -184,6 +191,7 @@ public:
   std::vector<Param>  m_pList;
   CellIdToIJK         m_grid;
   CAR_DBL2D           m_bcData;
+  bool                m_usg, m_unstructured;
 };
 
 
@@ -433,11 +441,18 @@ bool H5LstPack::impl::SetupForWrite ()
   if (!m_p->GetField(ListPack::ITMP, &m_itmp) || !m_itmp ||
       !m_p->GetField(ListPack::MAXBC, &m_maxBc) || !m_maxBc ||
       !m_p->GetField(ListPack::NP, &m_np) || !m_np) return false;
+  SetupForWriteEnd();
+  return true;
+} // H5LstPack::impl::SetupForWrite
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void H5LstPack::impl::SetupForWriteEnd ()
+{
   m_maxBcSoFar = &iMaxBcSoFar(m_modIdx, m_type);
   if (*m_maxBcSoFar < *m_nBcs) *m_maxBcSoFar = *m_nBcs;
   m_prevSpNumBc = (int)m_vCellids->size();
-  return true;
-} // H5LstPack::impl::SetupForWrite
+} // H5LstPack::impl::SetupForWriteEnd
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
@@ -516,12 +531,7 @@ void H5LstPack::impl::FillBcData ()
   // have changed since the last stress period.
   WriteUseLast();
   // size the data array for this stress period
-  m_dSize = m_maxIdx;
-  if (*m_nBcs < 1)
-  {
-    m_dSize = static_cast<int>(m_vCellids->size());
-    --m_dSize;
-  }
+  Set_dSize();
   iSizeBcDataArray(m_type, m_maxIdx, m_bcData);
   // get the bc data for the current stress period if there are parameters
   GetBcDataFromPar();
@@ -530,6 +540,18 @@ void H5LstPack::impl::FillBcData ()
   // out where to put the data associated with a particular BC.
   FillData();
 } // H5LstPack::impl::FillBcData
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+void H5LstPack::impl::Set_dSize ()
+{
+  m_dSize = m_maxIdx;
+  if (*m_nBcs < 1)
+  {
+    m_dSize = static_cast<int>(m_vCellids->size());
+    --m_dSize;
+  }
+} // H5LstPack::impl::Set_dSize
 //------------------------------------------------------------------------------
 /// \brief Go through the data that was passed in. It is possible that there are
 /// already BCs active in this stress period that have come from parameters.
@@ -542,19 +564,22 @@ void H5LstPack::impl::ExistingBcData (int a_start)
   int ck, ci, cj, cellId;
   for (int i=a_start; i<(*m_nBcs+a_start) && *m_itmp > -1; i++)
   {
+    cellId = -1;
     if (m_istrm)
     {
       ck = m_istrm[i*(m_istrmSize)+0];
       ci = m_istrm[i*(m_istrmSize)+1];
       cj = m_istrm[i*(m_istrmSize)+2];
+      if (m_usg) cellId = m_istrm[i*(m_istrmSize)+m_istrmCellIdIdx];
     }
     else
     {
       ck = static_cast<int>(m_data[i*(*m_nDataFields)+0]);
       ci = static_cast<int>(m_data[i*(*m_nDataFields)+1]);
       cj = static_cast<int>(m_data[i*(*m_nDataFields)+2]);
+      if (m_usg) cellId = (int)m_data[i*(*m_nDataFields)+0];
     }
-    cellId = m_grid.IdFromIJK(ci, cj, ck);
+    if (-1 == cellId) cellId = m_grid.IdFromIJK(ci, cj, ck);
     m_idxs.push_back(GetBcIndex(cellId));
     if (m_idxs.back() > m_maxIdx)
       m_maxIdx = m_idxs.back();
@@ -689,8 +714,8 @@ void H5LstPack::impl::WriteUseLast ()
 //------------------------------------------------------------------------------
 void H5LstPack::impl::GetBcDataFromPar ()
 {
-  if (*m_np > 0)
-  {// if we are using last then get the data from the last stress period
+  if (*m_np > 0 && m_prevSpNumBc > 0)
+  {
     CAR_DBL2D tmpData;
     iSizeBcDataArray(m_type, m_prevSpNumBc-1, tmpData);
     CStr path;
@@ -871,6 +896,7 @@ CStr H5LstPack::impl::WriteBcData ()
 void H5LstPack::impl::LstPar ()
 {
   if (!Init()) return;
+  SetupForWriteEnd();
 
   // get some info about the parameter
   int                 start;
@@ -880,7 +906,10 @@ void H5LstPack::impl::LstPar ()
   int tmpItmp=1;
   m_itmp = &tmpItmp;
   ExistingBcData(start);
-  iSizeBcDataArray(m_type, m_maxIdx-m_minIdx, m_bcData);
+  iSizeBcDataArray(m_type, m_maxIdx, m_bcData);
+  int np(1);
+  if (!m_np) m_np = &np;
+  GetBcDataFromPar();
 
   int bcIdx, fieldIdx, dataIdx;
   std::map<int, int> srcDestIdxs;
@@ -891,7 +920,7 @@ void H5LstPack::impl::LstPar ()
   {
     for (int j=0; j<nBcFields; j++)
     {
-      bcIdx = m_idxs.at(i-start) - m_minIdx;
+      bcIdx = m_idxs.at(i-start);
       dataIdx = i*(*m_nDataFields)+3+j;
       fieldIdx = j;
       if (srcDestIdxs.find(j+3) != srcDestIdxs.end())
@@ -902,7 +931,7 @@ void H5LstPack::impl::LstPar ()
     }
   }
 
-  m_lbc->WriteList(m_sp, m_minIdx, m_type, m_file, *m_vCellids,
+  m_lbc->WriteList(m_sp, 0, m_type, m_file, *m_vCellids,
                    m_bcData, *m_vIface);
 } // H5LstPack::impl::LstPar
 //------------------------------------------------------------------------------
@@ -1129,9 +1158,11 @@ CStr H5StrPack::Write (int& a_itmp)
   CStr rval; 
   if (Init())
   {
-    m_p.WriteUseLast();
     m_p.ExistingBcData(0);
     iSizeBcDataArray(m_p.m_type, m_p.m_maxIdx, m_p.m_bcData);
+    // size the data array for this stress period
+    m_p.Set_dSize();
+    m_p.HandleUseLast();
     FillBcData();
     rval = m_p.WriteBcData();
     WriteSegData();
@@ -1139,6 +1170,8 @@ CStr H5StrPack::Write (int& a_itmp)
     {
       a_itmp = (int)m_p.m_vCellids->size();
     }
+    m_p.m_itmp = &a_itmp;
+    m_p.WriteUseLast();
   }
   return rval;
 } // H5StrPack::Write
@@ -1167,6 +1200,7 @@ bool H5StrPack::Init ()
       a_p->GetField(STRpack::MXSTRM, &m_mxstrm) && m_mxstrm &&
       a_p->GetField(STRpack::ITRBAR, &m_itrbar) && m_itrbar &&
       a_p->GetField(STRpack::IDIVAR, &m_idivar) && m_idivar &&
+      a_p->GetField(STRpack::NPSTR, &m_npstr) && m_npstr &&
       a_p->GetField(ListPack::ITMP, &m_p.m_itmp) && m_p.m_itmp)
   {
     m_p.Init();
@@ -1175,6 +1209,9 @@ bool H5StrPack::Init ()
     m_p.m_nBcs = m_nstrem;
     m_p.m_nFields = m_streamFields;
     m_p.m_istrm = m_istrm;
+    m_p.m_np = m_npstr;
+
+    m_p.SetupForWriteEnd();
     return true;
   }
   return false;
@@ -1184,6 +1221,7 @@ bool H5StrPack::Init ()
 //------------------------------------------------------------------------------
 void H5StrPack::FillBcData ()
 {
+  if (*m_p.m_itmp < 1) return;
   int nBcFields = 7;
   for (int i=0; i<*m_p.m_nBcs; i++)
   {
@@ -1369,6 +1407,7 @@ bool H5SfrPack::Init ()
       m_p.m_istrm = m_istrm;
       m_p.m_nBcs = &m_numReaches;
       m_p.m_istrmSize = *m_nistrmd;
+      m_p.m_istrmCellIdIdx = 5;
       return true;
     }
   }
@@ -1387,7 +1426,9 @@ CStr H5SfrPack::Ln2 ()
     CStr file1;
     util::StripPathFromFilename(m_p.m_file, file1);
     rval.Format("GMS_HDF5_SFR2_REACH \"%s\" \"SFR2\"", file1);
+    if (!m_p.m_glob->Unstructured()) m_p.m_usg = false;
     m_p.ExistingBcData(0);
+    if (!m_p.m_glob->Unstructured()) m_p.m_usg = true;
     iSizeBcDataArray(m_p.m_type, m_p.m_maxIdx, m_p.m_bcData);
     for (int i = 0; i < m_numReaches; ++i)
     { // fill in the bcData
@@ -1437,7 +1478,6 @@ CStr H5SfrPack::Ln6 (int& a_itmp)
   CStr rval;
   if (Init())
   {
-    WriteUseLast();
     WriteSegData();
     WriteSegFlow();
     CStr file1;
@@ -1447,13 +1487,14 @@ CStr H5SfrPack::Ln6 (int& a_itmp)
       if (*m_p.m_itmp < 1) a_itmp = *m_nss;
       rval.Format("GMS_HDF5_01 \"%s\" \"SFR2\" %d", file1, m_p.m_sp);
     }
+    WriteUseLast(a_itmp);
   }
   return rval;
 } // H5SfrPack::Ln6
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-void H5SfrPack::WriteUseLast ()
+void H5SfrPack::WriteUseLast (int a_itmp)
 {
   CStr path;
   path.Format("%s/%s", m_p.m_type, MFBC_USELAST);
@@ -1462,7 +1503,7 @@ void H5SfrPack::WriteUseLast ()
   H5DSWriterDimInfo dim(start, n2write);
   H5DataSetWriter w(&s);
   w.SetDimInfoForWriting(&dim);
-  int itmpToWrite = *m_p.m_itmp > 0 ? 0 : 1;
+  int itmpToWrite = a_itmp > 0 ? 0 : 1;
   w.WriteData(&itmpToWrite, 1);
 } // H5SfrPack::WriteUseLast
 //------------------------------------------------------------------------------

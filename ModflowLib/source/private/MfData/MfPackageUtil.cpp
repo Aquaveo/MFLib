@@ -164,6 +164,7 @@ void MfData::Packages::Disu1 (const int *a_NODES,
                               const int *a_IVSD,
                               const int *a_IDSYMRD)
 {
+  MfData::Get().SetIntVar("DISU_NODES", *a_NODES);
   MfPackage pack(MfData::Packages::DISU);
   MfPackage *p(MfData::Get().GetPackage(MfData::Packages::DISU));
   bool exists(p ? 1 : 0);

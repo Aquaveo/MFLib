@@ -96,6 +96,7 @@ static void iGetReachData (int a_nrow,
       a_irch.push_back(g.IFromId(cellids[j]));
       a_jrch.push_back(g.JFromId(cellids[j]));
     }
+    if (MfData::MfGlobal::Get().Unstructured()) a_krch = cellids;
   }
 
   // get the segment ids

@@ -16,10 +16,6 @@ public:
   void testIsDataArray();
   void testCreateDefaultMfH5File();
   void testexpSEN();
-  void testexpGetAllArealUseLast();
-  void testexpArealPropFromUseLast();
-  void testexpArealLayFromUseLast();
-  void testexpEtSegFromUseLast();
   void testexpSuperFile();
   void testexpParamFile();
 };

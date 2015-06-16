@@ -53,5 +53,8 @@ int xfpWriteAttributeDouble(hid_t a_Loc,
                             const char *a_Name,
                             int a_Number,
                             double *a_val);
+void expGmsH5_CreateDefaultH5File (const char *a_,
+                                   int a_modelType,
+                                   bool a_compress);
 
 #endif

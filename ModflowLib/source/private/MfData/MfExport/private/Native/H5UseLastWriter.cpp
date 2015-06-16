@@ -349,6 +349,10 @@ void H5UseLastWriter::WriteEtsNetSeg (int a_)
 void H5UseLastWriter::CheckArealFromUseLast ()
 {
   int nCells = m_pack->GetGlobal()->NumRow() * m_pack->GetGlobal()->NumCol();
+  if (m_pack->GetGlobal()->Unstructured())
+  {
+    nCells = m_pack->GetGlobal()->NumNodesUnstructured();
+  }
   CStr baseName(m_pack->GetNative()->GetExp()->GetBaseFileName());
   // read all of the use last flags on the data
   CAR_INT2D flags;
@@ -381,4 +385,380 @@ void H5UseLastWriter::CheckArealFromUseLast ()
 } // H5UseLastWriter::CheckArealFromUseLast
 
 
+///////////////////////////////////////////////////////////////////////////////
+// TESTS
+///////////////////////////////////////////////////////////////////////////////
+#if CXX_TEST
+#include <private/MfData/MfExport/private/Native/H5UseLastWriter.t.h>
+#include <private/MfData/MfExport/private/ExpGmsH5.h>
+#include <private/MfLibAsserts.h>
+
+//------------------------------------------------------------------------------
+/// \brief Exports the use last information for the areal packages
+//------------------------------------------------------------------------------
+static void expUseLastAreal (const char * a_file,
+                             const char * a_path,
+                             int a_sp,
+                             std::vector<int> &a_data)
+{
+  CStr f(a_file), path(a_path);
+  f += ".h5";
+  path += MFBC_USELAST;
+  H5DataSetWriterSetup setup(f, path, H5T_NATIVE_INT, 2);
+  H5DataSetWriter h(&setup);
+  h.AllowTypeConversions(true);
+  // do multidim stuff if needed
+  std::vector<hsize_t> start(2,0), n2write(2,1);
+  start[1] = a_sp - 1;
+  n2write[0] = a_data.size();
+  H5DSWriterDimInfo dim(start, n2write);
+  h.SetDimInfoForWriting(&dim);
+  h.WriteData(&a_data[0], a_data.size());
+} // expUseLastAreal
+
+
+//------------------------------------------------------------------------------
+void H5UseLastWriterT::testCreateClass ()
+{
+  H5UseLastWriter* p = new H5UseLastWriter(NULL);
+  TS_ASSERT(p);
+  if (p) delete(p);
+} // H5UseLastWriterT::testCreateClass
+//------------------------------------------------------------------------------
+void H5UseLastWriterT::test_iGetAllArealUseLast ()
+{
+  CStr f, f1, path, path1;
+  util::GetTempDirectory(f);
+  f += "\\tmp";
+  f1 = f;
+  f1 += ".h5";
+
+  expGmsH5_CreateDefaultH5File(f,1,0);
+
+  path = "Recharge/";
+  path1 = path;
+  path1 += MFBC_USELAST;
+  std::vector<int> dat(2, 0);
+  expUseLastAreal(f, path, 1, dat);
+  dat[0] = dat[1] = 1;
+  expUseLastAreal(f, path, 2, dat);
+
+  CAR_INT2D flags;
+  iGetAllArealUseLast(flags, "Recharge/", f);
+  TS_ASSERT_EQUALS(flags.GetSize1(), 2);
+  TS_ASSERT_EQUALS(flags.GetSize2(), 2);
+  TS_ASSERT_EQUALS(flags.at(0,0), 0);
+  TS_ASSERT_EQUALS(flags.at(0,1), 1);
+  TS_ASSERT_EQUALS(flags.at(1,0), 0);
+  TS_ASSERT_EQUALS(flags.at(1,1), 1);
+  H5DataReader::CloseAllH5FilesOpenForWriting();
+
+  TS_ASSERT(!remove(f1));
+} // H5UseLastWriterT::testexpGetAllArealUseLast
+//------------------------------------------------------------------------------
+void H5UseLastWriterT::test_iArealPropFromUseLast ()
+{
+  CStr f, f1, path, path1, path2;
+  util::GetTempDirectory(f);
+  f += "\\tmp";
+  f1 = f;
+  f1 += ".h5";
+
+  expGmsH5_CreateDefaultH5File(f,1,0);
+
+  path = "Recharge/";
+  path1 = path;
+  path1 += MFBC_DATA;
+  path2 = path;
+  path2 += MFBC_DATAMULT;
+  std::vector<int> dat(2, 0);
+  expUseLastAreal(f, path, 1, dat);
+  dat[0] = dat[1] = 1;
+  expUseLastAreal(f, path, 2, dat);
+
+  CAR_INT2D flags;
+  iGetAllArealUseLast(flags, "Recharge/", f);
+  iArealPropFromUseLast(flags, 10, "Recharge/", f);
+  {
+    CAR_DBL3D dat;
+    dat.SetSize(1, 10, 2, 1);
+    std::pair<int, int> p(0,1);
+    VEC_INT_PAIR indices(3,p);
+    indices[1].second = 10;
+    indices[2].second = 2;
+    H5DataSetReader r(f1, path1, indices);
+    r.GetData(&dat.at(0,0,0), 20);
+    TS_ASSERT_EQUALS(dat.at(0,0,0), 0);
+    TS_ASSERT_EQUALS(dat.at(0,9,1), 0);
+  }
+  {
+    CAR_DBL2D dat;
+    dat.SetSize(1, 2, 0);
+    std::pair<int, int> p(0,1);
+    VEC_INT_PAIR indices(2,p);
+    indices[1].second = 2;
+    H5DataSetReader r(f1, path2, indices);
+    r.GetData(&dat.at(0,0), 2);
+    TS_ASSERT_EQUALS(dat.at(0,0), 1);
+    TS_ASSERT_EQUALS(dat.at(0,1), 1);
+  }
+  H5DataReader::CloseAllH5FilesOpenForWriting();
+  TS_ASSERT(!remove(f1));
+
+  expGmsH5_CreateDefaultH5File(f,1,0);
+
+  path = "Recharge/";
+  path1 = path;
+  path1 += MFBC_DATA;
+  dat[0] = dat[1] = 0;
+  expUseLastAreal(f, path, 1, dat);
+  dat[0] = dat[1] = 1;
+  expUseLastAreal(f, path, 2, dat);
+  iGetAllArealUseLast(flags, "Recharge/", f);
+  // write some data and then call the function
+  {
+    std::vector<double> vd(10, 2);
+    H5DataSetWriterSetup s(f1, path1, H5T_NATIVE_DOUBLE, 3);
+    std::vector<hsize_t> start1(3, 0), n2write(3, 1);
+    n2write[1] = 10;
+    H5DSWriterDimInfo dim1(start1, n2write);
+    H5DataSetWriter w(&s);
+    w.SetDimInfoForWriting(&dim1);
+    w.WriteData(&vd[0], 10);
+  }
+  {
+    CAR_DBL2D mult;
+    mult.SetSize(1,1,2);
+    H5DataSetWriterSetup s(f1, path2, H5T_NATIVE_DOUBLE, 2);
+    std::vector<hsize_t> start1(2, 0),
+      n2write(2, 1);
+    H5DSWriterDimInfo dim1(start1, n2write);
+    H5DataSetWriter w(&s);
+    w.SetDimInfoForWriting(&dim1);
+    w.WriteData(&mult.at(0,0), 1);
+  }
+
+  iArealPropFromUseLast(flags, 10, "Recharge/", f);
+  {
+    CAR_DBL3D dat;
+    dat.SetSize(1, 10, 2, 1);
+    std::pair<int, int> p(0,1);
+    VEC_INT_PAIR indices(3,p);
+    indices[1].second = 10;
+    indices[2].second = 2;
+    H5DataSetReader r(f1, path1, indices);
+    r.GetData(&dat.at(0,0,0), 20);
+    TS_ASSERT_EQUALS(dat.at(0,0,0), 2);
+    TS_ASSERT_EQUALS(dat.at(0,9,0), 2);
+    TS_ASSERT_EQUALS(dat.at(0,9,1), 0);
+    TS_ASSERT_EQUALS(dat.at(0,9,1), 0);
+  }
+  {
+    CAR_DBL2D dat;
+    dat.SetSize(1, 2, 0);
+    std::pair<int, int> p(0,1);
+    VEC_INT_PAIR indices(2,p);
+    indices[1].second = 2;
+    H5DataSetReader r(f1, path2, indices);
+    r.GetData(&dat.at(0,0), 2);
+    TS_ASSERT_EQUALS(dat.at(0,0), 2);
+    TS_ASSERT_EQUALS(dat.at(0,1), 1);
+  }
+  H5DataReader::CloseAllH5FilesOpenForWriting();
+  TS_ASSERT(!remove(f1));
+} // H5UseLastWriterT::test_iArealPropFromUseLast
+//------------------------------------------------------------------------------
+void H5UseLastWriterT::test_iEtSegFromUseLast ()
+{
+  CStr f, f1, path, path1, path2;
+  util::GetTempDirectory(f);
+  f += "\\tmp";
+  f1 = f;
+  f1 += ".h5";
+
+  expGmsH5_CreateDefaultH5File(f,1,0);
+
+  path = "ETS/";
+  path1 = path;
+  path1 += MFBC_PXDP;
+  path2 = path;
+  path2 += MFBC_PXDPMULT;
+
+  // shouldn't add items from Use Last when ETS package not enabled
+  CAR_INT2D flags;
+  iGetAllArealUseLast(flags, "ETS/", f);
+  // update the areal data
+  iArealPropFromUseLast(flags, 10, "ETS/", f);
+  // update the areal layer
+  iArealLayFromUseLast(flags, 10, "ETS/", f);
+  // update the extinction depth proportion
+  iEtSegFromUseLast(flags, 10, f, MFBC_PXDP, MFBC_PXDPMULT);
+  {
+    std::vector<hsize_t> size;
+
+    // property
+    H5DataSetReader propertyReader(f1, path + MFBC_DATA);
+    propertyReader.GetDataSetDimensions(size);
+    TS_ASSERT(size.size() == 3);
+    TS_ASSERT_EQUALS2(1, size.at(0));
+    TS_ASSERT_EQUALS2(1, size.at(1));
+    TS_ASSERT_EQUALS2(1, size.at(2));
+
+    // layer
+    H5DataSetReader layerReader(f1, path + MFBC_LAY);
+    layerReader.GetDataSetDimensions(size);
+    TS_ASSERT(size.size() == 2);
+    TS_ASSERT_EQUALS2(1, size.at(0));
+    TS_ASSERT_EQUALS2(1, size.at(1));
+
+    // extinction depth
+    H5DataSetReader extDepthReader(f1, path + MFBC_PXDP);
+    extDepthReader.GetDataSetDimensions(size);
+    TS_ASSERT(size.size() == 3);
+    TS_ASSERT_EQUALS2(1, size.at(0));
+    TS_ASSERT_EQUALS2(1, size.at(1));
+    TS_ASSERT_EQUALS2(1, size.at(2));
+  }
+
+  std::vector<int> dat(2, 0);
+  expUseLastAreal(f, path, 1, dat);
+  dat[0] = dat[1] = 1;
+  expUseLastAreal(f, path, 2, dat);
+
+  iGetAllArealUseLast(flags, "ETS/", f);
+  iEtSegFromUseLast(flags, 10, f, MFBC_PXDP, MFBC_PXDPMULT);
+  {
+    CAR_DBL3D dat;
+    dat.SetSize(1, 10, 2, 1);
+    std::pair<int, int> p(0,1);
+    VEC_INT_PAIR indices(3,p);
+    indices[1].second = 10;
+    indices[2].second = 2;
+    H5DataSetReader r(f1, path1, indices);
+    r.GetData(&dat.at(0,0,0), 20);
+    TS_ASSERT_EQUALS(dat.at(0,0,0), 0);
+    TS_ASSERT_EQUALS(dat.at(0,9,1), 0);
+  }
+  {
+    CAR_DBL2D dat;
+    dat.SetSize(1, 2, 0);
+    std::pair<int, int> p(0,1);
+    VEC_INT_PAIR indices(2,p);
+    indices[1].second = 2;
+    H5DataSetReader r(f1, path2, indices);
+    r.GetData(&dat.at(0,0), 2);
+    TS_ASSERT_EQUALS(dat.at(0,0), 1);
+    TS_ASSERT_EQUALS(dat.at(0,1), 1);
+  }
+  H5DataReader::CloseAllH5FilesOpenForWriting();
+  TS_ASSERT(!remove(f1));
+} // H5UseLastWriterT::testexpEtSegFromUseLast
+//------------------------------------------------------------------------------
+void H5UseLastWriterT::test_iArealLayFromUseLast ()
+{
+  CStr f, f1, path, path1, path2;
+  util::GetTempDirectory(f);
+  f += "\\tmp";
+  f1 = f;
+  f1 += ".h5";
+
+  expGmsH5_CreateDefaultH5File(f,1,0);
+
+  path = "Recharge/";
+  path1 = path;
+  path1 += MFBC_LAY;
+  path2 = path;
+  path2 += MFBC_LAYMULT;
+  std::vector<int> dat(2, 0);
+  expUseLastAreal(f, path, 1, dat);
+  dat[0] = dat[1] = 1;
+  expUseLastAreal(f, path, 2, dat);
+
+  CAR_INT2D flags;
+  iGetAllArealUseLast(flags, "Recharge/", f);
+  iArealLayFromUseLast(flags, 10, "Recharge/", f);
+  {
+    CAR_INT2D dat;
+    dat.SetSize(10, 2, 2);
+    std::pair<int, int> p(0,10);
+    VEC_INT_PAIR indices(2,p);
+    indices[1].second = 2;
+    H5DataSetReader r(f1, path1, indices);
+    r.GetData(&dat.at(0,0), 20);
+    TS_ASSERT_EQUALS(dat.at(0,0), 1);
+    TS_ASSERT_EQUALS(dat.at(9,1), 1);
+  }
+  {
+    std::vector<int> dat(2, 0);
+    std::pair<int, int> p(0,2);
+    VEC_INT_PAIR indices(1,p);
+    H5DataSetReader r(f1, path2, indices);
+    r.GetData(&dat.at(0), 2);
+    TS_ASSERT_EQUALS(dat.at(0), 1);
+    TS_ASSERT_EQUALS(dat.at(1), 1);
+  }
+  H5DataReader::CloseAllH5FilesOpenForWriting();
+  TS_ASSERT(!remove(f1));
+
+
+  expGmsH5_CreateDefaultH5File(f,1,0);
+
+  path = "Recharge/";
+  path1 = path;
+  path1 += MFBC_LAY;
+  dat[0] = dat[1] = 0;
+  expUseLastAreal(f, path, 1, dat);
+  dat[0] = dat[1] = 1;
+  expUseLastAreal(f, path, 2, dat);
+  iGetAllArealUseLast(flags, "Recharge/", f);
+  // write some data and then call the function
+  {
+    std::vector<int> vd(10, 2);
+    H5DataSetWriterSetup s(f1, path1, H5T_NATIVE_INT, 2);
+    std::vector<hsize_t> start1(2, 0), n2write(2, 1);
+    n2write[0] = 10;
+    H5DSWriterDimInfo dim1(start1, n2write);
+    H5DataSetWriter w(&s);
+    w.SetDimInfoForWriting(&dim1);
+    w.WriteData(&vd[0], 10);
+  }
+  {
+    int mult(2);
+    H5DataSetWriterSetup s(f1, path2, H5T_NATIVE_INT, 1);
+    std::vector<hsize_t> start1(1, 0),
+      n2write(1, 1);
+    H5DSWriterDimInfo dim1(start1, n2write);
+    H5DataSetWriter w(&s);
+    w.SetDimInfoForWriting(&dim1);
+    w.WriteData(&mult, 1);
+  }
+
+  iArealLayFromUseLast(flags, 10, "Recharge/", f);
+  {
+    CAR_INT2D dat;
+    dat.SetSize(10, 2, 2);
+    std::pair<int, int> p(0,10);
+    VEC_INT_PAIR indices(2,p);
+    indices[1].second = 2;
+    H5DataSetReader r(f1, path1, indices);
+    r.GetData(&dat.at(0,0), 20);
+    TS_ASSERT_EQUALS(dat.at(0,0), 2);
+    TS_ASSERT_EQUALS(dat.at(9,0), 2);
+    TS_ASSERT_EQUALS(dat.at(0,1), 1);
+    TS_ASSERT_EQUALS(dat.at(9,1), 1);
+  }
+  {
+    std::vector<int> dat(2, 0);
+    std::pair<int, int> p(0,2);
+    VEC_INT_PAIR indices(1,p);
+    H5DataSetReader r(f1, path2, indices);
+    r.GetData(&dat.at(0), 2);
+    TS_ASSERT_EQUALS(dat.at(0), 2);
+    TS_ASSERT_EQUALS(dat.at(1), 1);
+  }
+  H5DataReader::CloseAllH5FilesOpenForWriting();
+  TS_ASSERT(!remove(f1));
+} // H5UseLastWriterT::test_iArealLayFromUseLast
+
+#endif
 

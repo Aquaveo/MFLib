@@ -308,7 +308,8 @@ bool NativeExpBcf::CanWriteLine (int a_line, int a_lay)
   }
   else if (6 == a_line) // HY
   {
-    if (1 == laycon[i] || 3 == laycon[i]) return true;
+    if (1 == laycon[i] || 3 == laycon[i] ||
+        (m_usg && 4 == laycon[i]) ) return true;
   }
   else if (7 == a_line) // VCONT
   {
@@ -317,7 +318,7 @@ bool NativeExpBcf::CanWriteLine (int a_line, int a_lay)
   else if (8 == a_line) // SF2
   {
     if (GetNative()->GetExp()->AtLeastOneTransientSPExists() &&
-        (2 == laycon[i] || 3 == laycon[i]))
+         (2 == laycon[i] || 3 == laycon[i] || (m_usg && 4 == laycon[i]) ) )
       return true;
   }
   else if (9 == a_line)

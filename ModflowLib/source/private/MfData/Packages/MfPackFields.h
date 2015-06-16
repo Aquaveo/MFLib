@@ -64,6 +64,7 @@ namespace MfData
     namespace ListPack
     {
       const char * const ITMP = "ITMP";
+      const char * const ITMPCLN = "ITMPCLN";
       const char * const MAXBC = "MAXBC";
       const char * const NUMBC = "NUMBC";
       const char * const NUMFIELDS = "NUMFIELDS";
@@ -467,6 +468,7 @@ namespace MfData
       const char * const MXSTRM = "MXSTRM";
       const char * const ITRBAR = "ITRBAR";
       const char * const IDIVAR = "IDIVAR";
+      const char * const NPSTR = "NPSTR";
     }
     namespace SFRpack
     {

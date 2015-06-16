@@ -31,6 +31,7 @@ namespace MfData
     const MfGlobal &operator=(const MfGlobal &rhs);
 
     int Unstructured() const;
+    int NumNodesUnstructured() const;
     int ModelType();
     int NumRow();
     int NumCol();
@@ -86,16 +87,6 @@ namespace MfData
                     int a_LENUNI,
                     const int *a_LAYCBD,
                     int a_IUNSTR);
-    static void SetDisu1(int a_IUNSTR,
-                         int a_NODES,
-                         int a_NJAG,
-                         int a_IVSD,
-                         int a_IDSYMRD);
-    static void SetDisu2(const int *a_NODLAY);
-    static void SetDisu3(const double* a_TOP,
-                         const double* a_BOT,
-                         const Real* a_AREA,
-                         const int* a_JA);
 
   private:
 

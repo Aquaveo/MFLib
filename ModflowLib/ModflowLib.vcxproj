@@ -1058,6 +1058,7 @@ build_test_runner.bat
     <ClInclude Include="source\private\MfData\MfExport\private\Native\H5LstPack.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\H5Strings.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\H5UseLastWriter.h" />
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\H5UseLastWriter.t.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\Mnw1PropList.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\Mnw1PropList.t.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpCln.h" />
