@@ -638,6 +638,7 @@ bool ProcessorSFR2::impl::WriteStreamData (FILE *a_fp)
 #include <private/Gms2Mf2k/Files/Processor/ProcessorSFR2.t.h>
 #include <private\H5DataReader\H5DataSetReader.h>
 #include <private/MfLibAsserts.h>
+#include <private/MfData/MfGlobal.h>
 
 //------------------------------------------------------------------------------
 void ProcessorSFR2T::testCreateClass () const
@@ -671,6 +672,7 @@ void ProcessorSFR2T::testDoConvertFile () const
 
   TS_ASSERT(SetCurrentDirectory(path));
 
+  MfData::Get().Unstructured(0);
   ProcessorSFR2 p(fromFile, tmpFile, 15, 10, false);
   TS_ASSERT(p.DoConvertFile());
 

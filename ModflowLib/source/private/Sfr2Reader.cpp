@@ -476,6 +476,7 @@ void Sfr2ReaderT::testiGetReachData ()
   std::vector<int>  m_ireach, m_jseg;
   std::vector<Real> m_rchLen;
 
+  MfData::Get().Unstructured(0);
   iGetReachData(nrow, ncol, line, m_krch, m_irch, m_jrch,
                 m_jseg, m_ireach, m_rchLen);
 
