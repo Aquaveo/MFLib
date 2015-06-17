@@ -126,6 +126,7 @@ void NativeExpSTP::CopyAdditionalFiles ()
   gsf = base + ".gsf";
   outMwf = outBase + ".mfw";
   outPrj = outBase + ".prj";
+  outVtu = outBase + ".vtu";
   outGsf = outBase + ".gsf";
   FILE* fp = fopen(mwf.c_str(), "r");
   if (fp)
