@@ -91,7 +91,7 @@ bool NativeExpSTP::Export ()
   }
 
   // copy world file and prj file if they exist
-  CopyMfwPrjFiles();
+  CopyAdditionalFiles();
   return true;
 } // MfNativeExpSTP::Export
 //------------------------------------------------------------------------------
@@ -114,16 +114,19 @@ void NativeExpSTP::ForcePackageWrite (const char* const a_)
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-void NativeExpSTP::CopyMfwPrjFiles ()
+void NativeExpSTP::CopyAdditionalFiles ()
 {
-  CStr nf, base, outBase, mwf, prj, outMwf, outPrj;
+  CStr nf, base, outBase, mwf, prj, outMwf, outPrj, vtu, gsf, outVtu, outGsf;
   outBase = GetNative()->GetExp()->GetBaseFileName();
   GetGlobal()->GetStrVar("NAME_FILE_STR", nf);
   util::StripExtensionFromFilename(nf.c_str(), base);
   mwf = base + ".mfw";
   prj = base + ".prj";
+  vtu = base + ".vtu";
+  gsf = base + ".gsf";
   outMwf = outBase + ".mfw";
   outPrj = outBase + ".prj";
+  outGsf = outBase + ".gsf";
   FILE* fp = fopen(mwf.c_str(), "r");
   if (fp)
   {
@@ -138,7 +141,24 @@ void NativeExpSTP::CopyMfwPrjFiles ()
     fp = NULL;
     util::FileCopy(prj, outPrj);
   }
-} // NativeExpSTP::CopyMfwPrjFiles
+  fp = fopen(vtu.c_str(), "r");
+  if (fp)
+  {
+    fclose(fp);
+    fp = NULL;
+    util::FileCopy(vtu, outVtu);
+  }
+  else
+  {
+    fp = fopen(gsf.c_str(), "r");
+    if (fp)
+    {
+      fclose(fp);
+      fp = NULL;
+      util::FileCopy(gsf, outGsf);
+    }
+  }
+} // NativeExpSTP::CopyAdditionalFiles
 
 
 ///////////////////////////////////////////////////////////////////////////////
