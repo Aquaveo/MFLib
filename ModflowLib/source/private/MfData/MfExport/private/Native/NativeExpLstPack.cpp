@@ -221,11 +221,18 @@ void NativeExpLstPack::Line2 ()
   if (Packages::WEL == GetPackage()->PackageName() &&
       GetGlobal()->ModelType() == MfData::USG)
   {
-    const int* iwelqv(0);
+    const int* iwelqv(0), *iafr(0);
     GetPackage()->GetField("IWELQV", &iwelqv);
+    GetPackage()->GetField("IAFR", &iafr);
     if (iwelqv && *iwelqv == 1)
     {
       ln += "AUTOFLOWREDUCE ";
+    }
+    if (iafr && *iafr != 0)
+    {
+      CStr tmp;
+      tmp.Format("IUNITAFR %d ", *iafr);
+      ln += tmp;
     }
   }
 
