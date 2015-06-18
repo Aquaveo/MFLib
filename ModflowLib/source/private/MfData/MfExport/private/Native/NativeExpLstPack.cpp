@@ -218,6 +218,16 @@ void NativeExpLstPack::Line2 ()
     ln += m_fieldStrings[start+i];
     ln += " ";
   }
+  if (Packages::WEL == GetPackage()->PackageName() &&
+      GetGlobal()->ModelType() == MfData::USG)
+  {
+    const int* iwelqv(0);
+    GetPackage()->GetField("IWELQV", &iwelqv);
+    if (iwelqv && *iwelqv == 1)
+    {
+      ln += "AUTOFLOWREDUCE ";
+    }
+  }
 
   AddToStoredLinesDesc(ln, desc);
 
