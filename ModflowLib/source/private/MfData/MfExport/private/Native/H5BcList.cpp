@@ -604,5 +604,16 @@ CStr H5BcList::Mnw1 ()
   }
   return rval;
 } // H5BcList::Mnw1
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+CStr H5BcList::ClnWel (int& a_itmp)
+{
+  CStr rval;
+  H5LstPack h(m_pack->GetGlobal(), m_pack->GetPackage(),
+              m_pack->GetNative(), this);
+  rval = h.ClnWel(a_itmp);
+  return rval;
+} // H5BcList::ClnWel
 
 

@@ -888,16 +888,55 @@ static std::map<CStr, std::vector<int> >& GetChunkMap ()
   return fg_chunkMap;
 } // GetChunkMap
 //------------------------------------------------------------------------------
+/// \brief Adds data sets to the BC group passed in
+//------------------------------------------------------------------------------
+static void CreateBcGroupDatasets (CStr& file,
+                                   const char* a_group,
+                                   bool a_compress)
+{
+  const int NUM_BC_PATHS = 7;
+  CStr bcPaths[NUM_BC_PATHS] = { MFBC_NUMBC, MFBC_USELAST, MFBC_CELLIDS,
+                                 MFBC_NAME, MFBC_MAPIDSTR, MFBC_IFACE,
+                                 MFBC_DATA };
+  hid_t bcType[NUM_BC_PATHS] = { H5T_NATIVE_INT, H5T_NATIVE_INT, H5T_NATIVE_INT,
+                                 H5T_NATIVE_CHAR, H5T_NATIVE_CHAR,
+                                 H5T_NATIVE_INT, H5T_NATIVE_DOUBLE };
+  int   bcDim[NUM_BC_PATHS] = { 1, 1, 1, 1, 1, 1, 3 };
+
+  for (int j=0; j<NUM_BC_PATHS; j++)
+  {
+    CreateH5Dataset(file, a_group, bcPaths[j], bcType[j], bcDim[j],
+                    a_compress);
+  }
+
+} // CreateBcGroupDatasets
+//------------------------------------------------------------------------------
 /// \brief Creates a default modflow h5 file
 //------------------------------------------------------------------------------
 void expGmsH5_CreateDefaultH5File (
   const char *a_
-, int a_modelType
-, bool a_compress
-)
+  , int a_modelType
+  , bool a_compress
+  )
 {
   CreateDefaultMfH5File(a_, a_modelType, a_compress);
 } // expGmsH5_CreateDefaultH5File
+//------------------------------------------------------------------------------
+/// \brief Adds the Wel (CLN) group to the h5 file
+//------------------------------------------------------------------------------
+void expGmsH5_CreateWelClnGroup (const char* a_,
+  bool a_compress)
+{
+  CStr file(a_);
+  file += ".h5";
+
+  H5DataSetWriterSetup s(file);
+  H5DataSetWriter t(&s);
+  if (t.CreateGroup("WEL (CLN)"))
+  {
+    CreateBcGroupDatasets(file, "WEL (CLN)", a_compress);
+  }
+} // expGmsH5_CreateWelClnGroup
 //------------------------------------------------------------------------------
 /// \brief Creates a default modflow h5 file
 //------------------------------------------------------------------------------
@@ -924,36 +963,24 @@ static bool CreateDefaultMfH5File (const char *a_,
   const int SW_GROUPS = 2;
   CStr swBcGrp[SW_GROUPS] = { "VDF", "VSC" };
 
-  const int NUM_BC_PATHS = 7;
-  CStr bcPaths[NUM_BC_PATHS] = { MFBC_NUMBC, MFBC_USELAST, MFBC_CELLIDS,
-                                 MFBC_NAME, MFBC_MAPIDSTR, MFBC_IFACE,
-                                 MFBC_DATA };
   const int NUM_ST_PATHS = 6;
   CStr stPaths[NUM_ST_PATHS] = { MFBC_STRSEGID, MFBC_SEGID, MFBC_SEGFLW,
                                  MFBC_ITRIB, MFBC_UPID, MFBC_NSEG };
   const int NUM_SF_PATHS = 4;
   CStr sfPaths[NUM_SF_PATHS] = { MFBC_STRSEGID, MFBC_NSEG, MFBC_SEGP,
                                  MFBC_SEGFLWT };
-  hid_t bcType[NUM_BC_PATHS] = { H5T_NATIVE_INT, H5T_NATIVE_INT, H5T_NATIVE_INT,
-                                 H5T_NATIVE_CHAR, H5T_NATIVE_CHAR,
-                                 H5T_NATIVE_INT, H5T_NATIVE_DOUBLE };
   hid_t stType[NUM_ST_PATHS] = { H5T_NATIVE_INT, H5T_NATIVE_INT,
                                  H5T_NATIVE_DOUBLE, H5T_NATIVE_INT,
                                  H5T_NATIVE_INT, H5T_NATIVE_INT };
   hid_t sfType[NUM_SF_PATHS] = { H5T_NATIVE_INT, H5T_NATIVE_INT,
                                  H5T_NATIVE_DOUBLE, H5T_NATIVE_DOUBLE};
-  int   bcDim[NUM_BC_PATHS] = { 1, 1, 1, 1, 1, 1, 3 };
   int   stDim[NUM_ST_PATHS] = { 1, 1, 2, 2, 1, 1 };
   int   sfDim[NUM_SF_PATHS] = { 1, 1, 3, 2 };
 
   for (i=0; i<GROUPS; i++)
   {
     t.CreateGroup(bcGrp[i]);
-    for (j=0; j<NUM_BC_PATHS; j++)
-    {
-      CreateH5Dataset(file, bcGrp[i], bcPaths[j], bcType[j], bcDim[j],
-                      a_compress);
-    }
+    CreateBcGroupDatasets(file, bcGrp[i], a_compress);
   }
 
   // do the extra stuff on streams (STR)
@@ -976,11 +1003,7 @@ static bool CreateDefaultMfH5File (const char *a_,
     for (i=0; i<SW_GROUPS; i++)
     {
       t.CreateGroup(swBcGrp[i]);
-      for (j=0; j<NUM_BC_PATHS; j++)
-      {
-        CreateH5Dataset(file, swBcGrp[i], bcPaths[j], bcType[j], bcDim[j],
-                        a_compress);
-      }
+      CreateBcGroupDatasets(file, swBcGrp[i], a_compress);
     }
   }
 

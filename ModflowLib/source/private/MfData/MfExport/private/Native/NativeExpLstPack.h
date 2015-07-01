@@ -89,7 +89,7 @@ namespace MfData
 
       bool                m_h5, m_usg, m_unstructured;
       const int          *m_nBcs, *m_nAux, *m_nDataFields;
-      int                 m_nFields, m_nI, m_nJ, m_nK;
+      int                 m_nFields, m_nI, m_nJ, m_nK, m_nodeOffset;
       const Real         *m_data;
       std::vector<CStr>   m_fieldStrings;
       bool                m_returnFlow;
@@ -99,7 +99,7 @@ namespace MfData
 
       NeLstPar *m_par;
       H5BcList *m_h5Bc;
-      CStr      m_h5BcStr;
+      CStr      m_h5BcStr, m_h5BcStrClnWell;
     };
 
   }

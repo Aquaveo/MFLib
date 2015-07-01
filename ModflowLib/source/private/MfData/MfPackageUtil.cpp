@@ -2081,7 +2081,8 @@ bool MfData::Packages::GetBcFieldNames (const char * const a_type,
 {
   bcFieldNames.resize(0);
   CStr type(a_type);
-  if (type == MfData::Packages::WEL)
+  if (type == MfData::Packages::WEL ||
+      type == MfData::Packages::CLNWEL)
   {
     bcFieldNames.push_back("Q");
   }

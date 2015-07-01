@@ -9,6 +9,7 @@
 
 #include <sstream>
 
+#include <private\MfData\MfExport\private\ExpGmsH5.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\MfData\MfExport\private\Native\H5BcList.h>
@@ -24,6 +25,7 @@
 #include <private\util\EReadAsciiFile.h>
 
 using namespace MfData::Export;
+const char * const CLN_CREATED = "H5 CLN Created";
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
@@ -43,6 +45,7 @@ NativeExpLstPack::NativeExpLstPack (bool a_h5)
 , m_nI(0)
 , m_nJ(0)
 , m_nK(0)
+, m_nodeOffset(-1)
 , m_par(0)
 , m_h5Bc(0)
 {
@@ -260,7 +263,19 @@ void NativeExpLstPack::Line5 ()
   stress.Format("          Stress Period %3d", GetGlobal()->GetCurrentPeriod());
   const int* itmpcln(0);
   GetPackage()->GetField(Packages::ListPack::ITMPCLN , &itmpcln);
-  if (itmpcln && 0 < *itmpcln) desc += " ITMPCLN";
+  if (itmpcln && 0 < *itmpcln)
+  {
+    desc += " ITMPCLN";
+    int h5ClnCreated(0);
+    GetGlobal()->GetIntVar(CLN_CREATED, h5ClnCreated);
+    if (m_h5 && !h5ClnCreated)
+    {
+      expGmsH5_CreateWelClnGroup(GetNative()->GetExp()->GetBaseFileName(),
+                                 GetNative()->Compress());
+      h5ClnCreated = 1;
+      GetGlobal()->SetIntVar(CLN_CREATED, h5ClnCreated);
+    }
+  }
   desc += stress;
 
   const int *itmp(0), *np(0);
@@ -268,17 +283,22 @@ void NativeExpLstPack::Line5 ()
       !GetPackage()->GetField(Packages::ListPack::NP , &np) || !np)
     return;
 
-  int tmpItmp(*itmp), tmpNp(*np);
+  int tmpItmp(*itmp), tmpNp(*np), tmpItmpCln(0);
+  if (itmpcln && 0 < *itmpcln) tmpItmpCln = *itmpcln;
   if (m_h5)
   {
     m_h5BcStr = m_h5Bc->LstPack(tmpItmp);
     tmpNp = 0;
+    if (itmpcln && 0 < *itmpcln)
+    {
+      m_h5BcStrClnWell = m_h5Bc->ClnWel(tmpItmpCln);
+    }
   }
   CStr ln;
   ln.Format("%5d %5d", tmpItmp, tmpNp);
   if (itmpcln && 0 < *itmpcln)
   {
-    CStr ln1; ln1.Format(" %5d", *itmpcln);
+    CStr ln1; ln1.Format(" %5d", tmpItmpCln);
     ln += ln1;
   }
   AddToStoredLinesDesc(ln, desc);
@@ -311,12 +331,16 @@ void NativeExpLstPack::Line6 ()
 
   const int *itmp(0);
   if (!GetPackage()->GetField(Packages::ListPack::ITMP, &itmp) || !itmp) return;
+  const int* itmpcln(0);
+  GetPackage()->GetField(Packages::ListPack::ITMPCLN , &itmpcln);
 
   CStr ln;
   if (m_h5)
   {
     ln = m_h5BcStr;
     if (!ln.empty()) AddToStoredLinesDesc(ln, desc);
+    ln = m_h5BcStrClnWell;
+    if (!ln.empty()) AddToStoredLinesDesc(ln, "");
     return;
   }
 
@@ -335,6 +359,28 @@ void NativeExpLstPack::Line6 ()
       ln += DataToStr(i, (int)j);
     }
     AddToStoredLinesDesc(ln, desc);
+  }
+
+  const int *nnpwel(0), *nodes(0);
+  GetPackage()->GetField(Packages::ListPack::NUMBC, &nnpwel);
+  GetPackage()->GetField("NODES", &nodes);
+  if (nodes && nnpwel && itmpcln && 0 < *itmpcln)
+  {
+    m_nodeOffset = *nodes;
+    bool tmpUnstructured = m_unstructured;
+    m_unstructured = true;
+    for (int ii=0; ii<*itmpcln; ++ii)
+    {
+      int i = ii + *nnpwel;
+      ln = IjkToStr(i);
+      for (size_t j=3; j<m_fieldStrings.size(); ++j)
+      {
+        ln += DataToStr(i, (int)j);
+      }
+      AddToStoredLinesDesc(ln, "6c. ICLNNODE Q [xyz]");
+    }
+
+    m_unstructured = tmpUnstructured;
   }
 } // NativeExpLstPack::Line6
 //------------------------------------------------------------------------------
@@ -361,7 +407,9 @@ CStr NativeExpLstPack::IjkToStr (int a_i)
     }
     else
     {
-      ln.Format("%5d ", (int)m_data[a_i*(*m_nDataFields)+0]);
+      int nodeid = (int)m_data[a_i*(*m_nDataFields)+0];
+      if (-1 != m_nodeOffset) nodeid -= m_nodeOffset;
+      ln.Format("%5d ", nodeid);
     }
   }
   return ln;

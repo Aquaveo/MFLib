@@ -31,6 +31,7 @@ namespace MfData
       CStr StrPack (int& a_itmp);
       CStr SfrLn2 ();
       CStr SfrLn6 (int& a_itmp);
+      CStr ClnWel (int& a_itmp);
       void LstPar ();
       void WriteMapIds ();
 

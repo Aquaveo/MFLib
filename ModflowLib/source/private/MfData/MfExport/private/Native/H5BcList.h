@@ -50,6 +50,7 @@ namespace MfData
       CStr SfrLn6 (int& a_itmp);
       CStr Mnw2 ();
       CStr Mnw1 ();
+      CStr ClnWel (int& a_itmp);
 
     private:
       NativePackExp* m_pack;

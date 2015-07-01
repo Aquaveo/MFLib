@@ -129,7 +129,7 @@ public:
       , m_seawatIdx1(-1), m_condfactIdx(-1), m_qfactIdx(-1), m_maxBcSoFar(0)
       , m_prevSpNumBc(0), m_grid(a_g->NumRow(),a_g->NumCol()), m_istrmSize(5)
       , m_usg(0), m_unstructured(0)
-      , m_istrmCellIdIdx(0)
+      , m_istrmCellIdIdx(0), m_dataStartIdx(0), m_cellIdOffset(0)
   {
     m_usg = a_g->ModelType() == MfData::USG;
     m_unstructured = a_g->Unstructured() ? 1 : 0;
@@ -171,6 +171,7 @@ public:
   CStr StrPack (int& a_itmp);
   CStr SfrLn2 ();
   CStr SfrLn6 (int& a_itmp);
+  CStr ClnWel (int& a_itmp);
 
   MfData::MfPackage* m_p;
   MfData::MfGlobal*  m_glob;
@@ -187,7 +188,8 @@ public:
   std::vector<CStr>   m_fieldStrings;
   int                 m_ifaceIdx, m_cellgrpIdx, m_seawatIdx0, m_seawatIdx1,
                       m_condfactIdx, m_qfactIdx;
-  int                *m_maxBcSoFar, m_prevSpNumBc;
+  int                *m_maxBcSoFar, m_prevSpNumBc, m_dataStartIdx,
+                      m_cellIdOffset;
   std::vector<Param>  m_pList;
   CellIdToIJK         m_grid;
   CAR_DBL2D           m_bcData;
@@ -280,7 +282,8 @@ void iSizeBcDataArray (CStr& a_type, int a_maxIdx, CAR_DBL2D& a_bcData)
     a_bcData.SetSize(7, a_maxIdx+1, 0);
     start = 6;
   }
-  else if (a_type == "Well")
+  else if (a_type == "Well" ||
+           a_type == "WEL (CLN)")
   { // Q, factor, WELDENS
     a_bcData.SetSize(3, a_maxIdx+1, 0);
     start = 1;
@@ -382,6 +385,13 @@ CStr H5LstPack::SfrLn6 (int& a_itmp)
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
+CStr H5LstPack::ClnWel (int& a_itmp)
+{
+  return m_p->ClnWel(a_itmp);
+} // H5LstPack::ClnWel
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
 void H5LstPack::LstPar ()
 {
  m_p->LstPar();
@@ -467,6 +477,7 @@ void H5LstPack::impl::SetType ()
   else if (CHD == m_packName)   m_type = "Specified Head";
   else if (STRSP == m_packName) m_type = "Stream";
   else if (SFR == m_packName)   m_type = "Stream (SFR2)";
+  else if (CLNWEL == m_packName) m_type = "WEL (CLN)";
   else m_type = "";
 } // H5LstPack::impl::SetType
 //------------------------------------------------------------------------------
@@ -525,7 +536,7 @@ void H5LstPack::impl::FillBcData ()
 {
   // Go through the data that was passed in. It is possible that there are
   // already BCs active in this stress period that have come from parameters.
-  ExistingBcData(0);
+  ExistingBcData(m_dataStartIdx);
   // Write the use last flag. If there are any parameters then we always set
   // the use last flag to false because we don't know what parameters may
   // have changed since the last stress period.
@@ -577,7 +588,7 @@ void H5LstPack::impl::ExistingBcData (int a_start)
       ck = static_cast<int>(m_data[i*(*m_nDataFields)+0]);
       ci = static_cast<int>(m_data[i*(*m_nDataFields)+1]);
       cj = static_cast<int>(m_data[i*(*m_nDataFields)+2]);
-      if (m_usg) cellId = (int)m_data[i*(*m_nDataFields)+0];
+      if (m_usg) cellId = (int)m_data[i*(*m_nDataFields)+0] - m_cellIdOffset;
     }
     if (-1 == cellId) cellId = m_grid.IdFromIJK(ci, cj, ck);
     m_idxs.push_back(GetBcIndex(cellId));
@@ -1146,6 +1157,35 @@ CStr H5LstPack::impl::SfrLn6 (int& a_itmp)
   rval = s.Ln6(a_itmp);
   return rval;
 } // H5LstPack::impl::SfrLn6
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+CStr H5LstPack::impl::ClnWel (int& a_itmp)
+{
+  CStr rval;
+  // do some setup to change things for CLN Wells
+  MfPackage p(*m_p), *tmpP(m_p);
+  TmpPackageNameChanger chg(&p, "CLNWEL");
+  m_p = &p;
+
+  const int *nnpwcln(0), *nodes(0), *itmpcln(0), *numbc(0);
+  m_p->GetField(Packages::ListPack::ITMPCLN, &itmpcln);
+  m_p->GetField("NNPWCLN", &nnpwcln);
+  m_p->GetField("NODES", &nodes);
+  m_p->GetField(Packages::ListPack::NUMBC, &numbc);
+  if (!itmpcln || !nnpwcln || !nodes || !numbc)
+  {
+    ASSERT(0);
+    return rval;
+  }
+  m_p->SetField(Packages::ListPack::ITMP, itmpcln);
+  m_p->SetField(Packages::ListPack::NUMBC, nnpwcln);
+  m_dataStartIdx = *numbc;
+  m_cellIdOffset = *nodes;
+  rval = Write(a_itmp);
+  m_p = tmpP;
+  return rval;
+} // H5LstPack::impl::ClnWel
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \class H5StrPack

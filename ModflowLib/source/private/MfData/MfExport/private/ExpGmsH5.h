@@ -56,5 +56,7 @@ int xfpWriteAttributeDouble(hid_t a_Loc,
 void expGmsH5_CreateDefaultH5File (const char *a_,
                                    int a_modelType,
                                    bool a_compress);
+void expGmsH5_CreateWelClnGroup (const char *a_,
+                                 bool a_compress);
 
 #endif
