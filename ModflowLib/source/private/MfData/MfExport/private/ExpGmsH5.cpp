@@ -936,6 +936,17 @@ void expGmsH5_CreateWelClnGroup (const char* a_,
   {
     CreateBcGroupDatasets(file, "WEL (CLN)", a_compress);
   }
+
+  {
+    std::vector<CStr> bcAttrPaths;
+    bcAttrPaths.push_back(MFBC_NAME);
+    bcAttrPaths.push_back(MFBC_MAPIDSTR);
+    hid_t fid(H5DataReader::GetFileId(file));
+    CStr bcGrp[1] = {"WEL (CLN)"};
+    // write the int attribute for the mapid and name
+    iWriteIntAttForDataSets(fid, bcGrp, 1, bcAttrPaths,
+                            MFBC_MAX_STR_LEN, 1);
+  }
 } // expGmsH5_CreateWelClnGroup
 //------------------------------------------------------------------------------
 /// \brief Creates a default modflow h5 file
