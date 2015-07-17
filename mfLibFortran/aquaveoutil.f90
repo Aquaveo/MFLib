@@ -17,6 +17,7 @@ module module_aquaveo_data
   save
   logical ::        m_stayopen
   logical ::        m_wrapper
+  logical ::        m_mp3du = .FALSE.
   logical ::        m_export
   logical ::        m_exportDB
   logical ::        m_promptForArray, m_readBinArraySingle
@@ -40,6 +41,8 @@ module module_aquaveo_data
             ed_setpath, &
             ed_getprefix, &
             ed_setprefix, &
+            ed_setMp3du, &
+            ed_getMp3du, &
             ed_setExportGeoDB, &
             ed_setExportGmsH5, &
             ed_setExportTables, &
@@ -201,6 +204,26 @@ module module_aquaveo_data
 
     m_prefix = a
   end subroutine ed_setprefix
+
+  !-----------------------------------------------------------------------------
+  ! BRIEF:      
+  !-----------------------------------------------------------------------------
+  subroutine ed_setMp3du (a_arg)
+    implicit none
+    integer, intent(in) :: a_arg
+
+    m_mp3du = .FALSE.
+    if (a_arg.ne.0) m_mp3du = .TRUE.
+  end subroutine ed_setMp3du
+
+  !-----------------------------------------------------------------------------
+  ! BRIEF:      
+  !-----------------------------------------------------------------------------
+  pure logical function ed_getMp3du ()
+    implicit none
+    
+    ed_getMp3du = m_mp3du
+  end function ed_getMp3du
 
   !-----------------------------------------------------------------------------
   ! BRIEF:      
