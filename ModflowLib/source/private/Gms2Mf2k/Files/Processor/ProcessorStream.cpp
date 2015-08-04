@@ -206,7 +206,7 @@ bool ProcessorStream::impl::WriteStreamData (FILE *a_fp,
       j = i * 5;
       if (a_unstructured)
       {
-        fprintf(a_fp, "%5d%5d%5d", m_iStrm.at(j+2), m_iStrm.at(j+3),
+        fprintf(a_fp, "%d %d %d", m_iStrm.at(j+2), m_iStrm.at(j+3),
                                    m_iStrm.at(j+4));
       }
       else
@@ -216,23 +216,45 @@ bool ProcessorStream::impl::WriteStreamData (FILE *a_fp,
                                          m_iStrm.at(j+4));
       }
       j = i * 11;
-      CStr s;
-      s = STR(m_strm.at(j+0),-1,15,STR_FULLWIDTH);
-      s += STR(m_strm.at(j+1),-1,10,STR_FULLWIDTH);
-      s += STR(m_strm.at(j+2),-1,10,STR_FULLWIDTH);
-      s += STR(m_strm.at(j+3),-1,10,STR_FULLWIDTH);
-      s += STR(m_strm.at(j+4),-1,10,STR_FULLWIDTH);
-      fprintf(a_fp, "%s\n", s.c_str());
+      if (a_unstructured)
+      {
+        fprintf(a_fp, "%s %s %s %s %s\n",
+          STR(m_strm.at(j+0)).c_str(),
+          STR(m_strm.at(j+1)).c_str(),
+          STR(m_strm.at(j+2)).c_str(),
+          STR(m_strm.at(j+3)).c_str(),
+          STR(m_strm.at(j+4)).c_str());
+      }
+      else
+      {
+        CStr s;
+        s = STR(m_strm.at(j+0),-1,15,STR_FULLWIDTH);
+        s += STR(m_strm.at(j+1),-1,10,STR_FULLWIDTH);
+        s += STR(m_strm.at(j+2),-1,10,STR_FULLWIDTH);
+        s += STR(m_strm.at(j+3),-1,10,STR_FULLWIDTH);
+        s += STR(m_strm.at(j+4),-1,10,STR_FULLWIDTH);
+        fprintf(a_fp, "%s\n", s.c_str());
+      }
     }
 
     for (i=0; m_icalc && i<m_nstream; i++)
     {
       j = i * 11;
-      CStr s;
-      s = STR(m_strm.at(j+5),-1,10,STR_FULLWIDTH);
-      s += STR(m_strm.at(j+6),-1,10,STR_FULLWIDTH);
-      s += STR(m_strm.at(j+7),-1,10,STR_FULLWIDTH);
-      fprintf(a_fp, "%s\n", s.c_str());
+      if (a_unstructured)
+      {
+        fprintf(a_fp, "%s %s %s\n",
+          STR(m_strm.at(j+5)).c_str(),
+          STR(m_strm.at(j+6)).c_str(),
+          STR(m_strm.at(j+7)).c_str());
+      }
+      else
+      {
+        CStr s;
+        s = STR(m_strm.at(j+5),-1,10,STR_FULLWIDTH);
+        s += STR(m_strm.at(j+6),-1,10,STR_FULLWIDTH);
+        s += STR(m_strm.at(j+7),-1,10,STR_FULLWIDTH);
+        fprintf(a_fp, "%s\n", s.c_str());
+      }
     }
 
     for (i=0; m_ntrib && i<m_nss; i++)
