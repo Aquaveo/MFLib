@@ -149,15 +149,12 @@ void NativeExpSTP::CopyAdditionalFiles ()
     fp = NULL;
     util::FileCopy(vtu, outVtu);
   }
-  else
+  fp = fopen(gsf.c_str(), "r");
+  if (fp)
   {
-    fp = fopen(gsf.c_str(), "r");
-    if (fp)
-    {
-      fclose(fp);
-      fp = NULL;
-      util::FileCopy(gsf, outGsf);
-    }
+    fclose(fp);
+    fp = NULL;
+    util::FileCopy(gsf, outGsf);
   }
 } // NativeExpSTP::CopyAdditionalFiles
 
