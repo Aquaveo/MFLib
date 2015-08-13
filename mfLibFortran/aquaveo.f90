@@ -69,7 +69,8 @@ module module_aquaveo
     ! reading this file
     read(isup, '(a)') fltype
     if ((fltype(1:7).ne.'MF2KSUP').and.(fltype(1:8).ne.'MF2K5SUP').and. &
-        (fltype(1:8).ne.'MFNWTSUP').and.(fltype(1:8).ne.'MFLGRSUP')) then
+        (fltype(1:8).ne.'MFNWTSUP').and.(fltype(1:8).ne.'MFLGRSUP').and. &
+        (fltype(1:8).ne.'MFUSGSUP')) then
       write(*,*) ' This file is not a GMS MODFLOW superfile. Assuming NAM file '
     else
       ! read the name file name from the superfile

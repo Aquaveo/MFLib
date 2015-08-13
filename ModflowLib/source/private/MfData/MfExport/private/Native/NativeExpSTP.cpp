@@ -7,6 +7,7 @@
 //------------------------------------------------------------------------------
 #include <private\MfData\MfExport\private\Native\NativeExpSTP.h>
 
+#include <Export.h>
 #include <private\H5DataReader\H5DataSetWriter.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\TxtExporter.h>
@@ -116,6 +117,8 @@ void NativeExpSTP::ForcePackageWrite (const char* const a_)
 //------------------------------------------------------------------------------
 void NativeExpSTP::CopyAdditionalFiles ()
 {
+  if (!mfLibExp_Exporting()) return;
+
   CStr nf, base, outBase, mwf, prj, outMwf, outPrj, vtu, gsf, outVtu, outGsf;
   outBase = GetNative()->GetExp()->GetBaseFileName();
   GetGlobal()->GetStrVar("NAME_FILE_STR", nf);
