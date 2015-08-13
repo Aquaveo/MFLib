@@ -62,7 +62,7 @@ namespace
 //------------------------------------------------------------------------------
 bool ClnPack (const CStr& type)
 {
-  if (Packages::CLNLine1 == type || Packages::CLN == type) return true;
+  if (Packages::CLNLine1 == type || Packages::CLN == type || "CL3" == type) return true;
   return false;
 } // ClnPack
 //------------------------------------------------------------------------------

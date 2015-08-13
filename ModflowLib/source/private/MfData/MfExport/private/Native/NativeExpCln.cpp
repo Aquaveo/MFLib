@@ -21,6 +21,8 @@
 
 using namespace MfData::Export;
 
+const std::string kLine2Written = "CLN Line 2 written";
+
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
@@ -54,9 +56,17 @@ bool NativeExpCln::Export ()
     AddToStoredLinesDesc(Line1(), Desc("1"));
     WriteCommentsCln();
   }
-  else {
+  else if (nm == "CL3") {
     Line2();
     Line3();
+  }
+  else {
+    // Write line 2 if we didn't already do it above
+    int line2written;
+    bool rv = GetGlobal()->GetIntVar(kLine2Written.c_str(), line2written);
+    if (rv && !line2written) {
+      Line2();
+    }
     Line4();
     if (GetGlobal()->Unstructured()) {
       Line5();
@@ -127,13 +137,28 @@ CStr NativeExpCln::Line1 ()
 void NativeExpCln::Line2 ()
 {
   AddArrayLines(Packages::Cln::NNDCLN, "2");
+  GetGlobal()->SetIntVar(kLine2Written.c_str(), 1);
 } // NativeExpCln::Line2
 //------------------------------------------------------------------------------
 /// \brief 3. CLNCON[NNDCLN(NCLN)]
 //------------------------------------------------------------------------------
 void NativeExpCln::Line3 ()
 {
-  //AddArrayLines(Packages::Cln::NODLAY, "3");
+  CStr aStr;
+  MfPackage* p = GetPackage();
+  if (!p) return;
+
+  using namespace MfData::Packages;
+  const int *nclncons(0), *clncon(0);
+  if (p->GetField("NCLNCONS", &nclncons) && nclncons &&
+      p->GetField("CLNCON", &clncon) && clncon) {
+    CStr aStr2;
+    for (int i = 0; i < *nclncons; ++i) {
+      aStr2.Format("%6d ", clncon[i]);
+      aStr += aStr2;
+    }
+    AddToStoredLinesDesc(aStr, Desc("3"));
+  }
 } // NativeExpCln::Line3
 //------------------------------------------------------------------------------
 /// \brief 4. IFNO IFTYP IFDIR FLENG FELEV FANGLE IFLIN ICCWADI
