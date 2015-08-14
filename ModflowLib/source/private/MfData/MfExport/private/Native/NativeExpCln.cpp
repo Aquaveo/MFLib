@@ -62,9 +62,9 @@ bool NativeExpCln::Export ()
   }
   else {
     // Write line 2 if we didn't already do it above
-    int line2written;
+    int line2written = 0;
     bool rv = GetGlobal()->GetIntVar(kLine2Written.c_str(), line2written);
-    if (rv && !line2written) {
+    if (!rv || !line2written) {
       Line2();
     }
     Line4();
