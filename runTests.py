@@ -49,9 +49,19 @@ def runOneTest (mod, t, idx):
         cmdStr = cmdStr.replace("%test-name-prefix%", infilePrefix)
         outFile = infile + "-" + mod.m_name + cmd.m_pipeOut + ".txt"
         cmdStr = cmdStr + " > " + outFile + " 2>&1"
-        output = subprocess.call('echo ' + cmdStr + ' >> ' + str(idx) + '-commands.txt', shell=True)
+        directory = cmd.m_directory
+        if directory:
+          directory = directory.replace('%program%', modStr)
+          directory = directory.replace('%program-name%', mod.m_name)
+          directory = directory.replace("%test-name%", infile)
+          directory = directory.replace("%test-name-prefix%", infilePrefix)
+          output = subprocess.call('echo ' + "cd " + directory + ' >> ' + str(idx) + '-commands.txt', shell=True)
+          output = subprocess.call('echo ' + cmdStr + ' >> ' + str(idx) + '-commands.txt', shell=True)
+          output = subprocess.call(cmdStr, shell=True, cwd=directory)
+        else:
+          output = subprocess.call('echo ' + cmdStr + ' >> ' + str(idx) + '-commands.txt', shell=True)
+          output = subprocess.call(cmdStr, shell=True)
         #print cmdStr
-        output = subprocess.call(cmdStr, shell=True)
     os.chdir(curDir) # change the directory back to what it was
 
     passed = True
@@ -124,10 +134,11 @@ def checkModelOutput (a_oFile, a_oDir):
     return status
 
 class programCommand:
-    def __init__ (self, a_index, a_commandStr, a_pipeOut):
+    def __init__ (self, a_index, a_commandStr, a_directory, a_pipeOut):
         self.m_index = a_index                        # index for when you have more than one command
         astr = a_commandStr.encode('ascii','ignore')
         self.m_commandStr = astr                      # the command line string
+        self.m_directory = a_directory                # the directory to run from
         self.m_pipeOut = a_pipeOut                    # string for where to redirect std out
 
 class inputToTest:
@@ -265,7 +276,10 @@ class theTester:
                 idx = int(child.getAttribute("index"))
                 cmdLine = child.getAttribute("cmdLine")
                 pipeOut = child.getAttribute("pipeOut")
-                cLine = programCommand(idx, cmdLine, pipeOut)
+                directory = None
+                if child.hasAttribute("directory"):
+                    directory = child.getAttribute("directory")
+                cLine = programCommand(idx, cmdLine, directory, pipeOut)
                 cmdLines.append(cLine)
         cmdLines.sort(key=lambda programCommand: programCommand.m_index)
         return cmdLines
@@ -312,6 +326,7 @@ class theTester:
         import os
         import string
         import xml.etree.ElementTree as xml
+        import xml.dom.minidom as minidom
 
         top = xml.Element("world")
 
@@ -331,7 +346,9 @@ class theTester:
 
         self.addTestResultsToXml(top,total,self.m_failed,elaspedTime)
 
-        xmlStr = xml.tostring(top)
+        consiseXmlStr = xml.tostring(top, 'utf-8')
+        reparsed = minidom.parseString(consiseXmlStr)
+        xmlStr = reparsed.toprettyxml(indent="  ")
         f = open(os.getcwd() + "\\test.xml", "w")
         f.write(xmlStr)
         f.close()
@@ -361,7 +378,7 @@ class theTester:
         if success != "1":
             atts = {}
             child2 = SubElement(child1, "failure", atts)
-            child2.attrib['path'] = path
+            child2.attrib['path'] = path.rstrip('\r\n')
 
 
     def addTestResultsToXml (self,xmlTop,total,failures,elapsedTime):

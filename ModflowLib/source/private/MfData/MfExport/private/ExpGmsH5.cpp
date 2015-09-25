@@ -1296,8 +1296,19 @@ static void expNameFile (MfGlobal* a_global,
       {
         setExt.insert(iGetTypeExtension(ftype.at(i), a_exp));
       }
+
       CStr file, type, baseName(a_exp->GetBaseFileName());
       util::StripPathFromFilename(baseName, baseName);
+      if (nfType == NF_MODFLOW)
+      {
+        CStr lowerBaseName = baseName;
+        lowerBaseName.ToLower();
+        uniqueNames.insert(lowerBaseName + ".h5");
+        uniqueNames.insert(lowerBaseName + ".mfn");
+        uniqueNames.insert(lowerBaseName + ".mfs");
+        uniqueNames.insert(lowerBaseName + ".param");
+      }
+
       std::ostringstream oStream;
       bool printedHeading(false);
       for (size_t i=0; i<ftype.size(); i++)
@@ -1310,12 +1321,10 @@ static void expNameFile (MfGlobal* a_global,
           {
             CStr extension(fname.at(i));
             util::StripAllButExtension(extension, extension);
-            if (setExt.find(extension) != setExt.end())
-            {
-              CStr tmpExt; tmpExt.Format("%s_UNIT_%d", extension, niu.at(i));
-              extension = tmpExt;
-            }
-            a_h5->BuildUniqueName(baseName, extension, niu.at(i),
+            CStr base(fname.at(i));
+            util::StripPathFromFilename(base, base);
+            util::StripExtensionFromFilename(base, base);
+            a_h5->BuildUniqueName(base, extension, niu.at(i),
                                   uniqueNames, file);
           }
           else
@@ -1839,9 +1848,9 @@ void ExpGmsH5T::testexpNameFile ()
     expected = "GLOBAL 1 testname.glo\n"
                "BAS6 3 testname.ba6\n"
                "LPF 4 testname.lpf\n"
-               "DATA(BINARY) 30 testname.hed\n"
+               "DATA(BINARY) 30 h.hed\n"
                "LMT6 18 testname.lmt6\n"
-               "DATA 201 testname.gage\n"
+               "DATA 201 h.gage\n"
                "GAGE 23 testname.gag\n"
                "ABC 301 testname.abc\n"
                "ABC 302 testname.abc_UNIT_302\n";
@@ -1878,9 +1887,9 @@ void ExpGmsH5T::testexpNameFile ()
     expected = "GLOBAL 1 testname.glo\n"
                "BAS6 3 testname.ba6\n"
                "LPF 4 testname.lpf\n"
-               "DATA(BINARY) 30 testname.hed\n"
+               "DATA(BINARY) 30 h.hed\n"
                "LMT6 18 testname.lmt6\n"
-               "DATA 201 testname.gage\n"
+               "DATA 201 h.gage\n"
                "GAGE 23 testname.gag\n"
                "ABC 301 testname.abc\n"
                "ABC 302 testname.abc_UNIT_302\n";
@@ -1893,9 +1902,9 @@ void ExpGmsH5T::testexpNameFile ()
     expected = "GLOBAL 1 testname.glo\n"
                "BAS6 3 testname.ba6\n"
                "LPF 4 testname.lpf\n"
-               "DATA(BINARY) 30 testname.hed\n"
+               "DATA(BINARY) 30 h.hed\n"
                "LMT6 18 testname.lmt6\n"
-               "DATA 201 testname.gage\n"
+               "DATA 201 h.gage\n"
                "GAGE 23 testname.gag\n"
                "ABC 301 testname.abc\n"
                "ABC 302 testname.abc_UNIT_302\n"
