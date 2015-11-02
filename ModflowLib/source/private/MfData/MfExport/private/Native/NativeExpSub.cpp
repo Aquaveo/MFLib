@@ -90,23 +90,29 @@ void NativeExpSub::Lines1to3 ()
     CStr desc = " 1. ISUBCB ISUBOC NNDB NDB NMZ NN AC1 AC2 ITMIN IDSAVE IDREST";
     AddToStoredLinesDesc(lin, desc);
 
-    lin = "";
-    desc = " 2. LN(NNDB)";
-    for (int i=0; i<*nndb; ++i)
+    if (*nndb > 0)
     {
-      CStr tmp; tmp.Format("%5d ", ln[i]);
-      lin += tmp;
+      lin = "";
+      desc = " 2. LN(NNDB)";
+      for (int i=0; i<*nndb; ++i)
+      {
+        CStr tmp; tmp.Format("%5d ", ln[i]);
+        lin += tmp;
+      }
+      AddToStoredLinesDesc(lin, desc);
     }
-    AddToStoredLinesDesc(lin, desc);
 
-    lin = "";
-    desc = " 3. LDN(NDB)";
-    for (int i=0; i<*ndb; ++i)
+    if (*ndb > 0)
     {
-      CStr tmp; tmp.Format("%5d ", ldn[i]);
-      lin += tmp;
+      lin = "";
+      desc = " 3. LDN(NDB)";
+      for (int i=0; i<*ndb; ++i)
+      {
+        CStr tmp; tmp.Format("%5d ", ldn[i]);
+        lin += tmp;
+      }
+      AddToStoredLinesDesc(lin, desc);
     }
-    AddToStoredLinesDesc(lin, desc);
   }
 } // NativeExpSub::Line1
 //------------------------------------------------------------------------------
