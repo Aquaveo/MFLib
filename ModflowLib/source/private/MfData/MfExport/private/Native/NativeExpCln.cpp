@@ -21,7 +21,6 @@
 
 using namespace MfData::Export;
 
-const std::string kLine2Written = "CLN Line 2 written";
 
 //------------------------------------------------------------------------------
 /// \brief
@@ -52,31 +51,52 @@ bool NativeExpCln::Export ()
 
   CStr nm = GetPackage()->PackageName();
 
-  if (nm == MfData::Packages::CLNLine1) {
+  if (nm == MfData::Packages::CLNLines0And1) {
+    CStr line0 = Line0();
+    if (!line0.empty()) {
+      AddToStoredLinesDesc(line0, Desc("0"));
+    }
     AddToStoredLinesDesc(Line1(), Desc("1"));
     WriteCommentsCln();
   }
-  else if (nm == "CL3") {
+  else if (nm == MfData::Packages::CLNLine2) {
     Line2();
+  }
+  else if (nm == MfData::Packages::CLNLine3) {
     Line3();
   }
-  else {
-    // Write line 2 if we didn't already do it above
-    int line2written = 0;
-    bool rv = GetGlobal()->GetIntVar(kLine2Written.c_str(), line2written);
-    if (!rv || !line2written) {
-      Line2();
-    }
+  else if (nm == MfData::Packages::CLNLine4To6) {
     Line4();
+    Line5();
+    Line6();
+  }
+  else if (nm == MfData::Packages::CLNLine13) {
+    Line13();
+    WriteStoredLinesCln();
+  }
+  else if (nm == MfData::Packages::CLNLine14) {
+    Line14();
+    WriteStoredLinesCln();
+  }
+  else if (nm == MfData::Packages::CLNLine15) {
+    Line15();
+    WriteStoredLinesCln();
+  }
+  else if (nm == MfData::Packages::CLNLine16) {
+    Line16();
+    WriteStoredLinesCln();
+  }
+  else {
+    Line7();
     if (GetGlobal()->Unstructured()) {
-      Line5();
+      Line8();
     }
     else {
-      Line6();
+      Line9();
     }
-    Line7();
-    Line8();
-    Line9();
+    Line10();
+    Line11();
+    Line12();
 
     WriteStoredLinesCln();
   }
@@ -105,6 +125,24 @@ void NativeExpCln::WriteStoredLinesCln ()
   WriteStoredLines();
   SetData(GetNative(), GetGlobal(), orig);
 } // NativeExpCln::WriteStoredLinesCln
+//------------------------------------------------------------------------------
+/// \brief 0. [OPTIONS opt, ...]
+//------------------------------------------------------------------------------
+CStr NativeExpCln::Line0 ()
+{
+  CStr aStr;
+  MfPackage* p = GetPackage();
+
+  using namespace MfData::Packages;
+  const int *iclntib(0);
+  if (p->GetField(Cln::ICLNTIB, &iclntib) && iclntib) {
+    if (*iclntib) {
+      aStr = "OPTIONS TRANSIENT";
+    }
+  }
+
+  return aStr;
+} // NativeExpCln::Line0
 //------------------------------------------------------------------------------
 /// \brief 1. NCLN ICLNNDS ICLNCB ICLNHD ICLNDD ICLNIB NCLNGWC NCONDUITYP
 //------------------------------------------------------------------------------
@@ -137,7 +175,6 @@ CStr NativeExpCln::Line1 ()
 void NativeExpCln::Line2 ()
 {
   AddArrayLines(Packages::Cln::NNDCLN, "2");
-  GetGlobal()->SetIntVar(kLine2Written.c_str(), 1);
 } // NativeExpCln::Line2
 //------------------------------------------------------------------------------
 /// \brief 3. CLNCON[NNDCLN(NCLN)]
@@ -161,9 +198,39 @@ void NativeExpCln::Line3 ()
   }
 } // NativeExpCln::Line3
 //------------------------------------------------------------------------------
-/// \brief 4. IFNO IFTYP IFDIR FLENG FELEV FANGLE IFLIN ICCWADI
+/// \brief 4. NJA_CLN
 //------------------------------------------------------------------------------
 void NativeExpCln::Line4 ()
+{
+  MfPackage* p = GetPackage();
+  if (!p) return;
+
+  using namespace MfData::Packages;
+  const int *nja_cln(0);
+  if (p->GetField("NJA_CLN", &nja_cln) && nja_cln) {
+    CStr aStr;
+    aStr.Format("%d", *nja_cln);
+    AddToStoredLinesDesc(aStr, Desc("4"));
+  }
+} // NativeExpCln::Line4
+//------------------------------------------------------------------------------
+/// \brief 5. IAC_CLN(ICLNNDS)
+//------------------------------------------------------------------------------
+void NativeExpCln::Line5 ()
+{
+  AddArrayLines(Packages::Cln::IAC_CLN, "5");
+} // NativeExpCln::Line5
+//------------------------------------------------------------------------------
+/// \brief 6. JA_CLN(NJA_CLN)
+//------------------------------------------------------------------------------
+void NativeExpCln::Line6 ()
+{
+  AddArrayLines(Packages::Cln::JA_CLN, "6");
+} // NativeExpCln::Line6
+//------------------------------------------------------------------------------
+/// \brief 7. IFNO IFTYP IFDIR FLENG FELEV FANGLE IFLIN ICCWADI
+//------------------------------------------------------------------------------
+void NativeExpCln::Line7 ()
 {
   using namespace MfData::Packages;
   using util::ForElement;
@@ -176,7 +243,7 @@ void NativeExpCln::Line4 ()
       p->GetField(Cln::NCLNNDS, &nclnnds) && nclnnds) {
     int n = *nclnnds;
     CStr aStr;
-    CStr desc = Desc("4");
+    CStr desc = Desc("7");
     for (int i = 1; i <= n; ++i) {
       aStr.Format("%s %s %s %s %s %s %s %s ",
                   STR(ForElement(aclnndsaq, i, 1, n), 0),
@@ -190,25 +257,25 @@ void NativeExpCln::Line4 ()
       AddToStoredLinesDesc(aStr, (i == 1 ? desc : ""));
     }
   }
-} // NativeExpCln::Line4
+} // NativeExpCln::Line7
 //------------------------------------------------------------------------------
-/// \brief 5. IFNOD IGWNOD IFCON FSKIN FLENGW FANISO ICGWADI
+/// \brief 8. IFNOD IGWNOD IFCON FSKIN FLENGW FANISO ICGWADI
 //------------------------------------------------------------------------------
-void NativeExpCln::Line5 ()
+void NativeExpCln::Line8 ()
 {
   using namespace MfData::Packages;
   using util::ForElement;
 
-  MfPackage* pLine5 = GetPackage();
-  MfPackage *pLine1 = GetGlobal()->GetPackage(MfData::Packages::CLNLine1);
+  MfPackage* pLine8 = GetPackage();
+  MfPackage *pLine1 = GetGlobal()->GetPackage(MfData::Packages::CLNLines0And1);
   const Real *aclngwcaq(0);
   const int *nclngwc(0);
 
-  if (pLine5->GetField(Cln::ACLNGWCAQ, &aclngwcaq) && aclngwcaq &&
+  if (pLine8->GetField(Cln::ACLNGWCAQ, &aclngwcaq) && aclngwcaq &&
       pLine1->GetField(Cln::NCLNGWC, &nclngwc) && nclngwc) {
     int n = *nclngwc;
     CStr aStr;
-    CStr desc = Desc("5");
+    CStr desc = Desc("8");
     for (int i = 1; i <= n; ++i) {
       aStr.Format("%s %s %s %s %s %s %s ",
                   STR(ForElement(aclngwcaq, i, 1, n), 0),
@@ -221,25 +288,25 @@ void NativeExpCln::Line5 ()
       AddToStoredLinesDesc(aStr, (i == 1 ? desc : ""));
     }
   }
-} // NativeExpCln::Line5
+} // NativeExpCln::Line8
 //------------------------------------------------------------------------------
-/// \brief 6. IFNOD IGWLAY IGWROW IGWFCOL IFCON FSKIN FLENGW FANISO ICGWADI
+/// \brief 9. IFNOD IGWLAY IGWROW IGWFCOL IFCON FSKIN FLENGW FANISO ICGWADI
 //------------------------------------------------------------------------------
-void NativeExpCln::Line6 ()
+void NativeExpCln::Line9 ()
 {
   using namespace MfData::Packages;
   using util::ForElement;
 
-  MfPackage* pLine6 = GetPackage();
-  MfPackage *pLine1 = GetGlobal()->GetPackage(MfData::Packages::CLNLine1);
+  MfPackage* pLine9 = GetPackage();
+  MfPackage *pLine1 = GetGlobal()->GetPackage(MfData::Packages::CLNLines0And1);
   const Real *aclngwcaq(0);
   const int *nclngwc(0);
 
-  if (pLine6->GetField(Cln::ACLNGWCAQ, &aclngwcaq) && aclngwcaq &&
+  if (pLine9->GetField(Cln::ACLNGWCAQ, &aclngwcaq) && aclngwcaq &&
       pLine1->GetField(Cln::NCLNGWC, &nclngwc) && nclngwc) {
     int n = *nclngwc;
     CStr aStr;
-    CStr desc = Desc("6");
+    CStr desc = Desc("9");
     for (int i = 1; i <= n; ++i) {
       aStr.Format("%s %s %s %s %s %s %s %s %s ",
                   STR(ForElement(aclngwcaq, i, 1, n), 0),
@@ -254,25 +321,25 @@ void NativeExpCln::Line6 ()
       AddToStoredLinesDesc(aStr, (i == 1 ? desc : ""));
     }
   }
-} // NativeExpCln::Line6
+} // NativeExpCln::Line9
 //------------------------------------------------------------------------------
-/// \brief 7. ICONDUITYP FRAD CONDUITK
+/// \brief 10. ICONDUITYP FRAD CONDUITK
 //------------------------------------------------------------------------------
-void NativeExpCln::Line7 ()
+void NativeExpCln::Line10 ()
 {
   using namespace MfData::Packages;
   using util::ForElement;
 
-  MfPackage* pLine7 = GetPackage();
-  MfPackage *pLine1 = GetGlobal()->GetPackage(MfData::Packages::CLNLine1);
+  MfPackage* pLine10 = GetPackage();
+  MfPackage *pLine1 = GetGlobal()->GetPackage(MfData::Packages::CLNLines0And1);
   const Real *aclncond(0);
   const int *nconduityp(0);
 
-  if (pLine7->GetField(Cln::ACLNCOND, &aclncond) && aclncond &&
+  if (pLine10->GetField(Cln::ACLNCOND, &aclncond) && aclncond &&
       pLine1->GetField(Cln::NCONDUITYP, &nconduityp) && nconduityp) {
     int n = *nconduityp;
     CStr aStr;
-    CStr desc = Desc("7");
+    CStr desc = Desc("10");
     for (int i = 1; i <= n; ++i) {
       aStr.Format("%s %s %s",
                   STR(ForElement(aclncond, i, 1, n), 0),
@@ -281,36 +348,117 @@ void NativeExpCln::Line7 ()
       AddToStoredLinesDesc(aStr, (i == 1 ? desc : ""));
     }
   }
-} // NativeExpCln::Line7
+} // NativeExpCln::Line10
 //------------------------------------------------------------------------------
-/// \brief 8. IBOUND(NCLNNDS) – U1DINT
+/// \brief 11. IBOUND(NCLNNDS) – U1DINT
 //------------------------------------------------------------------------------
-void NativeExpCln::Line8 ()
+void NativeExpCln::Line11 ()
 {
-  AddArrayLines(Packages::Cln::IBOUND, "8");
-} // NativeExpCln::Line8
+  AddArrayLines(Packages::Cln::IBOUND, "11");
+} // NativeExpCln::Line11
 //------------------------------------------------------------------------------
-/// \brief 9. STRT(NCLNNDS) – U1DREL
+/// \brief 12. STRT(NCLNNDS) – U1DREL
 //------------------------------------------------------------------------------
-void NativeExpCln::Line9 ()
+void NativeExpCln::Line12 ()
 {
-  AddArrayLines(Packages::Cln::STRT, "9");
-} // NativeExpCln::Line9
+  AddArrayLines(Packages::Cln::STRT, "12");
+} // NativeExpCln::Line12
 //------------------------------------------------------------------------------
-/// \brief 1. NODES NLAY NJAG IVSD NPER ITMUNI LENUNI IDSYMRD
+/// \brief 13. NIB0 NIB1 NIBM1
+//------------------------------------------------------------------------------
+void NativeExpCln::Line13 ()
+{
+  MfPackage* p = GetPackage();
+  if (!p) return;
+
+  using namespace MfData::Packages;
+  const int *nib0(0), *nib1(0), *nibm1(0);
+  if (p->GetField("NIB0", &nib0) && nib0 &&
+      p->GetField("NIB1", &nib1) && nib1 &&
+      p->GetField("NIBM1", &nibm1) && nibm1) {
+    CStr aStr;
+    aStr.Format("%d %d %d", *nib0, *nib1, *nibm1);
+    AddToStoredLinesDesc(aStr, Desc("13"));
+  }
+} // NativeExpCln::Line13
+//------------------------------------------------------------------------------
+/// \brief 14. IB0 – U1DREL
+//------------------------------------------------------------------------------
+void NativeExpCln::Line14 ()
+{
+  AddArrayLines(Packages::Cln::IB0, "14");
+} // NativeExpCln::Line14
+//------------------------------------------------------------------------------
+/// \brief 15. IB1 [HEADOPT]
+//------------------------------------------------------------------------------
+void NativeExpCln::Line15 ()
+{
+  MfPackage* p = GetPackage();
+  if (!p) return;
+
+  using namespace MfData::Packages;
+  const int *ib1(0), *iheadopt(0);
+  const double *hvalue(0);
+  if (p->GetField("IB1", &ib1) && ib1 &&
+      p->GetField("IHEADOPT", &iheadopt) && iheadopt &&
+      p->GetField("HVALUE", &hvalue) && hvalue) {
+    CStr aStr;
+    if (*iheadopt == 0)
+      aStr.Format("%d", *ib1);
+    else if (*iheadopt == 1)
+      aStr.Format("%d HEAD %s", *ib1, STR(*hvalue));
+    else
+      aStr.Format("%d AVHEAD", *ib1);
+    AddToStoredLinesDesc(aStr, Desc("15"));
+  }
+} // NativeExpCln::Line15
+//------------------------------------------------------------------------------
+/// \brief 16. IBM1 [HEADOPT]
+//------------------------------------------------------------------------------
+void NativeExpCln::Line16 ()
+{
+  MfPackage* p = GetPackage();
+  if (!p) return;
+
+  using namespace MfData::Packages;
+  const int *ibm1(0), *iheadopt(0);
+  const double *hvalue(0);
+  if (p->GetField("IBM1", &ibm1) && ibm1 &&
+      p->GetField("IHEADOPT", &iheadopt) && iheadopt &&
+      p->GetField("HVALUE", &hvalue) && hvalue) {
+    CStr aStr;
+    if (*iheadopt == 0)
+      aStr.Format("%d", *ibm1);
+    else if (*iheadopt == 1)
+      aStr.Format("%d HEAD %s", *ibm1, STR(*hvalue));
+    else
+      aStr.Format("%d AVHEAD", *ibm1);
+    AddToStoredLinesDesc(aStr, Desc("16"));
+  }
+} // NativeExpCln::Line16
+//------------------------------------------------------------------------------
+/// \brief
 //------------------------------------------------------------------------------
 void NativeExpCln::InitDescriptionMap ()
 {
   m_mapDesc.clear();
-  m_mapDesc.insert(std::make_pair("1", " 1. NCLN ICLNNDS ICLNCB ICLNHD ICLNDD ICLNIB NCLNGWC NCONDUITYP"));
-  m_mapDesc.insert(std::make_pair("2", " 2. NNDCLN(NCLN)"));
-  m_mapDesc.insert(std::make_pair("3", " 3. CLNCON[NNDCLN(NCLN)]"));
-  m_mapDesc.insert(std::make_pair("4", " 4. IFNO IFTYP IFDIR FLENG FELEV FANGLE IFLIN ICCWADI"));
-  m_mapDesc.insert(std::make_pair("5", " 5. IFNOD IGWNOD IFCON FSKIN FLENGW FANISO ICGWADI"));
-  m_mapDesc.insert(std::make_pair("6", " 6. IFNOD IGWLAY IGWROW IGWFCOL IFCON FSKIN FLENGW FANISO ICGWADI"));
-  m_mapDesc.insert(std::make_pair("7", " 7. ICONDUITYP FRAD CONDUITK"));
-  m_mapDesc.insert(std::make_pair("8", " 8. IBOUND(NCLNNDS)"));
-  m_mapDesc.insert(std::make_pair("9", " 9. STRT(NCLNNDS)"));
+  m_mapDesc.insert(std::make_pair( "0", " 0. [OPTIONS opt, ...]"));
+  m_mapDesc.insert(std::make_pair( "1", " 1. NCLN ICLNNDS ICLNCB ICLNHD ICLNDD ICLNIB NCLNGWC NCONDUITYP"));
+  m_mapDesc.insert(std::make_pair( "2", " 2. NNDCLN(NCLN)"));
+  m_mapDesc.insert(std::make_pair( "3", " 3. CLNCON[NNDCLN(NCLN)]"));
+  m_mapDesc.insert(std::make_pair( "4", " 4. NJA_CLN"));
+  m_mapDesc.insert(std::make_pair( "5", " 5. IAC_CLN(ICLNNDS)"));
+  m_mapDesc.insert(std::make_pair( "6", " 6. JA_CLN(NJA_CLN)"));
+  m_mapDesc.insert(std::make_pair( "7", " 7. IFNO IFTYP IFDIR FLENG FELEV FANGLE IFLIN ICCWADI"));
+  m_mapDesc.insert(std::make_pair( "8", " 5. IFNOD IGWNOD IFCON FSKIN FLENGW FANISO ICGWADI"));
+  m_mapDesc.insert(std::make_pair( "9", " 9. IFNOD IGWLAY IGWROW IGWFCOL IFCON FSKIN FLENGW FANISO ICGWADI"));
+  m_mapDesc.insert(std::make_pair("10", "10. ICONDUITYP FRAD CONDUITK"));
+  m_mapDesc.insert(std::make_pair("11", "11. IBOUND(NCLNNDS)"));
+  m_mapDesc.insert(std::make_pair("12", "12. STRT(NCLNNDS)"));
+  m_mapDesc.insert(std::make_pair("13", "13. NIB0 NIB1 NIBM1"));
+  m_mapDesc.insert(std::make_pair("14", "14. IB0(NIBO)"));
+  m_mapDesc.insert(std::make_pair("15", "15. IB1 [HEADOPT]"));
+  m_mapDesc.insert(std::make_pair("16", "16. IBM1 [HEADOPT]"));
 } // NativeExpCln::Desc
 //------------------------------------------------------------------------------
 /// \brief Return the description string for the given line.

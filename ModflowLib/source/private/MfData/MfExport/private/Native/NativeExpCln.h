@@ -14,7 +14,7 @@ namespace MfData
     {
       friend NativeExpClnT;
     public:
-      enum ArraySizeEnum {ASE_LN4 = 8, ASE_LN5 = 7, ASE_LN6 = 9};
+      enum ArraySizeEnum {ASE_LN7 = 8, ASE_LN8 = 7, ASE_LN9 = 9};
 
       NativeExpCln();
       virtual ~NativeExpCln();
@@ -26,6 +26,7 @@ namespace MfData
       virtual void   AddToStoredLinesDesc(const char* a_line,
                                           const char* a_desc);
 
+      CStr Line0();
       CStr Line1();
       void Line2();
       void Line3();
@@ -35,6 +36,13 @@ namespace MfData
       void Line7();
       void Line8();
       void Line9();
+      void Line10();
+      void Line11();
+      void Line12();
+      void Line13();
+      void Line14();
+      void Line15();
+      void Line16();
 
       void WriteCommentsCln();
       void WriteStoredLinesCln();

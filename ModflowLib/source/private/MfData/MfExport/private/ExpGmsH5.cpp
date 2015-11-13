@@ -435,7 +435,7 @@ static bool iPackageToNativeExport (
       || Packages::VDFStressPeriod == packName
       || Packages::VSCLine3 == packName
       || Packages::VSCStressPeriod == packName
-      || Packages::CLNLine1 == packName
+      || Packages::CLNLines0And1 == packName
       || Packages::CLN == packName
       || Packages::GNC == packName
      )

@@ -104,14 +104,15 @@ bool MfData::SetGlobal (const int *a_NLAY,
 //------------------------------------------------------------------------------
 /// \brief CLN package.
 //------------------------------------------------------------------------------
-bool MfData::ClnLine1 (const int *a_NCLN,
-                       const int *a_ICLNNDS,
-                       const int *a_ICLNCB,
-                       const int *a_ICLNHD,
-                       const int *a_ICLNDD,
-                       const int *a_ICLNIB,
-                       const int *a_NCLNGWC,
-                       const int *a_NCONDUITYP)
+bool MfData::exp_ClnLines0And1 (const int *a_NCLN,
+                                const int *a_ICLNNDS,
+                                const int *a_ICLNCB,
+                                const int *a_ICLNHD,
+                                const int *a_ICLNDD,
+                                const int *a_ICLNIB,
+                                const int *a_NCLNGWC,
+                                const int *a_NCONDUITYP,
+                                const int *a_ICLNTIB)
 {
   if (!a_NCLN ||
       !a_ICLNNDS ||
@@ -120,19 +121,21 @@ bool MfData::ClnLine1 (const int *a_NCLN,
       !a_ICLNDD ||
       !a_ICLNIB ||
       !a_NCLNGWC ||
-      !a_NCONDUITYP)
+      !a_NCONDUITYP ||
+      !a_ICLNTIB)
   {
     util::NullFuncArg(__FILE__, __LINE__);
     return false;
   }
-  MfData::Packages::ClnLine1(a_NCLN,a_ICLNNDS,a_ICLNCB,a_ICLNHD,a_ICLNDD,
-                             a_ICLNIB,a_NCLNGWC,a_NCONDUITYP);
+  MfData::Packages::ClnLines0And1(a_NCLN,a_ICLNNDS,a_ICLNCB,a_ICLNHD,
+                                  a_ICLNDD,a_ICLNIB,a_NCLNGWC,a_NCONDUITYP,
+                                  a_ICLNTIB);
   return true;
-} // MfData::ClnLine1
+} // MfData::exp_ClnLines0And1
 //------------------------------------------------------------------------------
 /// \brief CLN package.
 //------------------------------------------------------------------------------
-bool MfData::ClnLine4 (const Real *a_ACLNNDSAQ,
+bool MfData::ClnLine7 (const Real *a_ACLNNDSAQ,
                        const int *a_NCLNNDS)
 {
   if (!a_ACLNNDSAQ ||
@@ -141,56 +144,56 @@ bool MfData::ClnLine4 (const Real *a_ACLNNDSAQ,
     util::NullFuncArg(__FILE__, __LINE__);
     return false;
   }
-  MfData::Packages::ClnLine4(a_ACLNNDSAQ,a_NCLNNDS);
+  MfData::Packages::ClnLine7(a_ACLNNDSAQ,a_NCLNNDS);
   return true;
-} // MfData::ClnLine4
+} // MfData::ClnLine7
 //------------------------------------------------------------------------------
 /// \brief CLN package.
 //------------------------------------------------------------------------------
-bool MfData::ClnLine5 (const Real *a_ACLNGWCAQ)
+bool MfData::ClnLine8 (const Real *a_ACLNGWCAQ)
 {
   if (!a_ACLNGWCAQ)
   {
     util::NullFuncArg(__FILE__, __LINE__);
     return false;
   }
-  MfData::Packages::ClnLine5(a_ACLNGWCAQ);
+  MfData::Packages::ClnLine8(a_ACLNGWCAQ);
   return true;
-} // MfData::ClnLine5
+} // MfData::ClnLine8
 //------------------------------------------------------------------------------
 /// \brief CLN package.
 //------------------------------------------------------------------------------
-bool MfData::ClnLine6 (const Real *a_ACLNGWCAQ)
+bool MfData::ClnLine9 (const Real *a_ACLNGWCAQ)
 {
   if (!a_ACLNGWCAQ)
   {
     util::NullFuncArg(__FILE__, __LINE__);
     return false;
   }
-  MfData::Packages::ClnLine6(a_ACLNGWCAQ);
+  MfData::Packages::ClnLine9(a_ACLNGWCAQ);
   return true;
-} // MfData::ClnLine6
+} // MfData::ClnLine9
 //------------------------------------------------------------------------------
 /// \brief CLN package.
 //------------------------------------------------------------------------------
-bool MfData::ClnLine7 (const Real *a_ACLNCOND)
+bool MfData::ClnLine10 (const Real *a_ACLNCOND)
 {
   if (!a_ACLNCOND)
   {
     util::NullFuncArg(__FILE__, __LINE__);
     return false;
   }
-  MfData::Packages::ClnLine7(a_ACLNCOND);
+  MfData::Packages::ClnLine10(a_ACLNCOND);
   return true;
-} // MfData::ClnLine7
+} // MfData::ClnLine10
 //------------------------------------------------------------------------------
 /// \brief CLN package.
 //------------------------------------------------------------------------------
-bool MfData::ClnLines8And9 ()
+bool MfData::ClnLines11And12 ()
 {
-  MfData::Packages::ClnLines8And9();
+  MfData::Packages::ClnLines11And12();
   return true;
-} // MfData::ClnLines8And9
+} // MfData::ClnLines11And12
 //------------------------------------------------------------------------------
 /// \brief This receives the data that belongs to the DISU (discretization)
 /// package.

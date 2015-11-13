@@ -27,20 +27,21 @@ namespace MfData
                  const int *a_LENUNI,
                  const int *a_LAYCBD,
                  const int *a_IUNSTR);
-  bool ClnLine1(const int *a_NCLN,
-                const int *a_ICLNNDS,
-                const int *a_ICLNCB,
-                const int *a_ICLNHD,
-                const int *a_ICLNDD,
-                const int *a_ICLNIB,
-                const int *a_NCLNGWC,
-                const int *a_NCONDUITYP);
-  bool ClnLine4 (const Real *a_ACLNNDSAQ,
+  bool exp_ClnLines0And1(const int *a_NCLN,
+                         const int *a_ICLNNDS,
+                         const int *a_ICLNCB,
+                         const int *a_ICLNHD,
+                         const int *a_ICLNDD,
+                         const int *a_ICLNIB,
+                         const int *a_NCLNGWC,
+                         const int *a_NCONDUITYP,
+                         const int *a_ICLNTIB);
+  bool ClnLine7 (const Real *a_ACLNNDSAQ,
                  const int *a_NCLNNDS);
-  bool ClnLine5 (const Real *a_ACLNGWCAQ);
-  bool ClnLine6 (const Real *a_ACLNGWCAQ);
-  bool ClnLine7 (const Real *a_ACLNCOND);
-  bool ClnLines8And9 ();
+  bool ClnLine8 (const Real *a_ACLNGWCAQ);
+  bool ClnLine9 (const Real *a_ACLNGWCAQ);
+  bool ClnLine10 (const Real *a_ACLNCOND);
+  bool ClnLines11And12 ();
   bool Disu1 (const int *a_NODES,
               const int *a_NJAG,
               const int *a_IVSD,

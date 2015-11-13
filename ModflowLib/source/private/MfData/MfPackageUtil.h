@@ -14,21 +14,22 @@ namespace MfData
   {
     void GetComments(CStr a_pack,
                      CStr& a_comment);
-    void ClnLine1 (const int *a_NCLN,
-                   const int *a_ICLNNDS,
-                   const int *a_ICLNCB,
-                   const int *a_ICLNHD,
-                   const int *a_ICLNDD,
-                   const int *a_ICLNIB,
-                   const int *a_NCLNGWC,
-                   const int *a_NCONDUITYP);
-    void ClnLine4 (const Real *a_ACLNNDSAQ,
+    void ClnLines0And1 (const int *a_NCLN,
+                        const int *a_ICLNNDS,
+                        const int *a_ICLNCB,
+                        const int *a_ICLNHD,
+                        const int *a_ICLNDD,
+                        const int *a_ICLNIB,
+                        const int *a_NCLNGWC,
+                        const int *a_NCONDUITYP,
+                        const int *a_ICLNTIB);
+    void ClnLine7 (const Real *a_ACLNNDSAQ,
                    const int *a_NCLNNDS);
-    void ClnLine5Or6 (const Real *a_ACLNGWCAQ, int a_size2);
-    void ClnLine5 (const Real *a_ACLNGWCAQ);
-    void ClnLine6 (const Real *a_ACLNGWCAQ);
-    void ClnLine7 (const Real *a_ACLNCOND);
-    void ClnLines8And9 ();
+    void ClnLine8Or9 (const Real *a_ACLNGWCAQ, int a_size2);
+    void ClnLine8 (const Real *a_ACLNGWCAQ);
+    void ClnLine9 (const Real *a_ACLNGWCAQ);
+    void ClnLine10 (const Real *a_ACLNCOND);
+    void ClnLines11And12 ();
     void Disu1 (const int *a_NODES,
                 const int *a_NJAG,
                 const int *a_IVSD,

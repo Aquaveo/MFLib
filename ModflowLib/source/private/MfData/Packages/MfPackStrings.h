@@ -17,7 +17,14 @@ namespace MfData
     const char * const BTN = "BTN";
     const char * const CHD = "CHD";
     const char * const CLN = "CLN"; // USG
-    const char * const CLNLine1 = "CLNLine1"; // USG
+    const char * const CLNLines0And1 = "CLNLines0And1"; // USG
+    const char * const CLNLine2 = "CL2"; // USG
+    const char * const CLNLine3 = "CL3"; // USG
+    const char * const CLNLine4To6 = "CL4"; // USG
+    const char * const CLNLine13 = "CL5"; // USG
+    const char * const CLNLine14 = "CL6"; // USG
+    const char * const CLNLine15 = "CL7"; // USG
+    const char * const CLNLine16 = "CL8"; // USG
     const char * const CLNWEL = "CLNWEL"; // USG
     const char * const DE4 = "DE4";
     const char * const DE4Line1 = "DE4Line1";

@@ -10,6 +10,7 @@ namespace MfData
   {
     namespace Cln
     {
+      const char * const ICLNTIB = "ICLNTIB";
       const char * const NCLN = "NCLN";
       const char * const ICLNNDS = "ICLNNDS";
       const char * const ICLNCB = "ICLNCB";
@@ -19,12 +20,22 @@ namespace MfData
       const char * const NCLNGWC = "NCLNGWC";
       const char * const NCONDUITYP = "NCONDUITYP";
       const char * const NNDCLN = "NNDCLN";
+      const char * const NJA_CLN = "NJA_CLN";
+      const char * const IAC_CLN = "IAC_CLN";
+      const char * const JA_CLN = "JA_CLN";
       const char * const ACLNNDSAQ = "ACLNNDSAQ";
       const char * const NCLNNDS = "NCLNNDS";
       const char * const ACLNGWCAQ = "ACLNGWCAQ";
       const char * const ACLNCOND = "ACLNCOND";
       const char * const IBOUND = "IBOUND";
       const char * const STRT = "STRT";
+      const char * const NIB0 = "NIB0";
+      const char * const NIB1 = "NIB1";
+      const char * const NIBM1 = "NIBM1";
+      const char * const IB0 = "IB0";
+      const char * const IB1 = "IB1";
+      const char * const IHEADOPT = "IHEADOPT";
+      const char * const HVALUE = "HVALUE";
     }
     namespace DisPack
     {

@@ -27,20 +27,21 @@ DLLEXPORT void MFLIBEXP_TABLES(const char *a_arg,
                                int dummy);
 DLLEXPORT void MFLIBEXP_PUTCURRENTPERIOD(const int *a_KPER);
 DLLEXPORT void MFLIBEXP_PUTCURRENTGRID(const int *a_IGRID);
-DLLEXPORT void MFLIBEXP_CLNLINE1 (const int *a_NCLN,
-                                  const int *a_ICLNNDS,
-                                  const int *a_ICLNCB,
-                                  const int *a_ICLNHD,
-                                  const int *a_ICLNDD,
-                                  const int *a_ICLNIB,
-                                  const int *a_NCLNGWC,
-                                  const int *a_NCONDUITYP);
-DLLEXPORT void MFLIBEXP_CLNLINE4 (const Real *a_ACLNNDSAQ,
+DLLEXPORT void MFLIBEXP_CLNLINES0AND1 (const int *a_NCLN,
+                                       const int *a_ICLNNDS,
+                                       const int *a_ICLNCB,
+                                       const int *a_ICLNHD,
+                                       const int *a_ICLNDD,
+                                       const int *a_ICLNIB,
+                                       const int *a_NCLNGWC,
+                                       const int *a_NCONDUITYP,
+                                       const int *a_ICLNTIB);
+DLLEXPORT void MFLIBEXP_CLNLINE7 (const Real *a_ACLNNDSAQ,
                                   const int *a_NCLNNDS);
-DLLEXPORT void MFLIBEXP_CLNLINE5 (const Real *a_ACLNGWCAQ);
-DLLEXPORT void MFLIBEXP_CLNLINE6 (const Real *a_ACLNGWCAQ);
-DLLEXPORT void MFLIBEXP_CLNLINE7 (const Real *a_ACLNCOND);
-DLLEXPORT void MFLIBEXP_CLNLINES8AND9 ();
+DLLEXPORT void MFLIBEXP_CLNLINE8 (const Real *a_ACLNGWCAQ);
+DLLEXPORT void MFLIBEXP_CLNLINE9 (const Real *a_ACLNGWCAQ);
+DLLEXPORT void MFLIBEXP_CLNLINE10 (const Real *a_ACLNCOND);
+DLLEXPORT void MFLIBEXP_CLNLINES11AND12 ();
 DLLEXPORT void MFLIBEXP_DISU1(const int *a_NODES,
                               const int *a_NJAG,
                               const int *a_IVSD,

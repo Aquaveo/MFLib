@@ -182,53 +182,55 @@ DLLEXPORT void MFLIBEXP_PUTCURRENTGRID (const int *a_IGRID)
 //------------------------------------------------------------------------------
 /// \brief CLN package.
 //------------------------------------------------------------------------------
-DLLEXPORT void MFLIBEXP_CLNLINE1 (const int *a_NCLN,
+DLLEXPORT void MFLIBEXP_CLNLINES0AND1 (const int *a_NCLN,
                                   const int *a_ICLNNDS,
                                   const int *a_ICLNCB,
                                   const int *a_ICLNHD,
                                   const int *a_ICLNDD,
                                   const int *a_ICLNIB,
                                   const int *a_NCLNGWC,
-                                  const int *a_NCONDUITYP)
+                                  const int *a_NCONDUITYP,
+                                  const int *a_ICLNTIB)
 {
-  MfData::ClnLine1(a_NCLN,a_ICLNNDS,a_ICLNCB,a_ICLNHD,a_ICLNDD,a_ICLNIB,a_NCLNGWC,a_NCONDUITYP);
-} // MFLIBEXP_CLNLINE1
+  MfData::exp_ClnLines0And1(a_NCLN,a_ICLNNDS,a_ICLNCB,a_ICLNHD,a_ICLNDD,
+                            a_ICLNIB,a_NCLNGWC,a_NCONDUITYP,a_ICLNTIB);
+} // MFLIBEXP_CLNLINES0AND1
 //------------------------------------------------------------------------------
 /// \brief CLN package.
 //------------------------------------------------------------------------------
-DLLEXPORT void MFLIBEXP_CLNLINE4 (const Real *a_ACLNNDSAQ,
+DLLEXPORT void MFLIBEXP_CLNLINE7 (const Real *a_ACLNNDSAQ,
                                   const int *a_NCLNNDS)
 {
-  MfData::ClnLine4(a_ACLNNDSAQ, a_NCLNNDS);
-} // MFLIBEXP_CLNLINE4
-//------------------------------------------------------------------------------
-/// \brief CLN package.
-//------------------------------------------------------------------------------
-DLLEXPORT void MFLIBEXP_CLNLINE5 (const Real *a_ACLNGWCAQ)
-{
-  MfData::ClnLine5(a_ACLNGWCAQ);
-} // MFLIBEXP_CLNLINE5
-//------------------------------------------------------------------------------
-/// \brief CLN package.
-//------------------------------------------------------------------------------
-DLLEXPORT void MFLIBEXP_CLNLINE6 (const Real *a_ACLNGWCAQ)
-{
-  MfData::ClnLine6(a_ACLNGWCAQ);
-} // MFLIBEXP_CLNLINE6
-//------------------------------------------------------------------------------
-/// \brief CLN package.
-//------------------------------------------------------------------------------
-DLLEXPORT void MFLIBEXP_CLNLINE7 (const Real *a_ACLNCOND)
-{
-  MfData::ClnLine7(a_ACLNCOND);
+  MfData::ClnLine7(a_ACLNNDSAQ, a_NCLNNDS);
 } // MFLIBEXP_CLNLINE7
 //------------------------------------------------------------------------------
 /// \brief CLN package.
 //------------------------------------------------------------------------------
-DLLEXPORT void MFLIBEXP_CLNLINES8AND9 ()
+DLLEXPORT void MFLIBEXP_CLNLINE8 (const Real *a_ACLNGWCAQ)
 {
-  MfData::ClnLines8And9();
-} // MFLIBEXP_CLNLINES8AND9
+  MfData::ClnLine8(a_ACLNGWCAQ);
+} // MFLIBEXP_CLNLINE8
+//------------------------------------------------------------------------------
+/// \brief CLN package.
+//------------------------------------------------------------------------------
+DLLEXPORT void MFLIBEXP_CLNLINE9 (const Real *a_ACLNGWCAQ)
+{
+  MfData::ClnLine9(a_ACLNGWCAQ);
+} // MFLIBEXP_CLNLINE9
+//------------------------------------------------------------------------------
+/// \brief CLN package.
+//------------------------------------------------------------------------------
+DLLEXPORT void MFLIBEXP_CLNLINE10 (const Real *a_ACLNCOND)
+{
+  MfData::ClnLine10(a_ACLNCOND);
+} // MFLIBEXP_CLNLINE10
+//------------------------------------------------------------------------------
+/// \brief CLN package.
+//------------------------------------------------------------------------------
+DLLEXPORT void MFLIBEXP_CLNLINES11AND12 ()
+{
+  MfData::ClnLines11And12();
+} // MFLIBEXP_CLNLINES11AND12
 //------------------------------------------------------------------------------
 /// \brief This is the data associated with Discretization package for MODFLOW.
 /// \param a_NODES

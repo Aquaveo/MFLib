@@ -42,7 +42,8 @@ module module_exportData
         END SUBROUTINE mfLibExp_putCurrentGrid
 !     ------------------------------------------------------------------
 !      Declare the C function
-        SUBROUTINE mfLibexp_ClnLine1(NCLN,ICLNNDS,ICLNCB,ICLNHD,ICLNDD,ICLNIB,NCLNGWC,NCONDUITYP)
+        SUBROUTINE mfLibexp_ClnLines0And1(ICLNTIB,NCLN,ICLNNDS,ICLNCB,ICLNHD,ICLNDD,ICLNIB,NCLNGWC,NCONDUITYP)
+          INTEGER ICLNTIB [REFERENCE]
           INTEGER NCLN [REFERENCE]
           INTEGER ICLNNDS [REFERENCE]
           INTEGER ICLNCB [REFERENCE]
@@ -51,32 +52,32 @@ module module_exportData
           INTEGER ICLNIB [REFERENCE]
           INTEGER NCLNGWC [REFERENCE]
           INTEGER NCONDUITYP [REFERENCE]
-        END SUBROUTINE mfLibexp_ClnLine1
+        END SUBROUTINE mfLibexp_ClnLines0And1
 !     ------------------------------------------------------------------
 !      Declare the C function
-        SUBROUTINE mfLibexp_ClnLine4(ACLNNDSAQ,NCLNNDS)
+        SUBROUTINE mfLibexp_ClnLine7(ACLNNDSAQ,NCLNNDS)
           REAL ACLNNDSAQ (*)
           INTEGER NCLNNDS [REFERENCE]
-        END SUBROUTINE mfLibexp_ClnLine4
+        END SUBROUTINE mfLibexp_ClnLine7
 !     ------------------------------------------------------------------
 !      Declare the C function
-        SUBROUTINE mfLibExp_ClnLine5(ACLNGWCAQ)
+        SUBROUTINE mfLibExp_ClnLine8(ACLNGWCAQ)
           REAL ACLNGWCAQ (*)
-        END SUBROUTINE mfLibExp_ClnLine5
+        END SUBROUTINE mfLibExp_ClnLine8
 !     ------------------------------------------------------------------
 !      Declare the C function
-        SUBROUTINE mfLibExp_ClnLine6(ACLNGWCAQ)
+        SUBROUTINE mfLibExp_ClnLine9(ACLNGWCAQ)
           REAL ACLNGWCAQ (*)
-        END SUBROUTINE mfLibExp_ClnLine6
+        END SUBROUTINE mfLibExp_ClnLine9
 !     ------------------------------------------------------------------
 !      Declare the C function
-        SUBROUTINE mfLibExp_ClnLine7(ACLNCOND)
+        SUBROUTINE mfLibExp_ClnLine10(ACLNCOND)
           REAL ACLNCOND (*)
-        END SUBROUTINE mfLibExp_ClnLine7
+        END SUBROUTINE mfLibExp_ClnLine10
 !     ------------------------------------------------------------------
 !      Declare the C function
-        SUBROUTINE mfLibExp_ClnLines8And9()
-        END SUBROUTINE mfLibExp_ClnLines8And9
+        SUBROUTINE mfLibExp_ClnLines11And12()
+        END SUBROUTINE mfLibExp_ClnLines11And12
 !     ------------------------------------------------------------------
 !      Declare the C function
         SUBROUTINE mfLibExp_Disu1(NODES,NJAG,IVSD,IDSYMRD)
@@ -1150,9 +1151,10 @@ module module_exportData
 
   public:: exp_GeoDB, exp_GLO1BAS6DF, exp_GLO1BAS6RP, &
            exp_DISU1, exp_DISU2, exp_DISU3, &
-           exp_ClnLine1, exp_ClnLine4a, exp_ClnLine4, &
-           exp_ClnLine5a, exp_ClnLine5, exp_ClnLine6a, exp_ClnLine6, &
-           exp_ClnLine7, exp_ClnLines8And9, &
+           exp_ClnLines0And1, exp_ClnLine2, exp_ClnLine3, exp_ClnLine4, &
+           exp_ClnLine7a, exp_ClnLine7, & exp_ClnLine8a, exp_ClnLine8, &
+           exp_ClnLine9a, exp_ClnLine9, exp_ClnLine10, exp_ClnLines11And12, &
+           exp_ClnLine13, exp_ClnLine14, exp_ClnLine15, exp_ClnLine16, &
            exp_ListPackage, exp_SipPackage, exp_De4Line1, exp_De4Line2, &
            exp_SorPackage, exp_PcgPackage, exp_LmgPackage, exp_GmgPackage, &
            exp_SmsPackage, exp_SmsXmdPackage, exp_SmsPcguPackage, &
@@ -1219,18 +1221,58 @@ module module_exportData
   !-----------------------------------------------------------------------------
   ! BRIEF:  
   !-----------------------------------------------------------------------------
-  subroutine exp_ClnLine1 (NCLN,ICLNNDS,ICLNCB,ICLNHD,ICLNDD,ICLNIB,NCLNGWC,NCONDUITYP)
+  subroutine exp_ClnLines0And1 (ICLNTIB,NCLN,ICLNNDS,ICLNCB,ICLNHD,ICLNDD,ICLNIB,NCLNGWC,NCONDUITYP)
     implicit none
-    integer, intent(in) :: NCLN,ICLNNDS,ICLNCB,ICLNHD,ICLNDD,ICLNIB,NCLNGWC,NCONDUITYP
+    integer, intent(in) :: ICLNTIB,NCLN,ICLNNDS,ICLNCB,ICLNHD,ICLNDD,ICLNIB,NCLNGWC,NCONDUITYP
 
     if (NOT(ed_getExportData())) return
-    call mfLibexp_ClnLine1(NCLN,ICLNNDS,ICLNCB,ICLNHD,ICLNDD,ICLNIB,NCLNGWC,NCONDUITYP)
-  end subroutine exp_ClnLine1
+    call mfLibexp_ClnLines0And1(ICLNTIB,NCLN,ICLNNDS,ICLNCB,ICLNHD,ICLNDD,ICLNIB,NCLNGWC,NCONDUITYP)
+  end subroutine exp_ClnLines0And1
 
   !-----------------------------------------------------------------------------
   ! BRIEF:  
   !-----------------------------------------------------------------------------
-  subroutine exp_ClnLine4a (ACLNNDSAQ,NCLNNDS,I,IFNO,IFTYP,IFDIR,FLENG,FELEV,FANGLE,IFLIN,ICCWADI)
+  subroutine exp_ClnLine2
+    implicit none
+    integer DUMMY
+
+    if (NOT(ed_getExportData())) return
+    DUMMY = 0
+    call mfLibExp_SingleValInt('CL2','DUMMY',DUMMY)
+    call mfLibExp_ExpPack('CL2')
+  end subroutine exp_ClnLine2
+
+  !-----------------------------------------------------------------------------
+  ! BRIEF:  
+  !-----------------------------------------------------------------------------
+  subroutine exp_ClnLine3
+    implicit none
+    integer DUMMY
+    
+    if (NOT(ed_getExportData())) return
+    DUMMY = 0
+    call mfLibExp_SingleValInt('CL3','DUMMY',DUMMY)
+    call mfLibExp_ExpPack('CL3')
+  end subroutine exp_ClnLine3
+
+  !-----------------------------------------------------------------------------
+  ! BRIEF:  
+  !-----------------------------------------------------------------------------
+  subroutine exp_ClnLine4 (NJA_CLN)
+    implicit none
+    integer, intent(in)         :: NJA_CLN
+
+
+    if (NOT(ed_getExportData())) return 
+
+    call mfLibExp_SingleValInt('CL4','NJA_CLN',NJA_CLN)
+    call mfLibExp_ExpPack('CL4')
+  end subroutine exp_ClnLine4
+
+  !-----------------------------------------------------------------------------
+  ! BRIEF:  
+  !-----------------------------------------------------------------------------
+  subroutine exp_ClnLine7a (ACLNNDSAQ,NCLNNDS,I,IFNO,IFTYP,IFDIR,FLENG,FELEV,FANGLE,IFLIN,ICCWADI)
     implicit none
     real, intent(inout) :: ACLNNDSAQ(NCLNNDS,*)
     integer, intent(in) :: NCLNNDS, I, IFNO, IFTYP, IFDIR, IFLIN, ICCWADI
@@ -1245,24 +1287,24 @@ module module_exportData
     ACLNNDSAQ(I,6) = FANGLE
     ACLNNDSAQ(I,7) = IFLIN
     ACLNNDSAQ(I,8) = ICCWADI
-  end subroutine exp_ClnLine4a
+  end subroutine exp_ClnLine7a
   
   !-----------------------------------------------------------------------------
   ! BRIEF:  
   !-----------------------------------------------------------------------------
-  subroutine exp_ClnLine4 (ACLNNDSAQ,NCLNNDS)
+  subroutine exp_ClnLine7 (ACLNNDSAQ,NCLNNDS)
     implicit none
     real, intent(in) :: ACLNNDSAQ(*)
     integer, intent(in) :: NCLNNDS
 
     if (NOT(ed_getExportData())) return
-    call mfLibexp_ClnLine4(ACLNNDSAQ,NCLNNDS)
-  end subroutine exp_ClnLine4
+    call mfLibexp_ClnLine7(ACLNNDSAQ,NCLNNDS)
+  end subroutine exp_ClnLine7
 
   !-----------------------------------------------------------------------------
   ! BRIEF:  Puts the variables into the array.
   !-----------------------------------------------------------------------------
-  subroutine exp_ClnLine5a (ACLNGWCAQ,NCLNGWC,I,IFNO,IFNOD,IFCON,FSKIN,FLENG,FANISO,ICGWADI)
+  subroutine exp_ClnLine8a (ACLNGWCAQ,NCLNGWC,I,IFNO,IFNOD,IFCON,FSKIN,FLENG,FANISO,ICGWADI)
     implicit none
     real, intent(inout) :: ACLNGWCAQ(NCLNGWC,*)
     integer, intent(in) :: NCLNGWC, I, IFNO, IFNOD, IFCON, ICGWADI
@@ -1276,23 +1318,23 @@ module module_exportData
     ACLNGWCAQ(I,5) = FLENG
     ACLNGWCAQ(I,6) = FANISO
     ACLNGWCAQ(I,7) = ICGWADI
-  end subroutine exp_ClnLine5a
+  end subroutine exp_ClnLine8a
   
   !-----------------------------------------------------------------------------
   ! BRIEF:  
   !-----------------------------------------------------------------------------
-  subroutine exp_ClnLine5 (ACLNGWCAQ)
+  subroutine exp_ClnLine8 (ACLNGWCAQ)
     implicit none
     real, intent(in) :: ACLNGWCAQ(*)
 
     if (NOT(ed_getExportData())) return
-    call mfLibExp_ClnLine5(ACLNGWCAQ)
-  end subroutine exp_ClnLine5
+    call mfLibExp_ClnLine8(ACLNGWCAQ)
+  end subroutine exp_ClnLine8
 
   !-----------------------------------------------------------------------------
   ! BRIEF:  Puts the variables into the array.
   !-----------------------------------------------------------------------------
-  subroutine exp_ClnLine6a (ACLNGWCAQ,NCLNGWC,I,IFNO,IFLAY,IFROW,IFCOL,IFCON,FSKIN,FLENG,FANISO,ICGWADI)
+  subroutine exp_ClnLine9a (ACLNGWCAQ,NCLNGWC,I,IFNO,IFLAY,IFROW,IFCOL,IFCON,FSKIN,FLENG,FANISO,ICGWADI)
     implicit none
     real, intent(inout) :: ACLNGWCAQ(NCLNGWC,*)
     integer, intent(in) :: NCLNGWC, I, IFNO, IFLAY, IFROW, IFCOL, IFCON, ICGWADI
@@ -1308,39 +1350,100 @@ module module_exportData
     ACLNGWCAQ(I,7) = FLENG
     ACLNGWCAQ(I,8) = FANISO
     ACLNGWCAQ(I,9) = ICGWADI
-  end subroutine exp_ClnLine6a
+  end subroutine exp_ClnLine9a
   
   !-----------------------------------------------------------------------------
   ! BRIEF:  
   !-----------------------------------------------------------------------------
-  subroutine exp_ClnLine6 (ACLNGWCAQ)
+  subroutine exp_ClnLine9 (ACLNGWCAQ)
     implicit none
     real, intent(in) :: ACLNGWCAQ(*)
 
     if (NOT(ed_getExportData())) return
-    call mfLibExp_ClnLine6(ACLNGWCAQ)
-  end subroutine exp_ClnLine6
+    call mfLibExp_ClnLine9(ACLNGWCAQ)
+  end subroutine exp_ClnLine9
 
   !-----------------------------------------------------------------------------
   ! BRIEF:  
   !-----------------------------------------------------------------------------
-  subroutine exp_ClnLine7 (ACLNCOND)
+  subroutine exp_ClnLine10 (ACLNCOND)
     implicit none
     real, intent(in) :: ACLNCOND(*)
 
     if (NOT(ed_getExportData())) return
-    call mfLibExp_ClnLine7(ACLNCOND)
-  end subroutine exp_ClnLine7
+    call mfLibExp_ClnLine10(ACLNCOND)
+  end subroutine exp_ClnLine10
 
   !-----------------------------------------------------------------------------
   ! BRIEF:  
   !-----------------------------------------------------------------------------
-  subroutine exp_ClnLines8And9 ()
+  subroutine exp_ClnLines11And12 ()
     implicit none
 
     if (NOT(ed_getExportData())) return
-    call mfLibExp_ClnLines8And9()
-  end subroutine exp_ClnLines8And9
+    call mfLibExp_ClnLines11And12()
+  end subroutine exp_ClnLines11And12
+
+  !-----------------------------------------------------------------------------
+  ! BRIEF:  
+  !-----------------------------------------------------------------------------
+  subroutine exp_ClnLine13 (NIB0,NIB1,NIBM1)
+    implicit none
+    integer, intent(in)         :: NIB0,NIB1,NIBM1
+
+    if (NOT(ed_getExportData())) return 
+    
+    call mfLibExp_SingleValInt('CL5','NIB0',NIB0)
+    call mfLibExp_SingleValInt('CL5','NIB1',NIB1)
+    call mfLibExp_SingleValInt('CL5','NIBM1',NIBM1)
+    call mfLibExp_ExpPack('CL5')
+  end subroutine exp_ClnLine13
+
+  !-----------------------------------------------------------------------------
+  ! BRIEF:  
+  !-----------------------------------------------------------------------------
+  subroutine exp_ClnLine14
+    implicit none
+    integer DUMMY
+
+    if (NOT(ed_getExportData())) return 
+    call mfLibExp_SingleValInt('CL6','DUMMY',DUMMY)
+    call mfLibExp_ExpPack('CL6')
+  end subroutine exp_ClnLine14
+
+  !-----------------------------------------------------------------------------
+  ! BRIEF:  
+  !-----------------------------------------------------------------------------
+  subroutine exp_ClnLine15 (IB1,IHEADOPT,HVALUE)
+    implicit none
+    integer, intent(in)         :: IB1,IHEADOPT
+    real, intent(in)            :: HVALUE
+
+
+    if (NOT(ed_getExportData())) return 
+    
+    call mfLibExp_SingleValInt('CL7','IB1',IB1)
+    call mfLibExp_SingleValInt('CL7','IHEADOPT',IHEADOPT)
+    call mfLibExp_SingleValFlt('CL7','HVALUE',HVALUE)
+    call mfLibExp_ExpPack('CL7')
+  end subroutine exp_ClnLine15
+
+  !-----------------------------------------------------------------------------
+  ! BRIEF:  
+  !-----------------------------------------------------------------------------
+  subroutine exp_ClnLine16 (IBM1,IHEADOPT,HVALUE)
+    implicit none
+    integer, intent(in)         :: IBM1,IHEADOPT
+    real, intent(in)            :: HVALUE
+
+
+    if (NOT(ed_getExportData())) return 
+    
+    call mfLibExp_SingleValInt('CL8','IBM1',IBM1)
+    call mfLibExp_SingleValInt('CL8','IHEADOPT',IHEADOPT)
+    call mfLibExp_SingleValFlt('CL8','HVALUE',HVALUE)
+    call mfLibExp_ExpPack('CL8')
+  end subroutine exp_ClnLine16
 
   !-----------------------------------------------------------------------------
   ! BRIEF:  

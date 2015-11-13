@@ -117,9 +117,10 @@ bool MfExportUtil::Is1dArray (const CStr &a_name)
       a_name == Disu::JA || a_name == Disu::IVC ||
       a_name == Disu::CL1 || a_name == Disu::CL1 ||
       a_name == Disu::CL12 || a_name == Disu::FAHL ||
-      a_name == Cln::NNDCLN || a_name == Cln::IBOUND ||
-      a_name == Cln::STRT || a_name == Swi::NUZONE ||
-      a_name == Swi::NUSURF)
+      a_name == Cln::NNDCLN || a_name == Cln::IAC_CLN ||
+      a_name == Cln::JA_CLN || a_name == Cln::IBOUND ||
+      a_name == Cln::IB0 || a_name == Cln::STRT ||
+      a_name == Swi::NUZONE || a_name == Swi::NUSURF)
   {
     return true;
   }

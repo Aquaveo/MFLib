@@ -42,20 +42,22 @@ static std::map<CStr, CStr>& GetCommentsMap ()
 //------------------------------------------------------------------------------
 /// \brief 
 //------------------------------------------------------------------------------
-void MfData::Packages::ClnLine1 (const int *a_NCLN,
-                                 const int *a_ICLNNDS,
-                                 const int *a_ICLNCB,
-                                 const int *a_ICLNHD,
-                                 const int *a_ICLNDD,
-                                 const int *a_ICLNIB,
-                                 const int *a_NCLNGWC,
-                                 const int *a_NCONDUITYP)
+void MfData::Packages::ClnLines0And1 (const int *a_ICLNTIB,
+                                      const int *a_NCLN,
+                                      const int *a_ICLNNDS,
+                                      const int *a_ICLNCB,
+                                      const int *a_ICLNHD,
+                                      const int *a_ICLNDD,
+                                      const int *a_ICLNIB,
+                                      const int *a_NCLNGWC,
+                                      const int *a_NCONDUITYP)
 {
-  MfPackage pack(MfData::Packages::CLNLine1);
-  MfPackage *p(MfData::Get().GetPackage(MfData::Packages::CLNLine1));
+  MfPackage pack(MfData::Packages::CLNLines0And1);
+  MfPackage *p(MfData::Get().GetPackage(MfData::Packages::CLNLines0And1));
   bool exists(p ? 1 : 0);
   if (!exists)
     p = &pack;
+  p->SetField(MfData::Packages::Cln::ICLNTIB, a_ICLNTIB);
   p->SetField(MfData::Packages::Cln::NCLN, a_NCLN);
   p->SetField(MfData::Packages::Cln::ICLNNDS, a_ICLNNDS);
   p->SetField(MfData::Packages::Cln::ICLNCB, a_ICLNCB);
@@ -66,12 +68,12 @@ void MfData::Packages::ClnLine1 (const int *a_NCLN,
   p->SetField(MfData::Packages::Cln::NCONDUITYP, a_NCONDUITYP);
   if (!exists)
     MfData::Get().AddPackage(&pack);
-  MfData::Get().Export(MfData::Packages::CLNLine1);
-} // MfData::Packages::ClnLine1
+  MfData::Get().Export(MfData::Packages::CLNLines0And1);
+} // MfData::Packages::exp_ClnLines0And1
 //------------------------------------------------------------------------------
 /// \brief 
 //------------------------------------------------------------------------------
-void MfData::Packages::ClnLine4 (const Real *a_ACLNNDSAQ,
+void MfData::Packages::ClnLine7 (const Real *a_ACLNNDSAQ,
                                  const int *a_NCLNNDS)
 {
   MfPackage pack(MfData::Packages::CLN);
@@ -81,7 +83,7 @@ void MfData::Packages::ClnLine4 (const Real *a_ACLNNDSAQ,
     p = &pack;
 
   // Make a copy of the array because it is freed right away
-  int size = (*a_NCLNNDS) * MfData::Export::NativeExpCln::ASE_LN4;
+  int size = (*a_NCLNNDS) * MfData::Export::NativeExpCln::ASE_LN7;
   Real* aclnndsaq = util::NewRealArray(size);
   for (int i=0; i<size; i++) {
     aclnndsaq[i] = a_ACLNNDSAQ[i];
@@ -91,11 +93,11 @@ void MfData::Packages::ClnLine4 (const Real *a_ACLNNDSAQ,
   p->SetField(MfData::Packages::Cln::NCLNNDS, a_NCLNNDS);
   if (!exists)
     MfData::Get().AddPackage(&pack);
-} // MfData::Packages::ClnLine4
+} // MfData::Packages::ClnLine7
 //------------------------------------------------------------------------------
 /// \brief 
 //------------------------------------------------------------------------------
-void MfData::Packages::ClnLine5Or6 (const Real *a_ACLNGWCAQ, int a_size2)
+void MfData::Packages::ClnLine8Or9 (const Real *a_ACLNGWCAQ, int a_size2)
 {
   MfPackage pack(MfData::Packages::CLN);
   MfPackage *p(MfData::Get().GetPackage(MfData::Packages::CLN));
@@ -104,7 +106,7 @@ void MfData::Packages::ClnLine5Or6 (const Real *a_ACLNGWCAQ, int a_size2)
     p = &pack;
 
   // Get size of the array
-  MfPackage *pLine1 = MfData::Get().GetPackage(MfData::Packages::CLNLine1);
+  MfPackage *pLine1 = MfData::Get().GetPackage(MfData::Packages::CLNLines0And1);
   const int* nclngwc(0);
   if (!pLine1->GetField(Cln::NCLNGWC, &nclngwc) || !nclngwc)
     return;
@@ -119,25 +121,25 @@ void MfData::Packages::ClnLine5Or6 (const Real *a_ACLNGWCAQ, int a_size2)
   p->SetField(MfData::Packages::Cln::ACLNGWCAQ, aclnndsaq);
   if (!exists)
     MfData::Get().AddPackage(&pack);
-} // MfData::Packages::ClnLine5Or6
+} // MfData::Packages::ClnLine8Or9
 //------------------------------------------------------------------------------
 /// \brief 
 //------------------------------------------------------------------------------
-void MfData::Packages::ClnLine5 (const Real *a_ACLNGWCAQ)
+void MfData::Packages::ClnLine8 (const Real *a_ACLNGWCAQ)
 {
-  ClnLine5Or6(a_ACLNGWCAQ, MfData::Export::NativeExpCln::ASE_LN5);
-} // MfData::Packages::ClnLine5
+  ClnLine8Or9(a_ACLNGWCAQ, MfData::Export::NativeExpCln::ASE_LN8);
+} // MfData::Packages::ClnLine8
 //------------------------------------------------------------------------------
 /// \brief 
 //------------------------------------------------------------------------------
-void MfData::Packages::ClnLine6 (const Real *a_ACLNGWCAQ)
+void MfData::Packages::ClnLine9 (const Real *a_ACLNGWCAQ)
 {
-  ClnLine5Or6(a_ACLNGWCAQ, MfData::Export::NativeExpCln::ASE_LN6);
-} // MfData::Packages::ClnLine6
+  ClnLine8Or9(a_ACLNGWCAQ, MfData::Export::NativeExpCln::ASE_LN9);
+} // MfData::Packages::ClnLine9
 //------------------------------------------------------------------------------
 /// \brief 
 //------------------------------------------------------------------------------
-void MfData::Packages::ClnLine7 (const Real *a_ACLNCOND)
+void MfData::Packages::ClnLine10 (const Real *a_ACLNCOND)
 {
   MfPackage pack(MfData::Packages::CLN);
   MfPackage *p(MfData::Get().GetPackage(MfData::Packages::CLN));
@@ -148,14 +150,14 @@ void MfData::Packages::ClnLine7 (const Real *a_ACLNCOND)
   p->SetField(MfData::Packages::Cln::ACLNCOND, a_ACLNCOND);
   if (!exists)
     MfData::Get().AddPackage(&pack);
-} // MfData::Packages::ClnLine7
+} // MfData::Packages::ClnLine10
 //------------------------------------------------------------------------------
 /// \brief 
 //------------------------------------------------------------------------------
-void MfData::Packages::ClnLines8And9 ()
+void MfData::Packages::ClnLines11And12 ()
 {
   MfData::Get().Export(MfData::Packages::CLN);
-} // MfData::Packages::ClnLines8And9
+} // MfData::Packages::ClnLines11And12
 //------------------------------------------------------------------------------
 /// \brief 
 //------------------------------------------------------------------------------
