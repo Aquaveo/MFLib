@@ -21,7 +21,16 @@
 
 using namespace MfData::Export;
 
-
+namespace {
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+std::vector<int>& NNDCLN ()
+{
+  static std::vector<int> fg_nndcln;
+  return fg_nndcln;
+} // NNDCLN
+}
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
@@ -175,13 +184,25 @@ CStr NativeExpCln::Line1 ()
 void NativeExpCln::Line2 ()
 {
   AddArrayLines(Packages::Cln::NNDCLN, "2");
+
+  MfPackage* pNNDCLN = GetGlobal()->GetPackage(Packages::Cln::NNDCLN);
+  if (!pNNDCLN) return;
+
+  const int *nndclnArray(0), *nndclnSize(0);
+  if (pNNDCLN->GetField("ARRAY", &nndclnArray) && nndclnArray &&
+      pNNDCLN->GetField("JJ", &nndclnSize) && nndclnSize) {
+    std::vector<int>& nndcln = NNDCLN();
+    nndcln.assign(*nndclnSize, 0);
+    for (int i = 0; i < *nndclnSize; ++i) {
+      nndcln[i] = nndclnArray[i];
+    }
+  }
 } // NativeExpCln::Line2
 //------------------------------------------------------------------------------
 /// \brief 3. CLNCON[NNDCLN(NCLN)]
 //------------------------------------------------------------------------------
 void NativeExpCln::Line3 ()
 {
-  CStr aStr;
   MfPackage* p = GetPackage();
   if (!p) return;
 
@@ -189,12 +210,18 @@ void NativeExpCln::Line3 ()
   const int *nclncons(0), *clncon(0);
   if (p->GetField("NCLNCONS", &nclncons) && nclncons &&
       p->GetField("CLNCON", &clncon) && clncon) {
-    CStr aStr2;
-    for (int i = 0; i < *nclncons; ++i) {
-      aStr2.Format("%6d ", clncon[i]);
-      aStr += aStr2;
+    int count = 0;
+    std::vector<int>& nndcln = NNDCLN();
+    for (size_t i = 0; i < nndcln.size(); ++i) {
+      CStr aStr;
+      int nodeCount = nndcln[i];
+      for (int j = 0; j < nodeCount; ++j) {
+        CStr aStr2;
+        aStr2.Format("%6d ", clncon[count++]);
+        aStr += aStr2;
+      }
+      AddToStoredLinesDesc(aStr, Desc("3"));
     }
-    AddToStoredLinesDesc(aStr, Desc("3"));
   }
 } // NativeExpCln::Line3
 //------------------------------------------------------------------------------
@@ -398,7 +425,7 @@ void NativeExpCln::Line15 ()
 
   using namespace MfData::Packages;
   const int *ib1(0), *iheadopt(0);
-  const double *hvalue(0);
+  const Real *hvalue(0);
   if (p->GetField("IB1", &ib1) && ib1 &&
       p->GetField("IHEADOPT", &iheadopt) && iheadopt &&
       p->GetField("HVALUE", &hvalue) && hvalue) {
@@ -422,7 +449,7 @@ void NativeExpCln::Line16 ()
 
   using namespace MfData::Packages;
   const int *ibm1(0), *iheadopt(0);
-  const double *hvalue(0);
+  const Real *hvalue(0);
   if (p->GetField("IBM1", &ibm1) && ibm1 &&
       p->GetField("IHEADOPT", &iheadopt) && iheadopt &&
       p->GetField("HVALUE", &hvalue) && hvalue) {
