@@ -812,10 +812,11 @@ static void iCopyArray (std::vector<Real>& a_vec,
   int nCellsLay( (*a_JJ)*(*a_II) );
   int k(*a_K);
   if (k < 1) k = 1;
-  int start(iGetStart(k));
+  int start( (k-1) * nCellsLay );
   int nVal( (k) * nCellsLay );
   if (MfData::Get().Unstructured())
   {
+    start = iGetStart(k);
     nVal = iGetNumCellsUnstructured();
   }
 
