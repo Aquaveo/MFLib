@@ -1323,7 +1323,7 @@ void NativeExpSolverT::testLine1_NWT ()
        thetadum((Real)7.8), akappadum((Real)9.1), gammadum((Real)2.3),
        amomentdum((Real)4.5), Btoldum((Real)6.7), Breducdum((Real)8.9);
   int  Mxiter(11), Linmeth(1), IPRNWT(12), IBOTAV(13), IFDPARAM(1),
-       Btrack(14), Numtrack(15);
+       Btrack(14), Numtrack(15), ICNVGFLG(0);
 
   MfPackage* p = m_p->GetPackage();
   p->SetField(NWTpack::toldum, &toldum);
@@ -1334,6 +1334,7 @@ void NativeExpSolverT::testLine1_NWT ()
   p->SetField(NWTpack::IPRNWT, &IPRNWT);
   p->SetField(NWTpack::IBOTAV, &IBOTAV);
   p->SetField(NWTpack::IFDPARAM, &IFDPARAM);
+  p->SetField(NWTpack::ICNVGFLG, &ICNVGFLG);
   CStr base = "1.2 3.4 11 5.6 1 12 13 SIMPLE ";
   CStr str = m_p->Line1_NWT();
   TS_ASSERT_EQUALS2(base, str);
