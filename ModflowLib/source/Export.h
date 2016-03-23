@@ -620,7 +620,8 @@ DLLEXPORT void MFLIBEXP_NWTLN1(const Real* toldum,
                                const int* Btrack,
                                const int* Numtrack,
                                const Real* Btoldum,
-                               const Real* Breducdum);
+                               const Real* Breducdum,
+                               const int* ICNVGFLG);
 DLLEXPORT void MFLIBEXP_NWTLN2(const int* IACL,
                                const int* NORDER,
                                const int* LEVEL,

@@ -641,6 +641,7 @@ namespace MfData
       const char * const Numtrack = "Numtrack";
       const char * const Btoldum = "Btoldum";
       const char * const Breducdum = "Breducdum";
+      const char * const ICNVGFLG = "ICNVGFLG";
       const char * const IACL = "IACL";
       const char * const NORDER = "NORDER";
       const char * const LEVEL = "LEVEL";

@@ -586,7 +586,7 @@ CStr NativeExpSolver::Line1_NWT ()
     * akappadum(0),* gammadum(0),* amomentdum(0),* Btoldum(0),
     * Breducdum(0);
   const int* Mxiter(0),* Linmeth(0),* IPRNWT(0),* IBOTAV(0),* IFDPARAM(0),
-    * Btrack(0),* Numtrack(0);
+    * Btrack(0),* Numtrack(0), * ICNVGFLG(0);
 
   MfPackage* p = GetPackage();
   if (p->GetField(NWTpack::toldum, &toldum) && toldum &&
@@ -596,7 +596,8 @@ CStr NativeExpSolver::Line1_NWT ()
       p->GetField(NWTpack::Linmeth, &Linmeth) && Linmeth &&
       p->GetField(NWTpack::IPRNWT, &IPRNWT) && IPRNWT &&
       p->GetField(NWTpack::IBOTAV, &IBOTAV) && IBOTAV &&
-      p->GetField(NWTpack::IFDPARAM, &IFDPARAM) && IFDPARAM)
+      p->GetField(NWTpack::IFDPARAM, &IFDPARAM) && IFDPARAM &&
+      p->GetField(NWTpack::ICNVGFLG, &ICNVGFLG) && ICNVGFLG)
   {
     CStr opt[4] = {"SIMPLE", "MODERATE", "COMPLEX", "SPECIFIED"};
 
@@ -611,6 +612,7 @@ CStr NativeExpSolver::Line1_NWT ()
       var = 0;
     }
     rval += opt[var];
+    if (1 == *ICNVGFLG) rval += " CONTINUE";
     rval += " ";
     if (var == 3)
     {

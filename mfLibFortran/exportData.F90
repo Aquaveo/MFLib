@@ -933,7 +933,7 @@ module module_exportData
         SUBROUTINE MFLIBEXP_NWTLN1(toldum,ftoldum,Mxiter,Thickdum,Linmeth,&
                                    IPRNWT,IBOTAV,IFDPARAM,thetadum,&
                                    akappadum,gammadum,amomentdum,Btrack,&
-                                   Numtrack,Btoldum,Breducdum)
+                                   Numtrack,Btoldum,Breducdum,ICNVGFLG)
           REAL    toldum [REFERENCE]
           REAL    ftoldum [REFERENCE]
           INTEGER Mxiter [REFERENCE]
@@ -950,6 +950,7 @@ module module_exportData
           INTEGER Numtrack [REFERENCE]
           REAL    Btoldum [REFERENCE]
           REAL    Breducdum [REFERENCE]
+          INTEGER ICNVGFLG [REFERENCE]
         END SUBROUTINE MFLIBEXP_NWTLN1
 !     ------------------------------------------------------------------
 !      Declare the C function
@@ -1700,17 +1701,19 @@ module module_exportData
   !-----------------------------------------------------------------------------
   subroutine exp_NwtPackageLn1(toldum,ftoldum,Mxiter,Thickdum,Linmeth,IPRNWT,&
                                IBOTAV,IFDPARAM,thetadum,akappadum,gammadum,&
-                               amomentdum,Btrack,Numtrack,Btoldum,Breducdum)
+                               amomentdum,Btrack,Numtrack,Btoldum,Breducdum,&
+                               ICNVGFLG)
     implicit none
     real, intent(in)::    toldum,ftoldum,Thickdum,thetadum,akappadum,gammadum,&
                           amomentdum,Btoldum,Breducdum
     integer, intent(in):: Mxiter,Linmeth,IPRNWT,IBOTAV,IFDPARAM,Btrack,&
-                          Numtrack
+                          Numtrack,ICNVGFLG
                           
     if (NOT(ed_getExportData())) return
     call MFLIBEXP_NWTLN1(toldum,ftoldum,Mxiter,Thickdum,Linmeth,IPRNWT,&
                          IBOTAV,IFDPARAM,thetadum,akappadum,gammadum,&
-                         amomentdum,Btrack,Numtrack,Btoldum,Breducdum)
+                         amomentdum,Btrack,Numtrack,Btoldum,Breducdum,&
+                         ICNVGFLG)
 
   end subroutine exp_NwtPackageLn1
 

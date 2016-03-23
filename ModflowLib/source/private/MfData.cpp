@@ -1995,7 +1995,8 @@ bool MfData::NwtLn1 (const Real* toldum,
                      const int* Btrack,
                      const int* Numtrack,
                      const Real* Btoldum,
-                     const Real* Breducdum)
+                     const Real* Breducdum,
+                     const int* ICNVGFLG)
 {
   if (!toldum ||
       !ftoldum ||
@@ -2012,7 +2013,8 @@ bool MfData::NwtLn1 (const Real* toldum,
       !Btrack ||
       !Numtrack ||
       !Btoldum ||
-      !Breducdum
+      !Breducdum ||
+      !ICNVGFLG
       )
   {
     util::NullFuncArg(__FILE__, __LINE__);
@@ -2020,7 +2022,7 @@ bool MfData::NwtLn1 (const Real* toldum,
   }
   MfData::Packages::NwtLn1(toldum,ftoldum,Mxiter,Thickdum,Linmeth,IPRNWT,IBOTAV,
                  IFDPARAM,thetadum,akappadum,gammadum,amomentdum,Btrack,
-                 Numtrack,Btoldum,Breducdum);
+                 Numtrack,Btoldum,Breducdum,ICNVGFLG);
   return true;
 } // MfData::NwtLn1
 //------------------------------------------------------------------------------

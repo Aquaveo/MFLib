@@ -2615,7 +2615,8 @@ bool MfData::Packages::NwtLn1 (const Real* toldum,
                                const int* Btrack,
                                const int* Numtrack,
                                const Real* Btoldum,
-                               const Real* Breducdum)
+                               const Real* Breducdum,
+                               const int* ICNVGFLG)
 {
   using namespace MfData::Packages;
   MfPackage pack(NWT);
@@ -2640,6 +2641,8 @@ bool MfData::Packages::NwtLn1 (const Real* toldum,
   p->SetField(NWTpack::Numtrack, Numtrack);
   p->SetField(NWTpack::Btoldum, Btoldum);
   p->SetField(NWTpack::Breducdum, Breducdum);
+  p->SetField(NWTpack::ICNVGFLG, ICNVGFLG);
+
   if (!exists)
     MfData::Get().AddPackage(p);
   //MfData::Get().Export(p->PackageName());

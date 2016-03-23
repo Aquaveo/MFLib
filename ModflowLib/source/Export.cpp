@@ -1448,11 +1448,12 @@ DLLEXPORT void MFLIBEXP_NWTLN1 (const Real* toldum,
                                 const int* Btrack,
                                 const int* Numtrack,
                                 const Real* Btoldum,
-                                const Real* Breducdum)
+                                const Real* Breducdum,
+                                const int* ICNVGFLG)
 {
   MfData::NwtLn1(toldum,ftoldum,Mxiter,Thickdum,Linmeth,IPRNWT,IBOTAV,
                  IFDPARAM,thetadum,akappadum,gammadum,amomentdum,Btrack,
-                 Numtrack,Btoldum,Breducdum);
+                 Numtrack,Btoldum,Breducdum,ICNVGFLG);
 } // MFLIBEXP_NWTLN1
 //------------------------------------------------------------------------------
 /// \brief 
@@ -1470,7 +1471,7 @@ DLLEXPORT void MFLIBEXP_NWTLN2 (const int* IACL,
 {
   MfData::NwtLn2(IACL,NORDER,LEVEL,NORTH,IREDSYS,RRCTOLS,
                  IDROPTOL,EPSRNS,HCLOSEXMDDUM,MXITERXMD);
-} // MFLIBEXP_NWTLN1
+} // MFLIBEXP_NWTLN2
 //------------------------------------------------------------------------------
 /// \brief 
 //------------------------------------------------------------------------------

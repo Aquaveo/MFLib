@@ -518,7 +518,8 @@ namespace MfData
                 const int* Btrack,
                 const int* Numtrack,
                 const Real* Btoldum,
-                const Real* Breducdum);
+                const Real* Breducdum,
+                const int* ICNVGFLG);
     bool NwtLn2(const int* IACL,
                 const int* NORDER,
                 const int* LEVEL,
