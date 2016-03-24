@@ -9,12 +9,12 @@
 
 #include <Export.h>
 #include <private\H5DataReader\H5DataSetWriter.h>
+#include <private\MfData\MfExport\private\H5\H5BcList.h>
+#include <private\MfData\MfExport\private\H5\H5UseLastWriter.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
-#include <private\MfData\MfExport\private\TxtExporter.h>
-#include <private\MfData\MfExport\private\Native\H5BcList.h>
-#include <private\MfData\MfExport\private\Native\H5UseLastWriter.h>
 #include <private\MfData\MfExport\private\Native\NativeExpNam.h>
 #include <private\MfData\MfExport\private\Native\NativeUtil.h>
+#include <private\MfData\MfExport\private\TxtExporter.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackStrings.h>

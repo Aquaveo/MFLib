@@ -7,8 +7,8 @@
 //------------------------------------------------------------------------------
 #include <private\MfData\MfExport\private\Native\NativeExpLstPar.h>
 
+#include <private\MfData\MfExport\private\H5\H5BcList.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
-#include <private\MfData\MfExport\private\Native\H5BcList.h>
 #include <private\MfData\MfExport\private\TxtExporter.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\MfPackageUtil.h>

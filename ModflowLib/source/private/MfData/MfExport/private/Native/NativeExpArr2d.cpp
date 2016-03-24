@@ -11,7 +11,7 @@
 #include <sstream>
 
 #include <private\MfData\MfExport\private\Mf2kNative.h>
-#include <private\MfData\MfExport\private\Native\H5ArrayWriter.h>
+#include <private\MfData\MfExport\private\H5\H5ArrayWriter.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>

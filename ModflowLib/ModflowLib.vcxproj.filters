@@ -307,19 +307,7 @@
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpSwi.cpp">
       <Filter>source\private\MfData\MfExport\private\Native</Filter>
     </ClCompile>
-    <ClCompile Include="source\private\MfData\MfExport\private\Native\H5ArrayWriter.cpp">
-      <Filter>source\private\MfData\MfExport\private\Native</Filter>
-    </ClCompile>
-    <ClCompile Include="source\private\MfData\MfExport\private\Native\H5UseLastWriter.cpp">
-      <Filter>source\private\MfData\MfExport\private\Native</Filter>
-    </ClCompile>
-    <ClCompile Include="source\private\MfData\MfExport\private\Native\H5BcList.cpp">
-      <Filter>source\private\MfData\MfExport\private\Native</Filter>
-    </ClCompile>
     <ClCompile Include="source\private\MfData\MfExport\private\Native\Mnw1PropList.cpp">
-      <Filter>source\private\MfData\MfExport\private\Native</Filter>
-    </ClCompile>
-    <ClCompile Include="source\private\MfData\MfExport\private\Native\H5LstPack.cpp">
       <Filter>source\private\MfData\MfExport\private\Native</Filter>
     </ClCompile>
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpVdf.cpp">
@@ -327,6 +315,21 @@
     </ClCompile>
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpVsc.cpp">
       <Filter>source\private\MfData\MfExport\private\Native</Filter>
+    </ClCompile>
+    <ClCompile Include="source\private\MfData\MfExport\private\H5\H5ArrayWriter.cpp">
+      <Filter>source\private\MfData\MfExport\private\H5</Filter>
+    </ClCompile>
+    <ClCompile Include="source\private\MfData\MfExport\private\H5\H5BcList.cpp">
+      <Filter>source\private\MfData\MfExport\private\H5</Filter>
+    </ClCompile>
+    <ClCompile Include="source\private\MfData\MfExport\private\H5\H5LstPack.cpp">
+      <Filter>source\private\MfData\MfExport\private\H5</Filter>
+    </ClCompile>
+    <ClCompile Include="source\private\MfData\MfExport\private\H5\H5UseLastWriter.cpp">
+      <Filter>source\private\MfData\MfExport\private\H5</Filter>
+    </ClCompile>
+    <ClCompile Include="source\private\MfData\MfExport\private\Sqlite\SqBcList.cpp">
+      <Filter>source\private\MfData\MfExport\private\Sqlite</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -882,22 +885,7 @@
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpSwi.t.h">
       <Filter>source\private\MfData\MfExport\private\Native</Filter>
     </ClInclude>
-    <ClInclude Include="source\private\MfData\MfExport\private\Native\H5ArrayWriter.h">
-      <Filter>source\private\MfData\MfExport\private\Native</Filter>
-    </ClInclude>
-    <ClInclude Include="source\private\MfData\MfExport\private\Native\H5UseLastWriter.h">
-      <Filter>source\private\MfData\MfExport\private\Native</Filter>
-    </ClInclude>
-    <ClInclude Include="source\private\MfData\MfExport\private\Native\H5BcList.h">
-      <Filter>source\private\MfData\MfExport\private\Native</Filter>
-    </ClInclude>
     <ClInclude Include="source\private\MfData\MfExport\private\Native\Mnw1PropList.h">
-      <Filter>source\private\MfData\MfExport\private\Native</Filter>
-    </ClInclude>
-    <ClInclude Include="source\private\MfData\MfExport\private\Native\H5Strings.h">
-      <Filter>source\private\MfData\MfExport\private\Native</Filter>
-    </ClInclude>
-    <ClInclude Include="source\private\MfData\MfExport\private\Native\H5LstPack.h">
       <Filter>source\private\MfData\MfExport\private\Native</Filter>
     </ClInclude>
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpVdf.h">
@@ -915,8 +903,26 @@
     <ClInclude Include="source\private\MfData\MfExport\private\Native\Mnw1PropList.t.h">
       <Filter>source\private\MfData\MfExport\private\Native</Filter>
     </ClInclude>
-    <ClInclude Include="source\private\MfData\MfExport\private\Native\H5UseLastWriter.t.h">
-      <Filter>source\private\MfData\MfExport\private\Native</Filter>
+    <ClInclude Include="source\private\MfData\MfExport\private\H5\H5ArrayWriter.h">
+      <Filter>source\private\MfData\MfExport\private\H5</Filter>
+    </ClInclude>
+    <ClInclude Include="source\private\MfData\MfExport\private\H5\H5BcList.h">
+      <Filter>source\private\MfData\MfExport\private\H5</Filter>
+    </ClInclude>
+    <ClInclude Include="source\private\MfData\MfExport\private\H5\H5LstPack.h">
+      <Filter>source\private\MfData\MfExport\private\H5</Filter>
+    </ClInclude>
+    <ClInclude Include="source\private\MfData\MfExport\private\H5\H5Strings.h">
+      <Filter>source\private\MfData\MfExport\private\H5</Filter>
+    </ClInclude>
+    <ClInclude Include="source\private\MfData\MfExport\private\H5\H5UseLastWriter.h">
+      <Filter>source\private\MfData\MfExport\private\H5</Filter>
+    </ClInclude>
+    <ClInclude Include="source\private\MfData\MfExport\private\H5\H5UseLastWriter.t.h">
+      <Filter>source\private\MfData\MfExport\private\H5</Filter>
+    </ClInclude>
+    <ClInclude Include="source\private\MfData\MfExport\private\Sqlite\SqBcList.h">
+      <Filter>source\private\MfData\MfExport\private\Sqlite</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -979,6 +985,12 @@
     </Filter>
     <Filter Include="source\private\samg">
       <UniqueIdentifier>{1736618b-c7e7-4509-b5e7-1233714663b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\private\MfData\MfExport\private\H5">
+      <UniqueIdentifier>{5e46bb41-f902-48dd-b9cc-938ab10952d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\private\MfData\MfExport\private\Sqlite">
+      <UniqueIdentifier>{807ce495-2d3d-4c4a-840f-54554c731e08}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -7,9 +7,9 @@
 //------------------------------------------------------------------------------
 #include <private\MfData\MfExport\private\Native\NativeExpEts.h>
 
+#include <private\MfData\MfExport\private\H5\H5UseLastWriter.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
-#include <private\MfData\MfExport\private\Native\H5UseLastWriter.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>

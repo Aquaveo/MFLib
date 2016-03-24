@@ -11,7 +11,7 @@
 // 1. Precompiled header
 
 // 2. My own header
-#include <private\MfData\MfExport\private\Native\H5LstPack.h>
+#include <private\MfData\MfExport\private\H5\H5LstPack.h>
 
 // 3. Standard library headers
 #include <hash_map>
@@ -25,10 +25,10 @@
 #include <private/H5DataReader/H5DataSetWriter.h>
 #include <private/H5DataReader/H5DataSetWriterSetup.h>
 #include <private/ListReader/CellIdToIJK.h>
+#include <private/MfData/MfExport/private/H5/H5BcList.h>
+#include <private/MfData/MfExport/private/H5/H5Strings.h>
 #include <private/MfData/MfExport/private/Mf2kNative.h>
 #include <private/MfData/MfExport/private/MfExportUtil.h>
-#include <private/MfData/MfExport/private/Native/H5BcList.h>
-#include <private/MfData/MfExport/private/Native/H5Strings.h>
 #include <private/MfData/MfExport/private/TxtExporter.h>
 #include <private/MfData/MfGlobal.h>
 #include <private/MfData/MfPackageUtil.h>

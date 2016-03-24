@@ -7,9 +7,9 @@
 //------------------------------------------------------------------------------
 #include <private\MfData\MfExport\private\Native\NativeExpVdf.h>
 
+#include <private\MfData\MfExport\private\H5\H5ArrayWriter.h>
+#include <private\MfData\MfExport\private\H5\H5UseLastWriter.h>
 #include <private\MfData\MfExport\private\MfExporterImpl.h>
-#include <private\MfData\MfExport\private\Native\H5ArrayWriter.h>
-#include <private\MfData\MfExport\private\Native\H5UseLastWriter.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackStrings.h>
@@ -230,7 +230,7 @@ void NativeExpVdfT::tearDown ()
 //------------------------------------------------------------------------------
 void NativeExpVdfT::testCreateClass ()
 {
-  NativeExpVdf* p = new NativeExpVdf(true);
+  NativeExpVdf* p = new NativeExpVdf();
   TS_ASSERT(p);
   if (p) delete(p);
 } // NativeExpVdfT::testCreateClass

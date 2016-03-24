@@ -11,7 +11,7 @@
 // 1. Precompiled header
 
 // 2. My own header
-#include <private\MfData\MfExport\private\Native\H5UseLastWriter.h>
+#include <private\MfData\MfExport\private\H5\H5UseLastWriter.h>
 
 // 3. Standard library headers
 
@@ -23,9 +23,9 @@
 #include <private/H5DataReader/H5DataSetReader.h>
 #include <private/H5DataReader/H5DataSetWriter.h>
 #include <private/H5DataReader/H5DataSetWriterSetup.h>
+#include <private/MfData/MfExport/private/H5/H5ArrayWriter.h>
+#include <private/MfData/MfExport/private/H5/H5Strings.h>
 #include <private/MfData/MfExport/private/Mf2kNative.h>
-#include <private/MfData/MfExport/private/Native/H5ArrayWriter.h>
-#include <private/MfData/MfExport/private/Native/H5Strings.h>
 #include <private/MfData/MfExport/private/Native/NativePackExp.h>
 #include <private/MfData/MfExport/private/TxtExporter.h>
 #include <private/MfData/MfGlobal.h>
@@ -389,7 +389,7 @@ void H5UseLastWriter::CheckArealFromUseLast ()
 // TESTS
 ///////////////////////////////////////////////////////////////////////////////
 #if CXX_TEST
-#include <private/MfData/MfExport/private/Native/H5UseLastWriter.t.h>
+#include <private/MfData/MfExport/private/H5/H5UseLastWriter.t.h>
 #include <private/MfData/MfExport/private/ExpGmsH5.h>
 #include <private/MfLibAsserts.h>
 

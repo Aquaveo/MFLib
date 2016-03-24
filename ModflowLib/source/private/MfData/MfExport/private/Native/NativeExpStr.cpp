@@ -9,9 +9,9 @@
 
 #include <sstream>
 
+#include <private\MfData\MfExport\private\H5\H5BcList.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
-#include <private\MfData\MfExport\private\Native\H5BcList.h>
 #include <private\MfData\MfExport\private\Native\NativeExpNam.h>
 #include <private\MfData\MfExport\private\Native\NativeUtil.h>
 #include <private\MfData\MfExport\private\TxtExporter.h>
