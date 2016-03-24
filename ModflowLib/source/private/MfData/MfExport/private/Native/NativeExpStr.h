@@ -16,7 +16,7 @@ namespace MfData
     {
       friend NativeExpStrT;
     public:
-      NativeExpStr(bool a_h5);
+      NativeExpStr();
       ~NativeExpStr();
       virtual bool Export();
 
@@ -80,7 +80,6 @@ namespace MfData
                           std::vector< std::vector<CStr> >& a_prev);
       void Par_SetToSkipExistingStrParams();
 
-      bool                  m_h5;
       std::map<int, double> m_mapParKeyVal;
       std::map<int, int>    m_mapParSegKey;
       std::map<int, int>    m_mapParSegInstances;

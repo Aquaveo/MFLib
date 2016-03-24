@@ -15,16 +15,10 @@ module module_exportData
       INTERFACE
 !     ------------------------------------------------------------------
 !      Declare the C function
-        SUBROUTINE mfLibExp_GeoDb(ARG,FNAME)
+        SUBROUTINE MFLIBEXP_EXPORT(ARG,FNAME)
           CHARACTER  ARG (*)
           CHARACTER  FNAME (*)
-        END SUBROUTINE mfLibExp_GeoDb
-!     ------------------------------------------------------------------
-!      Declare the C function
-        SUBROUTINE mfLibExp_GMS(ARG,FNAME)
-          CHARACTER  ARG (*)
-          CHARACTER  FNAME (*)
-        END SUBROUTINE mfLibExp_GMS
+        END SUBROUTINE MFLIBEXP_EXPORT
 !     ------------------------------------------------------------------
 !      Declare the C function
         SUBROUTINE mfLibExp_Tables(ARG)
@@ -1150,7 +1144,7 @@ module module_exportData
 
      END INTERFACE
 
-  public:: exp_GeoDB, exp_GLO1BAS6DF, exp_GLO1BAS6RP, &
+  public:: exp_Export, exp_GLO1BAS6DF, exp_GLO1BAS6RP, &
            exp_DISU1, exp_DISU2, exp_DISU3, &
            exp_ClnLines0And1, exp_ClnLine2, exp_ClnLine3, exp_ClnLine4, &
            exp_ClnLine7a, exp_ClnLine7, & exp_ClnLine8a, exp_ClnLine8, &
@@ -1170,22 +1164,12 @@ module module_exportData
   !-----------------------------------------------------------------------------
   ! BRIEF:  
   !-----------------------------------------------------------------------------
-  subroutine exp_GeoDB (a_arg, a_fileName)
+  subroutine exp_Export (a_arg, a_fileName)
     implicit none
     character(*), intent(in) :: a_arg, a_fileName
     
-    call mfLibExp_GeoDb(a_arg, a_fileName)
-  end subroutine exp_GeoDB
-
-  !-----------------------------------------------------------------------------
-  ! BRIEF:  
-  !-----------------------------------------------------------------------------
-  subroutine exp_GmsH5 (a_arg, a_fileName)
-    implicit none
-    character(*), intent(in) :: a_arg, a_fileName
-    
-    call mfLibExp_GMS(a_arg, a_fileName)
-  end subroutine exp_GmsH5
+    call MFLIBEXP_EXPORT(a_arg, a_fileName)
+  end subroutine exp_Export
 
   !-----------------------------------------------------------------------------
   ! BRIEF:  
@@ -3278,24 +3262,13 @@ end module module_exportData
 !-----------------------------------------------------------------------------
 ! BRIEF:  
 !-----------------------------------------------------------------------------
-subroutine g_exp_GeoDB (a_arg, a_fileName)
+subroutine g_exp_Export (a_arg, a_fileName)
   use module_exportData
   implicit none
   character(*), intent(in) :: a_arg, a_fileName
   
-  call exp_GeoDB(a_arg, a_fileName)
-end subroutine g_exp_GeoDB
-
-!-----------------------------------------------------------------------------
-! BRIEF:  
-!-----------------------------------------------------------------------------
-subroutine g_exp_GmsH5 (a_arg, a_fileName)
-  use module_exportData
-  implicit none
-  character(*), intent(in) :: a_arg, a_fileName
-  
-  call exp_GmsH5(a_arg, a_fileName)
-end subroutine g_exp_GmsH5
+  call exp_Export(a_arg, a_fileName)
+end subroutine g_exp_Export
 
 !-----------------------------------------------------------------------------
 ! BRIEF:  

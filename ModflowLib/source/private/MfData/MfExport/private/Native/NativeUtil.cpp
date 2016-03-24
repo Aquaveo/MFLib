@@ -191,8 +191,8 @@ NativePackExp* NativeUtil::CreatePackExp (Mf2kNative* a_native,
 
   bool& h5(iH5Flag());
   CStr type(a_package->PackageName());
-  if (Array2d(type, a_native))                  ret = new NativeExpArr2d(h5);
-  else if (MfExportUtil::Is1dArray(type))       ret = new NativeExpArr1d(h5);
+  if (Array2d(type, a_native))                  ret = new NativeExpArr2d();
+  else if (MfExportUtil::Is1dArray(type))       ret = new NativeExpArr1d();
   else if (MfExportUtil::IsSolver(type))        ret = new NativeExpSolver();
   else if (Packages::NAM == type)               ret = new NativeExpNam();
   else if (ClnPack(type))                       ret = new NativeExpCln();
@@ -212,34 +212,35 @@ NativePackExp* NativeUtil::CreatePackExp (Mf2kNative* a_native,
   else if ("FNC" == type)                       ret = new NativeExpMlt();
   else if (Packages::HFB == type)               ret = new NativeExpHfb();
   else if (Packages::PES == type)               ret = new NativeExpPes();
-  else if (LstPack(type))                       ret = new NativeExpLstPack(h5);
-  else if (Packages::LPRM == type)              ret = new NativeExpLstPar(h5);
+  else if (LstPack(type))                       ret = new NativeExpLstPack();
+  else if (Packages::LPRM == type)              ret = new NativeExpLstPar();
   else if (Packages::RCH == type)               ret = new NativeExpRch();
   else if (Packages::ETS == type)               ret = new NativeExpEts();
   else if (Packages::EVT == type)               ret = new NativeExpEvt();
   else if (LakPack(type))                       ret = new NativeExpLak();
   else if (Packages::GAGE == type)              ret = new NativeExpGag();
-  else if (Mnw1Pack(type))                      ret = new NativeExpMnw1(h5);
-  else if (Packages::MNW2 == type)              ret = new NativeExpMnw2(h5);
+  else if (Mnw1Pack(type))                      ret = new NativeExpMnw1();
+  else if (Packages::MNW2 == type)              ret = new NativeExpMnw2();
   else if (Packages::MNWI == type)              ret = new NativeExpMnwi();
-  else if (SfrPack(type))                       ret = new NativeExpSfr(h5);
+  else if (SfrPack(type))                       ret = new NativeExpSfr();
   else if (HobPack(type))                       ret = new NativeExpObs();
   else if (IsFlowObsPackage(type))              ret = new NativeExpLstObs();
   else if (SubPack(type))                       ret = new NativeExpSub();
-  else if (UzfPack(type))                       ret = new NativeExpUzf(h5);
-  else if (StrPack(type))                       ret = new NativeExpStr(h5);
+  else if (UzfPack(type))                       ret = new NativeExpUzf();
+  else if (StrPack(type))                       ret = new NativeExpStr();
   else if (LgrPack(type))                       ret = new NativeExpLgr();
   else if (Packages::GNC == type)               ret = new NativeExpGnc();
   else if (Packages::SWI == type)               ret = new NativeExpSwi();
-  else if (VdfPack(type))                       ret = new NativeExpVdf(h5);
-  else if (VscPack(type))                       ret = new NativeExpVsc(h5);
+  else if (VdfPack(type))                       ret = new NativeExpVdf();
+  else if (VscPack(type))                       ret = new NativeExpVsc();
 
   // leave at end. This is the last "package" processed
-  else if ("STP" == type)                       ret = new NativeExpSTP(h5);
+  else if ("STP" == type)                       ret = new NativeExpSTP();
 
   if (ret)
   {
     ret->SetData(a_native, a_global, a_package);
+    ret->SetH5Flag(h5);
   }
   h5 = false;
   return(ret);

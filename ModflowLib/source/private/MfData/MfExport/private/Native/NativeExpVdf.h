@@ -15,7 +15,7 @@ namespace MfData
     {
       friend NativeExpVdfT;
     public:
-      NativeExpVdf(bool a_h5);
+      NativeExpVdf();
       ~NativeExpVdf();
       virtual bool Export();
 
@@ -27,7 +27,6 @@ namespace MfData
       void Lines6to7();
       CStr Desc(const char* a_line);
 
-      bool m_h5;
     };
 
   }

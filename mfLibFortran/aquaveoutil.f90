@@ -44,6 +44,7 @@ module module_aquaveo_data
             ed_setMp3du, &
             ed_getMp3du, &
             ed_setExportGeoDB, &
+            ed_setExportText, &
             ed_setExportGmsH5, &
             ed_setExportTables, &
             ed_getExportData, &
@@ -234,8 +235,19 @@ module module_aquaveo_data
 
     m_export = .TRUE.
     m_exportDB = .TRUE.
-    call g_exp_GeoDb(a_arg, a_fName)
+    call g_exp_Export(a_arg, a_fName)
   end subroutine ed_setExportGeoDB
+
+  !-----------------------------------------------------------------------------
+  ! BRIEF:      
+  !-----------------------------------------------------------------------------
+  subroutine ed_setExportText (a_arg, a_fName)
+    implicit none
+    character(*), intent(in) :: a_arg, a_fName
+
+    m_export = .TRUE.
+    call g_exp_Export(a_arg, a_fName)
+  end subroutine ed_setExportText
 
   !-----------------------------------------------------------------------------
   ! BRIEF:      
@@ -245,7 +257,7 @@ module module_aquaveo_data
     character(*), intent(in) :: a_arg, a_fName
 
     m_export = .TRUE.
-    call g_exp_GmsH5(a_arg, a_fName)
+    call g_exp_Export(a_arg, a_fName)
   end subroutine ed_setExportGmsH5
 
   !-----------------------------------------------------------------------------

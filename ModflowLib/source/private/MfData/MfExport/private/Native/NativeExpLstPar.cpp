@@ -18,8 +18,7 @@ using namespace MfData::Export;
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-NativeExpLstPar::NativeExpLstPar (bool a_h5)
-: m_h5(a_h5)
+NativeExpLstPar::NativeExpLstPar ()
 {
 } // MfNativeExpLstPar::MfNativeExpLstPar
 //------------------------------------------------------------------------------
@@ -44,7 +43,7 @@ bool NativeExpLstPar::Export ()
     return true;
   }
 
-  if (m_h5)
+  if (GetH5Flag())
   {
     H5BcList h(this);
     h.LstPar();

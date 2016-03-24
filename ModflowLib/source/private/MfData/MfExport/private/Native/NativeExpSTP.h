@@ -15,7 +15,7 @@ namespace MfData
     {
       friend NativeExpSTPT;
     public:
-      NativeExpSTP(bool a_h5);
+      NativeExpSTP();
       ~NativeExpSTP();
       virtual bool Export();
 
@@ -26,7 +26,6 @@ namespace MfData
       void ForcePackageWrite(const char* const a_);
       void CopyAdditionalFiles();
 
-      bool m_h5;
     };
 
   }

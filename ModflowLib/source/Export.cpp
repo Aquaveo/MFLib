@@ -121,11 +121,10 @@ static void FormatNameFileNameForLgr (CStr t, CStr& nameFile)
   nameFile += t;
 } // FormatNameFileNameForLgr
 //------------------------------------------------------------------------------
-/// \brief This tells us that we are exporting a geodatabase and gives
-/// the file name of the geodatabase.
-/// \param a_fName a character string that is the path to the geodatabase
+/// \brief This tells us that we are exporting either text, h5, or a geodb.
+/// \param a_fName a character string that is the path to the output files
 //------------------------------------------------------------------------------
-DLLEXPORT void MFLIBEXP_GEODB (const char *a_arg,
+DLLEXPORT void MFLIBEXP_EXPORT (const char *a_arg,
                                int a_dummy1,
                                const char * a_fName,
                                int a_dummy2)
@@ -135,23 +134,7 @@ DLLEXPORT void MFLIBEXP_GEODB (const char *a_arg,
   mfLibExp_Exporting() = true;
   GetFileName() = fname;
   GetExporterStr() = exp;
-} // MFLIBEXP_GEODB
-//------------------------------------------------------------------------------
-/// \brief This tells us that we are exporting a GMS HDF5 modflow sim and gives
-/// the file name of the simulation files.
-/// \param a_fName a character string that is the path to the new simulation
-//------------------------------------------------------------------------------
-DLLEXPORT void MFLIBEXP_GMS (const char *a_arg,
-                             int a_dummy1,
-                             const char * a_fName,
-                             int a_dummy2)
-{
-  CStr tmp, fname(util::GetStr(a_fName, a_dummy1)),
-       exp(util::GetStr(a_arg, a_dummy2));
-  mfLibExp_Exporting() = true;
-  GetFileName() = fname;
-  GetExporterStr() = exp;
-} // MFLIBEXP_GMS
+} // MFLIBEXP_EXPORT
 //------------------------------------------------------------------------------
 /// \brief This tells us that we are exporting only certain packages to a DB
 /// \param a_arg a character string that has the packages we are exporting

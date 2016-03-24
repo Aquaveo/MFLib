@@ -28,8 +28,7 @@ using namespace MfData::Export;
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-NativeExpMnw1::NativeExpMnw1 (bool a_h5) :
-m_h5(a_h5)
+NativeExpMnw1::NativeExpMnw1 ()
 {
 } // MfNativeExpMnw1::MfNativeExpMnw1
 //------------------------------------------------------------------------------
@@ -45,7 +44,7 @@ bool NativeExpMnw1::Export ()
 {
   if (Packages::MNWSetup == GetPackage()->PackageName())
   {
-    if (m_h5)
+    if (GetH5Flag())
     {
       AddToStoredLinesDesc("#GMS_HDF5_01", "");
     }
@@ -144,7 +143,7 @@ void NativeExpMnw1::Line1to3 ()
       AddToStoredLinesDesc(ln, desc);
       iowell2Sorted[2] = auxiliaryUnits["QSUM"];
     }
-    if (m_h5)
+    if (GetH5Flag())
     {
       H5BcList h5(this);
       const char *type = "Multi-Node Well";
@@ -187,7 +186,7 @@ void NativeExpMnw1::Line4 ()
 //------------------------------------------------------------------------------
 void NativeExpMnw1::Line5 ()
 {
-  if (m_h5)
+  if (GetH5Flag())
   {
     H5BcList h5(this);
     CStr l = h5.Mnw1();

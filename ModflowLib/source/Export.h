@@ -15,14 +15,10 @@
 extern "C"
 {
 void mfLibExp_NameFile(const char * a_fName);
-DLLEXPORT void MFLIBEXP_GEODB(const char *a_arg,
-                              int a_dummy,
-                              const char * a_fName,
-                              int a_dummy1);
-DLLEXPORT void MFLIBEXP_GMS(const char *a_arg,
-                            int a_dummy,
-                            const char * a_fName,
-                            int a_dummy1);
+DLLEXPORT void MFLIBEXP_EXPORT(const char *a_arg,
+                               int a_dummy,
+                               const char * a_fName,
+                               int a_dummy1);
 DLLEXPORT void MFLIBEXP_TABLES(const char *a_arg,
                                int dummy);
 DLLEXPORT void MFLIBEXP_PUTCURRENTPERIOD(const int *a_KPER);

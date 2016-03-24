@@ -190,7 +190,7 @@ static void RemoveLastReturn (CStr& line)
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-NativeExpArr2d::NativeExpArr2d (bool a_h5) :
+NativeExpArr2d::NativeExpArr2d () :
   m_name()
 , m_lay(0)
 , m_iData(0)
@@ -204,7 +204,6 @@ NativeExpArr2d::NativeExpArr2d (bool a_h5) :
 , m_unstructured(0)
 , m_stacked(0)
 , m_tmp_iMult(1)
-, m_h5(a_h5)
 {
   bool usg = MfData::MfGlobal::Get().ModelType() == MfData::USG;
   if (usg)
@@ -520,7 +519,7 @@ bool NativeExpArr2d::CanDoConstant ()
       SubstituteMultArray();
 
       H5ArrayWriter writer(this);
-      if (m_h5 && writer.ForceToH5File())
+      if (GetH5Flag() && writer.ForceToH5File())
       {
         writer.WriteData();
       }
@@ -536,7 +535,7 @@ bool NativeExpArr2d::CanDoConstant ()
 //------------------------------------------------------------------------------
 bool NativeExpArr2d::WriteInternalArray ()
 {
-  if (!GetNative()->GetArraysInternal() || m_h5) return false;
+  if (!GetNative()->GetArraysInternal() || GetH5Flag()) return false;
 
   CStr str;
   str.Format("INTERNAL %s (FREE) %s", StrMult(), StrIprn());
@@ -578,7 +577,7 @@ void NativeExpArr2d::SubstituteMultArray ()
 void NativeExpArr2d::WriteToFile ()
 {
   CStr str;
-  if (!m_h5) str = ArrayToTxtFile();
+  if (!GetH5Flag()) str = ArrayToTxtFile();
   else       str = ArrayToH5File();
   AddToStoredLinesDesc(str, "");
 } // NativeExpArr2d::WriteToFile

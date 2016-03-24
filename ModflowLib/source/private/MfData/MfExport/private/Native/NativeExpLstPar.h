@@ -15,7 +15,7 @@ namespace MfData
     {
       friend NativeExpLstParT;
     public:
-      NativeExpLstPar(bool a_h5);
+      NativeExpLstPar();
       ~NativeExpLstPar();
       virtual bool Export();
 
@@ -23,7 +23,6 @@ namespace MfData
       NativeExpLstPar(const NativeExpLstPar& rhs);
       const NativeExpLstPar& operator=(const NativeExpLstPar& rhs);
 
-      bool m_h5;
     };
 
   }

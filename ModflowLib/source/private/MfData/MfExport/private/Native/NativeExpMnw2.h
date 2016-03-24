@@ -15,7 +15,7 @@ namespace MfData
     {
       friend NativeExpMnw2T;
     public:
-      NativeExpMnw2(bool a_h5);
+      NativeExpMnw2();
       ~NativeExpMnw2();
       virtual bool Export();
 
@@ -37,7 +37,6 @@ namespace MfData
       void Line2h();
       void Lines34();
 
-      bool m_h5;
     };
 
   }

@@ -297,7 +297,7 @@ class theTester:
         print "Copying test inputs"
         for node in dom.getElementsByTagName('root'):
             self.m_description = node.getAttribute('description')
-            self.m_nProcess = node.getAttribute('nProcess')
+            self.m_nProcess = int(node.getAttribute('nProcess'))
         #print self.m_nProcess + "\n"
         if (self.m_nProcess > 8) :
             self.m_nProcess = 8

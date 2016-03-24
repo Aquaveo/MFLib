@@ -23,7 +23,7 @@ using namespace MfData::Export;
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-NativeExpSTP::NativeExpSTP (bool a_h5) : m_h5(a_h5)
+NativeExpSTP::NativeExpSTP ()
 {
 } // MfNativeExpSTP::MfNativeExpSTP
 //------------------------------------------------------------------------------
@@ -82,7 +82,7 @@ bool NativeExpSTP::Export ()
     if (exOc) exOc->WriteComments(); exOc->WriteStoredLines(); delete(exOc);
   }
 
-  if (m_h5)
+  if (GetH5Flag())
   {
     H5BcList h(this);
     h.WriteMapIdsForListBcs();

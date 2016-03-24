@@ -15,7 +15,7 @@ namespace MfData
     class NativeExpArr2d : public NativePackExp
     {
     public:
-      NativeExpArr2d(bool a_h5);
+      NativeExpArr2d();
       ~NativeExpArr2d();
       virtual bool Export();
 
@@ -69,7 +69,7 @@ namespace MfData
       double*     m_dataD;
       int         m_nrow, m_ncol, m_curSp, m_tmp_iMult;
       bool        m_firstTime;
-      bool        m_unstructured, m_stacked, m_h5;
+      bool        m_unstructured, m_stacked;
       std::vector<double> m_pilotKeys;
     };
 

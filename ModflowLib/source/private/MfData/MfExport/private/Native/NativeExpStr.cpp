@@ -49,9 +49,8 @@ CStr Desc2 ()
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-NativeExpStr::NativeExpStr (bool a_h5)
-: m_h5(a_h5)
-, m_mapParKeyVal()
+NativeExpStr::NativeExpStr ()
+: m_mapParKeyVal()
 , m_mapParSegKey()
 , m_mapParSegInstances()
 , m_usg(false)
@@ -83,7 +82,7 @@ bool NativeExpStr::Export ()
 
   if (1 == GetGlobal()->GetCurrentPeriod())
   {
-    if (m_h5) AddToStoredLinesDesc("#GMS_HDF5_01", "");
+    if (GetH5Flag()) AddToStoredLinesDesc("#GMS_HDF5_01", "");
     Line2();
   }
   Lines5to6();
@@ -156,7 +155,7 @@ void NativeExpStr::Lines5to6 ()
     CStr line, line2;
     CStr desc = " 5. ITMP IRDFLG IPTFLG";
     int tmpItmp(*itmp);
-    if (m_h5)
+    if (GetH5Flag())
     {
       H5BcList h(this);
       line2 = h.Str(tmpItmp);
@@ -178,7 +177,7 @@ void NativeExpStr::Lines5to6 ()
       if (m_unstructured) desc.Replace("6a. Layer Row Col", "6b. Node");
     }
 
-    if (m_h5)
+    if (GetH5Flag())
     {
       if (!line2.empty()) AddToStoredLinesDesc(line2, " 6 to 10");
     }
@@ -249,7 +248,7 @@ CStr NativeExpStr::Line6FromData (int i,
 //------------------------------------------------------------------------------
 void NativeExpStr::Lines8to10 ()
 {
-  if (m_h5) return;
+  if (GetH5Flag()) return;
   const int *istrpb(0), *nss(0), *ntrib(0), *ndiv(0), *icalc(0), *istcb1(0),
             *istcb2(0), *itmp(0), *irdflg(0), *iptflg(0), *istrm(0),
             *nstrem(0), *mxstrm(0), *itrbar(0), *idivar(0);

@@ -21,7 +21,7 @@ using namespace MfData::Export;
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-NativeExpUzf::NativeExpUzf (bool a_h5) : m_h5(a_h5)
+NativeExpUzf::NativeExpUzf ()
 {
 } // MfNativeExpUzf::MfNativeExpUzf
 //------------------------------------------------------------------------------
@@ -315,7 +315,7 @@ void NativeExpUzf::Lines9to16 ()
       }
     }
 
-    if (m_h5)
+    if (GetH5Flag())
     {
       std::vector<int> vDat(4, 1);
       vDat[0] = *nuzf1 < 0 ? 1 : 0;

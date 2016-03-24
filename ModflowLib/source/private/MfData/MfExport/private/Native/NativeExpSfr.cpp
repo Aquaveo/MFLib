@@ -77,9 +77,8 @@ std::vector<Real>& SfrCondFact2 (int a_idx)
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-NativeExpSfr::NativeExpSfr (bool a_h5) :
-  m_h5(a_h5)
-, m_iseg(0)
+NativeExpSfr::NativeExpSfr ()
+: m_iseg(0)
 , m_iotsg(0)
 , m_idivar(0)
 , m_segOrig(0)
@@ -124,7 +123,7 @@ bool NativeExpSfr::Export ()
   }
   else if (Packages::SFRLine1 == nm)
   {
-    if (m_h5) AddToStoredLinesDesc("#GMS_HDF5_01", "");
+    if (GetH5Flag()) AddToStoredLinesDesc("#GMS_HDF5_01", "");
     Line1();
     WriteCommentsSfr();
   }
@@ -140,7 +139,7 @@ bool NativeExpSfr::Export ()
   {
     Line6();
     WriteStoredLinesSfr();
-    if (!m_h5 && GetGlobal()->GetCurrentPeriod() == GetGlobal()->NumPeriods())
+    if (!GetH5Flag() && GetGlobal()->GetCurrentPeriod() == GetGlobal()->NumPeriods())
     {
       LastChanceBeforeWriting();
     }
@@ -200,7 +199,7 @@ void NativeExpSfr::Line2 ()
 {
   CStr desc = " 2. KRCH IRCH JRCH ISEG IREACH RCHLEN ";
   if (m_usg) desc.Replace(" 2", "2a");
-  if (m_h5)
+  if (GetH5Flag())
   {
     H5BcList h(this);
     CStr line = h.SfrLn2();
@@ -301,7 +300,7 @@ void NativeExpSfr::Line5 ()
   {
     CStr ln;
     ln.Format("%5d %5d %5d", *itmp, *irdflg, *iptflg);
-    if (!m_h5) AddToStoredLinesDesc(ln, Desc5());
+    if (!GetH5Flag()) AddToStoredLinesDesc(ln, Desc5());
     GetGlobal()->SetStrVar(SFR_H5_LINE_5, ln);
     CStr tmp;
     GetGlobal()->GetStrVar(SFR_LINE5, tmp);
@@ -315,7 +314,7 @@ void NativeExpSfr::Line5 ()
 //------------------------------------------------------------------------------
 void NativeExpSfr::Line6 ()
 {
-  if (m_h5)
+  if (GetH5Flag())
   {
     CStr line6, line5, desc = "6a. NSEG ICALC OUTSEG IUPSEG";
     GetGlobal()->GetStrVar(SFR_H5_LINE_5, line5);

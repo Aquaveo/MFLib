@@ -34,11 +34,13 @@ namespace MfData
       void SetData(Mf2kNative* a_native,
                    MfGlobal* a_global,
                    MfPackage* a_package);
+      void SetH5Flag (bool a_h5);
 
     protected:
       Mf2kNative*    GetNative();
       MfGlobal*      GetGlobal();
       MfPackage*     GetPackage();
+      bool           GetH5Flag();
       virtual void   AddToStoredLinesDesc(const char* a_line,
                                           const char* a_desc);
       void           AddToStoredLinesDesc(const std::vector<CStr>& a_line,

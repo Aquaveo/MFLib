@@ -31,6 +31,7 @@ public:
        : m_native(NULL)
        , m_global(NULL)
        , m_package(NULL)
+       , m_h5(false)
   {
 
   }
@@ -38,6 +39,7 @@ public:
   Mf2kNative* m_native;
   MfGlobal*   m_global;
   MfPackage*  m_package;
+  bool        m_h5;
 };
 //------------------------------------------------------------------------------
 /// \brief
@@ -68,6 +70,13 @@ void NativePackExp::SetData (Mf2kNative* a_native,
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
+void NativePackExp::SetH5Flag (bool a_h5)
+{
+  m_p->m_h5 = a_h5;
+} // NativePackExp::SetH5Flag
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
 Mf2kNative* NativePackExp::GetNative ()
 {
   return m_p->m_native;
@@ -86,6 +95,13 @@ MfPackage* NativePackExp::GetPackage ()
 {
   return m_p->m_package;
 } // NativePackExp::GetPackage
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+bool NativePackExp::GetH5Flag ()
+{
+  return m_p->m_h5;
+} // NativePackExp::GetH5Flag
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------

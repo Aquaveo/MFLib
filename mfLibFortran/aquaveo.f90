@@ -137,22 +137,24 @@ module module_aquaveo
         call ed_setstayopen(.TRUE.)
       else if (arg1(1:1).eq.'-') then
         flag = 0
-        if (arg1.eq.'-exportText') flag=1
-        if (arg1.eq.'-exportText_ArraysInFolder') flag=1
-        if (arg1.eq.'-exportText_ArraysInternal') flag=1
-        if (arg1.eq.'-exportTextAI') flag=1
+        if (arg1.eq.'-exportText') flag=3
+        if (arg1.eq.'-exportText_ArraysInFolder') flag=3
+        if (arg1.eq.'-exportText_ArraysInternal') flag=3
+        if (arg1.eq.'-exportTextAI') flag=3
         if (arg1.eq.'-exportGeoDB') flag=1
         if (arg1.eq.'-exportGeoDBFree') flag=1
         if (arg1.eq.'-exportSQLite') flag=1
         if (arg1.eq.'-exportGmsH5') flag=2
         if (arg1.eq.'-exportGmsCompressedH5') flag=2
-        if (flag.eq.1.or.flag.eq.2) then
+        if (flag.gt.0.and.flag.lt.4) then
           call ed_SetPromptForArray(.true., .true.)
           call getarg(3, arg2)
           if (flag.eq.1) then
             call ed_setExportGeoDB(arg1,arg2)
-          else
+          else if (flag.eq.2) then
             call ed_setExportGmsH5(arg1,arg2)
+          else if (flag.eq.3) then
+            call ed_setExportText(arg1,arg2)
           endif
           if (iargc() > 4) then
             call getarg(4, arg3)

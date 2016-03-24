@@ -36,8 +36,7 @@ namespace
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-NativeExpMnw2::NativeExpMnw2 (bool a_h5) :
-  m_h5(a_h5)
+NativeExpMnw2::NativeExpMnw2 ()
 {
 } // MfNativeExpMnw2::MfNativeExpMnw2
 //------------------------------------------------------------------------------
@@ -523,7 +522,7 @@ void NativeExpMnw2::Lines34 ()
   desc.Format("   3. ITMP (SP%d)", a_sp);
   AddToStoredLinesDesc(line, desc);
 
-  if (m_h5)
+  if (GetH5Flag())
   {
     H5BcList h5(this);
     line = h5.Mnw2();

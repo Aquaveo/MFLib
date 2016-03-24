@@ -19,7 +19,7 @@ namespace MfData
       friend NativeExpLstPackT;
       friend NeLstPar;
     public:
-      NativeExpLstPack(bool a_h5);
+      NativeExpLstPack();
       ~NativeExpLstPack();
       virtual bool Export();
 
@@ -87,7 +87,7 @@ namespace MfData
       void Line7(FILE* a_fp, int a_sp);
       void BufferTheLineForComments(CStr& a_line);
 
-      bool                m_h5, m_usg, m_unstructured;
+      bool                m_usg, m_unstructured;
       const int          *m_nBcs, *m_nAux, *m_nDataFields;
       int                 m_nFields, m_nI, m_nJ, m_nK, m_nodeOffset;
       const Real         *m_data;

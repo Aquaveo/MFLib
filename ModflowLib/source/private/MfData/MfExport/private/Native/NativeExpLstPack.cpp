@@ -29,9 +29,8 @@ const char * const CLN_CREATED = "H5 CLN Created";
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-NativeExpLstPack::NativeExpLstPack (bool a_h5)
-: m_h5(a_h5)
-, m_usg(false)
+NativeExpLstPack::NativeExpLstPack ()
+: m_usg(false)
 , m_unstructured(false)
 , m_nBcs(0)
 , m_nAux(0)
@@ -57,7 +56,6 @@ NativeExpLstPack::NativeExpLstPack (bool a_h5)
     m_nJ = MfData::MfGlobal::Get().NumCol();
     m_unstructured = MfData::MfGlobal::Get().Unstructured() ? 1 : 0;
   }
-  if (m_h5) m_h5Bc = new H5BcList(this);
 } // MfNativeExpLstPack::MfNativeExpLstPack
 //------------------------------------------------------------------------------
 /// \brief
@@ -98,7 +96,7 @@ bool NativeExpLstPack::Export ()
 {
   if (1 == GetGlobal()->GetCurrentPeriod())
   {
-    if (m_h5) AddToStoredLinesDesc("#GMS_HDF5_01", "");
+    if (GetH5Flag()) AddToStoredLinesDesc("#GMS_HDF5_01", "");
     Line1();
     Line2();
 
@@ -119,7 +117,7 @@ bool NativeExpLstPack::Export ()
 //------------------------------------------------------------------------------
 void NativeExpLstPack::Line1 ()
 {
-  if (m_h5 || Packages::DRT == GetPackage()->PackageName()) return;
+  if (GetH5Flag() || Packages::DRT == GetPackage()->PackageName()) return;
 
   CStr desc = " 1. [PARAMETER ";
   desc += "NP";
@@ -129,7 +127,7 @@ void NativeExpLstPack::Line1 ()
   CStr ln;
 
   const int* np(0);
-  if (!m_h5 &&
+  if (!GetH5Flag() &&
       (!GetPackage()->GetField(Packages::ListPack::NP, &np) || !np ||
        *np < 1))
     return;
@@ -204,7 +202,7 @@ void NativeExpLstPack::Line2 ()
         GetPackage()->GetField("MXL", &mxl) && mxl)
     {
       int tmpNp(*np);
-      if (m_h5) tmpNp = 0;
+      if (GetH5Flag()) tmpNp = 0;
       int imxl = *mxl;
       if (0 == tmpNp) imxl = 0;
       CStr ln2;
@@ -268,7 +266,7 @@ void NativeExpLstPack::Line5 ()
     desc += " ITMPCLN";
     int h5ClnCreated(0);
     GetGlobal()->GetIntVar(CLN_CREATED, h5ClnCreated);
-    if (m_h5 && !h5ClnCreated)
+    if (GetH5Flag() && !h5ClnCreated)
     {
       expGmsH5_CreateWelClnGroup(GetNative()->GetExp()->GetBaseFileName(),
                                  GetNative()->Compress());
@@ -285,8 +283,9 @@ void NativeExpLstPack::Line5 ()
 
   int tmpItmp(*itmp), tmpNp(*np), tmpItmpCln(0);
   if (itmpcln && 0 < *itmpcln) tmpItmpCln = *itmpcln;
-  if (m_h5)
+  if (GetH5Flag())
   {
+    if (!m_h5Bc) m_h5Bc = new H5BcList(this);
     m_h5BcStr = m_h5Bc->LstPack(tmpItmp);
     tmpNp = 0;
     if (itmpcln && 0 < *itmpcln)
@@ -335,7 +334,7 @@ void NativeExpLstPack::Line6 ()
   GetPackage()->GetField(Packages::ListPack::ITMPCLN , &itmpcln);
 
   CStr ln;
-  if (m_h5)
+  if (GetH5Flag())
   {
     ln = m_h5BcStr;
     if (!ln.empty()) AddToStoredLinesDesc(ln, desc);
