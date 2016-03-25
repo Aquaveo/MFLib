@@ -19,6 +19,9 @@ namespace MfData
       ~NativeExpSen();
       virtual bool Export();
 
+    protected:
+      virtual void   LastChanceBeforeWriting();
+
     private:
       NativeExpSen(const NativeExpSen& rhs);
       const NativeExpSen& operator=(const NativeExpSen& rhs);

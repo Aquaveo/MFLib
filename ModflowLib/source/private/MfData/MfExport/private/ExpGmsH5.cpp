@@ -154,10 +154,6 @@ static void expSuperFile(int a_model_type,
                          TxtExporter *a_exp);
 static void expParamFile(MfPackage* a_package,
                          TxtExporter *a_exp);
-static void expSEN(MfGlobal* a_global, TxtExporter *a_exp);
-static void saveSEN(MfPackage *a_pSen1,
-                    MfPackage *a_pSen,
-                    TxtExporter* a_exp);
 static void showWarnings(MfGlobal* a_global);
 static void expCheckArealFromUseLast(int a_nCells,
                                      const char * a_baseName);
@@ -390,9 +386,9 @@ static bool iPackageToNativeExport (
   }
 
   if (   MfExportUtil::IsSolver(packName)
-      //|| Packages::NAM == packName
+//      || Packages::NAM == packName
       || Packages::PVAL == packName
-      //|| Packages::SEN1 == packName
+      || Packages::SEN1 == packName
       || Packages::DISU == packName
       || Packages::DIS == packName
       || Packages::BCF == packName
@@ -438,6 +434,24 @@ static bool iPackageToNativeExport (
       || Packages::CLNLines0And1 == packName
       || Packages::CLN == packName
       || Packages::GNC == packName
+      // observations
+      //|| Packages::HOB == packName
+      //|| "OB1" == packName
+      //|| Packages::FOB == packName
+      //|| "OB2" == packName
+      //|| "OV2" == packName
+      //|| "OB3" == packName
+      //|| "OV3" == packName
+      //|| "OB4" == packName
+      //|| "OV4" == packName
+      //|| "OB5" == packName
+      //|| "OV5" == packName
+      //|| "OB6" == packName
+      //|| "OV6" == packName
+      //|| "OB7" == packName
+      //|| "OV7" == packName
+      //|| "OB8" == packName
+      //|| "OV8" == packName
      )
   {
      rval = true;
@@ -511,12 +525,6 @@ bool ExpGmsH5::ExportPackage (MfGlobal* a_global,
   {
     expNameFile(a_global, a_package, GetExp(), false, GetModelType(), this);
   }
-  else if (Packages::SEN1 == packName)
-  {
-    saveSEN(a_global->GetPackage(Packages::SEN),
-            a_package,
-            GetExp());
-  }
   else if (Packages::BIN == packName)
   {
     int hasBinary = 1;
@@ -526,7 +534,6 @@ bool ExpGmsH5::ExportPackage (MfGlobal* a_global,
   {
     ASSERT(_CrtCheckMemory());
     expParamFile(a_global->GetPackage("NAM1"), GetExp());
-    expSEN(a_global, GetExp());
     expNameFile(a_global, 0, GetExp(), true, GetModelType(), this);
     expSuperFile(a_global->ModelType(), a_global->GetPackage("NAM1"), GetExp());
   }
@@ -1552,125 +1559,6 @@ static void expParamFile (MfPackage* a_package,
   }
 } // expParamFile
 //------------------------------------------------------------------------------
-/// \brief Saves sensitivity process input file values until the type is known
-//         so they can be exported
-//------------------------------------------------------------------------------
-static void saveSEN (MfPackage *a_pSen,
-                     MfPackage *a_pSen1,
-                     TxtExporter* a_exp)
-{
-  using namespace MfData::Packages;
-  const int *isenall, *iuhead, *iprints, *isensu, *isenpu, *isenfm,
-            *nplist, *isens, *ln;
-  const char *parnam;
-  const Real *b, *bl, *bu, *bscal;
-  ParamList *list;
-  Parameters::GetParameterList(&list);
-
-  if (a_pSen->GetField(SENpack::ISENALL, &isenall) && isenall &&
-      a_pSen->GetField(SENpack::IUHEAD, &iuhead) && iuhead &&
-      a_pSen->GetField(SENpack::IPRINTS, &iprints) && iprints &&
-      a_pSen->GetField(SENpack::ISENSU, &isensu) && isensu &&
-      a_pSen->GetField(SENpack::ISENPU, &isenpu) && isenpu &&
-      a_pSen->GetField(SENpack::ISENFM, &isenfm) && isenfm &&
-      a_pSen1->GetField(SEN1pack::NPLIST, &nplist) && nplist &&
-      a_pSen1->GetField(SEN1pack::PARNAM, &parnam) && parnam &&
-      a_pSen1->GetField(SEN1pack::ISENS, &isens) && isens &&
-      a_pSen1->GetField(SEN1pack::LN, &ln) && ln &&
-      a_pSen1->GetField(SEN1pack::B, &b) && b &&
-      a_pSen1->GetField(SEN1pack::BL, &bl) && bl &&
-      a_pSen1->GetField(SEN1pack::BU, &bu) && bu &&
-      a_pSen1->GetField(SEN1pack::BSCAL, &bscal) && bscal)
-  {
-    SensitivityHeader& sh = a_exp->m_public->m_SensitivityHeader;
-    sh.isenall = *isenall;
-    sh.iuhead  = *iuhead;
-    sh.iprints = *iprints;
-    sh.isensu  = *isensu;
-    sh.isenpu  = *isenpu;
-    sh.isenfm  = *isenfm;
-    sh.nplist  = *nplist;
-
-    vector<SensitivityItem>& si = a_exp->m_public->m_SensitivityItems;
-    for (int i = 0; i < *nplist; ++i)
-    {
-      SensitivityItem senItem;
-      CStr parnamStr(parnam + i*10, 10);
-      senItem.name = parnamStr;
-      senItem.isens = isens[i];
-      senItem.ln    = ln[i];
-      senItem.b     = b[i];
-      senItem.bl    = bl[i];
-      senItem.bu    = bu[i];
-      senItem.bscal = bscal[i];
-      si.push_back(senItem);
-
-      Param p;
-      if (list->FindByName(parnamStr.c_str(), &p))
-      {
-        p.m_bscal = bscal[i];
-        list->UpdateParameter(&p);
-      }
-    }
-  }
-} // saveSEN
-//------------------------------------------------------------------------------
-/// \brief Exports sensitivity process input file
-//------------------------------------------------------------------------------
-static void expSEN (MfGlobal* a_global, TxtExporter *a_exp)
-{
-  using namespace MfData::Packages;
-  vector<SensitivityItem>& si = a_exp->m_public->m_SensitivityItems;
-  SensitivityHeader& sh = a_exp->m_public->m_SensitivityHeader;
-
-  ParamList *list;
-  Parameters::GetParameterList(&list);
-  Param p;
-  CStr paramFileTypes(PARAM_FILE_TYPES);
-  int nonKeyedCount = 0;
-  for (int i = 0; i < sh.nplist; ++i)
-  {
-    SensitivityItem& s = si[i];
-    if (list->FindByName(s.name, &p))
-    {
-      CStr type(p.m_type);
-      type.ToUpper();
-      if (paramFileTypes.find(p.m_type) == std::string::npos)
-        nonKeyedCount++;
-    }
-  }
-
-  //iNeedsSENFile(a_exp) = nonKeyedCount != 0;
-  bool needsSenFile = nonKeyedCount != 0 ? 1 : 0;
-  a_global->SetIntVar("NEEDS_SEN_FILE", needsSenFile);
-  if (!si.empty() && nonKeyedCount)
-  {
-    if (sh.nplist > 0)
-    {
-      CStr aCStr;
-      aCStr.Format("%d %d %d %d \n"
-                   "%d %d %d %d ",
-                   nonKeyedCount, sh.isenall, sh.iuhead, sh.nplist,
-                   sh.iprints, sh.isensu, sh.isenpu, sh.isenfm);
-      a_exp->WriteLineToFile(SEN, aCStr);
-      for (int i = 0; i < sh.nplist; ++i)
-      {
-        SensitivityItem& s = si[i];
-        if (list->FindByName(s.name, &p) &&
-            paramFileTypes.find(p.m_type) == std::string::npos)
-        {
-          CStr parnamStr(s.name);
-          CStr parnamStrCopy(parnamStr);
-          parnamStrCopy.Trim();
-          aCStr.Format("%s %d %d %s %s %s %s ", s.name, s.isens, s.ln,
-                       STR(s.b), STR(s.bl), STR(s.bu), STR(s.bscal));
-          a_exp->WriteLineToFile(SEN, aCStr);
-        }
-      }
-    }
-  }
-} // expSEN
-//------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
 static void showWarnings (MfGlobal* a_global)
@@ -2151,80 +2039,6 @@ void ExpGmsH5T::testCreateDefaultMfH5File ()
   H5Fclose(fid);
   H5Reader::CloseAllH5Files();
   TS_ASSERT(!remove(fullPath));
-}
-//------------------------------------------------------------------------------
-void ExpGmsH5T::testexpSEN ()
-{
-  using namespace MfData::Packages;
-  MfData::MfGlobal g(1,2,2,1,1,1,0);
-  MfData::MfPackage pSen(Packages::SEN);
-  MfData::MfPackage pSen1(Packages::SEN1);
-  int i[6]={1,2,3,4,5,6};
-  int nplist=4;
-  char *parnam = "RCH_ZONE_1RCH_ZONE_2RCH_ZONE_3Q         ";
-  int isens[4]={1,2,3,4};
-  int ln[4]={4,5,6,7};
-  Real b[4]={7,8,9,0};
-  Real bl[4]={0,1,2,3};
-  Real bu[4]={3,4,5,6};
-  Real bscal[4]={6,7,8,9};
-  ParamList *list;
-  Parameters::GetParameterList(&list);
-  list->Clear();
-
-  pSen.SetField("ISENALL", &i[0]);
-  pSen.SetField("IUHEAD", &i[1]);
-  pSen.SetField("IPRINTS", &i[2]);
-  pSen.SetField("ISENSU", &i[3]);
-  pSen.SetField("ISENPU", &i[4]);
-  pSen.SetField("ISENFM", &i[5]);
-
-  pSen1.SetField("NPLIST", &nplist);
-  pSen1.SetField("PARNAM", parnam);
-  pSen1.SetField("ISENS", isens);
-  pSen1.SetField("LN", ln);
-  pSen1.SetField("B", b);
-  pSen1.SetField("BL", bl);
-  pSen1.SetField("BU", bu);
-
-  TxtExporter t(TESTBASE);
-  CStr expected, output;
-
-  saveSEN(&pSen, &pSen1, &t);
-  expSEN(&g, &t);
-  t.GetFileContents(Packages::OCT, output);
-  TS_ASSERT(output.empty());
-  t.m_public->m_SensitivityItems.clear();
-
-  pSen1.SetField("BSCAL", bscal);
-
-  saveSEN(&pSen, &pSen1, &t);
-  expSEN(&g, &t);
-  t.GetFileContents(Packages::OCT, output);
-  TS_ASSERT(output.empty());
-  t.m_public->m_SensitivityItems.clear();
-
-  Param pRCH1("RCH_ZONE_1", -2, "RCH");
-  Param pRCH2("RCH_ZONE_2", -3, "RCH");
-  Param pRCH3("RCH_ZONE_3", -4, "RCH");
-  Param pQ("QPARAM", -5, "Q  ");
-  list->PushBack(&pRCH1);
-  list->PushBack(&pRCH2);
-  list->PushBack(&pRCH3);
-  list->PushBack(&pQ);
-  saveSEN(&pSen, &pSen1, &t);
-  expSEN(&g, &t);
-  list->Clear();
-  t.m_public->m_SensitivityItems.clear();
-
-  expected = "3 1 2 4 \n"
-             "3 4 5 6 \n"
-             "RCH_ZONE_1 1 4 7.0 0.0 3.0 6.0 \n"
-             "RCH_ZONE_2 2 5 8.0 1.0 4.0 7.0 \n"
-             "RCH_ZONE_3 3 6 9.0 2.0 5.0 8.0 \n";
-  t.GetFileContents(Packages::SEN, output);
-  TS_ASSERT_EQUALS2(expected, output);
-  t.m_public->m_SensitivityItems.clear();
 }
 //------------------------------------------------------------------------------
 void ExpGmsH5T::testexpSuperFile ()

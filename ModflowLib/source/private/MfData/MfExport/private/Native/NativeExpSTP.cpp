@@ -59,6 +59,7 @@ bool NativeExpSTP::Export ()
     if (exMnw2) exMnw2->Export(); delete(exMnw2);
   }
 
+  ForcePackageWrite(MfData::Packages::SEN1); // must be before the name file
   if (!GetNative()->StpFlag())
   {
     // write the name file

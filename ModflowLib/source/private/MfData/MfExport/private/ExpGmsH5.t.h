@@ -15,7 +15,6 @@ public:
   void testGetArrayMap();
   void testIsDataArray();
   void testCreateDefaultMfH5File();
-  void testexpSEN();
   void testexpSuperFile();
   void testexpParamFile();
 };

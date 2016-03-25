@@ -172,6 +172,7 @@ public:
   CStr SfrLn2 ();
   CStr SfrLn6 (int& a_itmp);
   CStr ClnWel (int& a_itmp);
+  void AddToSkippedParameters ();
 
   MfData::MfPackage* m_p;
   MfData::MfGlobal*  m_glob;
@@ -907,6 +908,7 @@ CStr H5LstPack::impl::WriteBcData ()
 void H5LstPack::impl::LstPar ()
 {
   if (!Init()) return;
+  AddToSkippedParameters();
   SetupForWriteEnd();
 
   // get some info about the parameter
@@ -1186,6 +1188,23 @@ CStr H5LstPack::impl::ClnWel (int& a_itmp)
   m_p = tmpP;
   return rval;
 } // H5LstPack::impl::ClnWel
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void H5LstPack::impl::AddToSkippedParameters ()
+{
+  using namespace MfData::Packages;
+  const char *nm(0), *typ(0);
+  if (!m_p->GetField(ListParameter::PNAME, &nm) || !nm ||
+      !m_p->GetField(ListParameter::PTYPE, &typ) || !typ) return;
+
+  CStr name(nm), type(typ);
+  CStr parToSkip;
+  m_glob->GetStrVar("Pars2Skip", parToSkip);
+  parToSkip += " ";
+  parToSkip += name;
+  m_glob->SetStrVar("Pars2Skip", parToSkip);
+} // H5LstPack::impl::AddToSkippedParameters
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \class H5StrPack

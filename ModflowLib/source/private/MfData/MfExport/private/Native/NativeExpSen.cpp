@@ -34,15 +34,6 @@ NativeExpSen::~NativeExpSen ()
 //------------------------------------------------------------------------------
 bool NativeExpSen::Export ()
 {
-  if (Line3().empty()) return true;
-  AddToStoredLinesDesc(Line1(), Desc1());
-  AddToStoredLinesDesc(Line2(), Desc2());
-  AddToStoredLinesDesc(Line3(), Desc3());
-
-  TmpPackageNameChanger tmp(GetPackage(), "SEN");
-  WriteComments();
-  WriteStoredLines();
-  GetGlobal()->SetIntVar("SEN_Exported", 1);
   return true;
 } // MfNativeExpSen::Export
 //------------------------------------------------------------------------------
@@ -60,7 +51,8 @@ CStr NativeExpSen::Line1 ()
       a_pSen->GetField(SENpack::MXSEN, &imxsen) && imxsen &&
       a_pSen1->GetField(SEN1pack::NPLIST, &nplist) && nplist)
   {
-    rval.Format("%d %d %d %d", *nplist, *isenall, *iuhead, *imxsen);
+    int np = (int)Line3().size();
+    rval.Format("%d %d %d %d", np, *isenall, *iuhead, *imxsen);
   }
   return rval;
 } // NativeExpSen::Line1
@@ -150,6 +142,21 @@ std::vector<CStr> NativeExpSen::Desc3 ()
   std::vector<CStr> rval(Line3().size(), " 3. PARNAM ISENS LN B BL BU BSCAL");
   return rval;
 } // NativeExpSen::Desc3
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void NativeExpSen::LastChanceBeforeWriting ()
+{
+  if (Line3().empty()) return;
+  AddToStoredLinesDesc(Line1(), Desc1());
+  AddToStoredLinesDesc(Line2(), Desc2());
+  AddToStoredLinesDesc(Line3(), Desc3());
+
+  TmpPackageNameChanger tmp(GetPackage(), "SEN");
+  WriteComments();
+  WriteStoredLines();
+  GetGlobal()->SetIntVar("SEN_Exported", 1);
+} // NativeExpSen::LastChanceBeforeWriting
 
 ///////////////////////////////////////////////////////////////////////////////
 // TESTS
