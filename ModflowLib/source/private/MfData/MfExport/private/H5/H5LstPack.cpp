@@ -1193,6 +1193,9 @@ CStr H5LstPack::impl::ClnWel (int& a_itmp)
 //------------------------------------------------------------------------------
 void H5LstPack::impl::AddToSkippedParameters ()
 {
+  if (m_glob->ModelType() != MfData::MF2K &&
+      m_glob->ModelType() != MfData::SEAWAT) return;
+
   using namespace MfData::Packages;
   const char *nm(0), *typ(0);
   if (!m_p->GetField(ListParameter::PNAME, &nm) || !nm ||
