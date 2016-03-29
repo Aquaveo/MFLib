@@ -689,6 +689,7 @@ const int MAX_FORMAT_LENGTH(10);
         int rval(_snprintf(istring, MAX_STRING_LENGTH, "%lld", ipart));
         ASSERT(rval >= 0);
         ilength = (short)strlen(istring);
+        if (i < 0) ilength--;
 
         int maxDigits;
         if (flags & STR_FLOAT)

@@ -59,7 +59,7 @@ void NativeExpObs::ExportObsPack ()
 
   CStr ln;
   ln.Format("%s %d", c, *i);
-  AddToStoredLinesDesc(ln, " 1. OUTNAM ISCALS [ALLFILLES]");
+  AddToStoredLinesDesc(ln, " 1. OUTNAM ISCALS [ALLFILES]");
 
   TmpPackageNameChanger tmp(a_package, "OBS");
 
@@ -89,8 +89,9 @@ void NativeExpObs::HobLine1 ()
   for (size_t i=0; i<d.size(); ++i)
   {
     if (d[i].m_vLay.empty() || d[i].m_vTimes.empty()) continue;
-
-    NH++;
+    
+    if (!d[i].m_vTimes.empty()) NH += (int)d[i].m_vTimes.size();
+    else                        NH++;
     int nLay = (int)d[i].m_vLay.size();
     if (nLay > 1)
     {
@@ -182,10 +183,11 @@ void NativeExpObs::HobLines3to6 ()
 
     int nTime = (int)hd.m_vTimes.size();
     if (nTime > 1) os << -nTime << " ";
-    else os << hd.m_vTimes[0].m_iRefSp << " "
-            << STR(hd.m_vTimes[0].m_tOff) << " ";
+    else os << hd.m_vTimes[0].m_iRefSp << " ";
 
-    os << STR(hd.m_rOff) << " " << STR(hd.m_cOff) << " "
+    os << STR(hd.m_vTimes[0].m_tOff) << " "
+       << STR(hd.m_rOff) << " "
+       << STR(hd.m_cOff) << " "
        << STR(hd.m_vTimes[0].m_hob) << " ";
 
     if (m_isMf2k)
@@ -217,7 +219,8 @@ void NativeExpObs::HobLines3to6 ()
     {
       std::stringstream os1;
       os1 << hd.m_vTimes[j].m_name << " " << hd.m_vTimes[j].m_iRefSp << " "
-          << STR(hd.m_vTimes[j].m_tOff) << " " << STR(hd.m_vTimes[j].m_hob);
+          << STR(hd.m_vTimes[j].m_tOff) << " " << STR(hd.m_vTimes[j].m_hob)
+          << " ";
       if (m_isMf2k)
       {
         os1 << STR(hd.m_vTimes[j].m_statH) << " "

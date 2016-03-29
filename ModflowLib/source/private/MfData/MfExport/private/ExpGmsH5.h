@@ -37,8 +37,6 @@ namespace MfData
     };
   }
 }
-ExpGmsH5Public* New_ExpGmsH5Public();
-void Delete_ExpGmsH5Public(ExpGmsH5Public* a_);
 int xfpWriteDatasetString(hid_t a_Loc,
                           const char *a_Name,
                           const char *a_Str);

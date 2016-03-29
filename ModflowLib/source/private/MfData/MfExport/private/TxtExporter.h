@@ -8,7 +8,6 @@
 
 class TxtExporterT;
 class ExpGmsH5T;
-class ExpGmsH5Public;
 
 class TxtExporter
 {
@@ -42,9 +41,6 @@ public:
   bool ClearFile(const char* const a_);
 
   std::map<CStr, std::vector<Real> >& HfbParData() { return m_hfbPar; }
-
-  ExpGmsH5Public* m_public;
-
 
 private:
   TxtExporter(const TxtExporter &rhs);

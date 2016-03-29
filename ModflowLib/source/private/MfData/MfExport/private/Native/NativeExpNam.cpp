@@ -125,10 +125,21 @@ void NativeExpNam::WriteFileStp ()
     if (type.find("data") != -1)
     {
       file = fname[i];
-      //CStr extension(fname[i]);
-      //util::StripAllButExtension(extension, extension);
-      //GetNative()->BuildUniqueName(baseName, extension, unit[i],
-      //                             uniqueNames, file);
+      util::StripPathFromFilename(file.c_str(), file);
+      if (uniqueNames.find(file) != uniqueNames.end())
+        GetNative()->BuildUniqueName(baseName, type, unit[i], uniqueNames, file);
+      else uniqueNames.insert(file);
+      // copy unsupported file
+      CStr sourceFile(fname[i]);
+      CStr destPath;
+      util::StripFileFromFilename(exp->GetBaseFileName(), destPath);
+      CStr destFile(destPath + file);
+      FILE *fp(fopen(sourceFile.c_str(), "r"));
+      if (fp)
+      {
+        fclose(fp);
+        util::FileCopy(sourceFile, destFile);
+      }
     }
     else if (exp->IsTypeSupported(ftype[i]) ||
              setNativeSupported.find(ftype[i]) != setNativeSupported.end())

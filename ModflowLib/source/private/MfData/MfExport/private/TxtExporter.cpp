@@ -71,9 +71,7 @@ private:
 //------------------------------------------------------------------------------
 TxtExporter::TxtExporter (const char * a_) :
   m_p(new TxtExporter::impl(a_))
-, m_public(0)
 {
-  m_public = New_ExpGmsH5Public();
 } // TxtExporter::TxtExporter
 //------------------------------------------------------------------------------
 /// \brief Destructor
@@ -84,8 +82,6 @@ TxtExporter::~TxtExporter ()
   {
     if (m_p) delete(m_p);
     m_p = 0;
-    if (m_public) Delete_ExpGmsH5Public(m_public);
-    m_public = 0;
   }
   catch (...) {}
 } // TxtExporter::~TxtExporter

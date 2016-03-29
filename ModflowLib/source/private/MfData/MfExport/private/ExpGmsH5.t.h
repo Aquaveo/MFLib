@@ -11,11 +11,8 @@ class ExpGmsH5T : public CxxTest::TestSuite
 public:
   void testCreateClass();
   void testSupportedPackage();
-  void testexpNameFile();
   void testGetArrayMap();
   void testIsDataArray();
   void testCreateDefaultMfH5File();
-  void testexpSuperFile();
-  void testexpParamFile();
 };
 #endif

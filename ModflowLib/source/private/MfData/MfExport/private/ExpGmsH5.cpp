@@ -42,13 +42,10 @@
 
 using namespace MfData;
 using namespace Export;
-using std::vector;
-using std::set;
 
 //-----CONSTANTS----------------------------------------------------------------
 #define PARAM_FILE_TYPES "DRN DRT GHB RIV CHD Q   STR SFR"
-
-enum enumNameFileType { NF_MODFLOW, NF_MT3D, NF_SEAWAT };
+const char* PAR_FILE_EXPORTED = "PAR_FILE_EXPORTED";
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \class ExpGmsH5::impl
@@ -56,54 +53,29 @@ enum enumNameFileType { NF_MODFLOW, NF_MT3D, NF_SEAWAT };
 class ExpGmsH5::impl
 {
 public:
-  impl() : m_nativeExp(0)
+  impl()
+    : m_nativeExp(0)
+    , m_global(NULL)
+    , m_package(NULL)
+    , m_exp(NULL)
+    , m_paramFileWasExported(0)
   {}
+
   ~impl()
   {
     if (m_nativeExp) delete(m_nativeExp);
   }
 
-  bool ExportNative (MfGlobal* a_global,
-                     MfPackage* a_package,
-                     TxtExporter* a_exp);
+  bool ExportNative ();
   void SetFileName (const char * const a_) { m_fname = a_; }
+  void ExpParamFile ();
+  void ExpSuperFile ();
+  MfGlobal* m_global;
+  MfPackage* m_package;
+  TxtExporter* m_exp;
   Mf2kNative* m_nativeExp;
   CStr m_fname;
-};
-////////////////////////////////////////////////////////////////////////////////
-/// \struct SensitivityItem
-////////////////////////////////////////////////////////////////////////////////
-//------------------------------------------------------------------------------
-/// \brief Used to store SEN item info between reading the sensitivity file and
-///        writing it.
-//------------------------------------------------------------------------------
-struct SensitivityItem
-{
-  CStr name;
-  int isens;
-  int ln;
-  Real b;
-  Real bl;
-  Real bu;
-  Real bscal;
-};
-
-////////////////////////////////////////////////////////////////////////////////
-/// \class SensitivityHeader
-////////////////////////////////////////////////////////////////////////////////
-//------------------------------------------------------------------------------
-/// \brief Used to store SEN header info between reading the sensitivity file
-///        and writing.
-//------------------------------------------------------------------------------
-struct SensitivityHeader
-{
-  int isenall;
-  int iuhead;
-  int iprints;
-  int isensu;
-  int isenpu;
-  int isenfm;
-  int nplist;
+  bool m_paramFileWasExported;
 };
 
 class ExpGmsH5Public
@@ -111,26 +83,12 @@ class ExpGmsH5Public
 public:
   ExpGmsH5Public() :
     m_paramFileWasExported(0)
-  , m_ExportedPackages()
-  , m_SensitivityHeader()
-  , m_SensitivityItems()
-  , m_NAM_ftype()
-  , m_NAM_fname()
-  , m_NAM_niu()
-  , m_NAM_maxStrLen(0)
   {}
 
   virtual ~ExpGmsH5Public()
   {}
 
   bool m_paramFileWasExported;
-  std::set<CStr> m_ExportedPackages;
-  SensitivityHeader m_SensitivityHeader;
-  std::vector<SensitivityItem> m_SensitivityItems;
-  std::vector<CStr> m_NAM_ftype;
-  std::vector<CStr> m_NAM_fname;
-  std::vector<int> m_NAM_niu;
-  int m_NAM_maxStrLen;
 };
 
 static void CreateH5Dataset(const CStr &a_file,
@@ -143,50 +101,8 @@ static bool CreateDefaultMfH5File(const char *a_,
                                   int a_modelType=1,
                                   bool a_compress=false);
 static std::map<CStr,std::vector<int> > &GetChunkMap();
-static void expNameFile(MfGlobal* a_global,
-                        MfPackage *a_package,
-                        TxtExporter *a_exp,
-                        int a_write,
-                        int a_modelType,
-                        ExpGmsH5* a_h5);
-static void expSuperFile(int a_model_type,
-                         MfPackage* a_package,
-                         TxtExporter *a_exp);
-static void expParamFile(MfPackage* a_package,
-                         TxtExporter *a_exp);
 static void showWarnings(MfGlobal* a_global);
-static void expCheckArealFromUseLast(int a_nCells,
-                                     const char * a_baseName);
-static bool& iNeedsSENFile();
-static void WriteDataSetWithZeros (CStr& f, CStr& path, hsize_t dim[3],
-                                   hsize_t start[3]);
 
-//------------------------------------------------------------------------------
-/// \brief Creates new class and passes ownership to the receiving class
-//------------------------------------------------------------------------------
-ExpGmsH5Public* New_ExpGmsH5Public ()
-{
-  ExpGmsH5Public* p = new ExpGmsH5Public();
-  return p;
-} // New_ExpGmsH5Public
-void Delete_ExpGmsH5Public (ExpGmsH5Public* a_)
-{
-  delete(a_);
-} // Delete_ExpGmsH5Public
-//------------------------------------------------------------------------------
-/// \brief holds a flag
-//------------------------------------------------------------------------------
-static bool& iWasParamFileExported (TxtExporter* a_exp)
-{
-  return a_exp->m_public->m_paramFileWasExported;
-} // iWasParamFileExported
-//------------------------------------------------------------------------------
-/// \brief Set that holds the packages that have been exported
-//------------------------------------------------------------------------------
-static std::set<CStr> &ExportedPackages (TxtExporter* a_exp)
-{
-  return a_exp->m_public->m_ExportedPackages;
-} // expExportedPackages
 //------------------------------------------------------------------------------
 /// \brief Constructor
 //------------------------------------------------------------------------------
@@ -386,7 +302,7 @@ static bool iPackageToNativeExport (
   }
 
   if (   MfExportUtil::IsSolver(packName)
-//      || Packages::NAM == packName
+      || Packages::NAM == packName
       || Packages::PVAL == packName
       || Packages::SEN1 == packName
       || Packages::DISU == packName
@@ -435,23 +351,23 @@ static bool iPackageToNativeExport (
       || Packages::CLN == packName
       || Packages::GNC == packName
       // observations
-      //|| Packages::HOB == packName
-      //|| "OB1" == packName
-      //|| Packages::FOB == packName
-      //|| "OB2" == packName
-      //|| "OV2" == packName
-      //|| "OB3" == packName
-      //|| "OV3" == packName
-      //|| "OB4" == packName
-      //|| "OV4" == packName
-      //|| "OB5" == packName
-      //|| "OV5" == packName
-      //|| "OB6" == packName
-      //|| "OV6" == packName
-      //|| "OB7" == packName
-      //|| "OV7" == packName
-      //|| "OB8" == packName
-      //|| "OV8" == packName
+      || Packages::HOB == packName
+      || "OB1" == packName
+      || Packages::FOB == packName
+      || "OB2" == packName
+      || "OV2" == packName
+      || "OB3" == packName
+      || "OV3" == packName
+      || "OB4" == packName
+      || "OV4" == packName
+      || "OB5" == packName
+      || "OV5" == packName
+      || "OB6" == packName
+      || "OV6" == packName
+      || "OB7" == packName
+      || "OV7" == packName
+      || "OB8" == packName
+      || "OV8" == packName
      )
   {
      rval = true;
@@ -473,59 +389,219 @@ static bool iPackageToNativeExport (
 //------------------------------------------------------------------------------
 /// \brief Uses the native exporter to write the files
 //------------------------------------------------------------------------------
-bool ExpGmsH5::impl::ExportNative (MfGlobal* a_global,
-                                   MfPackage* a_package,
-                                   TxtExporter* a_exp)
+bool ExpGmsH5::impl::ExportNative ()
 {
-    bool rval=false;
-    CStr packName(a_package->PackageName());
-    if (iPackageToNativeExport(packName, a_global, a_package))
+  if (!m_global || !m_package || !m_exp) return false;
+  bool rval=false;
+  CStr packName(m_package->PackageName());
+  if (iPackageToNativeExport(packName, m_global, m_package))
+  {
+    if (!m_nativeExp)
     {
-      if (!m_nativeExp)
-      {
-        m_nativeExp = new Mf2kNative;
-        m_nativeExp->SetFileName(m_fname.c_str());
-        m_nativeExp->SetArraysInternal(true);
-        m_nativeExp->ArealUseLastToh5(true);
-      }
-      if (m_nativeExp)
-      {
-        // TODO REMOVE
-        if ("STP" == packName) m_nativeExp->StpFlag() = true;
-        a_exp->AtLeastOneTransientSPExists() =
-          m_nativeExp->GetExp()->AtLeastOneTransientSPExists();
-        a_exp->SetOfSteadyStateStressPeriods() =
-          m_nativeExp->GetExp()->SetOfSteadyStateStressPeriods();
+      m_nativeExp = new Mf2kNative;
+      m_nativeExp->SetFileName(m_fname.c_str());
+      m_nativeExp->SetArraysInternal(true);
+      m_nativeExp->ArealUseLastToh5(true);
+    }
+    if (m_nativeExp)
+    {
+      // TODO REMOVE
+      if ("STP" == packName) m_nativeExp->StpFlag() = true;
+      m_exp->AtLeastOneTransientSPExists() =
+        m_nativeExp->GetExp()->AtLeastOneTransientSPExists();
+      m_exp->SetOfSteadyStateStressPeriods() =
+        m_nativeExp->GetExp()->SetOfSteadyStateStressPeriods();
 
-        rval = m_nativeExp->ExportPackage(a_global, a_package);
+      rval = m_nativeExp->ExportPackage(m_global, m_package);
 
-        // TODO REMOVE
-        if ("STP" == packName)
-        {
-          m_nativeExp->StpFlag() = false;
-          rval = false;
-        }
+      // TODO REMOVE
+      if ("STP" == packName)
+      {
+        m_nativeExp->StpFlag() = false;
+        rval = false;
       }
     }
-    return rval;
+  }
+  return rval;
 } // ExpGmsH5::impl::ExportNative
+//------------------------------------------------------------------------------
+/// \brief Writes out the parameter file
+//------------------------------------------------------------------------------
+void ExpGmsH5::impl::ExpParamFile ()
+{
+  if (!m_global || !m_package || !m_exp) return;
+
+  using namespace MfData::Packages;
+  MfPackage* p(m_global->GetPackage("NAM1"));
+  const char *fname(NULL);
+
+  int parFileExported(0);
+  m_global->SetIntVar(PAR_FILE_EXPORTED, parFileExported);
+  if (p->GetField(NameFile::FNAME, &fname) && fname)
+  {
+    CStr sourceFile;
+    util::StripExtensionFromFilename(fname, sourceFile);
+    sourceFile += ".param";
+    FILE* sourceParamFile = fopen(sourceFile.c_str(), "r");
+    if (sourceParamFile != NULL)
+    {
+      const size_t maxLineSize = 256;
+      char line[maxLineSize];
+      while (fgets(line, maxLineSize, sourceParamFile))
+      {
+        m_exp->WriteStringToFile("param", line);
+      }
+      parFileExported = 1;
+    }
+  }
+  
+  if (!parFileExported)
+  {
+
+    Param p;
+    ParamList *list(0);
+    Parameters::GetParameterList(&list);
+
+    // write out parameters for the DRN, DRT, GHB, RIV, CHD, WEL (Q)
+    CStr parTypes(PARAM_FILE_TYPES);
+
+    // We decided that we didn't want to duplicate code in mfLib for reading
+    // and interpreting array based parameters. So we decided that we would
+    // not write them to the param file and we would just have the code in
+    // GMS to read the array based parameters and figure out if they are
+    // using clusters or if they can be represented with key values. Once you
+    // write out the files from GMS then all of the parameters will be written
+    // to the param file.
+
+    for (size_t i=0; i<list->Size(); i++)
+    {
+      CStr line, type;
+      list->At(i, &p);
+      type = p.m_type;
+      line.ToUpper();
+      if (parTypes.find(type) != std::string::npos)
+      {
+        m_exp->WriteLineToFile("param", "BEGPAR");
+
+        line.Format("NAME \"%s\"", p.m_name);
+        m_exp->WriteLineToFile("param", line);
+
+        if (type == "Q")
+          type = "WELL";
+        line.Format("TYPE %s", type);
+        m_exp->WriteLineToFile("param", line);
+
+        line.Format("KEY %s", STR(p.m_key));
+        m_exp->WriteLineToFile("param", line);
+
+        line.Format("VALUE %s %s %s",
+                    STR(p.m_value),
+                    STR(p.m_min == 0 ? 1e-10 : p.m_min),
+                    STR(p.m_max == 0 ? p.m_start*100 : p.m_max));
+        m_exp->WriteLineToFile("param", line);
+
+        line.Format("SOLVE %d", p.m_isens ? 1 : 0);
+        m_exp->WriteLineToFile("param", line);
+
+        if (p.m_logTrans)
+        {
+          line = "LOGXFORM";
+          m_exp->WriteLineToFile("param", line);
+        }
+
+        line.Format("BSCAL %s", STR(p.m_bscal));
+        m_exp->WriteLineToFile("param", line);
+
+        m_exp->WriteLineToFile("param", "ENDPAR");
+        parFileExported = 1;
+      }
+    }
+  }
+  m_global->SetIntVar(PAR_FILE_EXPORTED, parFileExported);
+} // ExpGmsH5::impl::ExpParamFile
+//------------------------------------------------------------------------------
+/// \brief Writes out the super file so we can read in the parameter file
+//------------------------------------------------------------------------------
+void ExpGmsH5::impl::ExpSuperFile ()
+{
+  if (!m_global || !m_package || !m_exp) return;
+
+  using namespace MfData::Packages;
+  MfPackage* p(m_global->GetPackage("NAM1"));
+  if (!p) return;
+
+  const char *fname(NULL);
+  if (p->GetField(NameFile::FNAME, &fname) && fname)
+  {
+    CStr sourceFile;
+    util::StripExtensionFromFilename(fname, sourceFile);
+    sourceFile += ".mfs";
+    FILE *fp(fopen(sourceFile, "r"));
+    if (fp)
+    {
+      fclose(fp);
+      CStr destFile(m_exp->GetBaseFileName());
+      destFile += ".mfs";
+      util::FileCopy(sourceFile, destFile);
+      return;
+    }
+  }
+
+
+  CStr line, base(m_exp->GetBaseFileName());
+  //util::StripExtensionFromFilename(base, base);
+  util::StripPathFromFilename(base, base);
+
+  switch (m_global->ModelType())
+  {
+  case 0: // MODFLOW-2000
+    m_exp->WriteLineToFile("mfs", "MF2KSUP");
+    break;
+  case 1: // MODFLOW-2005
+    m_exp->WriteLineToFile("mfs", "MF2K5SUP");
+    break;
+  case 2: // MODFLOW-NWT
+    m_exp->WriteLineToFile("mfs", "MFNWTSUP");
+    break;
+  case 3: // SEAWAT
+    m_exp->WriteLineToFile("mfs", "MF2KSUP");
+    break;
+  case 4: // MODFLOW-LGR
+    m_exp->WriteLineToFile("mfs", "MFLGRSUP");
+    break;
+  case 5: // MODFLOW-USG
+    m_exp->WriteLineToFile("mfs", "MFUSGSUP");
+    break;
+  default:
+    ASSERT(0);
+    break;
+  }
+
+  int parFileExported(0);
+  m_global->GetIntVar(PAR_FILE_EXPORTED, parFileExported);
+  if (parFileExported)
+  {
+    line.Format("MPARAM \"%s.param\"", base);
+    m_exp->WriteLineToFile("mfs", line);
+  }
+  line.Format("NAME 99 \"%s.mfn\"", base);
+  m_exp->WriteLineToFile("mfs", line);
+} // ExpGmsH5::impl::ExpSuperFile
 //------------------------------------------------------------------------------
 /// \brief Exports the package data.
 //------------------------------------------------------------------------------
 bool ExpGmsH5::ExportPackage (MfGlobal* a_global,
                               MfPackage* a_package)
 {
+  m_p->m_global = a_global;
+  m_p->m_package = a_package;
+  m_p->m_exp = GetExp();
   // export package as native text
   bool rval(true);
-  if (m_p->ExportNative(a_global, a_package, GetExp())) return rval;
+  if (m_p->ExportNative()) return rval;
 
   CStr packName(a_package->PackageName());
-  ExportedPackages(GetExp()).insert(packName);
-  if (Packages::NAM == packName)
-  {
-    expNameFile(a_global, a_package, GetExp(), false, GetModelType(), this);
-  }
-  else if (Packages::BIN == packName)
+  if (Packages::BIN == packName)
   {
     int hasBinary = 1;
     a_global->SetIntVar("BINARY_EXPORT", hasBinary);
@@ -533,9 +609,8 @@ bool ExpGmsH5::ExportPackage (MfGlobal* a_global,
   else if ("STP" == packName) // this comes at the very end
   {
     ASSERT(_CrtCheckMemory());
-    expParamFile(a_global->GetPackage("NAM1"), GetExp());
-    expNameFile(a_global, 0, GetExp(), true, GetModelType(), this);
-    expSuperFile(a_global->ModelType(), a_global->GetPackage("NAM1"), GetExp());
+    m_p->ExpParamFile();
+    m_p->ExpSuperFile();
   }
   else
   {
@@ -1168,399 +1243,6 @@ static bool CreateDefaultMfH5File (const char *a_,
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-bool iIsSeawatType (const CStr& a_type)
-{
-  return a_type == "VDF" || a_type == "VSC";
-} // iIsSeawatType
-//------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
-bool iIsMt3dType (const CStr& a_type)
-{
-  std::set<CStr> mt3dTypes;
-  mt3dTypes.insert("BTN");
-  mt3dTypes.insert("ADV");
-  mt3dTypes.insert("DSP");
-  mt3dTypes.insert("SSM");
-  mt3dTypes.insert("RCT");
-  mt3dTypes.insert("TOB");
-  mt3dTypes.insert("GCG");
-  return mt3dTypes.find(a_type) != mt3dTypes.end();
-} // iIsMt3dType
-//------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
-static bool iIsTypeFiltered (const CStr& a_type,
-                             int a_namefileType,
-                             int a_modelType,
-                             TxtExporter* a_exp,
-                             MfGlobal* a_global)
-{
-  int needsSenFile(0), pval(0);
-  a_global->GetIntVar("NEEDS_SEN_FILE", needsSenFile);
-  a_global->GetIntVar("PVAL_Exported", pval);
-  if (a_type == "sen" && needsSenFile)
-    return true;
-  else if (a_type.CompareNoCase("pval") == 0 && !pval) 
-    return true;
-  else if (a_modelType == MfData::SEAWAT)
-  {
-    // for SEAWAT
-    if (a_namefileType == NF_MODFLOW &&
-        (iIsMt3dType(a_type) || iIsSeawatType(a_type)))
-    {
-      // only include MODFLOW packages in mfn
-      return true;
-    }
-    else if (a_namefileType == NF_MT3D && !iIsMt3dType(a_type))
-    {
-      // only include MT3D packages in mts
-      return true;
-    }
-  }
-  return false;
-} // iIsTypeFiltered
-//------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
-static bool iIsTypeSupported (const CStr& a_type,
-                              TxtExporter *a_exp,
-                              int a_modelType)
-{
-  if (a_modelType != MfData::SEAWAT)
-    return a_exp->IsTypeSupported(a_type);
-  else
-  {
-    return a_exp->IsTypeSupported(a_type) || iIsSeawatType(a_type);
-  }
-} // iIsTypeSupported
-//------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
-static CStr iGetTypeExtension (const CStr& a_type,
-                               TxtExporter *a_exp)
-{
-  if (a_exp->IsTypeSupported(a_type))
-    return a_exp->GetExtension(a_type);
-  else
-  {
-    CStr lowerType(a_type);
-    lowerType.ToLower();
-    if (lowerType.find("data") != -1) return "";
-    return lowerType;
-  }
-} // iGetTypeExtension
-//------------------------------------------------------------------------------
-/// \brief Exports the name file
-//------------------------------------------------------------------------------
-static void expNameFile (MfGlobal* a_global,
-                         MfPackage *a_package,
-                         TxtExporter *a_exp,
-                         int a_write,
-                         int a_modelType,
-                         ExpGmsH5* a_h5)
-{
-  using namespace Packages;
-  std::vector<CStr>& ftype = a_exp->m_public->m_NAM_ftype;
-  std::vector<CStr>& fname = a_exp->m_public->m_NAM_fname;
-  std::vector<int>& niu = a_exp->m_public->m_NAM_niu;
-  int& maxStrLen = a_exp->m_public->m_NAM_maxStrLen;
-
-  if (a_write == 2)
-  {
-    // for testing
-    ftype.clear();
-    fname.clear();
-    niu.clear();
-    maxStrLen = 0;
-  }
-  else if (!a_write)
-  {
-    const char *t(0), *n(0);
-    const int *iu;
-    if (!a_package->GetField(NameFile::FNAME, &n) || !n ||
-        !a_package->GetField(NameFile::FTYPE, &t) || !t ||
-        !a_package->GetField(NameFile::NIU, &iu) || !iu)
-       return;
-    ftype.push_back(t);
-    fname.push_back(n);
-    niu.push_back(*iu);
-    if (fname.back().GetLength() > maxStrLen)
-      maxStrLen = fname.back().GetLength();
-  }
-  else
-  {
-    int lastType;
-    if (a_modelType == MfData::SEAWAT)
-      lastType = NF_SEAWAT;
-    else
-      lastType = NF_MODFLOW;
-
-    for (int nfType = NF_MODFLOW; nfType <= lastType; ++nfType)
-    {
-      std::set<CStr> uniqueNames, setExt;
-      for (size_t i=0; i<ftype.size(); ++i)
-      {
-        setExt.insert(iGetTypeExtension(ftype.at(i), a_exp));
-      }
-
-      CStr file, type, baseName(a_exp->GetBaseFileName());
-      util::StripPathFromFilename(baseName, baseName);
-      if (nfType == NF_MODFLOW)
-      {
-        CStr lowerBaseName = baseName;
-        lowerBaseName.ToLower();
-        uniqueNames.insert(lowerBaseName + ".h5");
-        uniqueNames.insert(lowerBaseName + ".mfn");
-        uniqueNames.insert(lowerBaseName + ".mfs");
-        uniqueNames.insert(lowerBaseName + ".param");
-      }
-
-      std::ostringstream oStream;
-      bool printedHeading(false);
-      for (size_t i=0; i<ftype.size(); i++)
-      {
-        type = ftype.at(i);
-        type.ToLower();
-        if (!iIsTypeFiltered(ftype.at(i), nfType, a_modelType, a_exp, a_global))
-        {
-          if (type.find("data") != -1 && nfType != NF_MT3D)
-          {
-            CStr extension(fname.at(i));
-            util::StripAllButExtension(extension, extension);
-            CStr base(fname.at(i));
-            util::StripPathFromFilename(base, base);
-            util::StripExtensionFromFilename(base, base);
-            a_h5->BuildUniqueName(base, extension, niu.at(i),
-                                  uniqueNames, file);
-          }
-          else
-          {
-            if (iIsTypeSupported(ftype.at(i), a_exp, a_modelType))
-            {
-              a_h5->BuildUniqueName(baseName,
-                                    iGetTypeExtension(ftype.at(i), a_exp),
-                                    niu.at(i),
-                                    uniqueNames,
-                                    file);
-            }
-            else if (!iIsTypeFiltered(ftype.at(i), nfType, a_modelType, a_exp, a_global))
-            {
-              a_h5->BuildUniqueName(baseName, type, niu.at(i),
-                                    uniqueNames, file);
-
-              // copy unsupported file
-              CStr sourceFile(fname.at(i));
-              CStr destPath;
-              util::StripFileFromFilename(a_exp->GetBaseFileName(), destPath);
-              CStr destFile(destPath + file);
-              util::FileCopy(sourceFile, destFile);
-            }
-          }
-
-          if (nfType == NF_MODFLOW || nfType == NF_SEAWAT)
-          {
-            CStr str;
-            str.Format("%s %d %s", ftype.at(i), niu.at(i), file);
-            if (nfType == NF_MODFLOW)
-              a_exp->WriteLineToFile(NAM, str);
-            else
-              a_exp->WriteLineToFile(SWN, str);
-            if (a_modelType != MfData::SEAWAT || nfType == NF_SEAWAT)
-            {
-              oStream << "FILE UNIT: " << niu.at(i);
-              if (niu.at(i) < 100)
-                oStream << " ";
-              if (niu.at(i) < 10)
-                oStream << " ";
-              oStream << "  FILE NAME: " << fname.at(i);
-              int diff(maxStrLen - fname.at(i).GetLength());
-              for (int q=0; q<diff; q++)
-                oStream << " ";
-              oStream << "  FILE TYPE: " << ftype.at(i) << "\n";
-            }
-          }
-          else
-          {
-            if (!printedHeading)
-            {
-              a_exp->WriteLineToFile(MTS, "MT3DSUP");
-              printedHeading = true;
-            }
-            CStr str;
-            str.Format("%s \"%s\"", ftype.at(i), file);
-            a_exp->WriteLineToFile(MTS, str);
-          }
-        }
-      }
-  #ifdef CXX_TEST
-      if (!testCxx::TestsRunning())
-  #endif
-        printf("%s", oStream.str().c_str());
-    }
-  }
-} // expNameFile
-//------------------------------------------------------------------------------
-/// \brief Writes out the super file so we can read in the parameter file
-//------------------------------------------------------------------------------
-static void expSuperFile (int a_model_type,
-                          MfPackage* a_package,
-                          TxtExporter *a_exp)
-{
-  using namespace MfData::Packages;
-
-  if (!a_exp)
-    return;
-
-  const char *fname(NULL);
-  if (a_package->GetField(NameFile::FNAME, &fname) && fname)
-  {
-    CStr sourceFile;
-    util::StripExtensionFromFilename(fname, sourceFile);
-    sourceFile += ".mfs";
-    FILE *fp(fopen(sourceFile, "r"));
-    if (fp)
-    {
-      fclose(fp);
-      CStr destFile(a_exp->GetBaseFileName());
-      destFile += ".mfs";
-      util::FileCopy(sourceFile, destFile);
-      return;
-    }
-  }
-
-
-  CStr line, base(a_exp->GetBaseFileName());
-  //util::StripExtensionFromFilename(base, base);
-  util::StripPathFromFilename(base, base);
-
-  switch (a_model_type)
-  {
-  case 0: // MODFLOW-2000
-    a_exp->WriteLineToFile("mfs", "MF2KSUP");
-    break;
-  case 1: // MODFLOW-2005
-    a_exp->WriteLineToFile("mfs", "MF2K5SUP");
-    break;
-  case 2: // MODFLOW-NWT
-    a_exp->WriteLineToFile("mfs", "MFNWTSUP");
-    break;
-  case 3: // SEAWAT
-    a_exp->WriteLineToFile("mfs", "MF2KSUP");
-    break;
-  case 4: // MODFLOW-LGR
-    a_exp->WriteLineToFile("mfs", "MFLGRSUP");
-    break;
-  case 5: // MODFLOW-USG
-    a_exp->WriteLineToFile("mfs", "MFUSGSUP");
-    break;
-  default:
-    ASSERT(0);
-    break;
-  }
-
-  if (iWasParamFileExported(a_exp))
-  {
-    line.Format("MPARAM \"%s.param\"", base);
-    a_exp->WriteLineToFile("mfs", line);
-  }
-  line.Format("NAME 99 \"%s.mfn\"", base);
-  a_exp->WriteLineToFile("mfs", line);
-} // expSuperFile
-//------------------------------------------------------------------------------
-/// \brief Writes out the parameter file
-//------------------------------------------------------------------------------
-static void expParamFile (MfPackage* a_package,
-                          TxtExporter *a_exp)
-{
-  using namespace MfData::Packages;
-  const char *fname(NULL);
-
-  iWasParamFileExported(a_exp) = false;
-  if (a_package->GetField(NameFile::FNAME, &fname) && fname)
-  {
-    CStr sourceFile;
-    util::StripExtensionFromFilename(fname, sourceFile);
-    sourceFile += ".param";
-    FILE* sourceParamFile = fopen(sourceFile.c_str(), "r");
-    if (sourceParamFile != NULL)
-    {
-      const size_t maxLineSize = 256;
-      char line[maxLineSize];
-      while (fgets(line, maxLineSize, sourceParamFile))
-      {
-        a_exp->WriteStringToFile("param", line);
-      }
-      iWasParamFileExported(a_exp) = true;
-    }
-  }
-  
-  if (!iWasParamFileExported(a_exp))
-  {
-
-    Param p;
-    ParamList *list(0);
-    Parameters::GetParameterList(&list);
-
-    // write out parameters for the DRN, DRT, GHB, RIV, CHD, WEL (Q)
-    CStr parTypes(PARAM_FILE_TYPES);
-
-    // We decided that we didn't want to duplicate code in mfLib for reading
-    // and interpreting array based parameters. So we decided that we would
-    // not write them to the param file and we would just have the code in
-    // GMS to read the array based parameters and figure out if they are
-    // using clusters or if they can be represented with key values. Once you
-    // write out the files from GMS then all of the parameters will be written
-    // to the param file.
-
-    for (size_t i=0; i<list->Size(); i++)
-    {
-      CStr line, type;
-      list->At(i, &p);
-      type = p.m_type;
-      line.ToUpper();
-      if (parTypes.find(type) != std::string::npos)
-      {
-        a_exp->WriteLineToFile("param", "BEGPAR");
-
-        line.Format("NAME \"%s\"", p.m_name);
-        a_exp->WriteLineToFile("param", line);
-
-        if (type == "Q")
-          type = "WELL";
-        line.Format("TYPE %s", type);
-        a_exp->WriteLineToFile("param", line);
-
-        line.Format("KEY %s", STR(p.m_key));
-        a_exp->WriteLineToFile("param", line);
-
-        line.Format("VALUE %s %s %s",
-                    STR(p.m_value),
-                    STR(p.m_min == 0 ? 1e-10 : p.m_min),
-                    STR(p.m_max == 0 ? p.m_start*100 : p.m_max));
-        a_exp->WriteLineToFile("param", line);
-
-        line.Format("SOLVE %d", p.m_isens ? 1 : 0);
-        a_exp->WriteLineToFile("param", line);
-
-        if (p.m_logTrans)
-        {
-          line = "LOGXFORM";
-          a_exp->WriteLineToFile("param", line);
-        }
-
-        line.Format("BSCAL %s", STR(p.m_bscal));
-        a_exp->WriteLineToFile("param", line);
-
-        a_exp->WriteLineToFile("param", "ENDPAR");
-        iWasParamFileExported(a_exp) = true;
-      }
-    }
-  }
-} // expParamFile
-//------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
 static void showWarnings (MfGlobal* a_global)
 {
   int binaryExport(0);
@@ -1688,135 +1370,6 @@ void ExpGmsH5T::testSupportedPackage ()
   TS_ASSERT(t->IsTypeSupported(ZON));
 
   TS_ASSERT_EQUALS(e.m_types.size(), 48);
-}
-//------------------------------------------------------------------------------
-void ExpGmsH5T::testexpNameFile ()
-{
-  MfPackage p(Packages::NAM);
-  const int MF_FILE_NUMBER(9);
-  const int SW_FILE_NUMBER(13);
-  const char *nm[SW_FILE_NUMBER] =
-    {"f.global", "f1.basic", "f2.lay", "h.hed",
-     "h.l", "h.gage", "h.g", "i.ab", "i.abc",
-     "j.vdf", "j.vsc",
-     "k.btn", "l.gcg"};
-  const char *type[SW_FILE_NUMBER] =
-    {"GLOBAL", "BAS6", "LPF", "DATA(BINARY)",
-     "LMT6", "DATA", "GAGE", "ABC", "ABC",
-     "VDF", "VSC",
-     "BTN", "GCG"};
-  int units[SW_FILE_NUMBER] = {1, 3, 4, 30, 18, 201, 23, 301, 302,
-                               401, 402, 501, 502};
-
-  MfGlobal g(1,2,2,1,1,1,0);
-  CStr outPath;
-  util::GetTempDirectory(outPath);
-  CStr nameFile(outPath + "\\testname.mfn");
-  CStr abcFile(outPath + "\\testname.abc");
-
-  CStr basePath;
-  util::GetTestFilesDirectory(basePath);
-  basePath += "\\HDF5_InputFiles";
-  TS_ASSERT(SetCurrentDirectory(basePath));
-  {
-    ExpGmsH5 exp(outPath+"\\testname");
-    TxtExporter* t = exp.GetExp();
-
-    for (int i=0; i<MF_FILE_NUMBER; i++)
-    {
-      p.SetField(Packages::NameFile::FNAME, nm[i]);
-      p.SetField(Packages::NameFile::FTYPE, type[i]);
-      p.SetField(Packages::NameFile::NIU, &units[i]);
-      expNameFile(&g, &p, t, false, MfData::MF2K, &exp);
-    }
-
-    expNameFile(&g, 0, t, true, MfData::MF2K, &exp);
-
-    CStr expected;
-    expected = "GLOBAL 1 testname.glo\n"
-               "BAS6 3 testname.ba6\n"
-               "LPF 4 testname.lpf\n"
-               "DATA(BINARY) 30 h.hed\n"
-               "LMT6 18 testname.lmt6\n"
-               "DATA 201 h.gage\n"
-               "GAGE 23 testname.gag\n"
-               "ABC 301 testname.abc\n"
-               "ABC 302 testname.abc_UNIT_302\n";
-    CStr output;
-    t->GetFileContents(Packages::NAM, output);
-    TS_ASSERT_EQUALS2(expected, output);
-    TS_ASSERT_TXT_FILES_EQUAL(basePath+"\\i.ab", abcFile);
-  }
-  TS_ASSERT(!remove(nameFile));
-  TS_ASSERT(!remove(abcFile));
-
-  // test SEAWAT name file and MT3D
-  CStr btnFile(outPath + "\\testname.btn");
-  CStr gcgFile(outPath + "\\testname.gcg");
-  {
-    ExpGmsH5 exp(outPath+"\\testname");
-    TxtExporter* t = exp.GetExp();
-
-    // clear out the static variables in expNameFile
-    expNameFile(&g, &p, t, 2, 0, &exp);
-
-    for (int i=0; i<SW_FILE_NUMBER; i++)
-    {
-      p.SetField(Packages::NameFile::FNAME, nm[i]);
-      p.SetField(Packages::NameFile::FTYPE, type[i]);
-      p.SetField(Packages::NameFile::NIU, &units[i]);
-      expNameFile(&g, &p, t, false, MfData::MF2K, &exp);
-    }
-
-    expNameFile(&g, 0, t, true, MfData::SEAWAT, &exp);
-
-    // MODFLOW name file shouldn't have SEAWAT and MT3D packages
-    CStr expected;
-    expected = "GLOBAL 1 testname.glo\n"
-               "BAS6 3 testname.ba6\n"
-               "LPF 4 testname.lpf\n"
-               "DATA(BINARY) 30 h.hed\n"
-               "LMT6 18 testname.lmt6\n"
-               "DATA 201 h.gage\n"
-               "GAGE 23 testname.gag\n"
-               "ABC 301 testname.abc\n"
-               "ABC 302 testname.abc_UNIT_302\n";
-    CStr output;
-    t->GetFileContents(Packages::NAM, output);
-    TS_ASSERT_EQUALS2(expected, output);
-    TS_ASSERT_TXT_FILES_EQUAL(basePath+"\\i.ab", abcFile);
-
-    // SEAWAT name file should have SEAWAT and MT3D packages
-    expected = "GLOBAL 1 testname.glo\n"
-               "BAS6 3 testname.ba6\n"
-               "LPF 4 testname.lpf\n"
-               "DATA(BINARY) 30 h.hed\n"
-               "LMT6 18 testname.lmt6\n"
-               "DATA 201 h.gage\n"
-               "GAGE 23 testname.gag\n"
-               "ABC 301 testname.abc\n"
-               "ABC 302 testname.abc_UNIT_302\n"
-               "VDF 401 testname.vdf\n"
-               "VSC 402 testname.vsc\n"
-               "BTN 501 testname.btn\n"
-               "GCG 502 testname.gcg\n";
-    t->GetFileContents(Packages::SWN, output);
-    TS_ASSERT_EQUALS2(expected, output);
-
-    // MT3D super file should have MT3D packages
-    expected = "MT3DSUP\n"
-               "BTN \"testname.btn\"\n"
-               "GCG \"testname.gcg\"\n";
-    t->GetFileContents(Packages::MTS, output);
-    TS_ASSERT_EQUALS2(expected, output);
-    TS_ASSERT_TXT_FILES_EQUAL(basePath+"\\k.btn", btnFile);
-    TS_ASSERT_TXT_FILES_EQUAL(basePath+"\\l.gcg", gcgFile);
-
-  }
-  TS_ASSERT(!remove(nameFile));
-  TS_ASSERT(!remove(abcFile));
-  TS_ASSERT(!remove(btnFile));
-  TS_ASSERT(!remove(gcgFile));
 }
 //------------------------------------------------------------------------------
 void ExpGmsH5T::testGetArrayMap ()
@@ -2039,90 +1592,6 @@ void ExpGmsH5T::testCreateDefaultMfH5File ()
   H5Fclose(fid);
   H5Reader::CloseAllH5Files();
   TS_ASSERT(!remove(fullPath));
-}
-//------------------------------------------------------------------------------
-void ExpGmsH5T::testexpSuperFile ()
-{
-  MfData::MfPackage pack("NAM1");
-  CStr f, output, line;
-  util::GetTempDirectory(f);
-  f += "\\fmsuper";
-
-  {
-    TxtExporter t(f);
-    iWasParamFileExported(&t) = false;
-    expSuperFile(0, &pack, &t);
-    t.GetFileContents("mfs", output);
-    line = "MF2KSUP\n"
-           "NAME 99 \"fmsuper.mfn\"\n";
-    TS_ASSERT_EQUALS2(output, line);
-  }
-  {
-    TxtExporter t(f);
-    iWasParamFileExported(&t) = true;
-    expSuperFile(0, &pack, &t);
-    t.GetFileContents("mfs", output);
-    line = "MF2KSUP\n"
-           "MPARAM \"fmsuper.param\"\n"
-           "NAME 99 \"fmsuper.mfn\"\n";
-    TS_ASSERT_EQUALS2(output, line);
-  }
-}
-//------------------------------------------------------------------------------
-void ExpGmsH5T::testexpParamFile ()
-{
-  MfData::MfPackage pack("NAM1");
-  CStr f, output, line;
-  util::GetTempDirectory(f);
-  f += "\\parameters.mfs";
-  {
-    //pack.SetField(MfData::Packages::ListPack::ITMP, &itmp);
-    TxtExporter t(f);
-    expParamFile(&pack, &t);
-    t.GetFileContents("param", output);
-    line = "";
-    TS_ASSERT_EQUALS2(output, line);
-    TS_ASSERT_EQUALS(iWasParamFileExported(&t), false);
-  }
-
-  ParamList *list(0);
-  Parameters::GetParameterList(&list);
-  list->Clear();
-
-  {
-    Param p("w1", -1, "Q", 5, .1, 25);
-    p.m_isens = 1;
-    list->PushBack(&p);
-  }
-  {
-    Param p("d1", -2, "DRN", 5, .1, 25);
-    list->PushBack(&p);
-  }
-
-  {
-    TxtExporter t(f);
-    expParamFile(&pack, &t);
-    t.GetFileContents("param", output);
-    line = "BEGPAR\n"
-           "NAME \"w1\"\n"
-           "TYPE WELL\n"
-           "KEY -1.0\n"
-           "VALUE 5.0 0.1 25.0\n"
-           "SOLVE 1\n"
-           "BSCAL 1.0\n"
-           "ENDPAR\n"
-           "BEGPAR\n"
-           "NAME \"d1\"\n"
-           "TYPE DRN\n"
-           "KEY -2.0\n"
-           "VALUE 5.0 0.1 25.0\n"
-           "SOLVE 0\n"
-           "BSCAL 1.0\n"
-           "ENDPAR\n";
-    TS_ASSERT_EQUALS2(output, line);
-    TS_ASSERT_EQUALS(iWasParamFileExported(&t), true);
-  }
-  list->Clear();
 }
 
 #endif
