@@ -234,7 +234,7 @@ void NativeExpNam::WriteFileStp ()
 //------------------------------------------------------------------------------
 bool NativeExpNam::ExportFileType (const CStr& a_type)
 {
-  if ("asp" == a_type) return false;
+  if ("asp" == a_type && !GetH5Flag()) return false;
 
   CStr varStr;
   if ("pval" == a_type) varStr = "PVAL_Exported";
