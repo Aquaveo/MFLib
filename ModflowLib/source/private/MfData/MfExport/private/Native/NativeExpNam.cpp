@@ -21,6 +21,23 @@ using namespace MfData::Export;
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
+static std::set<CStr> iSeawatTypes ()
+{
+  std::set<CStr> ret;
+  ret.insert("vdf");
+  ret.insert("vsc");
+  ret.insert("btn");
+  ret.insert("adv");
+  ret.insert("dsp");
+  ret.insert("ssm");
+  ret.insert("rct");
+  ret.insert("tob");
+  ret.insert("gcg");
+  return ret;
+} // iSeawatTypes
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
 NativeExpNam::NativeExpNam ()
 {
 } // MfNativeExpNam::MfNativeExpNam
@@ -72,8 +89,8 @@ bool NativeExpNam::Export ()
 void NativeExpNam::WriteFileStp ()
 {
   // read the ftype and unit numbers
-  std::vector<CStr>& lines(GetPackage()->StringsToWrite());
-  std::vector<CStr>& desc(GetPackage()->StringDescriptions());
+  std::vector<CStr>& lines(GetPackage()->StringsToWrite()), linesSwn;
+  std::vector<CStr>& desc(GetPackage()->StringDescriptions()), descSwn;
   std::vector<CStr> ftype(lines.size(), ""), fname(lines.size(), "");
   std::vector<int> unit(lines.size(), 0);
   bool multExists(0), zoneExists(0);
@@ -115,12 +132,29 @@ void NativeExpNam::WriteFileStp ()
   CStr file, baseName = exp->GetBaseFileName();
   std::vector<CStr> types, extensions;
   util::StripPathFromFilename(baseName, baseName);
+
+  if (GetH5Flag())
+  {
+    CStr lowerBaseName = baseName;
+    lowerBaseName.ToLower();
+    uniqueNames.insert(lowerBaseName + ".h5");
+    uniqueNames.insert(lowerBaseName + ".mfn");
+    uniqueNames.insert(lowerBaseName + ".mfs");
+    uniqueNames.insert(lowerBaseName + ".param");
+  }
+
+  std::set<CStr> swnTypes;
+  if (GetGlobal()->ModelType() == MfData::SEAWAT) swnTypes = iSeawatTypes();
+  std::set<CStr>::iterator swnEnd = swnTypes.end();
+  bool swnOnly(false), mtsFirst(true);
   for (size_t i=0; i<ftype.size(); ++i)
   {
     CStr type = ftype[i];
     type.ToLower();
 
     if (!ExportFileType(type)) continue;
+    swnOnly = false;
+    if (swnTypes.find(type) != swnEnd) swnOnly = true;
 
     if (type.find("data") != -1)
     {
@@ -164,12 +198,36 @@ void NativeExpNam::WriteFileStp ()
     fline += unitStr;
     while (fline.GetLength() < 30) fline += " ";
     fline += file;
-    lines.push_back(fline);
-    desc.push_back(" 1. Ftype Nunit Fname [Option]");
+    linesSwn.push_back(fline);
+    descSwn.push_back(" 1. Ftype Nunit Fname [Option]");
+    if (!swnOnly)
+    {
+      lines.push_back(fline);
+      desc.push_back(" 1. Ftype Nunit Fname [Option]");
+    }
+    else
+    {
+      if (mtsFirst)
+      {
+        mtsFirst = false;
+        GetNative()->GetExp()->WriteLineToFile(Packages::MTS, "MT3DSUP");
+      }
+      CStr str;
+      str.Format("%s \"%s\"", ftype.at(i), file);
+      GetNative()->GetExp()->WriteLineToFile(Packages::MTS, str);
+    }
   }
 
   WriteComments();
   WriteStoredLines();
+  if (!swnTypes.empty())
+  {
+    lines = linesSwn;
+    desc = descSwn;
+    TmpPackageNameChanger tmp(GetPackage(), Packages::SWN);
+    WriteComments();
+    WriteStoredLines();
+  }
 } // NativeExpNam::WriteFileStp
 //------------------------------------------------------------------------------
 /// \brief

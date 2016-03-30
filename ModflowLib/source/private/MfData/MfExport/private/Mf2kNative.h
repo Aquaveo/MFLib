@@ -29,8 +29,6 @@ namespace MfData
       // this is temporary
       bool& StpFlag() { return m_StpPackFlag; }
 #pragma warning(disable : 4100)
-      //virtual bool ExportArray(MfGlobal *a_global,
-      //                         MfPackage *a_package) {return false;}
 
     private:
       Mf2kNative(const Mf2kNative &rhs);
