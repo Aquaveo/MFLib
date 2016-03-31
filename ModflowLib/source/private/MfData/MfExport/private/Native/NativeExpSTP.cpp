@@ -64,6 +64,7 @@ bool NativeExpSTP::Export ()
   {
     // write the name file
     MfPackage* nm = GetGlobal()->GetPackage(MfData::Packages::NAM);
+    if (GetH5Flag()) NativeUtil::ExportNextToH5();
     NativePackExp* ex = NativeUtil::CreatePackExp(GetNative(), GetGlobal(), nm);
     NativeExpNam* exNm = dynamic_cast<NativeExpNam*>(ex);
     if (exNm) exNm->WriteFileStp(); delete(exNm);
