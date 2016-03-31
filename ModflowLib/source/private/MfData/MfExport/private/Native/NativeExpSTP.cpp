@@ -60,7 +60,7 @@ bool NativeExpSTP::Export ()
   }
 
   ForcePackageWrite(MfData::Packages::SEN1); // must be before the name file
-//  if (!GetNative()->StpFlag())
+
   {
     // write the name file
     MfPackage* nm = GetGlobal()->GetPackage(MfData::Packages::NAM);

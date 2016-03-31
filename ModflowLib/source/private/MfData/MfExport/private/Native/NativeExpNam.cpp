@@ -21,11 +21,9 @@ using namespace MfData::Export;
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-static std::set<CStr> iSeawatTypes ()
+static std::set<CStr> iMt3dTypes ()
 {
   std::set<CStr> ret;
-  ret.insert("vdf");
-  ret.insert("vsc");
   ret.insert("btn");
   ret.insert("adv");
   ret.insert("dsp");
@@ -33,6 +31,16 @@ static std::set<CStr> iSeawatTypes ()
   ret.insert("rct");
   ret.insert("tob");
   ret.insert("gcg");
+  return ret;
+} // iMt3dTypes
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+static std::set<CStr> iSeawatTypes ()
+{
+  std::set<CStr> ret(iMt3dTypes());
+  ret.insert("vdf");
+  ret.insert("vsc");
   return ret;
 } // iSeawatTypes
 //------------------------------------------------------------------------------
@@ -143,7 +151,7 @@ void NativeExpNam::WriteFileStp ()
     uniqueNames.insert(lowerBaseName + ".param");
   }
 
-  std::set<CStr> swnTypes;
+  std::set<CStr> swnTypes, mt3dType(iMt3dTypes());
   if (GetGlobal()->ModelType() == MfData::SEAWAT) swnTypes = iSeawatTypes();
   std::set<CStr>::iterator swnEnd = swnTypes.end();
   bool swnOnly(false), mtsFirst(true);
@@ -205,7 +213,7 @@ void NativeExpNam::WriteFileStp ()
       lines.push_back(fline);
       desc.push_back(" 1. Ftype Nunit Fname [Option]");
     }
-    else
+    else if (mt3dType.find(type) != mt3dType.end())
     {
       if (mtsFirst)
       {

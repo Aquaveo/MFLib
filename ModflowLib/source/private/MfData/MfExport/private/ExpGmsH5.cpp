@@ -405,8 +405,6 @@ bool ExpGmsH5::impl::ExportNative ()
     }
     if (m_nativeExp)
     {
-      // TODO REMOVE
-      if ("STP" == packName) m_nativeExp->StpFlag() = true;
       m_exp->AtLeastOneTransientSPExists() =
         m_nativeExp->GetExp()->AtLeastOneTransientSPExists();
       m_exp->SetOfSteadyStateStressPeriods() =
@@ -414,11 +412,11 @@ bool ExpGmsH5::impl::ExportNative ()
 
       rval = m_nativeExp->ExportPackage(m_global, m_package);
 
-      // TODO REMOVE
       if ("STP" == packName)
       {
-        m_nativeExp->StpFlag() = false;
-        rval = false;
+        ASSERT(_CrtCheckMemory());
+        ExpParamFile();
+        ExpSuperFile();
       }
     }
   }
@@ -606,12 +604,6 @@ bool ExpGmsH5::ExportPackage (MfGlobal* a_global,
     int hasBinary = 1;
     a_global->SetIntVar("BINARY_EXPORT", hasBinary);
   }
-  else if ("STP" == packName) // this comes at the very end
-  {
-    ASSERT(_CrtCheckMemory());
-    m_p->ExpParamFile();
-    m_p->ExpSuperFile();
-  }
   else
   {
     rval = false;
@@ -624,14 +616,7 @@ bool ExpGmsH5::ExportPackage (MfGlobal* a_global,
     printf("Writing data for Stress Period %d\n", stressPeriod);
   }
 
-  bool testsRunning(0);
-#ifdef CXX_TEST
-  if (testCxx::TestsRunning())
-  {
-    testsRunning = true;
-  }
-#endif
-  if (rval && !testsRunning)
+  if (rval)
   {
     printf("Writing data for package: %s\n", packName.c_str());
     if ("STP" == packName)
