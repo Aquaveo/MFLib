@@ -295,6 +295,12 @@ static bool iPackageToNativeExport (
 {
   bool rval = false;
   CStr packName(a_);
+  //if (Packages::BIN != a_)
+  //{
+  //  rval = true;
+  //  NativeUtil::ExportNextToH5();
+  //}
+  //return rval;
 
   if (Packages::LPRM == packName)
   {
@@ -405,10 +411,6 @@ bool ExpGmsH5::impl::ExportNative ()
     }
     if (m_nativeExp)
     {
-      m_exp->AtLeastOneTransientSPExists() =
-        m_nativeExp->GetExp()->AtLeastOneTransientSPExists();
-      m_exp->SetOfSteadyStateStressPeriods() =
-        m_nativeExp->GetExp()->SetOfSteadyStateStressPeriods();
 
       rval = m_nativeExp->ExportPackage(m_global, m_package);
 
