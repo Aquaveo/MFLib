@@ -388,6 +388,8 @@ static bool iPackageToNativeExport (
       || iUzfPack(packName)
       || iLstPack(packName)
       || "STP" == packName
+      || "L98" == packName
+      || Packages::UPW == packName
      )  NativeUtil::ExportNextToH5();
 
   return rval;

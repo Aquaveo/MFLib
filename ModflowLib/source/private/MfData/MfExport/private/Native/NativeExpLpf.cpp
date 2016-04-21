@@ -93,7 +93,9 @@ void NativeExpLpf::OnSetData ()
   m_nLay = GetGlobal()->NumLay();
   ParamList *list;
   Parameters::GetParameterList(&list);
-  m_nPar = MfExportUtil::CountLpfParams(list, false);
+  bool flag(false);
+  if (GetH5Flag()) flag = true;
+  m_nPar = MfExportUtil::CountLpfParams(list, flag);
 } // MfNativeExpLpf::Export
 //------------------------------------------------------------------------------
 /// \brief
@@ -364,7 +366,7 @@ void NativeExpLpf::WriteLpfParams ()
     pType.ToLower();
     if (lpfParTypes.find(pType) != lpfParTypes.end())
     {
-      if (p.m_pilotPoints)
+      if (p.m_pilotPoints && !GetH5Flag())
       {
         WriteLpfPilotPar(list, &p);
       }
