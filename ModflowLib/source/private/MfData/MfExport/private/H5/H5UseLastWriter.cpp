@@ -390,7 +390,7 @@ void H5UseLastWriter::CheckArealFromUseLast ()
 ///////////////////////////////////////////////////////////////////////////////
 #if CXX_TEST
 #include <private/MfData/MfExport/private/H5/H5UseLastWriter.t.h>
-#include <private/MfData/MfExport/private/ExpGmsH5.h>
+#include <private/MfData/MfExport/private/H5/H5Util.h>
 #include <private/MfLibAsserts.h>
 
 //------------------------------------------------------------------------------
@@ -433,7 +433,7 @@ void H5UseLastWriterT::test_iGetAllArealUseLast ()
   f1 = f;
   f1 += ".h5";
 
-  expGmsH5_CreateDefaultH5File(f,1,0);
+  H5Util_CreateDefaultMfH5File(f,1,0);
 
   path = "Recharge/";
   path1 = path;
@@ -464,7 +464,7 @@ void H5UseLastWriterT::test_iArealPropFromUseLast ()
   f1 = f;
   f1 += ".h5";
 
-  expGmsH5_CreateDefaultH5File(f,1,0);
+  H5Util_CreateDefaultMfH5File(f,1,0);
 
   path = "Recharge/";
   path1 = path;
@@ -505,7 +505,7 @@ void H5UseLastWriterT::test_iArealPropFromUseLast ()
   H5DataReader::CloseAllH5FilesOpenForWriting();
   TS_ASSERT(!remove(f1));
 
-  expGmsH5_CreateDefaultH5File(f,1,0);
+  H5Util_CreateDefaultMfH5File(f,1,0);
 
   path = "Recharge/";
   path1 = path;
@@ -576,7 +576,7 @@ void H5UseLastWriterT::test_iEtSegFromUseLast ()
   f1 = f;
   f1 += ".h5";
 
-  expGmsH5_CreateDefaultH5File(f,1,0);
+  H5Util_CreateDefaultMfH5File(f,1,0);
 
   path = "ETS/";
   path1 = path;
@@ -662,7 +662,7 @@ void H5UseLastWriterT::test_iArealLayFromUseLast ()
   f1 = f;
   f1 += ".h5";
 
-  expGmsH5_CreateDefaultH5File(f,1,0);
+  H5Util_CreateDefaultMfH5File(f,1,0);
 
   path = "Recharge/";
   path1 = path;
@@ -701,7 +701,7 @@ void H5UseLastWriterT::test_iArealLayFromUseLast ()
   TS_ASSERT(!remove(f1));
 
 
-  expGmsH5_CreateDefaultH5File(f,1,0);
+  H5Util_CreateDefaultMfH5File(f,1,0);
 
   path = "Recharge/";
   path1 = path;

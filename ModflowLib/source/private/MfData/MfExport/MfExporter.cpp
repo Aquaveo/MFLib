@@ -85,21 +85,6 @@ bool MfExporter::CanExportTable (const char *a_)
 {
   return (m_p->CanExportTable(a_));
 } // MfExporter::CanExportPackage
-//------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
-bool MfExporter::Compress () const
-{
-  return m_p->Compress();
-} // MfExporter::CanExportPackage
-//------------------------------------------------------------------------------
-/// \brief Exports a package to some format based on the type of exporter
-//------------------------------------------------------------------------------
-//bool MfExporter::ExportArray (MfData::MfGlobal *a_global,
-//                              MfData::MfPackage *a_package)
-//{
-//  return(m_p->ExportArray(a_global, a_package));
-//} // MfExporter::ExportArray
 
 ///////////////////////////////////////////////////////////////////////////////
 // TESTS

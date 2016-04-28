@@ -12,7 +12,6 @@
 #include <fstream>
 #include <sstream>
 
-#include <private\MfData\MfExport\private\ExpGmsH5.h>
 #include <private\MfData\Packages\MfPackFields.h>
 #include <private\MfData\Packages\MfPackStrings.h>
 #include <private\util\util.h>

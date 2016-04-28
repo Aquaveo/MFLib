@@ -154,9 +154,6 @@
     <ClCompile Include="source\private\MfData\MfExport\private\ExpGeoDb.cpp">
       <Filter>source\private\MfData\MfExport\private</Filter>
     </ClCompile>
-    <ClCompile Include="source\private\MfData\MfExport\private\ExpGmsH5.cpp">
-      <Filter>source\private\MfData\MfExport\private</Filter>
-    </ClCompile>
     <ClCompile Include="source\private\MfData\MfExport\private\Gdb.cpp">
       <Filter>source\private\MfData\MfExport\private</Filter>
     </ClCompile>
@@ -330,6 +327,9 @@
     </ClCompile>
     <ClCompile Include="source\private\MfData\MfExport\private\Sqlite\SqBcList.cpp">
       <Filter>source\private\MfData\MfExport\private\Sqlite</Filter>
+    </ClCompile>
+    <ClCompile Include="source\private\MfData\MfExport\private\H5\H5Util.cpp">
+      <Filter>source\private\MfData\MfExport\private\H5</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -607,12 +607,6 @@
       <Filter>source\private\MfData\MfExport\private</Filter>
     </ClInclude>
     <ClInclude Include="source\private\MfData\MfExport\private\ExpGeoDb.h">
-      <Filter>source\private\MfData\MfExport\private</Filter>
-    </ClInclude>
-    <ClInclude Include="source\private\MfData\MfExport\private\ExpGmsH5.t.h">
-      <Filter>source\private\MfData\MfExport\private</Filter>
-    </ClInclude>
-    <ClInclude Include="source\private\MfData\MfExport\private\ExpGmsH5.h">
       <Filter>source\private\MfData\MfExport\private</Filter>
     </ClInclude>
     <ClInclude Include="source\private\MfData\MfExport\private\Gdb.t.h">
@@ -923,6 +917,12 @@
     </ClInclude>
     <ClInclude Include="source\private\MfData\MfExport\private\Sqlite\SqBcList.h">
       <Filter>source\private\MfData\MfExport\private\Sqlite</Filter>
+    </ClInclude>
+    <ClInclude Include="source\private\MfData\MfExport\private\H5\H5Util.h">
+      <Filter>source\private\MfData\MfExport\private\H5</Filter>
+    </ClInclude>
+    <ClInclude Include="source\private\MfData\MfExport\private\H5\H5Util.t.h">
+      <Filter>source\private\MfData\MfExport\private\H5</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

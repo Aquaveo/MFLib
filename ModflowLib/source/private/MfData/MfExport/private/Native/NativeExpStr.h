@@ -61,7 +61,6 @@ namespace MfData
       FILE* ParTmpFilePtr(CStr& a_pName, int a_sp, bool a_readonly);
       void  Store8to10ForPar(int sp, int itmp, int icalc,
                              int nss, int ntrib, int ndiv,
-                             std::vector<int>& istrm,
                              std::vector<Real>& strm,
                              std::vector<int>& itrbar,
                              std::vector<int>& idivar);

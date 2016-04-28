@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// FILE      H5BcList.cpp
+// FILE      H5LstPack.cpp
 // PURPOSE   
 //  (C) Copyright Aquaveo 2014. Distributed under the ModflowLib
 //  Software License, Version 1.0. (See accompanying file

@@ -533,7 +533,7 @@ void NativeExpStr::WriteParDefAndStressToTmp (std::vector<int>& a_parSeg)
     }
     // store lines 8to10 for this stress period
     Store8to10ForPar(i+1, itmp, icalc, nss, ntrib, ndiv,
-                     istrm, strm, itrbar, idivar);
+                     strm, itrbar, idivar);
   }
   fclose(fp);
   remove(StrTmpFileName().c_str());
@@ -642,7 +642,6 @@ FILE* NativeExpStr::ParTmpFilePtr (CStr& a_pName, int a_sp, bool a_readonly)
 //------------------------------------------------------------------------------
 void NativeExpStr::Store8to10ForPar (int sp, int itmp, int icalc, int nss,
                                      int ntrib, int ndiv,
-                                     std::vector<int>& istrm,
                                      std::vector<Real>& strm,
                                      std::vector<int>& itrbar,
                                      std::vector<int>& idivar)

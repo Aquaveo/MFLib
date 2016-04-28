@@ -128,7 +128,7 @@ MfExporterImpl::MfExporterImpl (const char *a_,
   , m_fileName()
   , m_tables()
   , m_modelType(0)
-  , m_compress(a_compress)
+  , m_compressH5(a_compress)
   , m_exp(new TxtExporter(""))
   , m_types()
   , m_map()

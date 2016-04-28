@@ -12,7 +12,6 @@
 #include <private\MfData\Packages\MfPackStrings.h>
 #include <private\MfData\Packages\MfPackFields.h>
 #include <private\MfData\MfExport\private\ExpGeoDb.h>
-#include <private\MfData\MfExport\private\ExpGmsH5.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\Parameters\Param.h>
 #include <private\Parameters\ParamList.h>
@@ -40,28 +39,29 @@ MfExporterImpl* MfExportUtil::CreateExporter (const char *a_type)
   {
     ret = new ExpGeoDbSQLite;
   }
-  else if (type == "-exportgmsh5")
+  else
   {
-    ret = new ExpGmsH5(false);
-  }
-  else if (type == "-exportgmscompressedh5")
-  {
-    ret = new ExpGmsH5(true);
-  }
-  else if (type == "-exporttext_arraysinfolder")
-  {
-    ret = new Mf2kNative;
-    if (ret) ((Mf2kNative*)ret)->SetArraysInFolder(true);
-  }
-  else if (type == "-exporttext_arraysinternal" ||
-           type == "-exporttextai")
-  {
-    ret = new Mf2kNative;
-    if (ret) ((Mf2kNative*)ret)->SetArraysInternal(true);
-  }
-  else // the default is "mf2knative"
-  {
-    ret = new Mf2kNative;
+    Mf2kNative *n(new Mf2kNative());
+    if (!n) return ret;
+    if (type == "-exportgmsh5" ||
+        type == "-exportgmscompressedh5")
+    {
+      n->SetArraysInternal(true);
+      n->ArealUseLastToh5(true);
+      bool flag(false);
+      if (type == "-exportgmscompressedh5") flag = true;
+      n->SetUseH5(true, flag);
+    }
+    else if (type == "-exporttext_arraysinfolder")
+    {
+      n->SetArraysInFolder(true);
+    }
+    else if (type == "-exporttext_arraysinternal" ||
+      type == "-exporttextai")
+    {
+      n->SetArraysInternal(true);
+    }
+    ret = n;
   }
   return(ret);
 } // MfExportUtil::GetExporter

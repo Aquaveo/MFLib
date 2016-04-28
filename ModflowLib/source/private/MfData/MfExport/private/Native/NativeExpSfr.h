@@ -34,7 +34,7 @@ namespace MfData
       void Line6b (int nseg, int isfropt, int kper);
       void Line6c (int nseg, int isfropt, int kper);
       void Line6d (int nseg, int isfropt, int kper);
-      void Line6e (int nseg, int isfropt, int kper);
+      void Line6e (int nseg);
 
       CStr StrVal (int a_);
       CStr StrVal (Real a_);
@@ -77,7 +77,7 @@ namespace MfData
                                     int a_nss);
       void           ParToTmp(std::map<CStr, std::vector<int> >& a_map,
                               int isfropt, int curSp);
-      bool           WriteStoredLinesToTmp(const CStr& a_pname, int a_curSp);
+      bool           WriteStoredLinesToTmp(const CStr& a_pname);
       CStr           TmpFileName(const CStr& a_name);
       bool           NoParamExists();
       void           AddToPval(const CStr& a_name, double a_val);

@@ -6,10 +6,9 @@
 
 #include <cxxtest/TestSuite.h>
 
-class ExpGmsH5T : public CxxTest::TestSuite
+class H5UtilT : public CxxTest::TestSuite
 {
 public:
-  void testCreateClass();
   void testSupportedPackage();
   void testGetArrayMap();
   void testIsDataArray();

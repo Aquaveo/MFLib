@@ -90,7 +90,7 @@ namespace MfData
     class MfExporterImpl
     {
     public:
-      MfExporterImpl(const char *a_, bool a_compress=true);
+      MfExporterImpl(const char *a_, bool m_compressH5=true);
       ~MfExporterImpl();
 
       const char* GetTypeName();
@@ -107,7 +107,8 @@ namespace MfData
               bool CanExportTable(const char *a_);
 
       TxtExporter *GetExp() { return m_exp; }
-      bool Compress() { return m_compress; }
+      bool CompressH5() const { return m_compressH5; }
+      void SetCompressH5(bool a_) { m_compressH5 = a_; }
 
       std::map<CStr, CStr> &GetMapArrays() { return m_map; }
       CStr PackageFromArrayName(CStr a_name);
@@ -120,6 +121,7 @@ namespace MfData
                            int a_unitNumber,
                            std::set<CStr>& a_uniqueNames,
                            CStr& a_fileName);
+      const std::map<CStr, CStr> GetTypes() const { return m_types; }
 
     protected:
       std::map<CStr, CStr> m_types;
@@ -135,7 +137,7 @@ namespace MfData
       CStr m_tables;
       int  m_modelType;
       TxtExporter* m_exp;
-      bool m_compress;
+      bool m_compressH5;
       std::vector< std::vector<int> > m_ibound;
       std::map<CStr, CStr> m_map;
 

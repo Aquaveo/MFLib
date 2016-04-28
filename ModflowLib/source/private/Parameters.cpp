@@ -18,7 +18,8 @@
 #include <private\H5DataReader\H5DataReaderUtil.h>
 #include <private\H5DataReader\H5DataSetWriter.h>
 #include <private\H5DataReader\H5DataSetWriterSetup.h>
-#include <private\MfData\MfExport\private\ExpGmsH5.h>
+#include <private\MfData\MfExport\private\H5\H5Util.h>
+#include <private\MfData\MfExport\private\MfExporterImpl.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackStrings.h>

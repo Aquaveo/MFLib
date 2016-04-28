@@ -11,7 +11,7 @@
 
 #include <private\H5DataReader\H5DataReaderUtil.h>
 #include <private\H5DataReader\H5DataSetWriterSetUp.h>
-#include <private\MfData\MfExport\private\ExpGmsH5.h>
+#include <private\MfData\MfExport\private\H5\H5Util.h>
 #include <private\util\util.h>
 
 class iWriteH5

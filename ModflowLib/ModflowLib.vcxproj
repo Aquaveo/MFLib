@@ -932,6 +932,7 @@ build_test_runner.bat
     <ClCompile Include="source\private\MfData\MfExport\private\H5\H5BcList.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\H5\H5LstPack.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\H5\H5UseLastWriter.cpp" />
+    <ClCompile Include="source\private\MfData\MfExport\private\H5\H5Util.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\Mnw1PropList.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpCln.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpDisu.cpp" />
@@ -1007,7 +1008,6 @@ build_test_runner.bat
     <ClCompile Include="source\private\MfData\Packages\ObsHd.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\MfExporter.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\ExpGeoDb.cpp" />
-    <ClCompile Include="source\private\MfData\MfExport\private\ExpGmsH5.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Gdb.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Mf2kNative.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\MfExporterImpl.cpp" />
@@ -1060,6 +1060,8 @@ build_test_runner.bat
     <ClInclude Include="source\private\MfData\MfExport\private\H5\H5Strings.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\H5\H5UseLastWriter.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\H5\H5UseLastWriter.t.h" />
+    <ClInclude Include="source\private\MfData\MfExport\private\H5\H5Util.h" />
+    <ClInclude Include="source\private\MfData\MfExport\private\H5\H5Util.t.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\Mnw1PropList.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\Mnw1PropList.t.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpCln.h" />
@@ -1202,8 +1204,6 @@ build_test_runner.bat
     <ClInclude Include="source\private\MfData\MfExport\MfExporter.t.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\ExpGeoDb.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\ExpGeoDb.t.h" />
-    <ClInclude Include="source\private\MfData\MfExport\private\ExpGmsH5.h" />
-    <ClInclude Include="source\private\MfData\MfExport\private\ExpGmsH5.t.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Gdb.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Gdb.t.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Mf2kNative.h" />

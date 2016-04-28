@@ -30,7 +30,6 @@ namespace MfData
                          MfPackage *a_package);
 
       bool CanExportTable(const char *a_);
-      bool Compress() const;
 
     private:
       MfExporter(const MfExporter &rhs);

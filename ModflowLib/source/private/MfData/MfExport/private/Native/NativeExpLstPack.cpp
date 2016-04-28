@@ -9,8 +9,8 @@
 
 #include <sstream>
 
-#include <private\MfData\MfExport\private\ExpGmsH5.h>
 #include <private\MfData\MfExport\private\H5\H5BcList.h>
+#include <private\MfData\MfExport\private\H5\H5Util.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\MfData\MfExport\private\TxtExporter.h>
@@ -268,8 +268,8 @@ void NativeExpLstPack::Line5 ()
     GetGlobal()->GetIntVar(CLN_CREATED, h5ClnCreated);
     if (GetH5Flag() && !h5ClnCreated)
     {
-      expGmsH5_CreateWelClnGroup(GetNative()->GetExp()->GetBaseFileName(),
-                                 GetNative()->Compress());
+      H5Util_CreateWelClnGroup(GetNative()->GetExp()->GetBaseFileName(),
+                               GetNative()->CompressH5());
       h5ClnCreated = 1;
       GetGlobal()->SetIntVar(CLN_CREATED, h5ClnCreated);
     }

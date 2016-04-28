@@ -377,7 +377,7 @@ void NativeExpSfr::Line6 ()
       Line6b(nseg, *isfropt, curSp);
       Line6c(nseg, *isfropt, curSp);
       Line6d(nseg, *isfropt, curSp);
-      Line6e(nseg, *isfropt, curSp);
+      Line6e(nseg);
       // not supported Line6f();
     }
   }
@@ -784,7 +784,7 @@ void NativeExpSfr::Line6d (int nseg, int isfropt, int kper)
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-void NativeExpSfr::Line6e (int nseg, int isfropt, int kper)
+void NativeExpSfr::Line6e (int nseg)
 {
   int icalc       = util::ForElement(m_iseg, 1, nseg, 4);
   // READ DATA SET 4F OR 6E FOR SEGMENT WHEN ICALC IS 4.
@@ -1368,10 +1368,10 @@ void NativeExpSfr::ParToTmp (std::map<CStr, std::vector<int> >& a_map,
       Line6b(nseg, isfropt, curSp);
       Line6c(nseg, isfropt, curSp);
       Line6d(nseg, isfropt, curSp);
-      Line6e(nseg, isfropt, curSp);
+      Line6e(nseg);
     }
     int mult(1);
-    if (!WriteStoredLinesToTmp(it->first, curSp)) mult = -1;
+    if (!WriteStoredLinesToTmp(it->first)) mult = -1;
 
     AddToGlobalVar(GetGlobal(), SFR_PARAM_SP, it->first, curSp*mult);
     AddToGlobalVar(GetGlobal(), SFR_PARAM_SP_NSEG, it->first,
@@ -1390,7 +1390,7 @@ void NativeExpSfr::ParToTmp (std::map<CStr, std::vector<int> >& a_map,
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-bool NativeExpSfr::WriteStoredLinesToTmp (const CStr& a_pname, int a_curSp)
+bool NativeExpSfr::WriteStoredLinesToTmp (const CStr& a_pname)
 {
   CStr tmpFname = TmpFileName(a_pname);
   std::string wFlg("a");

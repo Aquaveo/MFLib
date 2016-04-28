@@ -17,6 +17,7 @@ namespace MfData
     public:
       Mf2kNative();
 
+      virtual void SetFileName(const char *a_);
       virtual bool ExportPackage(MfGlobal *a_global,
                                  MfPackage *a_package);
       void SetArraysInFolder(bool a_);
@@ -25,10 +26,8 @@ namespace MfData
       bool GetArraysInternal() const {return m_arraysInternal;}
       void ArealUseLastToh5(bool a_) {m_arealUseLastToh5 = a_;}
       bool GetArealUseLastToh5() {return m_arealUseLastToh5;}
-
-      // this is temporary
-      bool& StpFlag() { return m_StpPackFlag; }
-#pragma warning(disable : 4100)
+      void SetUseH5(bool a_, bool a_compress);
+      bool GetUseH5() const { return m_h5; }
 
     private:
       Mf2kNative(const Mf2kNative &rhs);
@@ -36,7 +35,7 @@ namespace MfData
 
       bool m_arraysInFolder;
       bool m_arraysInternal;
-      bool m_StpPackFlag;
+      bool m_h5;
       bool m_arealUseLastToh5;
     };
   }

@@ -171,12 +171,6 @@ bool VscPack (const CStr& type)
     return true;
   return false;
 } // VscPack
-//------------------------------------------------------------------------------
-static bool& iH5Flag()
-{
-  static bool m_(false);
-  return m_;
-} // iH5Flag
 } // unnamed namespace
 //------------------------------------------------------------------------------
 /// \brief returns the right type of MfExporter.
@@ -189,7 +183,7 @@ NativePackExp* NativeUtil::CreatePackExp (Mf2kNative* a_native,
   NativePackExp *ret(NULL);
   if (!a_package) return ret;
 
-  bool& h5(iH5Flag());
+  bool h5(a_native->GetUseH5());
   CStr type(a_package->PackageName());
   if (Array2d(type, a_native))                  ret = new NativeExpArr2d();
   else if (MfExportUtil::Is1dArray(type))       ret = new NativeExpArr1d();
@@ -233,25 +227,21 @@ NativePackExp* NativeUtil::CreatePackExp (Mf2kNative* a_native,
   else if (Packages::SWI == type)               ret = new NativeExpSwi();
   else if (VdfPack(type))                       ret = new NativeExpVdf();
   else if (VscPack(type))                       ret = new NativeExpVsc();
-
   // leave at end. This is the last "package" processed
   else if ("STP" == type)                       ret = new NativeExpSTP();
+  else if (Packages::BIN == type)
+  {
+    int hasBinary = 1;
+    a_global->SetIntVar("BINARY_EXPORT", hasBinary);
+  }
 
   if (ret)
   {
     ret->SetData(a_native, a_global, a_package);
     ret->SetH5Flag(h5);
   }
-  h5 = false;
   return(ret);
 } // MfExportUtil::CreatePackExp
-//------------------------------------------------------------------------------
-/// \brief returns the right type of MfExporter.
-//------------------------------------------------------------------------------
-void NativeUtil::ExportNextToH5 ()
-{
-  iH5Flag() = true;
-} // NativeUtil::ExportNextArrayToH5
 
 
 

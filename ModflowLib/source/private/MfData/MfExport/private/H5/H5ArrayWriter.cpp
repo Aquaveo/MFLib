@@ -299,7 +299,7 @@ bool H5ArrayWriter::impl::ForceToH5File ()
 CStr H5ArrayWriter::impl::WriteData ()
 {
   m_nVal = GetNumValsToWrite();
-  bool  compress(m_pack->GetNative()->Compress());
+  bool  compress(m_pack->GetNative()->CompressH5());
   CStr  fname(H5Filename());
   CStr  path(H5Path());
   hid_t datatype((hid_t)GetDataType());

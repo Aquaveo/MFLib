@@ -25,7 +25,9 @@ namespace MfData
 
       void ForcePackageWrite(const char* const a_);
       void CopyAdditionalFiles();
-
+      void ShowWarnings();
+      void ExpParamFile();
+      void ExpSuperFile();
     };
 
   }
