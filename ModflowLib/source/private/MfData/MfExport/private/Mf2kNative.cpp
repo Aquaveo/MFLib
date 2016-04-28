@@ -37,8 +37,11 @@ Mf2kNative::Mf2kNative () :
 void Mf2kNative::SetFileName (const char *a_)
 {
   MfExporterImpl::SetFileName(a_);
-  CStr base = GetExp()->GetBaseFileName();
-  H5Util_CreateDefaultMfH5File(base, GetModelType(), CompressH5());
+  if (m_h5)
+  {
+    CStr base = GetExp()->GetBaseFileName();
+    H5Util_CreateDefaultMfH5File(base, GetModelType(), CompressH5());
+  }
 } // Mf2kNative::SetFileName
 //------------------------------------------------------------------------------
 /// \brief Exports the package data.
