@@ -741,6 +741,24 @@ void NativeExpArr2d::WriteZoneMultArrays (std::set<double>& a_keys,
   std::vector<int> zone(m_nrow*m_ncol, 0);
   std::vector<Real> mlt(m_nrow*m_ncol, 0);
 
+  // handle parameters with multiplier arrays
+  std::map<int, std::vector<Real>> parMltArray;
+  auto it = a_keys.begin();
+  auto itEnd = a_keys.end();
+  for (; it != itEnd; ++it)
+  {
+    Param p;
+    if (!a_list->FindByKey(*it, &p)) continue;
+    if (p.m_multArray)
+    {
+      std::vector<Real> vals;
+      if (a_list->GetParMultArray(&p, vals))
+      {
+        parMltArray.insert(std::make_pair((int)*it, vals));
+      }
+    }
+  }
+
   bool addParam(0);
   int val(0);
   bool constant(true), rConst(true), first(true);
@@ -761,6 +779,9 @@ void NativeExpArr2d::WriteZoneMultArrays (std::set<double>& a_keys,
       {
         zone[i] = (int)(m_dataD ? m_dataD[i] : m_data[i]);
         mlt[i] = 1.0;
+        auto pit = parMltArray.find(zone[i]);
+        if (pit != parMltArray.end()) mlt[i] = pit->second[i];
+
         if (foundKeys.find(zone[i]) == foundKeys.end())
         {
           foundKeys.insert(zone[i]);

@@ -1160,13 +1160,16 @@ void MfData::Packages::ObsHdPackage (const char *OBSNAME,
 //------------------------------------------------------------------------------
 void MfData::Packages::ObsHd4 (const int *MLAY,
                                const Real *PR,
-                               const int *ML)
+                               const int *ML,
+                               const int *NL,
+                               const int *MAXM)
 {
   if (GetHOB().empty())
     return;
 
   ObLay lay;
-  for (int i=0; i<*ML; i++)
+  int start = (*ML-1) * (*MAXM);
+  for (int i=start; i<*NL+start; i++)
   {
     lay.m_factor = PR[i];
     lay.m_lay = MLAY[i];

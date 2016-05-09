@@ -14,25 +14,21 @@
 #include <private\MfData\MfExport\private\Sqlite\SqBcList.h>
 
 // 3. Standard library headers
+#include <sstream>
 
 // 4. External library headers
 
 // 5. Shared code headers
 
 // 6. Non-shared code headers
-//#include <private/H5DataReader/H5DataSetReader.h>
-//#include <private/H5DataReader/H5DataSetWriter.h>
-//#include <private/H5DataReader/H5DataSetWriterSetup.h>
-//#include <private/MfData/MfExport/private/H5/H5LstPack.h>
-//#include <private/MfData/MfExport/private/H5/H5Strings.h>
-//#include <private/MfData/MfExport/private/Mf2kNative.h>
-//#include <private/MfData/MfExport/private/Native/Mnw1PropList.h>
-//#include <private/MfData/MfExport/private/Native/NativePackExp.h>
-//#include <private/MfData/MfExport/private/TxtExporter.h>
-//#include <private/MfData/MfGlobal.h>
-//#include <private/MfData/Packages/MfPackage.h>
-//#include <private/MfData/Packages/MfPackFields.h>
-//#include <private/MNWReader.h>
+#include <private/ListReader/CellIdToIJK.h>
+#include <private/MfData/MfExport/private/Native/NativeExpLstPack.h>
+#include <private/MfData/MfExport/private/Native/NativePackExp.h>
+#include <private/MfData/MfExport/private/Sqlite/SqFile.h>
+#include <private/MfData/MfGlobal.h>
+#include <private/MfData/Packages/MfPackage.h>
+#include <private/MfData/Packages/MfPackFields.h>
+#include <private/SQLite/CppSQLite3.h>
 
 //----- Forward declarations ---------------------------------------------------
 
@@ -48,14 +44,125 @@ using namespace MfData::Export;
 //----- Internal functions -----------------------------------------------------
 
 //----- Class / Function definitions -------------------------------------------
+class SqBcList::impl
+{
+public:
+  impl(NativeExpLstPack* a_)
+    : m_pack(a_)
+    , m_stmt_insert()
+    , m_grid(m_pack->GetGlobal()->NumRow(), m_pack->GetGlobal()->NumCol())
+  {}
 
+  void CreateTables();
+  void CreateSpTable();
+  void CreateInsertStmt();
 
+  void AddStressPeriodData();
+  int  CellId(int a_idx);
+
+  NativeExpLstPack     *m_pack;
+  CppSQLite3Statement   m_stmt_insert;
+  CellIdToIJK           m_grid;
+};
+
+typedef std::pair<std::vector<CStr>, std::vector<CStr>> pVecCStr;
+typedef std::map<CStr, pVecCStr> ColMap;
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-SqBcList::SqBcList (NativePackExp* a_) :
-  m_pack(a_)
+static ColMap &iSpTableCols ()
 {
+  static ColMap m_;
+  if (m_.empty())
+  {
+    std::vector<CStr> baseCols(3);
+    baseCols[0] = "OID"; baseCols[1] = "CELLID"; baseCols[2] = "SPID";
+    std::vector<CStr> baseType(3, "INTEGER");
+    baseType[0] = "INTEGER PRIMARY KEY";
+
+    { // DRN
+      std::vector<CStr> drn(baseCols), drnType(baseType);
+      drn.push_back("Elevation"); drnType.push_back("REAL");
+      drn.push_back("Cond");      drnType.push_back("REAL");
+      drn.push_back("IFACE");     drnType.push_back("INTEGER");
+      drn.push_back("CONDFACT");  drnType.push_back("REAL");
+      drn.push_back("CELLGRP");   drnType.push_back("INTEGER");
+      drn.push_back("DRNBELEV");  drnType.push_back("REAL");
+      pVecCStr pDrn(drn, drnType);
+      m_.insert(std::make_pair("DRN", pDrn));
+    }
+    { // DRT
+      std::vector<CStr> drt(baseCols), drtType(baseType);
+      drt.push_back("Elevation"); drtType.push_back("REAL");
+      drt.push_back("Cond");      drtType.push_back("REAL");
+      drt.push_back("LayR");      drtType.push_back("INTEGER");
+      drt.push_back("RowR");      drtType.push_back("INTEGER");
+      drt.push_back("ColR");      drtType.push_back("INTEGER");
+      drt.push_back("Rfprop");    drtType.push_back("REAL");
+      drt.push_back("IFACE");     drtType.push_back("INTEGER");
+      drt.push_back("CONDFACT");  drtType.push_back("REAL");
+      drt.push_back("CELLGRP");   drtType.push_back("INTEGER");
+      pVecCStr pDrt(drt, drtType);
+      m_.insert(std::make_pair("DRT", pDrt));
+    }
+    { // RIV
+      std::vector<CStr> riv(baseCols), rivType(baseType);
+      riv.push_back("Stage");       rivType.push_back("REAL");
+      riv.push_back("Cond");        rivType.push_back("REAL");
+      riv.push_back("Rbot");        rivType.push_back("REAL");
+      riv.push_back("IFACE");       rivType.push_back("INTEGER");
+      riv.push_back("CONDFACT");    rivType.push_back("REAL");
+      riv.push_back("CELLGRP");     rivType.push_back("INTEGER");
+      riv.push_back("RBDTHK");      rivType.push_back("REAL");
+      riv.push_back("RIVDEN");      rivType.push_back("REAL");
+      pVecCStr pRiv(riv, rivType);
+      m_.insert(std::make_pair("RIV", pRiv));
+    }
+    { // GHB
+      std::vector<CStr> ghb(baseCols), ghbType(baseType);
+      ghb.push_back("BHead");       ghbType.push_back("REAL");
+      ghb.push_back("Cond");        ghbType.push_back("REAL");
+      ghb.push_back("IFACE");       ghbType.push_back("INTEGER");
+      ghb.push_back("CONDFACT");    ghbType.push_back("REAL");
+      ghb.push_back("CELLGRP");     ghbType.push_back("INTEGER");
+      ghb.push_back("GHBELEV");     ghbType.push_back("REAL");
+      ghb.push_back("GHBDENS");     ghbType.push_back("REAL");
+      pVecCStr pGhb(ghb, ghbType);
+      m_.insert(std::make_pair("GHB", pGhb));
+    }
+    { // CHD
+      std::vector<CStr> chd(baseCols), chdType(baseType);
+      chd.push_back("SHead");       chdType.push_back("REAL");
+      chd.push_back("EHead");       chdType.push_back("REAL");
+      chd.push_back("SHEADFACT");   chdType.push_back("REAL");
+      chd.push_back("EHEADFACT");   chdType.push_back("REAL");
+      chd.push_back("CELLGRP");     chdType.push_back("INTEGER");
+      chd.push_back("CHDDENSOPT");  chdType.push_back("REAL");
+      chd.push_back("CHDDEN");      chdType.push_back("REAL");
+      pVecCStr pChd(chd, chdType);
+      m_.insert(std::make_pair("CHD", pChd));
+    }
+    { // WEL
+      std::vector<CStr> wel(baseCols), welType(baseType);
+      wel.push_back("Q");         welType.push_back("REAL");
+      wel.push_back("IFACE");     welType.push_back("INTEGER");
+      wel.push_back("QFACT");     welType.push_back("REAL");
+      wel.push_back("CELLGRP");   welType.push_back("INTEGER");
+      wel.push_back("WELDENS");   welType.push_back("REAL");
+      pVecCStr pWel(wel, welType);
+      m_.insert(std::make_pair("WEL", pWel));
+    }
+  }
+  return m_;
+} // iSpTableCols
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+SqBcList::SqBcList (NativeExpLstPack* a_) :
+  m_pack(a_)
+, m_p(new SqBcList::impl(a_))
+{
+  m_p->CreateTables();
 } // SqBcList::SqBcList
 //------------------------------------------------------------------------------
 /// \brief
@@ -66,188 +173,213 @@ SqBcList::~SqBcList ()
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-void SqBcList::WriteList (
-    const int //a_sp
-  , const int //a_start
-  , CStr& //a_type
-  , CStr& //a_f
-  , std::vector<int>& //a_cellids
-  , CAR_DBL2D& //a_bcData
-  , std::vector<int>& //a_vIface
+void SqBcList::AddVariable (
+  const char* a_var
+  , const char* a_val
   )
 {
-  //CStr path;
-  //// writing the bc "Property"
-  //{
-  //  path.Format("%s/%s", a_type, MFBC_DATA);
-  //  H5DataSetWriterSetup s(a_f, path, H5T_NATIVE_DOUBLE, 3);
-  //  std::vector<hsize_t> start(3, 0), n2write(3,1);
-  //  n2write[0] = a_bcData.GetSize1();
-  //  n2write[1] = a_bcData.GetSize2();
-  //  start[1] = a_start;
-  //  start[2] = a_sp - 1;
-  //  H5DSWriterDimInfo dim(start, n2write);
-  //  H5DataSetWriter w(&s);
-  //  w.SetDimInfoForWriting(&dim);
-  //  w.WriteData(&a_bcData.at(0,0),
-  //    static_cast<size_t>(a_bcData.GetSize1()*a_bcData.GetSize2()));
-  //}
-  //// writing the "numbcs"
-  //{
-  //  path.Format("%s/%s", a_type, MFBC_NUMBC);
-  //  H5DataSetWriterSetup s(a_f, path, H5T_NATIVE_INT, 1);
-  //  std::vector<hsize_t> start(1, 0), n2write(1, 1);
-  //  H5DSWriterDimInfo dim(start, n2write);
-  //  H5DataSetWriter w(&s);
-  //  w.SetDimInfoForWriting(&dim);
-  //  int nCellids(static_cast<int>(a_cellids.size()));
-  //  w.WriteData(&nCellids, 1);
-  //}
-  //// writing the bc "cellids"
-  //if (!a_cellids.empty())
-  //{
-  //  path.Format("%s/%s", a_type, MFBC_CELLIDS);
-  //  H5DataSetWriterSetup s(a_f, path, H5T_NATIVE_INT, 1);
-  //  std::vector<hsize_t> start(1, 0), n2write(1, a_cellids.size());
-  //  H5DSWriterDimInfo dim(start, n2write);
-  //  H5DataSetWriter w(&s);
-  //  w.SetDimInfoForWriting(&dim);
-  //  w.WriteData(&a_cellids.at(0), a_cellids.size());
-  //}
-  //// writing the bc "iface"
-  //if (!a_vIface.empty())
-  //{
-  //  path.Format("%s/%s", a_type, MFBC_IFACE);
-  //  H5DataSetWriterSetup s(a_f, path, H5T_NATIVE_INT, 1);
-  //  std::vector<hsize_t> start(1, 0), n2write(1, a_vIface.size());
-  //  H5DSWriterDimInfo dim(start, n2write);
-  //  H5DataSetWriter w(&s);
-  //  w.SetDimInfoForWriting(&dim);
-  //  w.WriteData(&a_vIface.at(0), a_vIface.size());
-  //}
-  //// write name and map id
-  //std::vector<char> vC(a_cellids.size(), 0);
-  //if (!a_cellids.empty())
-  //{
-  //  path.Format("%s/%s", a_type, MFBC_NAME);
-  //  H5DataSetWriterSetup s(a_f, path, H5T_NATIVE_CHAR, 1);
-  //  std::vector<hsize_t> start(1, 0), n2write(1, vC.size());
-  //  H5DSWriterDimInfo dim(start, n2write);
-  //  H5DataSetWriter w(&s);
-  //  w.SetDimInfoForWriting(&dim);
-  //  w.WriteData(&vC.at(0), vC.size());
-  //}
-  //if (!a_cellids.empty())
-  //{
-  //  path.Format("%s/%s", a_type, MFBC_MAPIDSTR);
-  //  H5DataSetWriterSetup s(a_f, path, H5T_NATIVE_CHAR, 1);
-  //  std::vector<hsize_t> start(1, 0), n2write(1, vC.size());
-  //  H5DSWriterDimInfo dim(start, n2write);
-  //  H5DataSetWriter w(&s);
-  //  w.SetDimInfoForWriting(&dim);
-  //  w.WriteData(&vC.at(0), vC.size());
-  //}
-} // SqBcList::WriteList
+  CppSQLite3DB *f = SqLiteDbForPackage(m_pack);
+  ASSERT(f);
+  if (!f) return;
+  CStr packName = m_pack->GetPackage()->PackageName();
+  std::stringstream ss;
+  ss << "INSERT INTO " << packName << "_VARIABLES Values('" << a_var << "', '"
+     << a_val << "')";
+  f->execDML(ss.str().c_str());
+} // SqBcList::AddVariable
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-void SqBcList::WriteSingleH5IntValue (
-  const char * //filePath
-, const char * //h5Path
-, int //value
-)
+void SqBcList::AddItmp (
+  int a_sp
+  , int a_itmp
+  )
 {
-  //H5DataSetWriterSetup s(filePath, h5Path, H5T_NATIVE_INT, 1);
-  //std::vector<hsize_t> start(1, 0), n2write(1, 1);
-  //H5DSWriterDimInfo dim(start, n2write);
-  //H5DataSetWriter w(&s);
-  //w.SetDimInfoForWriting(&dim);
-  //w.WriteData(&value, 1);
-} // SqBcList::WriteSingleH5IntValue
+  CppSQLite3DB *f = SqLiteDbForPackage(m_pack);
+  ASSERT(f);
+  if (!f) return;
+  CStr packName = m_pack->GetPackage()->PackageName();
+  std::stringstream ss;
+  ss << "INSERT INTO " << packName << "_ITMP Values('" << a_sp << "', '"
+     << a_itmp << "')";
+  f->execDML(ss.str().c_str());
+} // SqBcList::AddItmp
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-void SqBcList::WriteSingleH5DoubleValue (
-  const char * //filePath
-, const char * //h5Path
-, double //value
-)
+void SqBcList::AddStressPeriodData ()
 {
-  //H5DataSetWriterSetup s(filePath, h5Path, H5T_NATIVE_DOUBLE, 1);
-  //std::vector<hsize_t> start(1, 0), n2write(1, 1);
-  //H5DSWriterDimInfo dim(start, n2write);
-  //H5DataSetWriter w(&s);
-  //w.SetDimInfoForWriting(&dim);
-  //w.WriteData(&value, 1);
-} // SqBcList::WriteSingleH5IntValue
+  m_p->AddStressPeriodData();
+} // SqBcList::AddStressPeriodData
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-void SqBcList::Write1DIntArray (
-  const char * //a_filePath
-, const char * //a_h5Path
-, const int * //a_array
-, size_t //a_length
-, size_t //a_start
-)
+void SqBcList::impl::CreateTables ()
 {
-  //H5DataSetWriterSetup s(a_filePath, a_h5Path, H5T_NATIVE_INT, 1);
-  //std::vector<hsize_t> start(1, a_start), n2write(1, a_length);
-  //H5DSWriterDimInfo dim(start, n2write);
-  //H5DataSetWriter w(&s);
-  //w.SetDimInfoForWriting(&dim);
-  //w.WriteData(a_array, a_length);
-} // SqBcList::Write1DIntArray
-//------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
-void SqBcList::Write1DH5Value (
-  const char * //filePath
-, const char * //h5Path
-, hsize_t //position
-, int //value
-)
-{
-  //H5DataSetWriterSetup s(filePath, h5Path, H5T_NATIVE_INT, 1);
-  //std::vector<hsize_t> start(1, position), n2write(1, 1);
-  //H5DSWriterDimInfo dim(start, n2write);
-  //H5DataSetWriter w(&s);
-  //w.SetDimInfoForWriting(&dim);
-  //w.WriteData(&value, 1);
-} // SqBcList::Write1DH5Value
-//------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
-void SqBcList::WriteH5StringArray (
-  const char * //a_filePath
-, const char * //a_h5Path
-, const std::vector<CStr>& //a_array
-)
-{
-  //int maxLen(0);
+  CppSQLite3DB *f = SqLiteDbForPackage(m_pack);
+  ASSERT(f);
+  if (!f) return;
+  CStr packName = m_pack->GetPackage()->PackageName();
+  CStr tabName = packName;
+  tabName += "_VARIABLES";
+  if (f->tableExists(tabName)) return;
 
-  //for (std::vector<CStr>::const_iterator s = a_array.begin();
-  //     s != a_array.end(); ++s)
-  //{
-  //  int len = (int)s->length()+1;
-  //  if (len > maxLen)
-  //    maxLen = len;
-  //}
+  {
+    std::stringstream ss;
+    ss << "CREATE TABLE " << packName
+      << "_VARIABLES (Variable TEXT, Value TEXT)";
+    f->execDML(ss.str().c_str());
+  }
+  {
+    std::stringstream ss;
+    ss << "CREATE TABLE " << packName << "_ITMP (SPID INTEGER, ITMP INTEGER)";
+    f->execDML(ss.str().c_str());
+  }
+  {
+    std::stringstream ss;
+    ss << "CREATE TABLE " << packName << "_CELLGRP (CELLGRP INTEGER, MAPID TEXT)";
+    f->execDML(ss.str().c_str());
+  }
+  CreateSpTable();
+} // SqBcList::impl::CreateTables
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void SqBcList::impl::CreateSpTable ()
+{
+  CStr packName = m_pack->GetPackage()->PackageName();
+  ColMap &colMap(iSpTableCols());
+  if (colMap.find(packName) == colMap.end()) return;
+  CppSQLite3DB *f = SqLiteDbForPackage(m_pack);
+  ASSERT(f);
+  if (!f) return;
+  std::vector<CStr> &colStrs = colMap[packName].first;
+  std::vector<CStr> &colTypes = colMap[packName].second;
+  // find any aux variables that we don't create by default
+  std::set<CStr> strs;
+  strs.insert("K");
+  strs.insert("I");
+  strs.insert("J");
+  for (size_t i=3; i<colStrs.size(); ++i) // skip OID, CELLID, SPID
+  {
+    CStr tmp = colStrs[i];
+    tmp.ToUpper();
+    strs.insert(tmp);
+  }
+  std::vector<CStr> fieldStr = m_pack->m_fieldStrings;
+  std::vector<CStr> aux;
+  for (size_t i=0; i<fieldStr.size(); ++i)
+  {
+    CStr tmp = fieldStr[i];
+    tmp.ToUpper();
+    if (strs.find(tmp) == strs.end())
+    {
+      colStrs.push_back(fieldStr[i]);
+      colTypes.push_back("REAL");
+    }
+  }
 
-  //std::vector<char> strings(a_array.size()*maxLen, ' ');
-  //for (size_t i = 0; i < a_array.size(); ++i)
-  //{
-  //  strcpy(&strings.at(i*maxLen), a_array.at(i).c_str());
-  //}
+  std::stringstream ss;
+  ss << "CREATE TABLE " << packName << "_SP ("
+     << colStrs.front() << " " << colTypes.front();
+  for (size_t i=1; i<colStrs.size(); ++i)
+    ss << ", " << colStrs[i] << " " << colTypes[i];
+  ss << ")";
+  f->execDML(ss.str().c_str());
+} // SqBcList::impl::CreateSpTable
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void SqBcList::impl::CreateInsertStmt ()
+{
+  CppSQLite3DB *f = SqLiteDbForPackage(m_pack);
+  ASSERT(f);
+  if (!f) return;
+  std::stringstream ss;
+  ColMap &colMap(iSpTableCols());
+  CStr tabName = m_pack->GetPackage()->PackageName();
+  std::vector<CStr> &colStrs = colMap[tabName].first;
+  tabName += "_SP";
+  ss << "INSERT INTO " << tabName << " VALUES(?";
+  for (size_t i=1; i<colStrs.size(); ++i) ss << ", ?";
+  ss << ");";
+  m_stmt_insert = f->compileStatement(ss.str().c_str());
+} // SqBcList::impl::CreateInsertStmt
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void SqBcList::impl::AddStressPeriodData ()
+{
+  ColMap &colMap(iSpTableCols());
+  CStr packName = m_pack->GetPackage()->PackageName();
+  if (colMap.find(packName) == colMap.end()) return;
 
-  //H5DataSetWriterSetup ws(a_filePath, a_h5Path, H5T_NATIVE_CHAR, 1);
-  //std::vector<hsize_t> start(1, 0), n2write(1, strings.size());
-  //H5DSWriterDimInfo dim(start, n2write);
-  //H5DataSetWriter w(&ws);
-  //w.SetDimInfoForWriting(&dim);
-  //w.WriteData(&strings[0], strings.size());
-  //w.WriteAtt(MFBC_MAX_STR_LEN, maxLen);
-} // SqBcList::WriteH5StringArray
+  const int *itmp(0);
+  {
+    using namespace MfData::Packages::ListPack;
+    if (!m_pack->GetPackage()->GetField(ITMP, &itmp) || !itmp) return;
+  }
+  CreateInsertStmt();
+  // get the stress period
+  int sp = m_pack->GetGlobal()->GetCurrentPeriod();
+  std::vector<CStr> &colStrs = colMap[packName].first;
+  std::map<CStr, int> colIdx, dataIdx;
+  for (size_t i=0; i<colStrs.size(); ++i) colIdx[colStrs[i]] = (int)i+1;
+  for (size_t i=0; i<colStrs.size(); ++i)
+  {
+    for (size_t j=0; j<m_pack->m_fieldStrings.size(); ++j)
+    {
+      if (m_pack->m_fieldStrings[j] == colStrs[i])
+        dataIdx[colStrs[i]] = (int)j;
+    }
+  }
+
+  std::vector<Real> vals(colIdx.size()+1, 0.0);
+  vals[colIdx["SPID"]] = (Real)sp;
+  auto itEnd = colIdx.end();
+  if (colIdx.find("IFACE") != itEnd)    vals[colIdx["IFACE"]] = 1;
+  if (colIdx.find("CELLGRP") != itEnd)  vals[colIdx["CELLGRP"]] = -1;
+  if (colIdx.find("CONDFACT") != itEnd) vals[colIdx["CONDFACT"]] = 1.0;
+  if (colIdx.find("QFACT") != itEnd)    vals[colIdx["QFACT"]] = 1.0;
+
+  colIdx.erase("OID");
+  int nDataFields(*m_pack->m_nDataFields);
+  const Real *data(m_pack->m_data);
+  auto itEnd2 = dataIdx.end();
+  for (int i=0; i<*itmp; ++i)
+  {
+    m_stmt_insert.bind(colIdx["SPID"], sp);
+    vals[colIdx["CELLID"]] = (Real)CellId(i);
+    auto it = colIdx.begin();
+    for (; it != itEnd; ++it)
+    {
+      auto it2 = dataIdx.find(it->first);
+      if (it2 != itEnd2)
+      {
+        vals[it->second] = data[i*nDataFields+it2->second];
+      }
+      m_stmt_insert.bind(it->second, vals[it->second]);
+    }
+    m_stmt_insert.execQuery();
+    m_stmt_insert.reset();
+  }
+} // SqBcList::impl::AddStressPeriodData
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+int SqBcList::impl::CellId (int a_idx)
+{
+  int i(a_idx);
+  int nDataFields(*m_pack->m_nDataFields), cellIdOffset(0);
+  const Real *data(m_pack->m_data);
+  int ck, ci, cj, cellId(-1);
+  ck = static_cast<int>(data[i*(nDataFields)+0]);
+  ci = static_cast<int>(data[i*(nDataFields)+1]);
+  cj = static_cast<int>(data[i*(nDataFields)+2]);
+  if (m_pack->m_usg) cellId = (int)data[i*nDataFields+0] - cellIdOffset;
+  else cellId = m_grid.IdFromIJK(ci, cj, ck);
+  return cellId;
+} // SqBcList::impl::CellId
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
@@ -257,19 +389,6 @@ void SqBcList::WriteMapIdsForListBcs ()
   //            m_pack->GetNative(), this);
   //h.WriteMapIds();
 } // SqBcList::WriteMapIdsForListBcs
-//------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
-CStr SqBcList::LstPack (
-  int& //a_maxBc
-  )
-{
-  CStr rval;
-  //H5LstPack h(m_pack->GetGlobal(), m_pack->GetPackage(),
-  //            m_pack->GetNative(), this);
-  //ravl = h.Write(a_maxBc);
-  return rval;
-} // SqBcList::LstPack
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------

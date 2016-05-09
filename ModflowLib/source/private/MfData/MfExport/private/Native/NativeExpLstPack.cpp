@@ -13,6 +13,7 @@
 #include <private\MfData\MfExport\private\H5\H5Util.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
+#include <private\MfData\MfExport\private\Sqlite\SqBcList.h>
 #include <private\MfData\MfExport\private\TxtExporter.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\MfPackageUtil.h>
@@ -47,6 +48,7 @@ NativeExpLstPack::NativeExpLstPack ()
 , m_nodeOffset(-1)
 , m_par(0)
 , m_h5Bc(0)
+, m_sqList(0)
 {
   m_usg = MfData::MfGlobal::Get().ModelType() == MfData::USG;
   if (m_usg)
@@ -63,6 +65,7 @@ NativeExpLstPack::NativeExpLstPack ()
 NativeExpLstPack::~NativeExpLstPack ()
 {
   if (m_h5Bc) delete(m_h5Bc);
+  if (m_sqList) delete(m_sqList);
 } // MfNativeExpLstPack::~MfNativeExpLstPack
 //------------------------------------------------------------------------------
 /// \brief
@@ -94,6 +97,8 @@ void NativeExpLstPack::LastChanceBeforeWriting ()
 //------------------------------------------------------------------------------
 bool NativeExpLstPack::Export ()
 {
+  if (!m_sqList && GetNative()->GetUseSQLite()) m_sqList = new SqBcList(this);
+
   if (1 == GetGlobal()->GetCurrentPeriod())
   {
     if (GetH5Flag()) AddToStoredLinesDesc("#GMS_HDF5_01", "");
@@ -185,14 +190,16 @@ void NativeExpLstPack::Line2 ()
   if (!GetPackage()->GetField(Packages::ListPack::MAXBC, &maxBc) || !maxBc) return;
 
   if (!cbField.IsEmpty() &&
-      (!GetPackage()->GetField(CbFieldName(), &cb) || !cb)) return;
+      (!GetPackage()->GetField(cbField, &cb) || !cb)) return;
 
   CStr ln;
   ln.Format("%5d ", *maxBc);
   if (!cbField.IsEmpty())
   {
-    cbField.Format("%5d ", *cb);
-    ln += cbField;
+    CStr cbFieldVal;
+    cbFieldVal.Format("%5d ", *cb);
+    ln += cbFieldVal;
+    if (m_sqList) m_sqList->AddVariable(cbField.c_str(), cbFieldVal.c_str());
   }
 
   if (Packages::DRT == GetPackage()->PackageName())
@@ -281,6 +288,8 @@ void NativeExpLstPack::Line5 ()
       !GetPackage()->GetField(Packages::ListPack::NP , &np) || !np)
     return;
 
+  if (m_sqList) m_sqList->AddItmp(GetGlobal()->GetCurrentPeriod(), *itmp);
+
   int tmpItmp(*itmp), tmpNp(*np), tmpItmpCln(0);
   if (itmpcln && 0 < *itmpcln) tmpItmpCln = *itmpcln;
   if (GetH5Flag())
@@ -359,6 +368,7 @@ void NativeExpLstPack::Line6 ()
     }
     AddToStoredLinesDesc(ln, desc);
   }
+  if (m_sqList) m_sqList->AddStressPeriodData();
 
   const int *nnpwel(0), *nodes(0);
   GetPackage()->GetField(Packages::ListPack::NUMBC, &nnpwel);

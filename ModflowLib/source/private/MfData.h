@@ -308,7 +308,9 @@ namespace MfData
              const int *PLOT);
   bool ObsHd4(const int *MLAY,
               const Real *PR,
-              const int *ML);
+              const int *ML,
+              const int *NL,
+              const int *MAXM);
   bool ObsHd5(const int *ITT);
   bool ObsHd6(const char *OBSNAME,
               const int *IREFSP,

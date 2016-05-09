@@ -553,10 +553,12 @@ module module_exportData
         END SUBROUTINE mfLibExp_ObsHd
 !     ------------------------------------------------------------------
 !      Declare the C function
-        SUBROUTINE mfLibExp_ObsHd4(MLAY,PR,ML)
+        SUBROUTINE mfLibExp_ObsHd4(MLAY,PR,ML,NL,MAXM)
           DIMENSION     MLAY (*)
           DIMENSION     PR (*)
           INTEGER       ML [REFERENCE]
+          INTEGER       NL [REFERENCE]
+          INTEGER       MAXM [REFERENCE]
         END SUBROUTINE mfLibExp_ObsHd4
 !     ------------------------------------------------------------------
 !      Declare the C function
@@ -2354,14 +2356,14 @@ module module_exportData
   !-----------------------------------------------------------------------------
   ! BRIEF:  
   !-----------------------------------------------------------------------------
-  subroutine exp_ObsHd4 (MLAY,PR,ML)
+  subroutine exp_ObsHd4 (MLAY,PR,ML,NL,MAXM)
     implicit none
-    integer, intent(in)   :: ML
+    integer, intent(in)   :: ML,NL,MAXM
     integer, intent(in)   :: MLAY(ML)
     real, intent(in)      :: PR(ML)
 
     if (NOT(ed_getExportData())) return
-    call mfLibExp_ObsHd4(MLAY,PR,ML)
+    call mfLibExp_ObsHd4(MLAY,PR,ML,NL,MAXM)
   end subroutine exp_ObsHd4
 
   !-----------------------------------------------------------------------------

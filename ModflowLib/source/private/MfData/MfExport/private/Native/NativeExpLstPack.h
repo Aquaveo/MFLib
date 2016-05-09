@@ -13,11 +13,13 @@ namespace MfData
   {
     class NeLstPar;
     class H5BcList;
+    class SqBcList;
 
     class NativeExpLstPack : public NativePackExp
     {
       friend NativeExpLstPackT;
       friend NeLstPar;
+      friend SqBcList;
     public:
       NativeExpLstPack();
       ~NativeExpLstPack();
@@ -99,6 +101,7 @@ namespace MfData
 
       NeLstPar *m_par;
       H5BcList *m_h5Bc;
+      SqBcList *m_sqList;
       CStr      m_h5BcStr, m_h5BcStrClnWell;
     };
 

@@ -24,10 +24,10 @@ namespace MfData
       bool GetArraysInFolder() const {return m_arraysInFolder;}
       void SetArraysInternal(bool a_);
       bool GetArraysInternal() const {return m_arraysInternal;}
-      void ArealUseLastToh5(bool a_) {m_arealUseLastToh5 = a_;}
-      bool GetArealUseLastToh5() {return m_arealUseLastToh5;}
       void SetUseH5(bool a_, bool a_compress);
       bool GetUseH5() const { return m_h5; }
+      void SetUseSQLite(bool a_) { m_sqlite = a_; }
+      bool GetUseSQLite() const { return m_sqlite; }
 
     private:
       Mf2kNative(const Mf2kNative &rhs);
@@ -36,7 +36,7 @@ namespace MfData
       bool m_arraysInFolder;
       bool m_arraysInternal;
       bool m_h5;
-      bool m_arealUseLastToh5;
+      bool m_sqlite;
     };
   }
 }

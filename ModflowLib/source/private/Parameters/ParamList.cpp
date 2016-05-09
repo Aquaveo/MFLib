@@ -12,6 +12,7 @@
 
 #include <private\Parameters.h>
 #include <private\Parameters\Param.h>
+#include <private\Parameters\MultArray.h>
 #include <private\Parameters\PilotPoints.h>
 
 class ParamList::impl
@@ -373,6 +374,25 @@ bool ParamList::GetPilotPtIsens (int a_ptSetIndex,
   a_vals = it->second;
   return true;
 } // ParamList::GetPilotPtIsens
+//------------------------------------------------------------------------------
+/// /brief Gets the multiplier array associate with a parameter
+//------------------------------------------------------------------------------
+bool ParamList::GetParMultArray (
+  Param *a_
+  , std::vector<Real> &a_vals
+  ) const
+{
+  a_vals.resize(0);
+  if (!a_ || !a_->m_multArray) return false;
+
+  CStr fName(GetSourceFile());
+  const int loc(fName.ReverseFind("."));
+  fName.Delete(loc+1, (fName.GetLength()-loc)+1);
+  fName += "h5";
+  MultArray mlt(fName, a_->m_name);
+  if (!mlt.GetArray(a_vals)) return false;
+  return true;
+} // ParamList::GetParMultArray
 //------------------------------------------------------------------------------
 /// /brief Sets the name of the file where the parameters were read
 //------------------------------------------------------------------------------

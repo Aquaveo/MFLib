@@ -14,6 +14,7 @@
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\Native\NativeExpNam.h>
 #include <private\MfData\MfExport\private\Native\NativeUtil.h>
+#include <private\MfData\MfExport\private\Sqlite\SqFile.h>
 #include <private\MfData\MfExport\private\TxtExporter.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\Packages\MfPackage.h>
@@ -100,6 +101,11 @@ bool NativeExpSTP::Export ()
     H5DataReader::CloseAllH5FilesOpenForWriting();
     ExpParamFile();
     ExpSuperFile();
+  }
+
+  if (GetNative()->GetUseSQLite())
+  {
+    SqLiteCloseAllDb();
   }
 
   ShowWarnings();

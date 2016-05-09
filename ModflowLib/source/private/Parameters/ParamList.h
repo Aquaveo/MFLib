@@ -33,6 +33,8 @@ public:
                           std::vector<double> &a_vals) const;
   bool   GetPilotPtIsens(int a_ptSetIndex,
                          std::vector<int> &a_vals) const;
+  bool   GetParMultArray(Param *a_,
+                         std::vector<Real> &a_vals) const;
 
   void   SetSourceFile(const char *a_fName);
   const char * GetSourceFile() const;

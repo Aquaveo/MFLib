@@ -109,11 +109,11 @@ void NativeExpObs::HobLine1 ()
     const int *IUHOBSV(0), *NOPRINT(0);
     const Real *HOBDRY(0);
     if (p && p->GetField("IUHOBSV", &IUHOBSV) && IUHOBSV &&
-        p->GetField("NOPRINT", &NOPRINT) && NOPRINT &&
         p->GetField("HOBDRY", &HOBDRY) && HOBDRY)
     {
-      os << IUHOBSV << " " << STR(*HOBDRY);
-      if (*NOPRINT) os << " NOPRINT";
+      os << " " << *IUHOBSV << " " << STR(*HOBDRY);
+      p->GetField("NOPRINT", &NOPRINT);
+      if (NOPRINT) os << *NOPRINT;
       desc += " IUHOBSV HOBDRY [NOPRINT]";
     }
   }
@@ -165,7 +165,6 @@ void NativeExpObs::HobLines3to6 ()
     desc += " STAT-FLAG PLOT-SYMBOL";
     d6 += " STATh STATdd  STAT-FLAG PLOT-SYMBOL";
   }
-  if (m_isMf2k)
 
   for (size_t i=0; i<d.size(); ++i)
   {

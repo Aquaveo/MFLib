@@ -98,7 +98,7 @@ void NativeExpEvt::Line5 ()
   CStr ln;
   ln.Format("%5d %5d %5d %5d", *insurf, *inevtr, *inexdp, ievt);
   AddToStoredLinesDesc(ln, " 5. INSURF INEVTR INEXDP INIEVT");
-  if (GetNative()->GetArealUseLastToh5())
+  if (GetNative()->GetUseH5())
   {
     std::vector<int> vDat(4,0);
     vDat[0] = *insurf < 0 ? 1 : 0;

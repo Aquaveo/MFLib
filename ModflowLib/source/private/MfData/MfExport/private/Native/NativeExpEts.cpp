@@ -67,7 +67,7 @@ void NativeExpEts::Line1 ()
   ln.Format("%5d %5d %5d %5d", *nevtop, *ietscb, npar, *netseg);
   CStr desc = " 1. NETSOP IETSCB NPETS NETSEG";
   AddToStoredLinesDesc(ln, desc);
-  if (GetNative()->GetArealUseLastToh5())
+  if (GetNative()->GetUseH5())
   {
     H5UseLastWriter w(this);
     w.WriteEtsNetSeg(*netseg);
@@ -107,7 +107,7 @@ void NativeExpEts::Line4 ()
 
   CStr desc = " 4. INETSS INETSR INETSX [INIETS [INSGDF]]";
   AddToStoredLinesDesc(ln, desc);
-  if (GetNative()->GetArealUseLastToh5())
+  if (GetNative()->GetUseH5())
   {
     std::vector<int> vDat(5,0);
     vDat[0] = *insurf < 0 ? 1 : 0;

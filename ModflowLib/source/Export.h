@@ -356,7 +356,9 @@ DLLEXPORT void MFLIBEXP_OBSHD(const char *OBSNAME,
                               const int *PLOT);
 DLLEXPORT void MFLIBEXP_OBSHD4(const int *MLAY,
                                const Real *PR,
-                               const int *ML);
+                               const int *ML,
+                               const int *NL,
+                               const int *MAXM);
 DLLEXPORT void MFLIBEXP_OBSHD5(const int *ITT);
 DLLEXPORT void MFLIBEXP_OBSHD6(const char *OBSNAME,
                                int a_dummy,

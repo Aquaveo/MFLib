@@ -43,24 +43,21 @@ MfExporterImpl* MfExportUtil::CreateExporter (const char *a_type)
   {
     Mf2kNative *n(new Mf2kNative());
     if (!n) return ret;
-    if (type == "-exportgmsh5" ||
-        type == "-exportgmscompressedh5")
+    if (type == "-exportgmsh5" || type == "-exportgmscompressedh5")
     {
-      n->SetArraysInternal(true);
-      n->ArealUseLastToh5(true);
-      bool flag(false);
-      if (type == "-exportgmscompressedh5") flag = true;
-      n->SetUseH5(true, flag);
+      bool compress(false);
+      if (type == "-exportgmscompressedh5") compress = true;
+      n->SetUseH5(true, compress);
     }
     else if (type == "-exporttext_arraysinfolder")
     {
+      n->SetArraysInternal(false);
       n->SetArraysInFolder(true);
     }
-    else if (type == "-exporttext_arraysinternal" ||
-      type == "-exporttextai")
-    {
-      n->SetArraysInternal(true);
-    }
+    else if ("-exportgmssqlite" == type)           n->SetUseSQLite(true);
+    else if ("-exporttext" == type)                n->SetArraysInternal(false);
+    else if ("-exporttext_arraysinternal" == type) {}
+    else if ("-exporttextai" == type)              {}
     ret = n;
   }
   return(ret);

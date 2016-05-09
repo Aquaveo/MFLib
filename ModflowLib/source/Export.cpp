@@ -901,9 +901,11 @@ DLLEXPORT void MFLIBEXP_OBSHD (const char *OBSNAME,
 //------------------------------------------------------------------------------
 DLLEXPORT void MFLIBEXP_OBSHD4 (const int *MLAY,
                                 const Real *PR,
-                                const int *ML)
+                                const int *ML,
+                                const int *NL,
+                                const int *MAXM)
 {
-  MfData::ObsHd4(MLAY,PR,ML);
+  MfData::ObsHd4(MLAY,PR,ML,NL,MAXM);
 } // MFLIBEXP_OBSHD4
 //------------------------------------------------------------------------------
 /// \brief 

@@ -331,6 +331,9 @@
     <ClCompile Include="source\private\MfData\MfExport\private\H5\H5Util.cpp">
       <Filter>source\private\MfData\MfExport\private\H5</Filter>
     </ClCompile>
+    <ClCompile Include="source\private\MfData\MfExport\private\Sqlite\SqFile.cpp">
+      <Filter>source\private\MfData\MfExport\private\Sqlite</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Export.h">
@@ -923,6 +926,9 @@
     </ClInclude>
     <ClInclude Include="source\private\MfData\MfExport\private\H5\H5Util.t.h">
       <Filter>source\private\MfData\MfExport\private\H5</Filter>
+    </ClInclude>
+    <ClInclude Include="source\private\MfData\MfExport\private\Sqlite\SqFile.h">
+      <Filter>source\private\MfData\MfExport\private\Sqlite</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

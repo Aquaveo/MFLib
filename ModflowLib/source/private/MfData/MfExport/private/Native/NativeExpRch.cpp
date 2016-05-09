@@ -103,7 +103,7 @@ void NativeExpRch::Line5 ()
   CStr ln;
   ln.Format("%5d %5d", *inrech, irch);
   AddToStoredLinesDesc(ln, desc);
-  if (GetNative()->GetArealUseLastToh5())
+  if (GetNative()->GetUseH5())
   {
     std::vector<int> vDat(2,0);
     vDat[0] = *inrech < 0 ? 1 : 0;

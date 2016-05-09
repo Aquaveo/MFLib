@@ -1252,16 +1252,20 @@ bool MfData::ObsHd (const char *OBSNAME,
 //------------------------------------------------------------------------------
 bool MfData::ObsHd4 (const int *MLAY,
                      const Real *PR,
-                     const int *ML)
+                     const int *ML,
+                     const int *NL,
+                     const int *MAXM)
 {
   if (!MLAY ||
       !PR ||
-      !ML)
+      !ML ||
+      !NL ||
+      !MAXM)
   {
     util::NullFuncArg(__FILE__, __LINE__);
     return false;
   }
-  MfData::Packages::ObsHd4(MLAY,PR,ML);
+  MfData::Packages::ObsHd4(MLAY,PR,ML,NL,MAXM);
   return true;
 } // MfData::ObsHd4
 //------------------------------------------------------------------------------
