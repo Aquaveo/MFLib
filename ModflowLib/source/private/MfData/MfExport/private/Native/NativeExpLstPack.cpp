@@ -87,6 +87,7 @@ void NativeExpLstPack::OnSetData ()
 //------------------------------------------------------------------------------
 void NativeExpLstPack::LastChanceBeforeWriting ()
 {
+  if (m_sqList) m_sqList->EndWriteFile();
   FILE *fp = fopen(ParInfoFileName(), "r");
   if (!fp) return;
   fclose(fp);
@@ -105,6 +106,7 @@ bool NativeExpLstPack::Export ()
     Line1();
     Line2();
 
+    if (m_sqList) m_sqList->AddSqComment();
     WriteComments();
   }
 

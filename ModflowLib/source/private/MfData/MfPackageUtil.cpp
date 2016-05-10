@@ -2811,6 +2811,29 @@ bool MfData::Packages::Comment (const CStr& a_pack,
 //------------------------------------------------------------------------------
 /// \brief 
 //------------------------------------------------------------------------------
+bool MfData::Packages::CommentPushFront (const CStr& a_pack,
+                                         const CStr& a_line)
+{
+  std::map<CStr, CStr>& aMap(GetCommentsMap());
+
+  std::map<CStr, CStr>::iterator it(aMap.find(a_pack));
+  if (it == aMap.end())
+  {
+    aMap.insert(std::make_pair(a_pack, a_line));
+  }
+  else
+  {
+    CStr c = a_line;
+    c += "\n";
+    c += it->second;
+    it->second = c;
+  }
+
+  return true;
+} // MfData::Packages::Comment
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
 void MfData::Packages::GetComments (CStr a_pack,
                                     CStr& a_comment)
 {

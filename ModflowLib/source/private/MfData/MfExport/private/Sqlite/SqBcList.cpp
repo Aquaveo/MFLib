@@ -26,6 +26,7 @@
 #include <private/MfData/MfExport/private/Native/NativePackExp.h>
 #include <private/MfData/MfExport/private/Sqlite/SqFile.h>
 #include <private/MfData/MfGlobal.h>
+#include <private/MfData/MfPackageUtil.h>
 #include <private/MfData/Packages/MfPackage.h>
 #include <private/MfData/Packages/MfPackFields.h>
 #include <private/SQLite/CppSQLite3.h>
@@ -54,6 +55,7 @@ public:
   {}
 
   void CreateTables();
+  void CreateTriggers();
   void CreateSpTable();
   void CreateInsertStmt();
 
@@ -65,8 +67,10 @@ public:
   CellIdToIJK           m_grid;
 };
 
+const char* SQFT = "SQLITE_FILE_TIME";
 typedef std::pair<std::vector<CStr>, std::vector<CStr>> pVecCStr;
 typedef std::map<CStr, pVecCStr> ColMap;
+
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
@@ -214,6 +218,32 @@ void SqBcList::AddStressPeriodData ()
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
+void SqBcList::EndWriteFile ()
+{
+  CppSQLite3DB *f = SqLiteDbForPackage(m_pack);
+  ASSERT(f);
+  if (!f) return;
+  CStr tStr, packName = m_pack->GetPackage()->PackageName();
+  m_pack->GetGlobal()->GetStrVar(SQFT, tStr);
+  std::stringstream ss;
+  ss << "UPDATE " << packName << "_LASTEDIT SET LastEdit='"
+     << tStr << "' WHERE OID=1;";
+  f->execDML(ss.str().c_str());
+} // SqBcList::AddStressPeriodData
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void SqBcList::AddSqComment ()
+{
+  CStr tStr, packName = m_pack->GetPackage()->PackageName();
+  m_pack->GetGlobal()->GetStrVar(SQFT, tStr);
+  std::stringstream ss;
+  ss << "# GMS_SQLITE " << tStr;
+  MfData::Packages::CommentPushFront(packName, ss.str());
+} // SqBcList::AddSqComment
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
 void SqBcList::impl::CreateTables ()
 {
   CppSQLite3DB *f = SqLiteDbForPackage(m_pack);
@@ -225,23 +255,79 @@ void SqBcList::impl::CreateTables ()
   if (f->tableExists(tabName)) return;
 
   {
+    std::stringstream ss, ss1, ss2, ss3;
+    ss << "CREATE TABLE " << packName
+      << "_LASTEDIT (OID INTEGER PRIMARY KEY, LastEdit TEXT);";
+    f->execDML(ss.str().c_str());
+    ss1 << "INSERT INTO " << packName << "_LASTEDIT Values(?, datetime('now'))";
+    f->execDML(ss1.str().c_str());
+    // get the time that was written
+    CStr sqLiteFileTime;
+    if (!m_pack->GetGlobal()->GetStrVar(SQFT, sqLiteFileTime))
+    {
+      ss2 << "SELECT LastEdit FROM " << packName << "_LASTEDIT WHERE OID=1;";
+      CppSQLite3Query q = f->execQuery(ss2.str().c_str());
+      ss3 << q.fieldValue(0);
+      sqLiteFileTime = ss3.str();
+      m_pack->GetGlobal()->SetStrVar(SQFT, sqLiteFileTime);
+    }
+  }
+  {
     std::stringstream ss;
     ss << "CREATE TABLE " << packName
-      << "_VARIABLES (Variable TEXT, Value TEXT)";
+      << "_VARIABLES (Variable TEXT, Value TEXT);";
     f->execDML(ss.str().c_str());
   }
   {
     std::stringstream ss;
-    ss << "CREATE TABLE " << packName << "_ITMP (SPID INTEGER, ITMP INTEGER)";
+    ss << "CREATE TABLE " << packName << "_ITMP (SPID INTEGER, ITMP INTEGER);";
     f->execDML(ss.str().c_str());
   }
   {
     std::stringstream ss;
-    ss << "CREATE TABLE " << packName << "_CELLGRP (CELLGRP INTEGER, MAPID TEXT)";
+    ss << "CREATE TABLE " << packName << "_CELLGRP (CELLGRP INTEGER, MAPID TEXT);";
     f->execDML(ss.str().c_str());
   }
   CreateSpTable();
+  CreateTriggers();
 } // SqBcList::impl::CreateTables
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void SqBcList::impl::CreateTriggers ()
+{
+  CppSQLite3DB *f = SqLiteDbForPackage(m_pack);
+  ASSERT(f);
+  if (!f) return;
+  CStr packName = m_pack->GetPackage()->PackageName();
+  std::vector<CStr> tabNames, ops;
+  tabNames.push_back(packName + "_VARIABLES");
+  tabNames.push_back(packName + "_ITMP");
+  tabNames.push_back(packName + "_CELLGRP");
+  tabNames.push_back(packName + "_SP");
+  ops.push_back("INSERT");
+  ops.push_back("DELETE");
+  ops.push_back("UPDATE");
+
+  std::stringstream st;
+  st << "BEGIN"
+     << " UPDATE " << packName
+     << "_LASTEDIT SET LastEdit = datetime('now') WHERE OID = 1;"
+     << "END;";
+
+  for (size_t i=0; i<tabNames.size(); ++i)
+  {
+    CStr tName = tabNames[i];
+    for (size_t j=0; j<ops.size(); ++j)
+    {
+      tName = tabNames[i] + "_" + ops[j];
+      std::stringstream ss;
+      ss << "CREATE TRIGGER " << tName << " AFTER " << ops[j] << " ON "
+         << tabNames[i] << " " << st.str();
+      f->execDML(ss.str().c_str());
+    }
+  }
+} // SqBcList::impl::CreateTriggers
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------

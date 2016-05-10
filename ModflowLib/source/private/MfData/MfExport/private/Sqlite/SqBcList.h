@@ -20,6 +20,8 @@ namespace MfData
                         const char* a_val);
       void AddItmp (int a_sp, int a_itmp);
       void AddStressPeriodData ();
+      void EndWriteFile();
+      void AddSqComment();
 
       void WriteMapIdsForListBcs ();
       void LstPar ();

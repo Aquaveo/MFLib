@@ -552,6 +552,8 @@ namespace MfData
                           int ISAVE);
     bool Comment(const CStr& a_pack,
                  const CStr& a_line);
+    bool CommentPushFront(const CStr& a_pack,
+                          const CStr& a_line);
     bool MNW2_Ln1(const int* MNWMAX,
                   const int* IWL2CB,
                   const int* MNWPRNT,
