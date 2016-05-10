@@ -141,7 +141,8 @@ namespace MfData
     void SmsPcguPackage(const int* IPC,
                         const int* ISCL,
                         const int* IORD,
-                        const Real* RCLOSEPCGU);
+                        const Real* RCLOSEPCGU,
+                        const int* IFLAG);
     void Array2D(const char * const a_name,
                  const Real *a_data,
                  const Real *a_multiplier,

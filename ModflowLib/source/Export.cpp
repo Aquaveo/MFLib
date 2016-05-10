@@ -515,9 +515,10 @@ DLLEXPORT void MFLIBEXP_SMSXMDPACKAGE (const int* a_IACL,
 DLLEXPORT void MFLIBEXP_SMSPCGUPACKAGE (const int* a_IPC,
                                        const int* a_ISCL,
                                        const int* a_IORD,
-                                       const Real* a_RCLOSEPCGU)
+                                       const Real* a_RCLOSEPCGU,
+                                       const int* a_IFLAG)
 {
-  MfData::SmsPcguPackage(a_IPC, a_ISCL, a_IORD, a_RCLOSEPCGU);
+  MfData::SmsPcguPackage(a_IPC, a_ISCL, a_IORD, a_RCLOSEPCGU, a_IFLAG);
 } // MFLIBEXP_SMSPCGUPACKAGE
 //------------------------------------------------------------------------------
 /// \brief This is the data associated with an array

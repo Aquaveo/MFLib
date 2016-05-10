@@ -251,11 +251,12 @@ module module_exportData
         END SUBROUTINE mfLibExp_SmsXmdPackage
 !     ------------------------------------------------------------------
 !      Declare the C function
-        SUBROUTINE mfLibExp_SmsPcguPackage(IPC,ISCL,IORD,RCLOSEPCGU)
+        SUBROUTINE mfLibExp_SmsPcguPackage(IPC,ISCL,IORD,RCLOSEPCGU,IFLAG)
           INTEGER      IPC [REFERENCE]
           INTEGER      ISCL [REFERENCE]
           INTEGER      IORD [REFERENCE]
           REAL         RCLOSEPCGU [REFERENCE]
+          INTEGER      IFLAG [REFERENCE]
         END SUBROUTINE mfLibExp_SmsPcguPackage
 !     ------------------------------------------------------------------
 !      Declare the C function
@@ -1672,14 +1673,14 @@ module module_exportData
   !-----------------------------------------------------------------------------
   ! BRIEF:  
   !-----------------------------------------------------------------------------
-  subroutine exp_SmsPcguPackage (IPC,ISCL,IORD,RCLOSEPCGU)
+  subroutine exp_SmsPcguPackage (IPC,ISCL,IORD,RCLOSEPCGU,IFLAG)
     implicit none
-    integer, intent(in)      :: IPC,ISCL,IORD
+    integer, intent(in)      :: IPC,ISCL,IORD,IFLAG
     real, intent(in)         :: RCLOSEPCGU
 
     if (NOT(ed_getExportData())) return
 
-    call mfLibExp_SmsPcguPackage(IPC,ISCL,IORD,RCLOSEPCGU)
+    call mfLibExp_SmsPcguPackage(IPC,ISCL,IORD,RCLOSEPCGU,IFLAG)
   end subroutine exp_SmsPcguPackage
 
   !-----------------------------------------------------------------------------

@@ -660,12 +660,14 @@ bool MfData::SmsXmdPackage (const int* a_IACL,
 bool MfData::SmsPcguPackage (const int* a_IPC,
                             const int* a_ISCL,
                             const int* a_IORD,
-                            const Real* a_RCLOSEPCGU)
+                            const Real* a_RCLOSEPCGU,
+                            const int* a_IFLAG)
 {
   if (!a_IPC ||
       !a_ISCL ||
       !a_IORD ||
-      !a_RCLOSEPCGU)
+      !a_RCLOSEPCGU ||
+      !a_IFLAG)
   {
     util::NullFuncArg(__FILE__, __LINE__);
     return false;
@@ -674,7 +676,8 @@ bool MfData::SmsPcguPackage (const int* a_IPC,
   MfData::Packages::SmsPcguPackage(a_IPC,
                                    a_ISCL,
                                    a_IORD,
-                                   a_RCLOSEPCGU);
+                                   a_RCLOSEPCGU,
+                                   a_IFLAG);
   return true;
 } // MfData::SmsPcguPackage
 //------------------------------------------------------------------------------

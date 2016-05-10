@@ -153,7 +153,8 @@ namespace MfData
   bool SmsPcguPackage(const int* a_IPC,
                       const int* a_ISCL,
                       const int* a_IORD,
-                      const Real* a_RCLOSEPCGU);
+                      const Real* a_RCLOSEPCGU,
+                      const int* a_IFLAG);
   bool U2DREL(const char * const a_name,
               const Real *a_data,
               const Real *a_multiplier,

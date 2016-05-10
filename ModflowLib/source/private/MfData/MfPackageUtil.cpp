@@ -475,7 +475,8 @@ void MfData::Packages::SmsXmdPackage (const int* IACL,
 void MfData::Packages::SmsPcguPackage (const int* IPC,
                                        const int* ISCL,
                                        const int* IORD,
-                                       const Real* RCLOSEPCGU)
+                                       const Real* RCLOSEPCGU,
+                                       const int* IFLAG)
 {
   const char* const type = MfData::Packages::SMS;
   MfPackage pack(type);
@@ -487,6 +488,7 @@ void MfData::Packages::SmsPcguPackage (const int* IPC,
   p->SetField(MfData::Packages::SmsPack::ISCL, ISCL);
   p->SetField(MfData::Packages::SmsPack::IORD, IORD);
   p->SetField(MfData::Packages::SmsPack::RCLOSEPCGU, RCLOSEPCGU);
+  p->SetField(MfData::Packages::SmsPack::IFLAG, IFLAG);
   if (!exists)
     MfData::Get().AddPackage(p);
   MfData::Get().Export(type);

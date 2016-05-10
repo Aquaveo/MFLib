@@ -222,6 +222,7 @@ namespace MfData
       const char * const ISCL = "ISCL";
       const char * const IORD = "IORD";
       const char * const RCLOSEPCGU = "RCLOSEPCGU";
+      const char * const IFLAG = "IFLAG";
     }
     namespace Array
     {
