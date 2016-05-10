@@ -1511,15 +1511,24 @@ void NativeExpSolverT::testLine3_SMS ()
 //------------------------------------------------------------------------------
 void NativeExpSolverT::testLine4_SMS ()
 {
-  int IPC(1), ISCL(2), IORD(3);
+  int IPC(1), ISCL(2), IORD(3), IFLAG(0);
   Real RCLOSEPCGU((Real)0.1);
   MfPackage* p = m_p->GetPackage();
   p->SetField(SmsPack::IPC, &IPC);
   p->SetField(SmsPack::ISCL, &ISCL);
   p->SetField(SmsPack::IORD, &IORD);
+  p->SetField(SmsPack::IFLAG, &IFLAG);
   p->SetField(SmsPack::RCLOSEPCGU, &RCLOSEPCGU);
   CStr base = "1 2 3 0.1 ";
   CStr str = m_p->Line4_SMS();
+  TS_ASSERT_EQUALS2(base, str);
+  IFLAG = 1;
+  base = "CG 1 2 3 0.1 ";
+  str = m_p->Line4_SMS();
+  TS_ASSERT_EQUALS2(base, str);
+  IFLAG = 2;
+  base = "BCGS 1 2 3 0.1 ";
+  str = m_p->Line4_SMS();
   TS_ASSERT_EQUALS2(base, str);
 }
 #endif
