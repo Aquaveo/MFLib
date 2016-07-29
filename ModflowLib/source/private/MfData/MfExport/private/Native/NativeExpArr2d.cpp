@@ -856,10 +856,16 @@ void NativeExpArr2d::WriteZoneMultArrays (std::set<double>& a_keys,
                  fname1, ParArrayName());
     ArrayDataToFile(fname, NULL, &zone[0]);
     util::StripPathFromFilename(fname, fname);
+    if (GetNative()->GetArraysInFolder())
+    {
+      CStr s = fname;
+      fname = ".\\arrays\\" + s;
+    }
     line.Format("OPEN/CLOSE %s 1 (FREE) -1", fname);
     p->StringsToWrite().push_back(line);
   }
 
+  fname1 = GetNative()->FileName();
   if (1.0 == *m_mult && rConst)
   {
     line.Format("CONSTANT %s", STR(rVal));
@@ -882,6 +888,11 @@ void NativeExpArr2d::WriteZoneMultArrays (std::set<double>& a_keys,
                  fname1, ParArrayName());
     ArrayDataToFile(fname, &mlt[0], NULL);
     util::StripPathFromFilename(fname, fname);
+    if (GetNative()->GetArraysInFolder())
+    {
+      CStr s = fname;
+      fname = ".\\arrays\\" + s;
+    }
     line.Format("OPEN/CLOSE %s %s (FREE) -1", fname, STR(*m_mult));
     pMlt->StringsToWrite().push_back(line);
   }
@@ -996,6 +1007,11 @@ void NativeExpArr2d::WritePilotPointMultArrays (ParamList* a_list,
       fname.Format("%s_array_MLT_%s.txt", fileName, ppName);
       ArrayDataToFile(fname, &mlt[0], NULL);
       util::StripPathFromFilename(fname, fname);
+      if (GetNative()->GetArraysInFolder())
+      {
+        CStr s = fname;
+        fname = ".\\arrays\\" + s;
+      }
 
       line.Format("OPEN/CLOSE %s 1.0 (FREE) -1", fname);
       pMlt->StringsToWrite().push_back(line);
