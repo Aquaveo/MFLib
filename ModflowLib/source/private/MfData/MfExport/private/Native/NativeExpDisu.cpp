@@ -172,7 +172,7 @@ void NativeExpDisu::Line9 ()
 //------------------------------------------------------------------------------
 void NativeExpDisu::Line10a ()
 {
-  AddArrayLines(Packages::Disu::CL1, "10"); // "CONNECTION LENGTH 1"
+  AddArrayLines(Packages::Disu::CL1, "10a"); // "CONNECTION LENGTH 1"
 } // NativeExpDisu::Line10
 //------------------------------------------------------------------------------
 /// \brief 10b. CL2(NJAGS) - U1DREL
