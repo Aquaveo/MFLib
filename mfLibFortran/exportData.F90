@@ -1226,8 +1226,8 @@ module module_exportData
 
     if (NOT(ed_getExportData())) return
     DUMMY = 0
-    call mfLibExp_SingleValInt('CLNLine2','DUMMY',DUMMY)
-    call mfLibExp_ExpPack('CLNLine2')
+    call mfLibExp_SingleValInt('CL3','DUMMY',DUMMY)
+    call mfLibExp_ExpPack('CL3')
   end subroutine exp_ClnLine2
 
   !-----------------------------------------------------------------------------
@@ -1239,8 +1239,8 @@ module module_exportData
     
     if (NOT(ed_getExportData())) return
     DUMMY = 0
-    call mfLibExp_SingleValInt('CLNLine3','DUMMY',DUMMY)
-    call mfLibExp_ExpPack('CLNLine3')
+    call mfLibExp_SingleValInt('CL4','DUMMY',DUMMY)
+    call mfLibExp_ExpPack('CL4')
   end subroutine exp_ClnLine3
 
   !-----------------------------------------------------------------------------
@@ -1253,8 +1253,8 @@ module module_exportData
 
     if (NOT(ed_getExportData())) return 
 
-    call mfLibExp_SingleValInt('CLNLine4To6','NJA_CLN',NJA_CLN)
-    call mfLibExp_ExpPack('CLNLine4To6')
+    call mfLibExp_SingleValInt('CL5','NJA_CLN',NJA_CLN)
+    call mfLibExp_ExpPack('CL5')
   end subroutine exp_ClnLine4
 
   !-----------------------------------------------------------------------------
@@ -1381,10 +1381,10 @@ module module_exportData
 
     if (NOT(ed_getExportData())) return 
     
-    call mfLibExp_SingleValInt('CLNLine13','NIB0',NIB0)
-    call mfLibExp_SingleValInt('CLNLine13','NIB1',NIB1)
-    call mfLibExp_SingleValInt('CLNLine13','NIBM1',NIBM1)
-    call mfLibExp_ExpPack('CLNLine13')
+    call mfLibExp_SingleValInt('CL6','NIB0',NIB0)
+    call mfLibExp_SingleValInt('CL6','NIB1',NIB1)
+    call mfLibExp_SingleValInt('CL6','NIBM1',NIBM1)
+    call mfLibExp_ExpPack('CL6')
   end subroutine exp_ClnLine13
 
   !-----------------------------------------------------------------------------
@@ -1395,8 +1395,8 @@ module module_exportData
     integer DUMMY
 
     if (NOT(ed_getExportData())) return 
-    call mfLibExp_SingleValInt('CLNLine14','DUMMY',DUMMY)
-    call mfLibExp_ExpPack('CLNLine14')
+    call mfLibExp_SingleValInt('CL7','DUMMY',DUMMY)
+    call mfLibExp_ExpPack('CL7')
   end subroutine exp_ClnLine14
 
   !-----------------------------------------------------------------------------
@@ -1410,10 +1410,10 @@ module module_exportData
 
     if (NOT(ed_getExportData())) return 
     
-    call mfLibExp_SingleValInt('CLNLine15','IB1',IB1)
-    call mfLibExp_SingleValInt('CLNLine15','IHEADOPT',IHEADOPT)
-    call mfLibExp_SingleValFlt('CLNLine15','HVALUE',HVALUE)
-    call mfLibExp_ExpPack('CLNLine15')
+    call mfLibExp_SingleValInt('CL8','IB1',IB1)
+    call mfLibExp_SingleValInt('CL8','IHEADOPT',IHEADOPT)
+    call mfLibExp_SingleValFlt('CL8','HVALUE',HVALUE)
+    call mfLibExp_ExpPack('CL8')
   end subroutine exp_ClnLine15
 
   !-----------------------------------------------------------------------------
@@ -1427,10 +1427,10 @@ module module_exportData
 
     if (NOT(ed_getExportData())) return 
     
-    call mfLibExp_SingleValInt('CLNLine16','IBM1',IBM1)
-    call mfLibExp_SingleValInt('CLNLine16','IHEADOPT',IHEADOPT)
-    call mfLibExp_SingleValFlt('CLNLine16','HVALUE',HVALUE)
-    call mfLibExp_ExpPack('CLNLine16')
+    call mfLibExp_SingleValInt('CL9','IBM1',IBM1)
+    call mfLibExp_SingleValInt('CL9','IHEADOPT',IHEADOPT)
+    call mfLibExp_SingleValFlt('CL9','HVALUE',HVALUE)
+    call mfLibExp_ExpPack('CL9')
   end subroutine exp_ClnLine16
 
   !-----------------------------------------------------------------------------

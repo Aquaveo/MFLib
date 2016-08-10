@@ -477,7 +477,7 @@ void NativeExpCln::InitDescriptionMap ()
   m_mapDesc.insert(std::make_pair( "5", " 5. IAC_CLN(ICLNNDS)"));
   m_mapDesc.insert(std::make_pair( "6", " 6. JA_CLN(NJA_CLN)"));
   m_mapDesc.insert(std::make_pair( "7", " 7. IFNO IFTYP IFDIR FLENG FELEV FANGLE IFLIN ICCWADI"));
-  m_mapDesc.insert(std::make_pair( "8", " 5. IFNOD IGWNOD IFCON FSKIN FLENGW FANISO ICGWADI"));
+  m_mapDesc.insert(std::make_pair( "8", " 8. IFNOD IGWNOD IFCON FSKIN FLENGW FANISO ICGWADI"));
   m_mapDesc.insert(std::make_pair( "9", " 9. IFNOD IGWLAY IGWROW IGWFCOL IFCON FSKIN FLENGW FANISO ICGWADI"));
   m_mapDesc.insert(std::make_pair("10", "10. ICONDUITYP FRAD CONDUITK"));
   m_mapDesc.insert(std::make_pair("11", "11. IBOUND(NCLNNDS)"));
