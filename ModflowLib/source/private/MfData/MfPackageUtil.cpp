@@ -1655,7 +1655,10 @@ static bool ParamWithPackageValue (const char *PNAME,
 
     bool done(false);
     Param p1;
-    for (int j=10000; j<100000 && !done; j++)
+    double minParKey = -list->MinParamKey();
+    int start = 10000;
+    if ((int)minParKey >= start) start = (int)(minParKey + 1);
+    for (int j=start; j<100000 && !done; j++)
     {
       if (!list->FindByKey(-j, &p1))
       {

@@ -46,6 +46,7 @@ public:
                         const std::vector<double> a_vals,
                         const std::vector<int> a_isens);
   double UnusedParamKey();
+  double MinParamKey();
   bool   ParamOfTypeExists(const char *a_type);
 
   static bool IsPilotParName(const char *PNAM,

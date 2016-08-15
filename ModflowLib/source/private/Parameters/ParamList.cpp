@@ -453,6 +453,16 @@ double ParamList::UnusedParamKey ()
 //------------------------------------------------------------------------------
 /// /brief returns an unused key
 //------------------------------------------------------------------------------
+double ParamList::MinParamKey ()
+{
+  double r(-1.0);
+  auto it = m_p->m_findByKey.begin();
+  if (it != m_p->m_findByKey.end()) r = it->first;
+  return r;
+} // ParamList::MinParamKey
+//------------------------------------------------------------------------------
+/// /brief returns an unused key
+//------------------------------------------------------------------------------
 bool ParamList::ParamOfTypeExists (const char* a_type)
 {
   CStr type(a_type);

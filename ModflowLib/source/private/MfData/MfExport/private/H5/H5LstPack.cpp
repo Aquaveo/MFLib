@@ -1497,7 +1497,13 @@ CStr H5SfrPack::Ln2 ()
       m_p.m_bcData.at(0, m_p.m_idxs.at(i)) =
         static_cast<double>(m_strm[i*(*m_nstrmd)]);
     }
-    m_p.WriteBcData();
+    //m_p.WriteBcData();
+    int nSp = m_p.m_glob->NumPeriods();
+    for (int i=0; i<nSp; ++i)
+    {
+      m_p.m_sp = i+1;
+      m_p.WriteBcData();
+    }
     WriteReach();
   }
   return rval;
