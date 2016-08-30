@@ -407,7 +407,8 @@ std::vector<CStr> NativeExpHuf::Line11 (Param& a_par)
   for (size_t i=0; i<a_par.m_clust.size(); ++i)
   {
     std::stringstream ss;
-    ss << a_par.m_clust[i].m_hgu << " " << a_par.m_clust[i].m_mlt << " "
+    CStr hgu = a_par.m_type == "SYTP" ? "SYTP" : a_par.m_clust[i].m_hgu;
+    ss << hgu << " " << a_par.m_clust[i].m_mlt << " "
        << a_par.m_clust[i].m_zon << " ";
     for (size_t j=0; j<a_par.m_clust[i].m_iz.size(); ++j)
     {
