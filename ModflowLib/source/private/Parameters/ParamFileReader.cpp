@@ -81,7 +81,8 @@ bool ParamFileReader::FillInListFromFile (ParamList *a_)
         break;
       case ParamFileReader::VALUE:
         r.ReadData(p.m_value);
-        p.m_start = p.m_b = p.m_value;
+        p.m_parVal = p.m_b = p.m_value;
+        p.m_b_set = true;
         r.ReadData(p.m_min);
         r.ReadData(p.m_max);
         break;

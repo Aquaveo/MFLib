@@ -805,7 +805,7 @@ void NativeExpStr::Par_Lines3to4 (std::vector< std::vector<CStr> >& a_spLines)
       CStr parName = pName;
       MfExportUtil::InsertSingleQuotesInName(parName);
       while (parName.GetLength() < 12) parName += " ";
-      line.Format("%s %s", parName, STR(p.m_b));
+      line.Format("%s %s", parName, STR(pval));
       pack->StringsToWrite().push_back(line);
       pack->StringDescriptions().push_back(desc);
     }

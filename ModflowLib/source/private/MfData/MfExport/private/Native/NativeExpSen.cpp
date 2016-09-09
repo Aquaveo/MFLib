@@ -113,15 +113,25 @@ std::vector<CStr> NativeExpSen::Line3 ()
       a_pSen1->GetField(SEN1pack::BU, &bu) && bu &&
       a_pSen1->GetField(SEN1pack::BSCAL, &bscal) && bscal)
   {
+    ParamList *list(0);
+    Parameters::GetParameterList(&list);
+    Param p;
+
     for (int i = 0; i < *nplist; ++i)
     {
       CStr parnamStr(parnam + i*10, 10);
       parnamStr.Trim();
       if (SkipPar_Pval_Sen(parnamStr)) continue;
 
+      Real bValue;
+      if (list->FindByName(parnamStr.c_str(), &p))
+        bValue = (Real)p.m_b;
+      else
+        bValue = b[i];
+
       CStr line;
       line.Format("%s %d %d %s %s %s %s", parnamStr, isens[i], ln[i],
-                  STR(b[i]), STR(bl[i]), STR(bu[i]), STR(bscal[i]));
+                  STR(bValue), STR(bl[i]), STR(bu[i]), STR(bscal[i]));
       rval.push_back(line);
 
       Param p;

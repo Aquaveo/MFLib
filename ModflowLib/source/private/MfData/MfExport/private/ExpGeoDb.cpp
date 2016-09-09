@@ -842,7 +842,7 @@ static void ExportParamTable (ParamList *a_list)
     Db::db()->AddValue("ParamID", i+1, i);
     Db::db()->AddValue("PARNAM", par.m_name, i);
     Db::db()->AddValue("PARTYPE", par.m_type, i);
-    Db::db()->AddValue("Parval", par.m_start, i);
+    Db::db()->AddValue("Parval", par.m_parVal, i);
     Db::db()->AddValue("B", par.m_b, i);
     Db::db()->AddValue("Keyval", par.m_key, i);
     Db::db()->AddValue("BL", par.m_min, i);

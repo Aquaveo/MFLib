@@ -1080,7 +1080,7 @@ CStr NativeExpLstPack::Line3 (const CStr& a_pName,
   if (!pList) return tmpLn;
   Param par;
   if (!pList->FindByName(a_pName, &par)) return tmpLn;
-  double pVal = par.m_value;
+  double pVal = par.m_parVal;
   // write Line 3
   int w = util::RealWidth();
   int flg = STR_FULLWIDTH;

@@ -65,8 +65,9 @@ public:
     m_key(a_key),
     m_type(a_type),
     m_value(a_value),
-    m_start(a_value),
+    m_parVal(0),
     m_b(0),
+    m_b_set(0),
     m_min(a_min),
     m_max(a_max),
     m_logMinVal(a_logMinVal),
@@ -90,8 +91,9 @@ public:
     m_key(rhs.m_key),
     m_type(rhs.m_type),
     m_value(rhs.m_value),
-    m_start(rhs.m_start),
+    m_parVal(rhs.m_parVal),
     m_b(rhs.m_b),
+    m_b_set(rhs.m_b_set),
     m_min(rhs.m_min),
     m_max(rhs.m_max),
     m_logMinVal(rhs.m_logMinVal),
@@ -118,8 +120,9 @@ public:
       m_key = rhs.m_key;
       m_type = rhs.m_type;
       m_value = rhs.m_value;
-      m_start = rhs.m_start;
+      m_parVal = rhs.m_parVal;
       m_b = rhs.m_b;
+      m_b_set = rhs.m_b_set;
       m_min = rhs.m_min;
       m_max = rhs.m_max;
       m_logMinVal = rhs.m_logMinVal;
@@ -142,10 +145,10 @@ public:
   }
 
   CStr    m_name, m_type;
-  double  m_key, m_value, m_start, m_b, m_min, m_max, m_logMinVal, m_bscal;
+  double  m_key, m_value, m_parVal, m_b, m_min, m_max, m_logMinVal, m_bscal;
   int     m_scatIndex, m_isens;
   bool    m_pilotPoints, m_logInterp, m_multArray, m_logTrans,
-          m_clustInParamFile;
+          m_clustInParamFile, m_b_set;
   std::vector<PClust> m_clust;
   std::vector<CStr> m_instNames;
   std::map<CStr, std::vector<int> > m_instStress;

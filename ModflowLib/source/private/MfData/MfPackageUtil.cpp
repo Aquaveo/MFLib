@@ -1370,6 +1370,7 @@ void MfData::Packages::SENParList (const int *NPLIST,
     par.m_logTrans = LN[i] > 0 ? 1 : 0;
     par.m_value = B[i];
     par.m_b = B[i];
+    par.m_b_set = true;
     par.m_min = BL[i];
     par.m_max = BU[i];
     par.m_bscal = BSCAL[i];
@@ -1643,15 +1644,16 @@ static bool ParamWithPackageValue (const char *PNAME,
 
   if (GetPar(PNAME, PTYPE, par))
   {
-    par.m_start = *PVAL;
+    par.m_parVal = *PVAL;
     list->UpdateParameter(&par);
   }
   else if (!ParamList::IsPilotParName(PNAME, PTYPE))
   {
     par.m_name = PNAME;
     par.m_type = PTYPE;
-    par.m_start = *PVAL;
-    par.m_value = *PVAL;
+    par.m_parVal = *PVAL;
+    if (!par.m_b_set)
+      par.m_value = *PVAL;
 
     bool done(false);
     Param p1;

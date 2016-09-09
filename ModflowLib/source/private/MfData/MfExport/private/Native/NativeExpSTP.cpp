@@ -256,7 +256,7 @@ void NativeExpSTP::ExpParamFile ()
       list->At(i, &p);
       type = p.m_type;
       line.ToUpper();
-      if (parTypes.find(type) != std::string::npos)
+      if (!type.empty() && parTypes.find(type) != std::string::npos)
       {
         exp->WriteLineToFile("param", "BEGPAR");
 
@@ -274,7 +274,7 @@ void NativeExpSTP::ExpParamFile ()
         line.Format("VALUE %s %s %s",
                     STR(p.m_value),
                     STR(p.m_min == 0 ? 1e-10 : p.m_min),
-                    STR(p.m_max == 0 ? p.m_start*100 : p.m_max));
+                    STR(p.m_max == 0 ? p.m_parVal*100 : p.m_max));
         exp->WriteLineToFile("param", line);
 
         line.Format("SOLVE %d", p.m_isens ? 1 : 0);
