@@ -98,7 +98,7 @@ void NativeExpGnc::Line4 ()
     int nodeM = static_cast<int>(ForElement(gnc,2,i,*n1));
     int nodeJ = static_cast<int>(ForElement(gnc,3,i,*n1));
     Real alphaJ =                ForElement(gnc,4,i,*n1);
-    s1.Format("%5d%5d%5d %s",nodeN, nodeM, nodeJ,
+    s1.Format("%5d %5d %5d %s",nodeN, nodeM, nodeJ,
                              STR(alphaJ,-1,width,STR_FULLWIDTH));
     for (int j = 5; j < *n1; j += 2) {
       nodeJ = static_cast<int>(ForElement(gnc,j,  i,*n1));
