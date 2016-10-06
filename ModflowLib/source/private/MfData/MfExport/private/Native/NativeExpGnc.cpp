@@ -82,28 +82,30 @@ void NativeExpGnc::Line4 ()
   using util::ForElement;
 
   CStr desc = " 4. NodeN NodeM (NodeJ, J=1,MXADJn) (AlphaJ, J=1,MXADJn) AlphaN";
-  const int *n1(0), *n2(0), *iflalphan(0);
+  const int *n1(0), *n2(0), *iflalphan(0), *mxadjn(0);
   const Real *gnc(0);
   MfPackage* a_p=GetPackage();
   if (!a_p->GetField(Packages::GNCpack::N1, &n1) || !n1 ||
       !a_p->GetField(Packages::GNCpack::N2, &n2) || !n2 ||
       !a_p->GetField(Packages::GNCpack::GNCn, &gnc) || !gnc ||
-      !a_p->GetField(Packages::GNCpack::IFLALPHAn, &iflalphan) || !iflalphan)
-    return;
+      !a_p->GetField(Packages::GNCpack::IFLALPHAn, &iflalphan) || !iflalphan ||
+      !a_p->GetField(Packages::GNCpack::MXADJn, &mxadjn) || !mxadjn)
+  return;
 
   int width = util::RealWidth();
   CStr s1,s2;
   for (int i = 1; i <= *n2; ++i) {
     int nodeN = static_cast<int>(ForElement(gnc,1,i,*n1));
     int nodeM = static_cast<int>(ForElement(gnc,2,i,*n1));
-    int nodeJ = static_cast<int>(ForElement(gnc,3,i,*n1));
-    Real alphaJ =                ForElement(gnc,4,i,*n1);
-    s1.Format("%5d %5d %5d %s",nodeN, nodeM, nodeJ,
-                             STR(alphaJ,-1,width,STR_FULLWIDTH));
-    for (int j = 5; j < *n1; j += 2) {
-      nodeJ = static_cast<int>(ForElement(gnc,j,  i,*n1));
-      alphaJ =                 ForElement(gnc,j+1,i,*n1);
-      s2.Format(" %5d %s",nodeJ, STR(alphaJ,-1,width,STR_FULLWIDTH));
+    s1.Format("%5d %5d",nodeN, nodeM);
+    for (int k = 0; k < *mxadjn; ++k) {
+      int nodeJ = static_cast<int>(ForElement(gnc,3+k,i,*n1));
+      s2.Format(" %5d", nodeJ);
+      s1 += s2;
+    }
+    for (int k = 0; k < *mxadjn; ++k) {
+      Real alphaJ = ForElement(gnc,3+(*mxadjn)+k,i,*n1);
+      s2.Format(" %s", STR(alphaJ,-1,width,STR_FULLWIDTH));
       s1 += s2;
     }
     if (*iflalphan == 1) {
