@@ -578,7 +578,7 @@ void NativeExpArr2d::WriteToFile ()
 {
   CStr str;
   if (!GetH5Flag()) str = ArrayToTxtFile();
-  else       str = ArrayToH5File();
+  else              str = ArrayToH5File();
   AddToStoredLinesDesc(str, "");
 } // NativeExpArr2d::WriteToFile
 //------------------------------------------------------------------------------

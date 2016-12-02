@@ -334,6 +334,15 @@
     <ClCompile Include="source\private\MfData\MfExport\private\Sqlite\SqFile.cpp">
       <Filter>source\private\MfData\MfExport\private\Sqlite</Filter>
     </ClCompile>
+    <ClCompile Include="source\private\MfData\MfExport\private\Sqlite\SqArrayWriter.cpp">
+      <Filter>source\private\MfData\MfExport\private\Sqlite</Filter>
+    </ClCompile>
+    <ClCompile Include="source\private\MfData\MfExport\private\Sqlite\SqMfSchema.cpp">
+      <Filter>source\private\MfData\MfExport\private\Sqlite</Filter>
+    </ClCompile>
+    <ClCompile Include="source\private\MfData\MfExport\private\Sqlite\SqPackDbTables.h">
+      <Filter>source\private\MfData\MfExport\private\Sqlite</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Export.h">
@@ -928,6 +937,12 @@
       <Filter>source\private\MfData\MfExport\private\H5</Filter>
     </ClInclude>
     <ClInclude Include="source\private\MfData\MfExport\private\Sqlite\SqFile.h">
+      <Filter>source\private\MfData\MfExport\private\Sqlite</Filter>
+    </ClInclude>
+    <ClInclude Include="source\private\MfData\MfExport\private\Sqlite\SqArrayWriter.h">
+      <Filter>source\private\MfData\MfExport\private\Sqlite</Filter>
+    </ClInclude>
+    <ClInclude Include="source\private\MfData\MfExport\private\Sqlite\SqMfSchema.h">
       <Filter>source\private\MfData\MfExport\private\Sqlite</Filter>
     </ClInclude>
   </ItemGroup>
