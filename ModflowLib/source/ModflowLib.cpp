@@ -169,6 +169,18 @@ DLLEXPORT void MFLIB_SETPARFNAME (const char* a_fName,
   MfData::MfGlobal::Get().SetStrVar("NAME_FILE_STR", line1);
 } // MFLIB_SETPARAMFILENAME
 //------------------------------------------------------------------------------
+/// \brief This is called to set the filename of the parameter file that GMS
+/// uses.
+//------------------------------------------------------------------------------
+DLLEXPORT void MFLIB_SETPARFNAME_SEAWAT (const char* a_fName,
+                                         int a_fNameLen)
+{
+  CStr line1 = util::GetStr(a_fName, a_fNameLen);
+  if (line1.find("_MODFLOW") == -1) return;
+
+  MFLIB_SETPARFNAME(a_fName, a_fNameLen);
+} // MFLIB_SETPARFNAME_SEAWAT
+//------------------------------------------------------------------------------
 /// \brief This is called to set the filename of the modflow parameter file.
 //------------------------------------------------------------------------------
 DLLEXPORT void MFLIB_SETSENFNAME (const char* a_fName,

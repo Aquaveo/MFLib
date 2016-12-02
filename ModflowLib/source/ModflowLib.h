@@ -44,6 +44,8 @@ DLLEXPORT void MFLIB_SETPARFNAME(const char* a_fName,
                                  int a_fNameLen);
 DLLEXPORT void MFLIB_SETSENFNAME(const char* a_fName,
                                  int a_fNameLen);
+DLLEXPORT void MFLIB_SETPARFNAME_SEAWAT(const char* a_fName,
+                                        int a_fNameLen);
 DLLEXPORT void MFLIB_U2DDBL(int *a_SUCCESS,
                             int *a_IPRN,
                             const int *a_I,

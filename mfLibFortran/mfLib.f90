@@ -133,6 +133,11 @@ module mfLib
     END SUBROUTINE mfLib_SetParFName
 !     ------------------------------------------------------------------
 !      Declare the C function
+    SUBROUTINE MFLIB_SETPARFNAME_SEAWAT(FNAME)
+      CHARACTER*200 FNAME [REFERENCE]
+    END SUBROUTINE MFLIB_SETPARFNAME_SEAWAT
+!     ------------------------------------------------------------------
+!      Declare the C function
     SUBROUTINE mfLib_SetSenFName(FNAME)
       CHARACTER*200 FNAME [REFERENCE]
     END SUBROUTINE mfLib_SetSenFName
@@ -289,6 +294,7 @@ module mfLib
                ,mfLibF_Sfr &
                ,mfLibF90_STR &
                ,mfLibF_SetParFName &
+               ,MFLIBF_SETPARFNAME_SEAWAT &
                ,mfLibF_SetSenFName &
                ,mfLibF_MNW &
                ,mfLibF_FillInParType &
@@ -527,6 +533,13 @@ module mfLib
         
         call mfLib_SetParFName(FNAME)
       end subroutine mfLibF_SetParFName
+!-----------------------------------------------------------------------
+      subroutine MFLIBF_SETPARFNAME_SEAWAT (FNAME)
+        implicit none
+        CHARACTER(LEN=200), intent(in) :: FNAME
+        
+        call MFLIB_SETPARFNAME_SEAWAT(FNAME)
+      end subroutine MFLIBF_SETPARFNAME_SEAWAT
 !-----------------------------------------------------------------------
       subroutine mfLibF_SetSenFName (FNAME)
         implicit none
