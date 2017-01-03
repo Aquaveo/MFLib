@@ -67,7 +67,7 @@ public:
   CellIdToIJK           m_grid;
 };
 
-const char* SQFT = "SQLITE_FILE_TIME";
+static const char* SQFT = "SQLITE_FILE_TIME";
 typedef std::pair<std::vector<CStr>, std::vector<CStr>> pVecCStr;
 typedef std::map<CStr, pVecCStr> ColMap;
 
