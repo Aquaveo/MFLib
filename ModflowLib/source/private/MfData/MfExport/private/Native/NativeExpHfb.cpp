@@ -150,7 +150,7 @@ void NativeExpHfb::Lines2and3 ()
       // use m_value in case there is a SEN file with a different value
       // than the parameter value specified in the package file
       CStr s;
-      s.Format("%s %s %s %d", pname, p.m_type, STR(p.m_parVal), 
+      s.Format("%s %s %s %d", pname, p.m_type, STR((Real)p.m_parVal), 
                 nlst);
       AddToStoredLinesDesc(s, Desc(2));
       for (size_t i = 0; i < nlst; ++i)
