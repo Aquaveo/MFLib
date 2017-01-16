@@ -979,6 +979,7 @@ build_test_runner.bat
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeUtil.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Sqlite\SqArrayWriter.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Sqlite\SqBcList.cpp" />
+    <ClCompile Include="source\private\MfData\MfExport\private\Sqlite\SqDisu.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Sqlite\SqFile.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Sqlite\SqMfSchema.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Sqlite\SqPackDbTables.h" />
@@ -1150,6 +1151,7 @@ build_test_runner.bat
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeUtil.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Sqlite\SqArrayWriter.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Sqlite\SqBcList.h" />
+    <ClInclude Include="source\private\MfData\MfExport\private\Sqlite\SqDisu.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Sqlite\SqFile.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Sqlite\SqMfSchema.h" />
     <ClInclude Include="source\private\MfLibAsserts.h" />

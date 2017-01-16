@@ -186,7 +186,7 @@ void SqBcList::AddVariable (
 {
   std::string var = a_var;
   std::string val = a_val;
-  CppSQLite3DB *f = SqLiteDbForPackage(m_pack);
+  CppSQLite3DB *f = sqLiteDbForPackage(m_pack);
   ASSERT(f);
   if (!f) return;
   sqAddVariable(f, a_var, a_val);
@@ -199,7 +199,7 @@ void SqBcList::AddItmp (
   , int a_itmp
   )
 {
-  CppSQLite3DB *f = SqLiteDbForPackage(m_pack);
+  CppSQLite3DB *f = sqLiteDbForPackage(m_pack);
   ASSERT(f);
   if (!f) return;
   sqAddLstItmp(f, a_sp, a_itmp);
@@ -216,7 +216,7 @@ void SqBcList::AddStressPeriodData ()
 //------------------------------------------------------------------------------
 void SqBcList::EndWriteFile ()
 {
-  CppSQLite3DB *f = SqLiteDbForPackage(m_pack);
+  CppSQLite3DB *f = sqLiteDbForPackage(m_pack);
   ASSERT(f);
   if (!f) return;
   CStr tStr;
@@ -228,11 +228,7 @@ void SqBcList::EndWriteFile ()
 //------------------------------------------------------------------------------
 void SqBcList::AddSqComment ()
 {
-  CStr tStr, packName = m_pack->GetPackage()->PackageName();
-  m_pack->GetGlobal()->GetStrVar(SQFT, tStr);
-  std::stringstream ss;
-  ss << "# GMS_SQLITE " << tStr;
-  MfData::Packages::CommentPushFront(packName, ss.str());
+  sqAddSqliteComment(m_pack);
 } // SqBcList::AddSqComment
 //------------------------------------------------------------------------------
 /// \brief
@@ -240,7 +236,7 @@ void SqBcList::AddSqComment ()
 void SqBcList::impl::CreateTables ()
 {
   // make get database
-  CppSQLite3DB *f = SqLiteDbForPackage(m_pack);
+  CppSQLite3DB *f = sqLiteDbForPackage(m_pack);
   ASSERT(f);
   if (!f) return;
   if (sqDbHasTables(f)) return;
@@ -252,16 +248,7 @@ void SqBcList::impl::CreateTables ()
   std::vector<std::string> sql;
   if (!str.empty()) sql.push_back(str);
   sqCreatePackageTables(f, packName, sql);
-
-  { // get the time that was written
-    CStr sqLiteFileTime;
-    if (!m_pack->GetGlobal()->GetStrVar(SQFT, sqLiteFileTime))
-    {
-      sqGetLastEditTime(f, &str);
-      sqLiteFileTime = str.c_str();
-      m_pack->GetGlobal()->SetStrVar(SQFT, sqLiteFileTime);
-    }
-  }
+  sqStoreLastEditTime(f, m_pack);
 } // SqBcList::impl::CreateTables
 //------------------------------------------------------------------------------
 /// \brief
@@ -305,13 +292,13 @@ std::string SqBcList::impl::SpTableSql ()
     ss << ", " << colStrs[i] << " " << colTypes[i];
   ss << ")";
   return ss.str();
-} // SqBcList::impl::CreateSpTable
+} // SqBcList::impl::SpTableSql
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
 void SqBcList::impl::CreateInsertStmt ()
 {
-  CppSQLite3DB *f = SqLiteDbForPackage(m_pack);
+  CppSQLite3DB *f = sqLiteDbForPackage(m_pack);
   ASSERT(f);
   if (!f) return;
   std::stringstream ss;

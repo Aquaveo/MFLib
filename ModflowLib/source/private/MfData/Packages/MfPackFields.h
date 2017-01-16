@@ -51,11 +51,15 @@ namespace MfData
     }
     namespace Disu
     {
-      const char * const LAYCBD = "LAYCBD";
       const char * const NODES = "NODES";
+      const char * const NLAY = "NLAY";
       const char * const NJAG = "NJAG";
       const char * const IVSD = "IVSD";
+      const char * const NPER = "NPER";
+      const char * const ITMUNI = "ITMUNI";
+      const char * const LENUNI = "LENUNI";
       const char * const IDSYMRD = "IDSYMRD";
+      const char * const LAYCBD = "LAYCBD";
       const char * const NODLAY = "NODLAY";
       const char * const TOP = "TOP";
       const char * const BOT = "BOT";

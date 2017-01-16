@@ -44,18 +44,32 @@ namespace MfData
     size_t CurModIdx();
 
 
+    void SetVector(const char* a_NAME,
+                   const std::vector<int>& a_var);
+    void SetVector(const char* a_NAME,
+                   const std::vector<Real>& a_var);
+    void SetVector(const char* a_NAME,
+                   const std::vector<double>& a_var);
+
+    bool GetVector(const char* a_NAME,
+                   std::vector<int>& a_var) const;
+    bool GetVector(const char* a_NAME,
+                   std::vector<Real>& a_var) const;
+    bool GetVector(const char* a_NAME,
+                   std::vector<double>& a_var) const;
+
     void SetIntVar(const char* a_NAME,
                    int a_var);
     bool GetIntVar(const char* a_NAME,
-                   int& a_var);
+                   int& a_var) const;
     void SetRealVar(const char* a_NAME,
                     Real a_var);
     bool GetRealVar(const char* a_NAME,
-                    Real& a_var);
+                    Real& a_var) const;
     void SetStrVar(const char* a_NAME,
                    const CStr& a_var);
     bool GetStrVar(const char* a_NAME,
-                   CStr& a_var);
+                   CStr& a_var) const;
     void PutCurrentPeriod(int a_);
     int  GetCurrentPeriod();
 

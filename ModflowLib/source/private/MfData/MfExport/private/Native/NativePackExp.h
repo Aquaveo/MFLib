@@ -36,6 +36,7 @@ namespace MfData
 
       Mf2kNative*    GetNative();
       MfGlobal*      GetGlobal();
+      const MfGlobal* GetGlobal() const;
       MfPackage*     GetPackage();
     protected:
       bool           GetH5Flag();

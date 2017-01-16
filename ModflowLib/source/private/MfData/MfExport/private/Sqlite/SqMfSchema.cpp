@@ -24,6 +24,7 @@
 // 6. Non-shared code headers
 #include <private/SQLite/CppSQLite3.h>
 #include <private/MfData/MfExport/private/Sqlite/SqPackDbTables.h>
+#include <private/util/StdString.h> // for ASSERT
 
 //----- Forward declarations ---------------------------------------------------
 
@@ -83,7 +84,8 @@ static void iGetDbCommands (
   a_vSql->resize(0);
   a_vSql->push_back(SQ_LASTEDIT_CREATE);
   a_vSql->push_back(SQ_LASTEDIT_INIT);
-  a_vSql->push_back(SQ_VARIABLES_CREATE);
+  if ("DISU" != a_packName)
+    a_vSql->push_back(SQ_VARIABLES_CREATE);
   if ("CHD" == a_packName ||
       "DRN" == a_packName ||
       "DRT" == a_packName ||
@@ -128,7 +130,8 @@ static void iCreateLastEditTriggers (
 //------------------------------------------------------------------------------
 /// \brief create the required tables for a MODFLOW package
 /// \param a_db SQLite data base that will be modified
-/// \param[in] a_packName Name of the MODFLOW package
+/// \param[in] a_packName: Name of the MODFLOW package
+/// \param[in] a_sql: Existing list of sql create table strings
 //------------------------------------------------------------------------------
 void sqCreatePackageTables (
   CppSQLite3DB *a_db
@@ -138,12 +141,17 @@ void sqCreatePackageTables (
 {
   if (!a_db || a_packName.empty()) return;
 
-  std::vector<std::string> vSql;
-  iGetDbCommands(a_packName, &vSql);
-  for (size_t i=0; i<vSql.size(); ++i) a_db->execDML(vSql[i].c_str());
-  for (size_t i=0; i<a_sql.size(); ++i) a_db->execDML(a_sql[i].c_str());
-  iCreateLastEditTriggers(a_db);
-} // sqInitPackage
+  try {
+    std::vector<std::string> vSql;
+    iGetDbCommands(a_packName, &vSql);
+    for (size_t i=0; i<vSql.size(); ++i) a_db->execDML(vSql[i].c_str());
+    for (size_t i=0; i<a_sql.size(); ++i) a_db->execDML(a_sql[i].c_str());
+    iCreateLastEditTriggers(a_db);
+  }
+  catch (std::exception&) {
+    ASSERT(false);
+  }
+} // sqCreatePackageTables
 //------------------------------------------------------------------------------
 /// \brief checks if a database has any tables defined
 /// \param a_db SQLite data base that will be modified
@@ -212,7 +220,12 @@ void sqAddVariable (
 
   std::stringstream ss;
   ss << SQ_VARIABLES_INSERT << "'" << var << "', '" << val << "')";
-  a_db->execDML(ss.str().c_str());
+  try {
+    a_db->execDML(ss.str().c_str());
+  }
+  catch (std::exception&) {
+    ASSERT(false);
+  }
 } // sqAddVariable
 //------------------------------------------------------------------------------
 /// \brief Adds a variable to the SQ_VARIABLE table
@@ -231,4 +244,4 @@ void sqAddLstItmp (
   std::stringstream ss;
   ss << SQ_LST_ITMP_INSERT << a_sp << ", " << a_itmp << ")";
   a_db->execDML(ss.str().c_str());
-} // sqAddVariable
+} // sqAddLstItmp

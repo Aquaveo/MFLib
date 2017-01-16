@@ -57,49 +57,49 @@ public:
                 const T *a_);
   template <class T>
   bool GetField(const char *a_field,
-                const T **a_);
+                const T **a_) const;
 
-  void SetStructVal(const int* a_, dataPack &a_p)
+  void SetStructVal(const int* a_, dataPack &a_p) const
   {
     a_p.i=a_;
     a_p.f=0;
     a_p.d=0;
     a_p.c=0;
   }
-  void SetStructVal(const float* a_, dataPack &a_p)
+  void SetStructVal(const float* a_, dataPack &a_p) const
   {
     a_p.i=0;
     a_p.f=a_;
     a_p.d=0;
     a_p.c=0;
   }
-  void SetStructVal(const double* a_, dataPack &a_p)
+  void SetStructVal(const double* a_, dataPack &a_p) const
   {
     a_p.i=0;
     a_p.f=0;
     a_p.d=a_;
     a_p.c=0;
   }
-  void SetStructVal(const char* a_, dataPack &a_p)
+  void SetStructVal(const char* a_, dataPack &a_p) const
   {
     a_p.i=0;
     a_p.f=0;
     a_p.d=0;
     a_p.c=a_;
   }
-  void GetStructVal(const int** a_, dataPack &a_p)
+  void GetStructVal(const int** a_, const dataPack &a_p) const
   {
     *a_=a_p.i;
   }
-  void GetStructVal(const float** a_, dataPack &a_p)
+  void GetStructVal(const float** a_, const dataPack &a_p) const
   {
     *a_=a_p.f;
   }
-  void GetStructVal(const double** a_, dataPack &a_p)
+  void GetStructVal(const double** a_, const dataPack &a_p) const
   {
     *a_=a_p.d;
   }
-  void GetStructVal(const char** a_, dataPack &a_p)
+  void GetStructVal(const char** a_, const dataPack &a_p) const
   {
     *a_=a_p.c;
   }
@@ -187,22 +187,22 @@ bool MfPackage::SetField (const char* a_field,
 /// then it returns false.
 //------------------------------------------------------------------------------
 bool MfPackage::GetField (const char* a_field,
-                          const float **a_)
+                          const float **a_) const
 {
   return(m_p->GetField(a_field, a_));
 } // MfPackage::GetField
 bool MfPackage::GetField (const char* a_field,
-                          const double **a_)
+                          const double **a_) const
 {
   return(m_p->GetField(a_field, a_));
 } // MfPackage::GetField
 bool MfPackage::GetField (const char* a_field,
-                          const int **a_)
+                          const int **a_) const
 {
   return(m_p->GetField(a_field, a_));
 } // MfPackage::GetField
 bool MfPackage::GetField (const char* a_field,
-                          const char **a_)
+                          const char **a_) const
 {
   return(m_p->GetField(a_field, a_));
 } // MfPackage::GetField
@@ -305,13 +305,13 @@ bool MfPackage::impl::SetField (const char *a_field,
 //------------------------------------------------------------------------------
 template <class T>
 bool MfPackage::impl::GetField (const char *a_field,
-                                const T **a_)
+                                const T **a_) const
 {
   if (!a_)
     return false;
 
   CStr str(a_field);
-  std::map<CStr, dataPack >::iterator it;
+  std::map<CStr, dataPack >::const_iterator it;
   it = m_data.find(str);
   if (it == m_data.end())
     return false;

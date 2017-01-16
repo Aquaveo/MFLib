@@ -4,16 +4,24 @@
 #ifndef SQFILE_H
 #define SQFILE_H
 
+//----- Forward declarations ---------------------------------------------------
 class CppSQLite3DB;
+
 namespace MfData
 {
 namespace Export
 {
 
+static const char* SQFT = "SQLITE_FILE_TIME";
+
+//----- Forward declarations ---------------------------------------------------
 class NativePackExp;
 
-CppSQLite3DB *SqLiteDbForPackage(NativePackExp* a_);
-void SqLiteCloseAllDb();
+//----- Free functions ---------------------------------------------------------
+CppSQLite3DB *sqLiteDbForPackage(NativePackExp* a_);
+void sqLiteCloseAllDb();
+void sqAddSqliteComment (NativePackExp* a_exporter);
+void sqStoreLastEditTime (CppSQLite3DB* a_db, NativePackExp* a_exporter);
 
 } // namespace Export
 } // namespace MfData

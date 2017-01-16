@@ -32,9 +32,11 @@
 #include <cstdio>
 #include <cstring>
 
+#include <exception>
+
 #define CPPSQLITE_ERROR 1000
 
-class CppSQLite3Exception
+class CppSQLite3Exception : public std::exception
 {
 public:
 

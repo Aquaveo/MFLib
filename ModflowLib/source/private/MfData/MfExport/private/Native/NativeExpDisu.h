@@ -5,49 +5,53 @@
 #define NATIVEEXPDISU_H
 
 #include <private\MfData\MfExport\private\Native\NativePackExp.h>
+
+//----- Forward declarations----------------------------------------------------
 class NativeExpDisuT;
-namespace MfData
+
+namespace MfData {
+namespace Export {
+
+//----- Forward declarations----------------------------------------------------
+
+////////////////////////////////////////////////////////////////////////////////
+class NativeExpDisu : public NativePackExp
 {
-  namespace Export
-  {
-    class NativeExpDisu : public NativePackExp
-    {
-      friend NativeExpDisuT;
-    public:
-      NativeExpDisu();
-      virtual ~NativeExpDisu();
-      virtual bool Export();
-    private:
-      NativeExpDisu(const NativeExpDisu& rhs);
-      const NativeExpDisu& operator=(const NativeExpDisu& rhs);
+  friend NativeExpDisuT;
+public:
+  NativeExpDisu();
+  virtual ~NativeExpDisu();
+  virtual bool Export();
+private:
+  NativeExpDisu(const NativeExpDisu& rhs);
+  const NativeExpDisu& operator=(const NativeExpDisu& rhs);
 
-      virtual void OnSetData();
+  virtual void OnSetData();
 
-      CStr Line1();
-      CStr Line2();
-      void Line3();
-      void Line4();
-      void Line5();
-      void Line6();
-      void Line7();
-      void Line8();
-      void Line9();
-      void Line10a();
-      void Line10b();
-      void Line11();
-      void Line12();
-      std::vector<CStr> Line13();
+  CStr Line1();
+  CStr Line2();
+  void Line3();
+  void Line4();
+  void Line5();
+  void Line6();
+  void Line7();
+  void Line8();
+  void Line9();
+  void Line10a();
+  void Line10b();
+  void Line11();
+  void Line12();
+  std::vector<CStr> Line13();
 
-      void InitDescriptionMap ();
-      CStr Desc(const CStr& a_line);
-      void AddArrayLines (const CStr& a_name, const CStr& a_desc);
+  void InitDescriptionMap ();
+  CStr Desc(const CStr& a_line);
+  void AddArrayLines (const CStr& a_name, const CStr& a_desc);
 
-      int m_nLay, m_nSp;
-      std::vector<int> m_layCbd;
-      std::map<CStr, CStr> m_mapDesc;
-    };
+  int m_nLay, m_nSp;
+  std::map<CStr, CStr> m_mapDesc;
+}; // class NativeExpDisu
 
-  }
+}
 }
 
 #endif

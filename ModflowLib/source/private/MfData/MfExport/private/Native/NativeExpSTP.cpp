@@ -105,7 +105,7 @@ bool NativeExpSTP::Export ()
 
   if (GetNative()->GetUseSQLite())
   {
-    SqLiteCloseAllDb();
+    sqLiteCloseAllDb();
   }
 
   ShowWarnings();

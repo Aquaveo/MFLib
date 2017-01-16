@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// FILE      SqBcList.cpp
+// FILE      SqFile.cpp
 // PURPOSE   
 //  (C) Copyright Aquaveo 2014. Distributed under the ModflowLib
 //  Software License, Version 1.0. (See accompanying file
@@ -23,8 +23,11 @@
 
 // 6. Non-shared code headers
 #include <private/MfData/MfExport/private/Mf2kNative.h>
-#include <private/MfData/MfExport/private/TxtExporter.h>
 #include <private/MfData/MfExport/private/Native/NativePackExp.h>
+#include <private/MfData/MfExport/private/Sqlite/SqMfSchema.h>
+#include <private/MfData/MfExport/private/TxtExporter.h>
+#include <private/MfData/MfGlobal.h>
+#include <private/MfData/MfPackageUtil.h>
 #include <private/MfData/Packages/MfPackage.h>
 #include <private/SQLite/CppSQLite3.h>
 
@@ -80,7 +83,7 @@ static CppSQLite3DB* iGetDbFile (NativePackExp *a_)
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-CppSQLite3DB *SqLiteDbForPackage (NativePackExp *a_)
+CppSQLite3DB *sqLiteDbForPackage (NativePackExp *a_)
 {
   std::map<CStr, CppSQLite3DB*> &files(iFileMap());
   CStr packName = a_->GetPackage()->PackageName();
@@ -92,21 +95,63 @@ CppSQLite3DB *SqLiteDbForPackage (NativePackExp *a_)
     it = files.find(packName);
   }
   return it->second;
-} // SqLiteDbForPackage
+} // sqLiteDbForPackage
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-void SqLiteCloseAllDb ()
+void sqLiteCloseAllDb ()
 {
-  std::map<CStr, CppSQLite3DB*> &files(iFileMap());
-  auto it = files.begin();
-  auto itEnd = files.end();
-  for (; it != itEnd; ++it)
-  {
-    it->second->execDML("commit transaction;");
-    it->second->close();
+  try {
+    std::map<CStr, CppSQLite3DB*> &files(iFileMap());
+    auto it = files.begin();
+    auto itEnd = files.end();
+    for (; it != itEnd; ++it)
+    {
+      it->second->execDML("commit transaction;");
+      it->second->close();
+    }
   }
-} // SqLiteCloseAllDb
+  catch (std::exception&) {
+    ASSERT(false);
+  }
+} // sqLiteCloseAllDb
+//------------------------------------------------------------------------------
+/// \brief Add comment with timestamp to the text file.
+///
+/// Maybe this belongs in some sort of SqUtils.cpp file
+//------------------------------------------------------------------------------
+void sqAddSqliteComment (NativePackExp* a_exporter)
+{
+  ASSERT(a_exporter);
+  if (!a_exporter)
+    return;
+
+  CStr packName = a_exporter->GetPackage()->PackageName();
+  CStr tStr;
+  a_exporter->GetGlobal()->GetStrVar(SQFT, tStr);
+  std::stringstream ss;
+  ss << "# GMS_SQLITE " << tStr;
+  MfData::Packages::CommentPushFront(packName, ss.str());
+} // sqAddSqliteComment
+//------------------------------------------------------------------------------
+/// \brief Store the last time db was edited in MfGlobal.
+///
+/// Maybe this belongs in some sort of SqUtils.cpp file
+//------------------------------------------------------------------------------
+void sqStoreLastEditTime (CppSQLite3DB* a_db, NativePackExp* a_exporter)
+{
+  ASSERT(a_db);
+  if (!a_db) return;
+
+  CStr sqLiteFileTime;
+  if (!a_exporter->GetGlobal()->GetStrVar(SQFT, sqLiteFileTime))
+  {
+    std::string str;
+    sqGetLastEditTime(a_db, &str);
+    sqLiteFileTime = str.c_str();
+    a_exporter->GetGlobal()->SetStrVar(SQFT, sqLiteFileTime);
+  }
+} // sqStoreLastEditTime
 
 } // namespace Export
 } // namespace MfData

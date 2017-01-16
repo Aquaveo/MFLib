@@ -14,6 +14,7 @@
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\TxtExporter.h>
 #include <private\MfData\MfExport\private\MfExporterImpl.h>
+#include <private\MfData\MfExport\private\Sqlite\SqDisu.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
 
@@ -26,7 +27,6 @@ NativeExpDisu::NativeExpDisu ()
 : NativePackExp()
 , m_nLay()
 , m_nSp()
-, m_layCbd()
 , m_mapDesc()
 {
   InitDescriptionMap();
@@ -68,8 +68,15 @@ bool NativeExpDisu::Export ()
   std::vector<CStr> l13 = Line13();
   AddToStoredLinesDesc(l13, std::vector<CStr>(l13.size(), Desc("13")));
 
+  // Export to SQLite if necessary
+  if (GetNative()->GetUseSQLite()) {
+    SqDisu sqDisu(this);
+    sqDisu.Export();
+  }
+
   WriteComments();
   WriteStoredLines();
+
   return true;
 } // MfNativeExpDisu::Export
 //------------------------------------------------------------------------------
@@ -109,7 +116,6 @@ CStr NativeExpDisu::Line2 ()
   {
     for (int k=0; k<m_nLay; ++k)
     {
-      m_layCbd.push_back(laycbd[k]);
       ss << laycbd[k] << " ";
     }
     aStr = ss.str();

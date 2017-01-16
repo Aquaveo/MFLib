@@ -49,6 +49,9 @@ public:
   std::map<CStr, int>& iVars() { VectorSizes(); return m_intVars[m_curModIdx]; }
   std::map<CStr, Real>& rVars() { VectorSizes(); return m_realVars[m_curModIdx]; }
   std::map<CStr, CStr>& strVars() { VectorSizes(); return m_strVars[m_curModIdx]; }
+  std::map<CStr, std::vector<int>>& iVecs() { VectorSizes(); return m_intVecs[m_curModIdx]; }
+  std::map<CStr, std::vector<Real>>& rVecs() { VectorSizes(); return m_realVecs[m_curModIdx]; }
+  std::map<CStr, std::vector<double>>& dVecs() { VectorSizes(); return m_doubleVecs[m_curModIdx]; }
   MfData::Export::MfExporter* Exporter() { VectorSizes(); return m_export[m_curModIdx]; }
   CStr& NameFile() { VectorSizes(); return m_nameFile[m_curModIdx]; }
   ParamList& GetParamList() { VectorSizes(); return *m_params[m_curModIdx]; }
@@ -75,6 +78,9 @@ private:
   std::vector< std::map<CStr, int> > m_intVars;
   std::vector< std::map<CStr, Real> > m_realVars;
   std::vector< std::map<CStr, CStr> > m_strVars;
+  std::vector< std::map<CStr, std::vector<int>> > m_intVecs;
+  std::vector< std::map<CStr, std::vector<Real>> > m_realVecs;
+  std::vector< std::map<CStr, std::vector<double>> > m_doubleVecs;
   std::vector<MfData::Export::MfExporter*> m_export;
   std::vector<CStr> m_nameFile;
   std::vector<ParamList*> m_params;
@@ -96,6 +102,9 @@ private:
     if (idx > m_intVars.size()) m_intVars.resize(idx);
     if (idx > m_realVars.size()) m_realVars.resize(idx);
     if (idx > m_strVars.size()) m_strVars.resize(idx);
+    if (idx > m_intVecs.size()) m_intVecs.resize(idx);
+    if (idx > m_realVecs.size()) m_realVecs.resize(idx);
+    if (idx > m_doubleVecs.size()) m_doubleVecs.resize(idx);
     if (idx > m_export.size()) m_export.resize(idx, 0);
     if (idx > m_nameFile.size()) m_nameFile.resize(idx, "");
     while (idx > m_params.size()) m_params.push_back(new ParamList());
@@ -453,6 +462,81 @@ int MfGlobal::NumNodesUnstructured () const
   return m_p->NumNodesUnstructured();
 } // MfGlobal::NumNodesUnstructured
 //------------------------------------------------------------------------------
+/// \brief Sets a vector variable by name.
+/// \param[in] a_var: The vector.
+//------------------------------------------------------------------------------
+void MfGlobal::SetVector(const char* a_NAME, const std::vector<int>& a_var)
+{
+  CStr nm(a_NAME);
+  m_p->iVecs()[nm] = a_var;
+} // MfGlobal::SetVector
+//------------------------------------------------------------------------------
+/// \brief Sets a vector variable by name.
+/// \param[in] a_var: The vector.
+//------------------------------------------------------------------------------
+void MfGlobal::SetVector(const char* a_NAME, const std::vector<Real>& a_var)
+{
+  CStr nm(a_NAME);
+  m_p->rVecs()[nm] = a_var;
+} // MfGlobal::SetVector
+//------------------------------------------------------------------------------
+/// \brief Sets a vector variable by name.
+/// \param[in] a_var: The vector.
+//------------------------------------------------------------------------------
+void MfGlobal::SetVector(const char* a_NAME, const std::vector<double>& a_var)
+{
+  CStr nm(a_NAME);
+  m_p->dVecs()[nm] = a_var;
+} // MfGlobal::SetVector
+//------------------------------------------------------------------------------
+/// \brief Gets a vector variable by name.
+/// \param[in] a_NAME: The name.
+/// \param[in] a_var: The vector.
+/// \return true on success.
+//------------------------------------------------------------------------------
+bool MfGlobal::GetVector(const char* a_NAME, std::vector<int>& a_var) const
+{
+  CStr nm(a_NAME);
+  if (m_p->iVecs().find(nm) != m_p->iVecs().end())
+  {
+    a_var = m_p->iVecs()[nm];
+    return true;
+  }
+  return false;
+} // MfGlobal::GetVector
+//------------------------------------------------------------------------------
+/// \brief Gets a vector variable by name.
+/// \param[in] a_NAME: The name.
+/// \param[in] a_var: The vector.
+/// \return true on success.
+//------------------------------------------------------------------------------
+bool MfGlobal::GetVector(const char* a_NAME, std::vector<Real>& a_var) const
+{
+  CStr nm(a_NAME);
+  if (m_p->rVecs().find(nm) != m_p->rVecs().end())
+  {
+    a_var = m_p->rVecs()[nm];
+    return true;
+  }
+  return false;
+} // MfGlobal::GetVector
+//------------------------------------------------------------------------------
+/// \brief Gets a vector variable by name.
+/// \param[in] a_NAME: The name.
+/// \param[in] a_var: The vector.
+/// \return true on success.
+//------------------------------------------------------------------------------
+bool MfGlobal::GetVector(const char* a_NAME, std::vector<double>& a_var) const
+{
+  CStr nm(a_NAME);
+  if (m_p->dVecs().find(nm) != m_p->dVecs().end())
+  {
+    a_var = m_p->dVecs()[nm];
+    return true;
+  }
+  return false;
+} // MfGlobal::GetVector
+//------------------------------------------------------------------------------
 /// \brief Sets an integer variable by name
 //------------------------------------------------------------------------------
 void MfGlobal::SetIntVar (const char* a_NAME,
@@ -465,12 +549,13 @@ void MfGlobal::SetIntVar (const char* a_NAME,
 /// \brief Gets an integer variable by name
 //------------------------------------------------------------------------------
 bool MfGlobal::GetIntVar (const char* a_NAME,
-                          int& a_var)
+                          int& a_var) const
 {
   CStr nm(a_NAME);
-  if (m_p->iVars().find(nm) != m_p->iVars().end())
+  std::map<CStr, int>::const_iterator it = m_p->iVars().find(nm);
+  if (it != m_p->iVars().end())
   {
-    a_var = m_p->iVars()[nm];
+    a_var = it->second;
     return true;
   }
   return false;
@@ -488,12 +573,13 @@ void MfGlobal::SetRealVar (const char* a_NAME,
 /// \brief Gets an integer variable by name
 //------------------------------------------------------------------------------
 bool MfGlobal::GetRealVar (const char* a_NAME,
-                           Real& a_var)
+                           Real& a_var) const
 {
   CStr nm(a_NAME);
-  if (m_p->rVars().find(nm) != m_p->rVars().end())
+  std::map<CStr, Real>::const_iterator it = m_p->rVars().find(nm);
+  if (it != m_p->rVars().end())
   {
-    a_var = m_p->rVars()[nm];
+    a_var = it->second;
     return true;
   }
   return false;
@@ -511,12 +597,13 @@ void MfGlobal::SetStrVar (const char* a_NAME,
 /// \brief Gets an integer variable by name
 //------------------------------------------------------------------------------
 bool MfGlobal::GetStrVar (const char* a_NAME,
-                          CStr& a_var)
+                          CStr& a_var) const
 {
   CStr nm(a_NAME);
-  if (m_p->strVars().find(nm) != m_p->strVars().end())
+  std::map<CStr, CStr>::const_iterator it = m_p->strVars().find(nm);
+  if (it != m_p->strVars().end())
   {
-    a_var = m_p->strVars()[nm];
+    a_var = it->second;
     return true;
   }
   return false;
@@ -543,6 +630,11 @@ m_modelType(0),
 m_laycbd(),
 m_packages(),
 m_intVars(),
+m_realVars(),
+m_strVars(),
+m_intVecs(),
+m_realVecs(),
+m_doubleVecs(),
 m_export(),
 m_nameFile(),
 m_curModIdx(),
@@ -570,6 +662,11 @@ m_modelType(rhs.m_modelType),
 m_laycbd(rhs.m_laycbd),
 m_packages(rhs.m_packages),
 m_intVars(rhs.m_intVars),
+m_realVars(rhs.m_realVars),
+m_strVars(rhs.m_strVars),
+m_intVecs(rhs.m_intVecs),
+m_realVecs(rhs.m_realVecs),
+m_doubleVecs(rhs.m_doubleVecs),
 m_export(),
 m_nameFile(rhs.m_nameFile),
 m_curModIdx(rhs.m_curModIdx),
@@ -600,6 +697,11 @@ const MfGlobal::impl& MfGlobal::impl::operator= (const MfGlobal::impl &rhs)
     m_laycbd = rhs.m_laycbd;
     m_packages = rhs.m_packages;
     m_intVars = rhs.m_intVars;
+    m_realVars = rhs.m_realVars;
+    m_strVars = rhs.m_strVars;
+    m_intVecs = rhs.m_intVecs;
+    m_realVecs = rhs.m_realVecs;
+    m_doubleVecs = rhs.m_doubleVecs;
     for (size_t i=0; i<rhs.m_export.size(); ++i)
     {
       m_export.push_back(
@@ -654,6 +756,7 @@ bool MfGlobal::impl::AttachExporter (const char *a_,
 #ifdef CXX_TEST
 
 #include <private\MfData\MfGlobal.t.h>
+#include <private\MfLibAsserts.h>
 
 //------------------------------------------------------------------------------
 void MfGlobalT::setUp ()
@@ -759,5 +862,64 @@ void MfGlobalT::testExport ()
   TS_ASSERT(MfData::Get().Export("stuff"));
   MfData::Init(MfData::MF2K, -1, "", "", "");
 }
+//------------------------------------------------------------------------------
+void MfGlobalT::testVariables ()
+{
+  //TS_FAIL("MfGlobalT::testVariables");
+  {
+    m_p->SetIntVar("MyInt", 2);
+    int var;
+    bool rv = m_p->GetIntVar("MyInt", var);
+    TS_ASSERT(rv);
+    TS_ASSERT_EQUALS(var, 2);
+  }
+
+  {
+    m_p->SetRealVar("MyReal", 3.0);
+    Real var;
+    bool rv = m_p->GetRealVar("MyReal", var);
+    TS_ASSERT(rv);
+    TS_ASSERT_EQUALS(var, 3.0);
+  }
+
+  {
+    m_p->SetStrVar("MyStr", "Bob");
+    CStr var;
+    bool rv = m_p->GetStrVar("MyStr", var);
+    TS_ASSERT(rv);
+    TS_ASSERT_EQUALS(var, "Bob");
+  }
+} // MfGlobalT::testVariables
+//------------------------------------------------------------------------------
+void MfGlobalT::testVectors()
+{
+  //TS_FAIL("MfGlobalT::testVectors");
+  {
+    std::vector<int> in(3, 1);
+    m_p->SetVector("MyInt", in);
+    std::vector<int> out;
+    bool rv = m_p->GetVector("MyInt", out);
+    TS_ASSERT(rv);
+    TS_ASSERT_EQUALS_VEC(in, out);
+  }
+
+  {
+    std::vector<Real> in(3, 2.0);
+    m_p->SetVector("MyReal", in);
+    std::vector<Real> out;
+    bool rv = m_p->GetVector("MyReal", out);
+    TS_ASSERT(rv);
+    TS_ASSERT_EQUALS_VEC(in, out);
+  }
+
+  {
+    std::vector<double> in(3, 3.0);
+    m_p->SetVector("MyDouble", in);
+    std::vector<double> out;
+    bool rv = m_p->GetVector("MyDouble", out);
+    TS_ASSERT(rv);
+    TS_ASSERT_EQUALS_VEC(in, out);
+  }
+} // MfGlobalT::testVectors
 
 #endif

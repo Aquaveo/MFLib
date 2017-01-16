@@ -91,6 +91,13 @@ MfGlobal* NativePackExp::GetGlobal ()
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
+const MfGlobal* NativePackExp::GetGlobal () const
+{
+  return m_p->m_global;
+} // NativePackExp::GetGlobal
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
 MfPackage* NativePackExp::GetPackage ()
 {
   return m_p->m_package;

@@ -61,7 +61,7 @@ bool NativeExpArr1d::Export ()
     return false;
   }
 
-  if (!GetPackage()->GetField("K", &K) || !K) {
+  if (!p->GetField("K", &K) || !K) {
     K = &k;
   }
 

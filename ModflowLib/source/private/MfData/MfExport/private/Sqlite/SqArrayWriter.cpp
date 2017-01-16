@@ -88,7 +88,7 @@ SqArrayWriter::~SqArrayWriter ()
 //------------------------------------------------------------------------------
 void SqArrayWriter::EndWriteFile ()
 {
-  CppSQLite3DB *f = SqLiteDbForPackage(m_pack);
+  CppSQLite3DB *f = sqLiteDbForPackage(m_pack);
   ASSERT(f);
   if (!f) return;
   CStr tStr, packName = m_pack->GetPackage()->PackageName();
@@ -103,18 +103,14 @@ void SqArrayWriter::EndWriteFile ()
 //------------------------------------------------------------------------------
 void SqArrayWriter::AddSqComment ()
 {
-  CStr tStr, packName = m_pack->GetPackage()->PackageName();
-  m_pack->GetGlobal()->GetStrVar(SQFT, tStr);
-  std::stringstream ss;
-  ss << "# GMS_SQLITE " << tStr;
-  MfData::Packages::CommentPushFront(packName, ss.str());
+  sqAddSqliteComment(m_pack);
 } // SqArrayWriter::AddSqComment
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
 void SqArrayWriter::impl::CreateTables ()
 {
-  CppSQLite3DB *f = SqLiteDbForPackage(m_pack);
+  CppSQLite3DB *f = sqLiteDbForPackage(m_pack);
   ASSERT(f);
   if (!f) return;
   CStr packName = m_pack->GetPackage()->PackageName();
@@ -163,7 +159,7 @@ void SqArrayWriter::impl::CreateTables ()
 //------------------------------------------------------------------------------
 void SqArrayWriter::impl::CreateTriggers ()
 {
-  CppSQLite3DB *f = SqLiteDbForPackage(m_pack);
+  CppSQLite3DB *f = sqLiteDbForPackage(m_pack);
   ASSERT(f);
   if (!f) return;
   CStr packName = m_pack->GetPackage()->PackageName();

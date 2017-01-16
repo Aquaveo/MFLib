@@ -36,13 +36,13 @@ namespace MfData
     bool SetField(const char *a_field,
                   const char *a_);
     bool GetField(const char *a_field,
-                  const float **a_);
+                  const float **a_) const;
     bool GetField(const char *a_field,
-                  const double **a_);
+                  const double **a_) const;
     bool GetField(const char *a_field,
-                  const int** a_);
+                  const int** a_) const;
     bool GetField(const char *a_field,
-                  const char **a_);
+                  const char **a_) const;
 
     std::vector<CStr> FieldNames();
     std::vector<CStr>& StringsToWrite();
