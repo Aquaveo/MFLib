@@ -5,6 +5,8 @@
 #define NATIVEEXPARR1D_H
 
 #include <private\MfData\MfExport\private\Native\NativePackExp.h>
+#include <private/MfData/MfExport/private/Sqlite/SqMfSchema.h>
+
 namespace MfData
 {
   namespace Export
@@ -44,26 +46,9 @@ namespace MfData
         else
           WriteInternal(JJ, IPRN, ARR, MULT);
 
-        // if we are doing SQLite we need to get a copy of the array so we can
-        // be sure that MODFLOW has not modified the values
         if (GetNative()->GetUseSQLite())
         {
-          std::vector<T> vec;
-          MfPackage* p = GetPackage();
-          CStr packageName(p->PackageName());
-          CStr layerString;
-          layerString.Format("_Layer_%d", *K);
-          CStr vname = packageName + "_ARR" + layerString;
-          MfGlobal* g = GetGlobal();
-          //g->GetVector(vname, vec);
-          //vec.resize(*JJ);
-          //for (int i = 0; i < *JJ; ++i) vec[i] = ARR[i];
-          //g->SetVector(vname, vec);
-
-          vname = packageName + "_MULT" + layerString;
-          g->SetRealVar(vname, *MULT);
-          vname = packageName + "_IPRN" + layerString;
-          g->SetIntVar(vname, *IPRN);
+          //sqWriteArray(this, JJ, IPRN, ARR, MULT, K);
         }
 
         return true;
