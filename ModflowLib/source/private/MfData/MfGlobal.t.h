@@ -29,7 +29,6 @@ public:
   void testAttachExporter();
   void testExport();
   void testVariables();
-  void testVectors();
 
 private:
   MfData::MfGlobal *m_p;

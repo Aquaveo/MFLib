@@ -55,10 +55,10 @@ namespace MfData
           layerString.Format("_Layer_%d", *K);
           CStr vname = packageName + "_ARR" + layerString;
           MfGlobal* g = GetGlobal();
-          g->GetVector(vname, vec);
-          vec.resize(*JJ);
-          for (int i = 0; i < *JJ; ++i) vec[i] = ARR[i];
-          g->SetVector(vname, vec);
+          //g->GetVector(vname, vec);
+          //vec.resize(*JJ);
+          //for (int i = 0; i < *JJ; ++i) vec[i] = ARR[i];
+          //g->SetVector(vname, vec);
 
           vname = packageName + "_MULT" + layerString;
           g->SetRealVar(vname, *MULT);

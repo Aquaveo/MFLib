@@ -462,81 +462,6 @@ int MfGlobal::NumNodesUnstructured () const
   return m_p->NumNodesUnstructured();
 } // MfGlobal::NumNodesUnstructured
 //------------------------------------------------------------------------------
-/// \brief Sets a vector variable by name.
-/// \param[in] a_var: The vector.
-//------------------------------------------------------------------------------
-void MfGlobal::SetVector(const char* a_NAME, const std::vector<int>& a_var)
-{
-  CStr nm(a_NAME);
-  m_p->iVecs()[nm] = a_var;
-} // MfGlobal::SetVector
-//------------------------------------------------------------------------------
-/// \brief Sets a vector variable by name.
-/// \param[in] a_var: The vector.
-//------------------------------------------------------------------------------
-void MfGlobal::SetVector(const char* a_NAME, const std::vector<Real>& a_var)
-{
-  CStr nm(a_NAME);
-  m_p->rVecs()[nm] = a_var;
-} // MfGlobal::SetVector
-//------------------------------------------------------------------------------
-/// \brief Sets a vector variable by name.
-/// \param[in] a_var: The vector.
-//------------------------------------------------------------------------------
-void MfGlobal::SetVector(const char* a_NAME, const std::vector<double>& a_var)
-{
-  CStr nm(a_NAME);
-  m_p->dVecs()[nm] = a_var;
-} // MfGlobal::SetVector
-//------------------------------------------------------------------------------
-/// \brief Gets a vector variable by name.
-/// \param[in] a_NAME: The name.
-/// \param[in] a_var: The vector.
-/// \return true on success.
-//------------------------------------------------------------------------------
-bool MfGlobal::GetVector(const char* a_NAME, std::vector<int>& a_var) const
-{
-  CStr nm(a_NAME);
-  if (m_p->iVecs().find(nm) != m_p->iVecs().end())
-  {
-    a_var = m_p->iVecs()[nm];
-    return true;
-  }
-  return false;
-} // MfGlobal::GetVector
-//------------------------------------------------------------------------------
-/// \brief Gets a vector variable by name.
-/// \param[in] a_NAME: The name.
-/// \param[in] a_var: The vector.
-/// \return true on success.
-//------------------------------------------------------------------------------
-bool MfGlobal::GetVector(const char* a_NAME, std::vector<Real>& a_var) const
-{
-  CStr nm(a_NAME);
-  if (m_p->rVecs().find(nm) != m_p->rVecs().end())
-  {
-    a_var = m_p->rVecs()[nm];
-    return true;
-  }
-  return false;
-} // MfGlobal::GetVector
-//------------------------------------------------------------------------------
-/// \brief Gets a vector variable by name.
-/// \param[in] a_NAME: The name.
-/// \param[in] a_var: The vector.
-/// \return true on success.
-//------------------------------------------------------------------------------
-bool MfGlobal::GetVector(const char* a_NAME, std::vector<double>& a_var) const
-{
-  CStr nm(a_NAME);
-  if (m_p->dVecs().find(nm) != m_p->dVecs().end())
-  {
-    a_var = m_p->dVecs()[nm];
-    return true;
-  }
-  return false;
-} // MfGlobal::GetVector
-//------------------------------------------------------------------------------
 /// \brief Sets an integer variable by name
 //------------------------------------------------------------------------------
 void MfGlobal::SetIntVar (const char* a_NAME,
@@ -890,36 +815,5 @@ void MfGlobalT::testVariables ()
     TS_ASSERT_EQUALS(var, "Bob");
   }
 } // MfGlobalT::testVariables
-//------------------------------------------------------------------------------
-void MfGlobalT::testVectors()
-{
-  //TS_FAIL("MfGlobalT::testVectors");
-  {
-    std::vector<int> in(3, 1);
-    m_p->SetVector("MyInt", in);
-    std::vector<int> out;
-    bool rv = m_p->GetVector("MyInt", out);
-    TS_ASSERT(rv);
-    TS_ASSERT_EQUALS_VEC(in, out);
-  }
-
-  {
-    std::vector<Real> in(3, 2.0);
-    m_p->SetVector("MyReal", in);
-    std::vector<Real> out;
-    bool rv = m_p->GetVector("MyReal", out);
-    TS_ASSERT(rv);
-    TS_ASSERT_EQUALS_VEC(in, out);
-  }
-
-  {
-    std::vector<double> in(3, 3.0);
-    m_p->SetVector("MyDouble", in);
-    std::vector<double> out;
-    bool rv = m_p->GetVector("MyDouble", out);
-    TS_ASSERT(rv);
-    TS_ASSERT_EQUALS_VEC(in, out);
-  }
-} // MfGlobalT::testVectors
 
 #endif

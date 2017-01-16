@@ -357,12 +357,13 @@ bool SqDisu::impl::GetArrayData (const std::string& a_name,
                                  Real& a_mult,
                                  int& a_iprn) const
 {
-  const MfData::MfGlobal* global = m_nativeExporter->GetGlobal();
-  ArrayVariableNames avn = iGetArrayNames(a_name, a_layer);
-  bool rv1 = global->GetVector(avn.m_array.c_str(), a_vec);
-  bool rv2 = global->GetRealVar(avn.m_mult.c_str(), a_mult);
-  bool rv3 = global->GetIntVar(avn.m_iprn.c_str(), a_iprn);
-  return rv1 && rv2 && rv3;
+  //const MfData::MfGlobal* global = m_nativeExporter->GetGlobal();
+  //ArrayVariableNames avn = iGetArrayNames(a_name, a_layer);
+  //bool rv1 = global->GetVector(avn.m_array.c_str(), a_vec);
+  //bool rv2 = global->GetRealVar(avn.m_mult.c_str(), a_mult);
+  //bool rv3 = global->GetIntVar(avn.m_iprn.c_str(), a_iprn);
+  //return rv1 && rv2 && rv3;
+  return true;
 } // SqDisu::impl::GetArrayData
 //------------------------------------------------------------------------------
 /// \brief Return the 
