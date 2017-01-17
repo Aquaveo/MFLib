@@ -29,6 +29,8 @@
 #include <private/MfData/MfGlobal.h>
 #include <private/MfData/MfPackageUtil.h>
 #include <private/MfData/Packages/MfPackage.h>
+#include <private/MfData/Packages/MfPackStrings.h>
+#include <private/MfData/Packages/MfPackFields.h>
 #include <private/SQLite/CppSQLite3.h>
 
 //----- Forward declarations ---------------------------------------------------
@@ -58,14 +60,17 @@ static std::map<CStr, CppSQLite3DB*> &iFileMap ()
   return m_;
 } // iFileMap
 //------------------------------------------------------------------------------
-/// \brief
+/// \brief Opens a new DB file (removing any old one) at path/base_PACKAGE.db
+/// \param a_exporter: The exporter.
+/// \param a_modflowPackageName:    Modflow package name ("DISU" etc.)
+/// \return The DB pointer.
 //------------------------------------------------------------------------------
-static CppSQLite3DB* iGetDbFile (NativePackExp *a_)
+static CppSQLite3DB* iGetDbFile (NativePackExp *a_exporter,
+                                 std::string a_modflowPackageName)
 {
-  CStr packName = a_->GetPackage()->PackageName();
-  CStr base = a_->GetNative()->GetExp()->GetBaseFileName();
+  CStr base = a_exporter->GetNative()->GetExp()->GetBaseFileName();
   base += "_";
-  base += packName;
+  base += a_modflowPackageName;
   base += ".db";
 
   FILE *fp(fopen(base.c_str(), "r"));
@@ -81,18 +86,66 @@ static CppSQLite3DB* iGetDbFile (NativePackExp *a_)
   return ret;
 } // iGetDbFile
 //------------------------------------------------------------------------------
-/// \brief
+/// \brief Given the array name, return the modflow package name it goes with.
+/// \param a_array: Name of the array.
+/// \return The modflow package name.
+//------------------------------------------------------------------------------
+std::string sqMfPackageFromArrayName(const std::string& a_array)
+{
+  namespace mfdp = MfData::Packages;
+
+  static std::map<std::string, std::string> m_;
+
+  // Initialize the map
+  if (m_.empty()) {
+    // DISU
+    m_.insert(std::make_pair(mfdp::Disu::LAYCBD, mfdp::DISU));
+    m_.insert(std::make_pair(mfdp::Disu::NODLAY, mfdp::DISU));
+    m_.insert(std::make_pair(mfdp::Disu::TOP, mfdp::DISU));
+    m_.insert(std::make_pair(mfdp::Disu::BOT, mfdp::DISU));
+    m_.insert(std::make_pair(mfdp::Disu::AREA, mfdp::DISU));
+    m_.insert(std::make_pair(mfdp::Disu::IA, mfdp::DISU));
+    m_.insert(std::make_pair(mfdp::Disu::JA, mfdp::DISU));
+    m_.insert(std::make_pair(mfdp::Disu::IVC, mfdp::DISU));
+    m_.insert(std::make_pair(mfdp::Disu::CL1, mfdp::DISU));
+    m_.insert(std::make_pair(mfdp::Disu::CL2, mfdp::DISU));
+    m_.insert(std::make_pair(mfdp::Disu::CL12, mfdp::DISU));
+    m_.insert(std::make_pair(mfdp::Disu::FAHL, mfdp::DISU));
+  }
+
+  // Search for the name
+  auto it = m_.find(a_array);
+  if (it != m_.end()) {
+    return it->second;
+  }
+  return "";
+} // sqMfPackageFromArrayName
+//------------------------------------------------------------------------------
+/// \brief Returns the DB for the package, creating it if needed.
+/// \param a_exporter: Exporter.
+/// \return The DB pointer.
 //------------------------------------------------------------------------------
 CppSQLite3DB *sqLiteDbForPackage (NativePackExp *a_)
 {
-  std::map<CStr, CppSQLite3DB*> &files(iFileMap());
   CStr packName = a_->GetPackage()->PackageName();
-  auto it = files.find(packName);
+  return sqLiteDbForPackage(a_, packName);
+} // sqLiteDbForPackage
+//----- OVERLOAD ---------------------------------------------------------------
+/// \brief Returns the DB for the package, creating it if needed.
+/// \param a_exporter: Exporter.
+/// \param a_modflowPackageName:    Modflow package name ("DISU" etc.)
+/// \return The DB pointer.
+//----- OVERLOAD ---------------------------------------------------------------
+CppSQLite3DB *sqLiteDbForPackage (NativePackExp *a_exporter,
+                                  std::string a_modflowPackageName)
+{
+  std::map<CStr, CppSQLite3DB*> &files(iFileMap());
+  auto it = files.find(a_modflowPackageName);
   if (it == files.end())
   {
-    CppSQLite3DB *f = iGetDbFile(a_);
-    files.insert(std::make_pair(packName, f));
-    it = files.find(packName);
+    CppSQLite3DB *f = iGetDbFile(a_exporter, a_modflowPackageName);
+    files.insert(std::make_pair(a_modflowPackageName, f));
+    it = files.find(a_modflowPackageName);
   }
   return it->second;
 } // sqLiteDbForPackage

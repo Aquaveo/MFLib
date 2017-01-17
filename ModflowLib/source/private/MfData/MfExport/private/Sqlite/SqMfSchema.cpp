@@ -24,6 +24,7 @@
 // 6. Non-shared code headers
 #include <private/SQLite/CppSQLite3.h>
 #include <private/MfData/MfExport/private/Sqlite/SqPackDbTables.h>
+#include <private/MfData/Packages/MfPackStrings.h>
 #include <private/util/StdString.h> // for ASSERT
 
 //----- Forward declarations ---------------------------------------------------
@@ -127,6 +128,36 @@ static void iCreateLastEditTriggers (
   }
   for (size_t i=0; i<triggers.size(); ++i) a_db->execDML(triggers[i].c_str());
 } // iCreateTriggers
+//------------------------------------------------------------------------------
+/// \brief Get the SQL for creating the package database.
+/// \param[in]     a_packName: Modflow package name.
+/// \param[in,out] a_sql: SQL strings used to create the database tables.
+//------------------------------------------------------------------------------
+void sqGetPackageTableSql(const std::string &a_modflowPackageName,
+                          std::vector<std::string> &a_sql)
+{
+  namespace mfdp = MfData::Packages;
+
+  static std::map<std::string, std::string> m_;
+
+  // Initialize the map
+  if (m_.empty()) {
+    // DISU
+    m_.insert(std::make_pair(mfdp::DISU,
+  "CREATE TABLE Text (Text TEXT NOT NULL);"
+  "CREATE TABLE Variable (NODES INTEGER, NLAY INTEGER, NJAG INTEGER, IVSD INTEGER, NPER INTEGER, ITMUNI INTEGER, LENUNI INTEGER, IDSYMRD INTEGER);"
+  "INSERT INTO Variable DEFAULT VALUES;"
+  "CREATE TABLE ArrayInfo (OID INTEGER PRIMARY KEY NOT NULL, Name TEXT, CNSTNT REAL, Type INTEGER, Layer INTEGER);"
+  "CREATE TABLE IntArray (OID INTEGER PRIMARY KEY NOT NULL, ArrayInfo_OID INTEGER, CellId INTEGER, Value INTEGER);"
+  "CREATE TABLE RealArray (OID INTEGER PRIMARY KEY NOT NULL, ArrayInfo_OID INTEGER, CellId INTEGER, Value Real);"));
+  }
+
+  // Search the map
+  auto it = m_.find(a_modflowPackageName);
+  if (it != m_.end()) {
+    a_sql.push_back(it->second);
+  }
+} // sqGetPackageTableSql
 //------------------------------------------------------------------------------
 /// \brief create the required tables for a MODFLOW package
 /// \param a_db SQLite data base that will be modified

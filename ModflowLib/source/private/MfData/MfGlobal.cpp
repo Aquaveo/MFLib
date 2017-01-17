@@ -14,6 +14,7 @@
 #include <private\MfData\MfExport\MfExporter.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\Parameters\ParamList.h>
+#include <private\MfData\MfExport\private\Sqlite\SqArrayWriter.h>
 
 using namespace MfData;
 
@@ -55,6 +56,7 @@ public:
   MfData::Export::MfExporter* Exporter() { VectorSizes(); return m_export[m_curModIdx]; }
   CStr& NameFile() { VectorSizes(); return m_nameFile[m_curModIdx]; }
   ParamList& GetParamList() { VectorSizes(); return *m_params[m_curModIdx]; }
+  MfData::Export::SqArrayWriter* GetSqArrayWriter();
   size_t CurModIdx() { return m_curModIdx; }
   CStr& LgrName() { return m_LgrName; }
   int& Unstructured () { return m_unstructured; }
@@ -87,6 +89,7 @@ private:
   size_t m_curModIdx;
   CStr m_LgrName;
   int m_unstructured;
+  MfData::Export::SqArrayWriter* m_sqArrayWriter;
   void VectorSizes()
   {
     size_t idx = m_curModIdx + 1;
@@ -314,6 +317,13 @@ ParamList& MfGlobal::GetParamList ()
 {
   return(m_p->GetParamList());
 } // MfGlobal::GetParamList
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+MfData::Export::SqArrayWriter* MfGlobal::GetSqArrayWriter()
+{
+  return m_p->GetSqArrayWriter();
+} // MfGlobal::GetSqArrayWriter
 //------------------------------------------------------------------------------
 /// \brief Gets the time unit for the MODFLOW simulation.
 //------------------------------------------------------------------------------
@@ -564,7 +574,8 @@ m_export(),
 m_nameFile(),
 m_curModIdx(),
 m_LgrName(),
-m_unstructured(0)
+m_unstructured(0),
+m_sqArrayWriter(nullptr)
 {
   m_laycbd.push_back(std::vector<int>());
   if (Lay() > 0)
@@ -639,6 +650,15 @@ const MfGlobal::impl& MfGlobal::impl::operator= (const MfGlobal::impl &rhs)
   }
   return(*this);
 } // MfGlobal::impl::impl
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+MfData::Export::SqArrayWriter* MfGlobal::impl::GetSqArrayWriter()
+{
+  if (!m_sqArrayWriter)
+    m_sqArrayWriter = new MfData::Export::SqArrayWriter();
+  return m_sqArrayWriter;
+} // MfGlobal::impl::GetSqArrayWriter
 //------------------------------------------------------------------------------
 /// \brief Creates an exporter that is attached to the MODFLOW data. When a 
 /// package is added to the MODFLOW data then the exporter will be notified.

@@ -5,12 +5,17 @@
 #define MFGLOBAL_H
 
 #include <private/util/util.h>
+#include <private\MfData\MfExport\private\Sqlite\SqArrayWriter.h>
 
+  //----- Forward declarations -------------------------------------------------
 class MfGlobalT;
 class ParamList;
+namespace MfData { namespace Export { class SqArrayWriter; } }
 
 namespace MfData
 {
+  //----- Forward declarations -------------------------------------------------
+  //namespace Export { class SqArrayWriter; }
   class MfPackage;
   
   enum enumModelType { MF2K = 0, MF2K5, MFNWT, SEAWAT, LGR, USG };
@@ -42,6 +47,10 @@ namespace MfData
     int *LayCbd();
     ParamList& GetParamList();
     size_t CurModIdx();
+    MfData::Export::SqArrayWriter* GetSqArrayWriter();
+
+    void SetVector(const char* a_NAME, std::vector<int>& a_vec);
+    void GetVector(const char* a_NAME, std::vector<int>& a_vec);
 
     void SetIntVar(const char* a_NAME,
                    int a_var);

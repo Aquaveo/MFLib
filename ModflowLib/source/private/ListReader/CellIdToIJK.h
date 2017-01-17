@@ -16,8 +16,8 @@ public:
   {return (((a_k-1) * (m_i*m_j)) + (a_i-1)*m_j + a_j);}
 
 private:
-  CellIdToIJK(const CellIdToIJK &rhs);
-  const CellIdToIJK& operator=(const CellIdToIJK &rhs);
+  //CellIdToIJK(const CellIdToIJK &rhs);
+  //const CellIdToIJK& operator=(const CellIdToIJK &rhs);
 
   int m_i, m_j;
 };
