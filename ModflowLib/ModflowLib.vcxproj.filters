@@ -346,6 +346,9 @@
     <ClCompile Include="source\private\MfData\MfExport\private\Sqlite\SqDisu.cpp">
       <Filter>source\private\MfData\MfExport\private\Sqlite</Filter>
     </ClCompile>
+    <ClCompile Include="source\private\MfData\MfExport\private\Sqlite\SqExporter.cpp">
+      <Filter>source\private\MfData\MfExport\private\Sqlite</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Export.h">
@@ -949,6 +952,9 @@
       <Filter>source\private\MfData\MfExport\private\Sqlite</Filter>
     </ClInclude>
     <ClInclude Include="source\private\MfData\MfExport\private\Sqlite\SqDisu.h">
+      <Filter>source\private\MfData\MfExport\private\Sqlite</Filter>
+    </ClInclude>
+    <ClInclude Include="source\private\MfData\MfExport\private\Sqlite\SqExporter.h">
       <Filter>source\private\MfData\MfExport\private\Sqlite</Filter>
     </ClInclude>
   </ItemGroup>

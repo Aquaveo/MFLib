@@ -32,6 +32,8 @@
 #include <private/MfData/Packages/MfPackStrings.h>
 #include <private/SQLite/CppSQLite3.h>
 #include <private\MfData\MfExport\private\Sqlite\SqMfSchema.h>
+#include <private\MfData\MfExport\private\Sqlite\SqExporter.h>
+#include <private\MfData\MfExport\private\Sqlite\SqDisu.h>
 
 //----- Forward declarations ---------------------------------------------------
 
@@ -43,10 +45,6 @@ using namespace MfData::Export;
 //----- Constants / Enumerations -----------------------------------------------
 
 //----- Classes / Structs ------------------------------------------------------
-
-//----- Internal functions -----------------------------------------------------
-
-//----- Class / Function definitions -------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////////////
 class SqArrayWriter::impl
@@ -72,7 +70,20 @@ public:
                        CppSQLite3DB** a_db,
                        sqlite_int64& a_arrayOid,
                        std::vector<int>& cellIds);
+  void WriteArraySetup (MfData::Export::NativePackExp* a_package,
+                                       const std::string& a_arrayName,
+                                        int a_size, int a_iprn,
+                                        Real a_mult, int a_layer,
+                                        CppSQLite3DB** a_db,
+                                        sqlite_int64& a_arrayOid,
+                                        std::vector<int>& a_cellIds,
+                                        std::string& a_table,
+                                        std::string& a_field);
   void WriteArray(MfData::Export::NativePackExp* a_package,
+                const std::string& a_arrayName, int a_size,
+                int a_iprn, const int* a_array, Real a_mult,
+                int a_layer);
+  void WriteArrayToField(MfData::Export::NativePackExp* a_package,
                 const std::string& a_arrayName, int a_size,
                 int a_iprn, const int* a_array, Real a_mult,
                 int a_layer);
@@ -81,17 +92,46 @@ public:
                      CppSQLite3DB* a_db);
   void AddToIntArray(sqlite_int64 a_arrayOid, const std::vector<int>& a_cellIds,
                      const int* a_array, int a_size);
+  void AddToTable(const std::vector<int>& a_cellIds,
+                  const int* a_array, int a_size,
+                  const std::string& a_table,
+                  const std::string& a_field,
+                  CppSQLite3DB* db);
+  template <typename T>
+  void WriteArray2T(MfData::Export::NativePackExp* a_package,
+                    const std::string& a_arrayName, int a_size,
+                    int a_iprn, const T* a_array, Real a_mult,
+                    int a_layer);
+  void WriteArray2(MfData::Export::NativePackExp* a_package,
+                  const std::string& a_arrayName, int a_size,
+                  int a_iprn, const float* a_array, Real a_mult,
+                  int a_layer);
+  void WriteArray2(MfData::Export::NativePackExp* a_package,
+                  const std::string& a_arrayName, int a_size,
+                  int a_iprn, const double* a_array, Real a_mult,
+                  int a_layer);
+  void WriteArray2(MfData::Export::NativePackExp* a_package,
+                  const std::string& a_arrayName, int a_size,
+                  int a_iprn, const int* a_array, Real a_mult,
+                  int a_layer);
+  SqExporter* MakeExporter(const std::string& a_modflowPackageName);
+  SqExporter* GetExporter(const std::string& a_modflowPackageName);
 
   NativePackExp*        m_pack;
   CellIdToIJK           m_grid;
   CppSQLite3Statement   m_stmtInsertArrayInfo;
   CppSQLite3Statement   m_stmtInsertRealArray;
   CppSQLite3Statement   m_stmtInsertIntArray;
+  std::map<std::string, SqExporter*> m_mapSqExporters;
 };
 
 static const char* SQFT = "SQLITE_FILE_TIME";
 typedef std::pair<std::vector<CStr>, std::vector<CStr>> pVecCStr;
 typedef std::map<CStr, pVecCStr> ColMap;
+
+//----- Internal functions -----------------------------------------------------
+
+//----- Class / Function definitions -------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \class SqArrayWriter
@@ -156,6 +196,23 @@ void SqArrayWriter::WriteArraySetup (MfData::Export::NativePackExp* a_package,
   m_p->WriteArraySetup(a_package, a_arrayName, a_size, a_iprn, a_mult, a_layer,
                        a_db, a_arrayOid, cellIds);
 } // SqArrayWriter::WriteArraySetup
+//----- OVERLOAD ---------------------------------------------------------------
+/// \see SqArrayWriter::impl::WriteArraySetup.
+//----- OVERLOAD ---------------------------------------------------------------
+void SqArrayWriter::WriteArraySetup (
+                                       MfData::Export::NativePackExp* a_package,
+                                       const std::string& a_arrayName,
+                                        int a_size, int a_iprn,
+                                        Real a_mult, int a_layer,
+                                        CppSQLite3DB** a_db,
+                                        sqlite_int64& a_arrayOid,
+                                        std::vector<int>& a_cellIds,
+                                        std::string& a_table,
+                                        std::string& a_field)
+{
+  m_p->WriteArraySetup(a_package, a_arrayName, a_size, a_iprn, a_mult, a_layer,
+                       a_db, a_arrayOid, a_cellIds, a_table, a_field);
+} // SqArrayWriter::WriteArraySetup
 //------------------------------------------------------------------------------
 /// \brief \see SqArrayWriter::impl::WriteArray.
 //------------------------------------------------------------------------------
@@ -167,6 +224,28 @@ void SqArrayWriter::WriteArray(MfData::Export::NativePackExp* a_package,
   m_p->WriteArray(a_package, a_arrayName, a_size, a_iprn, a_array, a_mult,
                   a_layer);
 } // SqArrayWriter::WriteArray
+//------------------------------------------------------------------------------
+/// \brief \see SqArrayWriter::impl::WriteArrayToField
+//------------------------------------------------------------------------------
+void SqArrayWriter::WriteArrayToField(
+                MfData::Export::NativePackExp* a_package,
+                const std::string& a_arrayName, int a_size,
+                int a_iprn, const int* a_array, Real a_mult,
+                int a_layer)
+{
+  try {
+    CppSQLite3DB* db;
+    sqlite_int64 arrayOid;
+    std::vector<int> cellIds;
+    std::string table, field;
+    WriteArraySetup(a_package, a_arrayName, a_size, a_mult, a_iprn, a_layer,
+                    &db, arrayOid, cellIds, table, field);
+    AddToTable(cellIds, a_array, a_size, table, field, db);
+  }
+  catch (std::exception&) {
+    ASSERT(false);
+  }
+} // SqArrayWriter::WriteArrayToField
 //------------------------------------------------------------------------------
 /// \brief \see SqArrayWriter::impl::AddToIntArray.
 //------------------------------------------------------------------------------
@@ -183,6 +262,50 @@ CppSQLite3Statement* SqArrayWriter::GetInsertRealArrayStatement()
 {
   return &m_p->m_stmtInsertRealArray;
 } // SqArrayWriter::GetInsertRealArrayStatement
+//------------------------------------------------------------------------------
+/// \brief \see SqArrayWriter::impl::AddToTable.
+//------------------------------------------------------------------------------
+void SqArrayWriter::AddToTable(const std::vector<int>& a_cellIds,
+                               const int* a_array, int a_size,
+                               const std::string& a_table,
+                               const std::string& a_field,
+                               CppSQLite3DB* db)
+{
+  m_p->AddToTable(a_cellIds, a_array, a_size, a_table, a_field, db);
+} // SqArrayWriter::AddToTable
+//------------------------------------------------------------------------------
+/// \brief \see SqArrayWriter::impl::WriteArray2.
+//------------------------------------------------------------------------------
+void SqArrayWriter::WriteArray2(MfData::Export::NativePackExp* a_package,
+                const std::string& a_arrayName, int a_size,
+                int a_iprn, const float* a_array, Real a_mult,
+                int a_layer)
+{
+  m_p->WriteArray2(a_package, a_arrayName, a_size, a_iprn, a_array, a_mult,
+                    a_layer);
+} // SqArrayWriter::WriteArray2
+//------------------------------------------------------------------------------
+/// \brief \see SqArrayWriter::impl::WriteArray2.
+//------------------------------------------------------------------------------
+void SqArrayWriter::WriteArray2(MfData::Export::NativePackExp* a_package,
+                const std::string& a_arrayName, int a_size,
+                int a_iprn, const double* a_array, Real a_mult,
+                int a_layer)
+{
+  m_p->WriteArray2(a_package, a_arrayName, a_size, a_iprn, a_array, a_mult,
+                    a_layer);
+} // SqArrayWriter::WriteArray2
+//------------------------------------------------------------------------------
+/// \brief \see SqArrayWriter::impl::WriteArray2.
+//------------------------------------------------------------------------------
+void SqArrayWriter::WriteArray2(MfData::Export::NativePackExp* a_package,
+                const std::string& a_arrayName, int a_size,
+                int a_iprn, const int* a_array, Real a_mult,
+                int a_layer)
+{
+  m_p->WriteArray2(a_package, a_arrayName, a_size, a_iprn, a_array, a_mult,
+                    a_layer);
+} // SqArrayWriter::WriteArray2
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -208,7 +331,12 @@ SqArrayWriter::impl::~impl()
   m_stmtInsertArrayInfo.finalize();
   m_stmtInsertRealArray.finalize();
   m_stmtInsertIntArray.finalize();
-}
+
+  for (auto it = m_mapSqExporters.begin();
+       it != m_mapSqExporters.end(); ++it) {
+    delete(it->second);
+  }
+} // SqArrayWriter::impl::~impl
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
@@ -429,6 +557,37 @@ void SqArrayWriter::impl::WriteArraySetup (
 
   GetCellIds(a_package, a_size, a_layer, a_cellIds);
 } // SqArrayWriter::impl::WriteArraySetup
+//----- OVERLOAD ---------------------------------------------------------------
+/// \brief Setup before writing the array data. Create DB if needed, create
+///        tables, compile statements, add to the ArrayInfo table, get the
+///        cell IDs. This code is common between Real/double and Int versions
+///        of WriteArray.
+/// \param[in] a_package:   The package.
+/// \param[in] a_arrayName: Name of the array.
+/// \param[in] a_size:      Number of values in the array.
+/// \param[in] a_iprn:      IPRN.
+/// \param[in] a_mult:      Multiplier.
+/// \param[in] a_layer:     Layer.
+/// \param[out] a_db:       Database pointer.
+/// \param[out] a_arrayOid: OID field in ArrayInfo table for this new array.
+/// \param[out] a_cellIds:  Values to write to CellId field (which for some
+///                         arrays may not actually correspond to cells).
+//----- OVERLOAD ---------------------------------------------------------------
+void SqArrayWriter::impl::WriteArraySetup (
+                                       MfData::Export::NativePackExp* a_package,
+                                       const std::string& a_arrayName,
+                                        int a_size, int a_iprn,
+                                        Real a_mult, int a_layer,
+                                        CppSQLite3DB** a_db,
+                                        sqlite_int64& a_arrayOid,
+                                        std::vector<int>& a_cellIds,
+                                        std::string& a_table,
+                                        std::string& a_field)
+{
+  WriteArraySetup(a_package, a_arrayName, a_size, a_iprn, a_mult, a_layer,
+                  a_db, a_arrayOid, a_cellIds);
+  sqTableAndFieldFromArray(a_arrayName, a_table, a_field);
+} // SqArrayWriter::impl::WriteArraySetup
 //------------------------------------------------------------------------------
 /// \brief Add values to the IntArray table.
 /// \param[in] a_arrayOid: OID in ArrayInfo table for ArrayInfo_OID field.
@@ -479,3 +638,142 @@ void SqArrayWriter::impl::WriteArray(MfData::Export::NativePackExp* a_package,
     ASSERT(false);
   }
 } // SqArrayWriter::impl::WriteArray
+//------------------------------------------------------------------------------
+/// \brief Write array to a SQLite table and field. Specialization for int arrays.
+/// \param[in] a_package:   The package.
+/// \param[in] a_arrayName: Name of the array.
+/// \param[in] a_size:      Number of values in the array.
+/// \param[in] a_iprn:      IPRN.
+/// \param[in] a_mult:      Multiplier.
+/// \param[in] a_layer:     Layer.
+//------------------------------------------------------------------------------
+void SqArrayWriter::impl::WriteArrayToField(
+                MfData::Export::NativePackExp* a_package,
+                const std::string& a_arrayName, int a_size,
+                int a_iprn, const int* a_array, Real a_mult,
+                int a_layer)
+{
+  try {
+    CppSQLite3DB* db;
+    sqlite_int64 arrayOid;
+    std::vector<int> cellIds;
+    std::string table, field;
+    WriteArraySetup(a_package, a_arrayName, a_size, a_mult, a_iprn, a_layer,
+                    &db, arrayOid, cellIds, table, field);
+    AddToTable(cellIds, a_array, a_size, table, field, db);
+  }
+  catch (std::exception&) {
+    ASSERT(false);
+  }
+} // SqArrayWriter::impl::WriteArrayToField
+//------------------------------------------------------------------------------
+/// \brief Add values in the table.
+/// \param[in] a_arrayOid: OID in ArrayInfo table for ArrayInfo_OID field.
+/// \param[in] a_cellIds:  Values for the CellId field.
+/// \param[in] a_array:    Values for the Values field.
+/// \param[in] a_size:     Number of values.
+//------------------------------------------------------------------------------
+void SqArrayWriter::impl::AddToTable(const std::vector<int>& a_cellIds,
+                                      const int* a_array, int a_size,
+                                      const std::string& a_table,
+                                      const std::string& a_field,
+                                      CppSQLite3DB* db)
+{
+  try {
+    for (int i = 0; i < a_size; ++i) {
+      std::stringstream ss;
+      ss << "UPDATE " << a_table << " SET " << a_field << " = " << a_array[i]
+         << "WHERE CellId = " << a_cellIds[i];
+      db->execQuery(ss.str().c_str());
+    }
+  }
+  catch (std::exception&) {
+    ASSERT(false);
+  }
+} // SqArrayWriter::impl::AddToTable
+//------------------------------------------------------------------------------
+/// \brief Given a modflow package name, construct the appropriate SqExporter.
+/// \param[in] a_modflowPackageName: Modflow package name.
+/// \return SqExporter derived class.
+//------------------------------------------------------------------------------
+SqExporter* SqArrayWriter::impl::MakeExporter(
+  const std::string& a_modflowPackageName)
+{
+  // I tried using a map but couldn't get it to work in VS 2010
+  // http://stackoverflow.com/questions/582331
+  //template<typename T> Base * createInstance() { return new T; }
+
+  SqExporter* sqExporter = nullptr;
+  if (a_modflowPackageName == MfData::Packages::DISU)
+    sqExporter = new SqDisu();
+  else
+    ASSERT(false);
+
+  return sqExporter;
+} // SqArrayWriter::impl::MakeExporter
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+SqExporter* SqArrayWriter::impl::GetExporter(const std::string& a_modflowPackageName)
+{
+  // See if we already have one to return
+  auto it = m_mapSqExporters.find(a_modflowPackageName);
+  if (it != m_mapSqExporters.end()) {
+    return it->second;
+  }
+  else {
+    // Create one and save it for later
+    SqExporter* exporter = MakeExporter(a_modflowPackageName);
+    m_mapSqExporters.insert(std::make_pair(a_modflowPackageName,
+      exporter));
+    return exporter;
+  }
+} // SqArrayWriter::impl::GetExporter
+//------------------------------------------------------------------------------
+/// \brief To avoid duplicate code.
+//------------------------------------------------------------------------------
+template <typename T>
+void SqArrayWriter::impl::WriteArray2T(MfData::Export::NativePackExp* a_package,
+                                  const std::string& a_arrayName, int a_size,
+                                  int a_iprn, const T* a_array, Real a_mult,
+                                  int a_layer)
+{
+  std::string modflowPackageName = sqMfPackageFromArrayName(a_arrayName);
+  SqExporter* exporter = GetExporter(modflowPackageName);
+  ASSERT(exporter);
+  exporter->ExportArray(a_package, a_arrayName, a_size, a_iprn, a_array,
+                        a_mult, a_layer);
+} // SqArrayWriter::impl::WriteArray2T
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void SqArrayWriter::impl::WriteArray2(MfData::Export::NativePackExp* a_package,
+                                  const std::string& a_arrayName, int a_size,
+                                  int a_iprn, const float* a_array, Real a_mult,
+                                  int a_layer)
+{
+  WriteArray2T(a_package, a_arrayName, a_size, a_iprn, a_array,
+                        a_mult, a_layer);
+} // SqArrayWriter::impl::WriteArray2
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void SqArrayWriter::impl::WriteArray2(MfData::Export::NativePackExp* a_package,
+                const std::string& a_arrayName, int a_size,
+                int a_iprn, const double* a_array, Real a_mult,
+                int a_layer)
+{
+  WriteArray2T(a_package, a_arrayName, a_size, a_iprn, a_array,
+                        a_mult, a_layer);
+} // SqArrayWriter::impl::WriteArray2
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void SqArrayWriter::impl::WriteArray2(MfData::Export::NativePackExp* a_package,
+                const std::string& a_arrayName, int a_size,
+                int a_iprn, const int* a_array, Real a_mult,
+                int a_layer)
+{
+  WriteArray2T(a_package, a_arrayName, a_size, a_iprn, a_array,
+                        a_mult, a_layer);
+} // SqArrayWriter::impl::WriteArray2

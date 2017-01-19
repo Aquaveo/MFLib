@@ -86,41 +86,6 @@ static CppSQLite3DB* iGetDbFile (NativePackExp *a_exporter,
   return ret;
 } // iGetDbFile
 //------------------------------------------------------------------------------
-/// \brief Given the array name, return the modflow package name it goes with.
-/// \param a_array: Name of the array.
-/// \return The modflow package name.
-//------------------------------------------------------------------------------
-std::string sqMfPackageFromArrayName(const std::string& a_array)
-{
-  namespace mfdp = MfData::Packages;
-
-  static std::map<std::string, std::string> m_;
-
-  // Initialize the map
-  if (m_.empty()) {
-    // DISU
-    m_.insert(std::make_pair(mfdp::Disu::LAYCBD, mfdp::DISU));
-    m_.insert(std::make_pair(mfdp::Disu::NODLAY, mfdp::DISU));
-    m_.insert(std::make_pair(mfdp::Disu::TOP, mfdp::DISU));
-    m_.insert(std::make_pair(mfdp::Disu::BOT, mfdp::DISU));
-    m_.insert(std::make_pair(mfdp::Disu::AREA, mfdp::DISU));
-    m_.insert(std::make_pair(mfdp::Disu::IA, mfdp::DISU));
-    m_.insert(std::make_pair(mfdp::Disu::JA, mfdp::DISU));
-    m_.insert(std::make_pair(mfdp::Disu::IVC, mfdp::DISU));
-    m_.insert(std::make_pair(mfdp::Disu::CL1, mfdp::DISU));
-    m_.insert(std::make_pair(mfdp::Disu::CL2, mfdp::DISU));
-    m_.insert(std::make_pair(mfdp::Disu::CL12, mfdp::DISU));
-    m_.insert(std::make_pair(mfdp::Disu::FAHL, mfdp::DISU));
-  }
-
-  // Search for the name
-  auto it = m_.find(a_array);
-  if (it != m_.end()) {
-    return it->second;
-  }
-  return "";
-} // sqMfPackageFromArrayName
-//------------------------------------------------------------------------------
 /// \brief Returns the DB for the package, creating it if needed.
 /// \param a_exporter: Exporter.
 /// \return The DB pointer.

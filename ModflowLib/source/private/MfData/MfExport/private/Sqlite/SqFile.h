@@ -20,7 +20,6 @@ static const char* SQFT = "SQLITE_FILE_TIME";
 class NativePackExp;
 
 //----- Free functions ---------------------------------------------------------
-std::string sqMfPackageFromArrayName(const std::string& a_array);
 CppSQLite3DB *sqLiteDbForPackage(NativePackExp* a_);
 CppSQLite3DB *sqLiteDbForPackage (NativePackExp *a_, std::string a_name);
 void sqLiteCloseAllDb();

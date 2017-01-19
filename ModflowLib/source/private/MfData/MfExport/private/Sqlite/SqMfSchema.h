@@ -46,6 +46,9 @@ void sqAddLstItmp (
   , int a_sp
   , int a_itmp
   );
+void sqTableAndFieldFromArray(const std::string& a_array, std::string& a_table,
+                              std::string& a_field);
+std::string sqMfPackageFromArrayName(const std::string& a_array);
 //------------------------------------------------------------------------------
 template <typename T>
 void sqWriteArray(MfData::Export::NativePackExp* a_package,
@@ -56,5 +59,17 @@ void sqWriteArray(MfData::Export::NativePackExp* a_package,
   a_package->GetGlobal()->GetSqArrayWriter()->WriteArray(a_package,
                         a_arrayName, a_size, a_iprn, a_array, a_mult, a_layer);
 } // sqWriteArray
+//------------------------------------------------------------------------------
+template <typename T>
+void sqWriteArrayToField(MfData::Export::NativePackExp* a_package,
+                        const std::string& a_arrayName, int a_size,
+                        int a_iprn, const T* a_array, Real a_mult,
+                        int a_layer)
+{
+  SqArrayWriter writer;
+  writer.WriteArray2(a_package, a_arrayName, a_size, a_iprn, a_array, a_mult,
+                     a_layer);
+} // sqWriteArray
+
 
 #endif

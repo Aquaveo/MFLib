@@ -48,8 +48,10 @@ namespace MfData
 
         if (GetNative()->GetUseSQLite())
         {
-          sqWriteArray(this, GetPackage()->PackageName(), *JJ, *IPRN, ARR,
-                       *MULT, *K);
+          //sqWriteArray(this, GetPackage()->PackageName(), *JJ, *IPRN, ARR,
+          //             *MULT, *K);
+          sqWriteArrayToField(this, GetPackage()->PackageName(), *JJ, *IPRN,
+                              ARR, *MULT, *K);
         }
 
         return true;

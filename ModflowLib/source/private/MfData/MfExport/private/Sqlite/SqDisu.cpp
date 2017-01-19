@@ -50,7 +50,8 @@ using namespace MfData::Export;
 class SqDisu::impl
 {
 public:
-  impl(NativeExpDisu* a_);
+  explicit impl(NativeExpDisu* a_);
+  impl();
   ~impl();
 
   void Export ();
@@ -71,14 +72,6 @@ private:
 }; // class SqDisu::impl
 
 ////////////////////////////////////////////////////////////////////////////////
-struct ArrayVariableNames {
-  std::string m_array;
-  std::string m_mult;
-  std::string m_iprn;
-};
-
-
-////////////////////////////////////////////////////////////////////////////////
 /// \class SqDisu
 /// \brief Exports the DISU data to sqlite. \see SqDisu::impl
 ////////////////////////////////////////////////////////////////////////////////
@@ -87,6 +80,13 @@ struct ArrayVariableNames {
 //------------------------------------------------------------------------------
 SqDisu::SqDisu (NativeExpDisu* a_)
 : m_p(new SqDisu::impl(a_))
+{
+} // SqDisu::SqDisu
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+SqDisu::SqDisu ()
+: m_p(new SqDisu::impl())
 {
 } // SqDisu::SqDisu
 //------------------------------------------------------------------------------
@@ -104,6 +104,36 @@ void SqDisu::Export ()
 {
   m_p->Export();
 } // SqDisu::Export
+//------------------------------------------------------------------------------
+/// \brief Export the array to sqlite.
+/// \param
+//------------------------------------------------------------------------------
+void SqDisu::ExportArray(MfData::Export::NativePackExp* /*a_package*/,
+                         const std::string& /*a_arrayName*/, int /*a_size*/,
+                         int /*a_iprn*/, const float* /*a_array*/,
+                         Real /*a_mult*/, int /*a_layer*/)
+{
+} // SqDisu::ExportArray
+//------------------------------------------------------------------------------
+/// \brief Export the array to sqlite.
+/// \param
+//------------------------------------------------------------------------------
+void SqDisu::ExportArray(MfData::Export::NativePackExp* /*a_package*/,
+                         const std::string& /*a_arrayName*/, int /*a_size*/,
+                         int /*a_iprn*/, const double* /*a_array*/,
+                         Real /*a_mult*/, int /*a_layer*/)
+{
+} // SqDisu::ExportArray
+//------------------------------------------------------------------------------
+/// \brief Export the array to sqlite.
+/// \param
+//------------------------------------------------------------------------------
+void SqDisu::ExportArray(MfData::Export::NativePackExp* /*a_package*/,
+                         const std::string& /*a_arrayName*/, int /*a_size*/,
+                         int /*a_iprn*/, const int* /*a_array*/,
+                         Real /*a_mult*/, int /*a_layer*/)
+{
+} // SqDisu::ExportArray
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -115,6 +145,14 @@ void SqDisu::Export ()
 //------------------------------------------------------------------------------
 SqDisu::impl::impl (NativeExpDisu* a_)
 : m_nativeExporter(a_)
+, m_db(nullptr)
+{
+} // SqDisu::impl::impl
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+SqDisu::impl::impl ()
+: m_nativeExporter(nullptr)
 , m_db(nullptr)
 {
 } // SqDisu::impl::impl

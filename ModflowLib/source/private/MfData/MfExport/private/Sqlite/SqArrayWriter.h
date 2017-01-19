@@ -27,6 +27,12 @@ public:
                         int a_size, int a_iprn, Real a_mult, int a_layer,
                         CppSQLite3DB** a_db, sqlite_int64& a_arrayOid,
                         std::vector<int>& cellIds);
+  void WriteArraySetup (MfData::Export::NativePackExp* a_package,
+                        const std::string& a_arrayName,
+                        int a_size, int a_iprn, Real a_mult, int a_layer,
+                        CppSQLite3DB** a_db, sqlite_int64& a_arrayOid,
+                        std::vector<int>& cellIds, std::string& a_table,
+                        std::string& a_field);
   void AddToIntArray(sqlite_int64 a_arrayOid, const std::vector<int>& a_cellIds,
                      const int* a_array, int a_size);
   CppSQLite3Statement* GetInsertRealArrayStatement();
@@ -34,6 +40,15 @@ public:
                   const std::string& a_arrayName, int a_size,
                   int a_iprn, const int* a_array, Real a_mult,
                   int a_layer);
+  void WriteArrayToField(MfData::Export::NativePackExp* a_package,
+                  const std::string& a_arrayName, int a_size,
+                  int a_iprn, const int* a_array, Real a_mult,
+                  int a_layer);
+  void AddToTable(const std::vector<int>& a_cellIds,
+                                        const int* a_array, int a_size,
+                                        const std::string& a_table,
+                                        const std::string& a_field,
+                                        CppSQLite3DB* db);
 
   //------------------------------------------------------------------------------
   /// \brief Add values to the RealArray table.
@@ -61,6 +76,32 @@ public:
     }
   } // AddToRealArray
   //------------------------------------------------------------------------------
+  /// \brief Add values in the table.
+  /// \param[in] a_arrayOid: OID in ArrayInfo table for ArrayInfo_OID field.
+  /// \param[in] a_cellIds:  Values for the CellId field.
+  /// \param[in] a_array:    Values for the Values field.
+  /// \param[in] a_size:     Number of values.
+  //------------------------------------------------------------------------------
+  template <typename T>
+  void AddToTable(const std::vector<int>& a_cellIds,
+                                        const T* a_array, int a_size,
+                                        const std::string& a_table,
+                                        const std::string& a_field,
+                                        CppSQLite3DB* db)
+  {
+    try {
+      for (int i = 0; i < a_size; ++i) {
+        std::stringstream ss;
+        ss << "UPDATE " << a_table << " SET " << a_field << " = " << a_array[i]
+           << "WHERE CellId = " << a_cellIds[i];
+        db->execQuery(ss.str().c_str());
+      }
+    }
+    catch (std::exception&) {
+      ASSERT(false);
+    }
+  } // AddToTable
+  //------------------------------------------------------------------------------
   /// \brief Write array to SQLite. Template for Real or double arrays.
   /// \param[in] a_package:   The package.
   /// \param[in] a_arrayName: Name of the array.
@@ -87,6 +128,38 @@ public:
       ASSERT(false);
     }
   } // WriteArray
+  //------------------------------------------------------------------------------
+  template <typename T>
+  void WriteArrayToField(MfData::Export::NativePackExp* a_package,
+                  const std::string& a_arrayName, int a_size,
+                  int a_iprn, const T* a_array, Real a_mult,
+                  int a_layer)
+  {
+    try {
+      CppSQLite3DB* db;
+      sqlite_int64 arrayOid;
+      std::vector<int> cellIds;
+      std::string table, field;
+      WriteArraySetup(a_package, a_arrayName, a_size, a_mult, a_iprn, a_layer,
+                      &db, arrayOid, cellIds, table, field);
+      AddToTable(cellIds, a_array, a_size, table, field, db);
+    }
+    catch (std::exception&) {
+      ASSERT(false);
+    }
+  } // WriteArrayToField
+  void WriteArray2(MfData::Export::NativePackExp* a_package,
+                  const std::string& a_arrayName, int a_size,
+                  int a_iprn, const float* a_array, Real a_mult,
+                  int a_layer);
+  void WriteArray2(MfData::Export::NativePackExp* a_package,
+                  const std::string& a_arrayName, int a_size,
+                  int a_iprn, const double* a_array, Real a_mult,
+                  int a_layer);
+  void WriteArray2(MfData::Export::NativePackExp* a_package,
+                  const std::string& a_arrayName, int a_size,
+                  int a_iprn, const int* a_array, Real a_mult,
+                  int a_layer);
 
 private:
   class impl;

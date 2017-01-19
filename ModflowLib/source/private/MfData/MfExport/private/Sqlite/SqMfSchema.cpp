@@ -24,6 +24,7 @@
 // 6. Non-shared code headers
 #include <private/SQLite/CppSQLite3.h>
 #include <private/MfData/MfExport/private/Sqlite/SqPackDbTables.h>
+#include <private/MfData/Packages/MfPackFields.h>
 #include <private/MfData/Packages/MfPackStrings.h>
 #include <private/util/StdString.h> // for ASSERT
 
@@ -143,6 +144,7 @@ void sqGetPackageTableSql(const std::string &a_modflowPackageName,
   // Initialize the map
   if (m_.empty()) {
     // DISU
+#if 0
     m_.insert(std::make_pair(mfdp::DISU,
   "CREATE TABLE Text (Text TEXT NOT NULL);"
   "CREATE TABLE Variable (NODES INTEGER, NLAY INTEGER, NJAG INTEGER, IVSD INTEGER, NPER INTEGER, ITMUNI INTEGER, LENUNI INTEGER, IDSYMRD INTEGER);"
@@ -150,6 +152,15 @@ void sqGetPackageTableSql(const std::string &a_modflowPackageName,
   "CREATE TABLE ArrayInfo (OID INTEGER PRIMARY KEY NOT NULL, Name TEXT, CNSTNT REAL, Type INTEGER, Layer INTEGER);"
   "CREATE TABLE IntArray (OID INTEGER PRIMARY KEY NOT NULL, ArrayInfo_OID INTEGER, CellId INTEGER, Value INTEGER);"
   "CREATE TABLE RealArray (OID INTEGER PRIMARY KEY NOT NULL, ArrayInfo_OID INTEGER, CellId INTEGER, Value Real);"));
+#endif
+    m_.insert(std::make_pair(mfdp::DISU,
+  "CREATE TABLE DisuText (Text TEXT NOT NULL);"
+  "CREATE TABLE DisuVariables (NODES INTEGER, NLAY INTEGER, NJAG INTEGER, IVSD INTEGER, NPER INTEGER, ITMUNI INTEGER, LENUNI INTEGER, IDSYMRD INTEGER);"
+  "INSERT INTO DisuVariables DEFAULT VALUES;"
+  "CREATE TABLE DisuCells (CellId INTEGER PRIMARY KEY NOT NULL, Top REAL, Bot REAL, Area REAL, IAC INTEGER);"
+  "CREATE TABLE DisuConnections (OID INTEGER PRIMARY KEY NOT NULL, JA INTEGER, IVC INTEGER, CL12 INTEGER, FAHL REAL);"
+  "CREATE TABLE DisuConnectionsSymmetric (OID INTEGER PRIMARY KEY NOT NULL, CL1 INTEGER, CL2 INTEGER, FAHL REAL);"
+  "CREATE TABLE DisuArrays (OID INTEGER PRIMARY KEY NOT NULL, Name TEXT, Type INTEGER, CNSTNT REAL, IPRN INTEGER, Layer INTEGER);"));
   }
 
   // Search the map
@@ -158,6 +169,93 @@ void sqGetPackageTableSql(const std::string &a_modflowPackageName,
     a_sql.push_back(it->second);
   }
 } // sqGetPackageTableSql
+//------------------------------------------------------------------------------
+/// \brief Given the array name, return the modflow package name it goes with.
+/// \param a_array: Name of the array.
+/// \return The modflow package name.
+//------------------------------------------------------------------------------
+std::string sqMfPackageFromArrayName(const std::string& a_array)
+{
+  namespace mfdp = MfData::Packages;
+
+  static std::map<std::string, std::string> m_;
+
+  // Initialize the map
+  if (m_.empty()) {
+    // DISU
+    m_.insert(std::make_pair(mfdp::Disu::LAYCBD, mfdp::DISU));
+    m_.insert(std::make_pair(mfdp::Disu::NODLAY, mfdp::DISU));
+    m_.insert(std::make_pair(mfdp::Disu::TOP, mfdp::DISU));
+    m_.insert(std::make_pair(mfdp::Disu::BOT, mfdp::DISU));
+    m_.insert(std::make_pair(mfdp::Disu::AREA, mfdp::DISU));
+    m_.insert(std::make_pair(mfdp::Disu::IA, mfdp::DISU));
+    m_.insert(std::make_pair(mfdp::Disu::JA, mfdp::DISU));
+    m_.insert(std::make_pair(mfdp::Disu::IVC, mfdp::DISU));
+    m_.insert(std::make_pair(mfdp::Disu::CL1, mfdp::DISU));
+    m_.insert(std::make_pair(mfdp::Disu::CL2, mfdp::DISU));
+    m_.insert(std::make_pair(mfdp::Disu::CL12, mfdp::DISU));
+    m_.insert(std::make_pair(mfdp::Disu::FAHL, mfdp::DISU));
+  }
+
+  // Search for the name
+  auto it = m_.find(a_array);
+  if (it != m_.end()) {
+    return it->second;
+  }
+  return "";
+} // sqMfPackageFromArrayName
+//------------------------------------------------------------------------------
+/// \brief Given the array name, return the modflow package name it goes with.
+/// \param a_array: Name of the array.
+/// \return The modflow package name.
+//------------------------------------------------------------------------------
+void sqTableAndFieldFromArray(const std::string& a_array, std::string& a_table,
+  std::string& a_field)
+{
+  namespace mfdpdu = MfData::Packages::Disu;
+
+  struct TableRec {
+    TableRec(std::string a_table, std::string a_field)
+      : m_table(a_table)
+      , m_field(a_field) {}
+    std::string m_table;
+    std::string m_field;
+  };
+
+  static std::map<std::string, TableRec> m_;
+
+  // Initialize the map
+  if (m_.empty()) {
+    // DISU
+    std::string table = "DisuLayers";
+    m_.insert(std::make_pair(mfdpdu::LAYCBD, TableRec(table, mfdpdu::LAYCBD)));
+    m_.insert(std::make_pair(mfdpdu::NODLAY, TableRec(table, mfdpdu::NODLAY)));
+    table = "DisuCells";
+    m_.insert(std::make_pair(mfdpdu::TOP, TableRec(table, mfdpdu::TOP)));
+    m_.insert(std::make_pair(mfdpdu::BOT, TableRec(table, mfdpdu::BOT)));
+    m_.insert(std::make_pair(mfdpdu::AREA, TableRec(table, mfdpdu::AREA)));
+    m_.insert(std::make_pair(mfdpdu::IA, TableRec(table, mfdpdu::IA)));
+    table = "DisuConnections";
+    m_.insert(std::make_pair(mfdpdu::JA, TableRec(table, mfdpdu::JA)));
+    m_.insert(std::make_pair(mfdpdu::IVC, TableRec(table, mfdpdu::IVC)));
+    m_.insert(std::make_pair(mfdpdu::CL12, TableRec(table, mfdpdu::CL12)));
+    m_.insert(std::make_pair(mfdpdu::FAHL, TableRec(table, mfdpdu::FAHL)));
+    table = "DisuConnectionsSymmetric";
+    m_.insert(std::make_pair(mfdpdu::CL1, TableRec(table, mfdpdu::CL1)));
+    m_.insert(std::make_pair(mfdpdu::CL2, TableRec(table, mfdpdu::CL2)));
+    m_.insert(std::make_pair(mfdpdu::FAHL, TableRec(table, mfdpdu::FAHL)));
+  }
+
+  // Search for the name
+  auto it = m_.find(a_array);
+  if (it != m_.end()) {
+    a_table = it->second.m_table;
+    a_field = it->second.m_field;
+  }
+  else {
+    ASSERT(false);
+  }
+} // sqTableAndFieldFromArray
 //------------------------------------------------------------------------------
 /// \brief create the required tables for a MODFLOW package
 /// \param a_db SQLite data base that will be modified
