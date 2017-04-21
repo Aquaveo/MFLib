@@ -31,7 +31,9 @@ DLLEXPORT void MFLIBEXP_CLNLINES0AND1 (const int *a_NCLN,
                                        const int *a_ICLNIB,
                                        const int *a_NCLNGWC,
                                        const int *a_NCONDUITYP,
-                                       const int *a_ICLNTIB);
+                                       const int *a_ICLNTIB,
+                                       const int *a_ICLNPCB,
+                                       const int *a_ICLNGWCB);
 DLLEXPORT void MFLIBEXP_CLNLINE7 (const Real *a_ACLNNDSAQ,
                                   const int *a_NCLNNDS);
 DLLEXPORT void MFLIBEXP_CLNLINE8 (const Real *a_ACLNGWCAQ);

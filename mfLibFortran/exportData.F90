@@ -36,7 +36,7 @@ module module_exportData
         END SUBROUTINE mfLibExp_putCurrentGrid
 !     ------------------------------------------------------------------
 !      Declare the C function
-        SUBROUTINE mfLibexp_ClnLines0And1(ICLNTIB,NCLN,ICLNNDS,ICLNCB,ICLNHD,ICLNDD,ICLNIB,NCLNGWC,NCONDUITYP)
+        SUBROUTINE mfLibexp_ClnLines0And1(ICLNTIB,NCLN,ICLNNDS,ICLNCB,ICLNHD,ICLNDD,ICLNIB,NCLNGWC,NCONDUITYP,ICLNPCB,ICLNGWCB)
           INTEGER ICLNTIB [REFERENCE]
           INTEGER NCLN [REFERENCE]
           INTEGER ICLNNDS [REFERENCE]
@@ -46,6 +46,8 @@ module module_exportData
           INTEGER ICLNIB [REFERENCE]
           INTEGER NCLNGWC [REFERENCE]
           INTEGER NCONDUITYP [REFERENCE]
+          INTEGER ICLNPCB [REFERENCE]
+          INTEGER ICLNGWCB [REFERENCE]
         END SUBROUTINE mfLibexp_ClnLines0And1
 !     ------------------------------------------------------------------
 !      Declare the C function
@@ -1209,12 +1211,12 @@ module module_exportData
   !-----------------------------------------------------------------------------
   ! BRIEF:  
   !-----------------------------------------------------------------------------
-  subroutine exp_ClnLines0And1 (ICLNTIB,NCLN,ICLNNDS,ICLNCB,ICLNHD,ICLNDD,ICLNIB,NCLNGWC,NCONDUITYP)
+  subroutine exp_ClnLines0And1 (ICLNTIB,NCLN,ICLNNDS,ICLNCB,ICLNHD,ICLNDD,ICLNIB,NCLNGWC,NCONDUITYP,ICLNPCB,ICLNGWCB)
     implicit none
-    integer, intent(in) :: ICLNTIB,NCLN,ICLNNDS,ICLNCB,ICLNHD,ICLNDD,ICLNIB,NCLNGWC,NCONDUITYP
+    integer, intent(in) :: ICLNTIB,NCLN,ICLNNDS,ICLNCB,ICLNHD,ICLNDD,ICLNIB,NCLNGWC,NCONDUITYP,ICLNPCB,ICLNGWCB
 
     if (NOT(ed_getExportData())) return
-    call mfLibexp_ClnLines0And1(ICLNTIB,NCLN,ICLNNDS,ICLNCB,ICLNHD,ICLNDD,ICLNIB,NCLNGWC,NCONDUITYP)
+    call mfLibexp_ClnLines0And1(ICLNTIB,NCLN,ICLNNDS,ICLNCB,ICLNHD,ICLNDD,ICLNIB,NCLNGWC,NCONDUITYP,ICLNPCB,ICLNGWCB)
   end subroutine exp_ClnLines0And1
 
   !-----------------------------------------------------------------------------

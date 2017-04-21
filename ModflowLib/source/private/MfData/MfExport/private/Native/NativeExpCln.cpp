@@ -143,10 +143,21 @@ CStr NativeExpCln::Line0 ()
   MfPackage* p = GetPackage();
 
   using namespace MfData::Packages;
-  const int *iclntib(0);
-  if (p->GetField(Cln::ICLNTIB, &iclntib) && iclntib) {
-    if (*iclntib) {
-      aStr = "OPTIONS TRANSIENT";
+  const int *iclntib(0), *iclnpcb(0), *iclngwcb(0);
+  if (p->GetField(Cln::ICLNTIB, &iclntib) && iclntib &&
+      p->GetField(Cln::ICLNPCB, &iclnpcb) && iclnpcb &&
+      p->GetField(Cln::ICLNGWCB, &iclngwcb)) {
+    if (*iclntib || *iclnpcb) {
+      aStr = "OPTIONS";
+      if (*iclntib) {
+        aStr += " TRANSIENT";
+      }
+      if (*iclnpcb) {
+        aStr += " PROCESSCCF ";
+        CStr aUnitStr;
+        aUnitStr.Format("%d", *iclngwcb);
+        aStr += aUnitStr;
+      }
     }
   }
 

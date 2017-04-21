@@ -173,10 +173,13 @@ DLLEXPORT void MFLIBEXP_CLNLINES0AND1 (const int *a_NCLN,
                                   const int *a_ICLNIB,
                                   const int *a_NCLNGWC,
                                   const int *a_NCONDUITYP,
-                                  const int *a_ICLNTIB)
+                                  const int *a_ICLNTIB,
+                                  const int *a_ICLNPCB,
+                                  const int *a_ICLNGWCB)
 {
   MfData::exp_ClnLines0And1(a_NCLN,a_ICLNNDS,a_ICLNCB,a_ICLNHD,a_ICLNDD,
-                            a_ICLNIB,a_NCLNGWC,a_NCONDUITYP,a_ICLNTIB);
+                            a_ICLNIB,a_NCLNGWC,a_NCONDUITYP,a_ICLNTIB,
+                            a_ICLNPCB,a_ICLNGWCB);
 } // MFLIBEXP_CLNLINES0AND1
 //------------------------------------------------------------------------------
 /// \brief CLN package.

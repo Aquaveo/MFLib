@@ -19,6 +19,8 @@ namespace MfData
       const char * const ICLNIB = "ICLNIB";
       const char * const NCLNGWC = "NCLNGWC";
       const char * const NCONDUITYP = "NCONDUITYP";
+      const char * const ICLNPCB = "ICLNPCB";
+      const char * const ICLNGWCB = "ICLNGWCB";
       const char * const NNDCLN = "NNDCLN";
       const char * const NJA_CLN = "NJA_CLN";
       const char * const IAC_CLN = "IAC_CLN";

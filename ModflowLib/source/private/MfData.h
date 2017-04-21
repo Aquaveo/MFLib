@@ -35,7 +35,9 @@ namespace MfData
                          const int *a_ICLNIB,
                          const int *a_NCLNGWC,
                          const int *a_NCONDUITYP,
-                         const int *a_ICLNTIB);
+                         const int *a_ICLNTIB,
+                         const int *a_ICLNPCB,
+                         const int *a_ICLNGWCB);
   bool ClnLine7 (const Real *a_ACLNNDSAQ,
                  const int *a_NCLNNDS);
   bool ClnLine8 (const Real *a_ACLNGWCAQ);

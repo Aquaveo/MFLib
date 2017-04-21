@@ -50,7 +50,9 @@ void MfData::Packages::ClnLines0And1 (const int *a_ICLNTIB,
                                       const int *a_ICLNDD,
                                       const int *a_ICLNIB,
                                       const int *a_NCLNGWC,
-                                      const int *a_NCONDUITYP)
+                                      const int *a_NCONDUITYP,
+                                      const int *a_ICLNPCB,
+                                      const int *a_ICLNGWCB)
 {
   MfPackage pack(MfData::Packages::CLNLines0And1);
   MfPackage *p(MfData::Get().GetPackage(MfData::Packages::CLNLines0And1));
@@ -66,10 +68,12 @@ void MfData::Packages::ClnLines0And1 (const int *a_ICLNTIB,
   p->SetField(MfData::Packages::Cln::ICLNIB, a_ICLNIB);
   p->SetField(MfData::Packages::Cln::NCLNGWC, a_NCLNGWC);
   p->SetField(MfData::Packages::Cln::NCONDUITYP, a_NCONDUITYP);
+  p->SetField(MfData::Packages::Cln::ICLNPCB, a_ICLNPCB);
+  p->SetField(MfData::Packages::Cln::ICLNGWCB, a_ICLNGWCB);
   if (!exists)
     MfData::Get().AddPackage(&pack);
   MfData::Get().Export(MfData::Packages::CLNLines0And1);
-} // MfData::Packages::exp_ClnLines0And1
+} // MfData::Packages::ClnLines0And1
 //------------------------------------------------------------------------------
 /// \brief 
 //------------------------------------------------------------------------------

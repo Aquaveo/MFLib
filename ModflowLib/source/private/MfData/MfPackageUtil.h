@@ -22,7 +22,9 @@ namespace MfData
                         const int *a_ICLNIB,
                         const int *a_NCLNGWC,
                         const int *a_NCONDUITYP,
-                        const int *a_ICLNTIB);
+                        const int *a_ICLNTIB,
+                        const int *a_ICLNPCB,
+                        const int *a_ICLNGWCB);
     void ClnLine7 (const Real *a_ACLNNDSAQ,
                    const int *a_NCLNNDS);
     void ClnLine8Or9 (const Real *a_ACLNGWCAQ, int a_size2);
