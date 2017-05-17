@@ -32,6 +32,7 @@ NativeExpLpf::NativeExpLpf () :
 , m_unstructured(0)
 , m_stacked(0)
 , m_anyChaniNotOne(0)
+, m_useStorageCoefficent(false)
 {
   m_usg = MfData::MfGlobal::Get().ModelType() == MfData::USG;
   if (m_usg)
@@ -186,6 +187,8 @@ CStr NativeExpLpf::Line1 ()
   p->GetField(Packages::LPFpack::NOCVCO, &NOCVCO);
   p->GetField(Packages::LPFpack::NOVFC, &NOVFC);
 
+  if (ISFAC && *ISFAC != 0)
+    m_useStorageCoefficent = true;
 
   // ILPFCB HDRY NPLPF VERTLEAKFLAG
   rval.Format("%d %s %d", *ILPFCB, STR(*hdry), m_nPar);
@@ -454,7 +457,10 @@ void NativeExpLpf::Line10to16 (int a_line, int a_lay)
     return;
   }
 
-  MfPackage* p = GetGlobal()->GetPackage(arrName[a_line-10]);
+  CStr aName = arrName[a_line-10];
+  if (m_useStorageCoefficent && aName == ARR_LPF_SS)
+    aName = ARR_LPF_SC;
+  MfPackage* p = GetGlobal()->GetPackage(aName);
   CStr rval = p->StringsToWrite().front();
   p->StringsToWrite().erase(p->StringsToWrite().begin());
   AddToStoredLinesDesc(rval, Desc(a_line, a_lay));

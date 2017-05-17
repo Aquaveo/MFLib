@@ -54,6 +54,7 @@ void ArrayMap (std::map<CStr, ArrayInfo>& a_map)
   a_map[ARR_LPF_VK] = ArrayInfo(PA::LPF, "VK", "VK", "VK");
   a_map[ARR_LPF_VANI] = ArrayInfo(PA::LPF, "VANI", "VANI", "VANI");
   a_map[ARR_LPF_SS] = ArrayInfo(PA::LPF, "SS", "SS", "SS");
+  a_map[ARR_LPF_SC] = ArrayInfo(PA::LPF, "SS", "SS", "SS");
   a_map[ARR_LPF_SY] = ArrayInfo(PA::LPF, "SY", "SY", "SY");
   a_map[ARR_LPF_WET] = ArrayInfo(PA::LPF, "WET", "", "WETDRY");
   a_map[ARR_LPF_VKCBD] = ArrayInfo(PA::LPF, "QUASIVK", "VKCB", "VKCB");
