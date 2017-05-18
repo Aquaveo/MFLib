@@ -751,7 +751,7 @@ void H5UtilT::testGetArrayMap ()
 {
   MfData::Export::Mf2kNative ex;
   std::map<CStr, CStr> &m(ex.GetMapArrays());
-  TS_ASSERT_EQUALS(65, m.size());
+  TS_ASSERT_EQUALS(66, m.size());
   TS_ASSERT(m.find("crap") == m.end());
 
   TS_ASSERT(m[ARR_DIS_TOP] == "top");
@@ -788,6 +788,7 @@ void H5UtilT::testGetArrayMap ()
   TS_ASSERT(m[ARR_LPF_VK] == "VK");
   TS_ASSERT(m[ARR_LPF_VANI] == "VANI");
   TS_ASSERT(m[ARR_LPF_SS] == "SS");
+  TS_ASSERT(m[ARR_LPF_SC] == "SS");
   TS_ASSERT(m[ARR_LPF_SY] == "SY");
   TS_ASSERT(m[ARR_LPF_WET] == "WET");
   TS_ASSERT(m[ARR_LPF_VKCBD] == "QUASIVK");
