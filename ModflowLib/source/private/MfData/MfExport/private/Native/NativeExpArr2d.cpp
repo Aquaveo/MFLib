@@ -326,13 +326,11 @@ bool NativeExpArr2d::GetData ()
 void NativeExpArr2d::SaveIbound ()
 {
   std::vector< std::vector<int> >& ibnd(GetNative()->Ibound());
-  if (1 == *m_lay)
-  {
-    std::vector<int> myVec(m_nrow*m_ncol, 0);
-    ibnd.assign(GetGlobal()->NumLay(), myVec);
-  }
+  int numCellsInLayer = m_nrow*m_ncol;
+  std::vector<int> myVec(numCellsInLayer, 0);
+  ibnd.push_back(myVec);
 
-  for (size_t i=0; i<ibnd.front().size(); ++i)
+  for (int i=0; i<numCellsInLayer; ++i)
   {
     ibnd[*m_lay-1][i] = m_iData[i];
   }
