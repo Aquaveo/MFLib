@@ -124,6 +124,53 @@ static bool iRchEtEtsLayerData (const CStr& a_)
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
+static bool iEtsSegmentData (const CStr& a_)
+{
+  if (a_ == ARR_ETS_PXDP || a_ == ARR_ETS_PETM)
+    return true;
+  else
+    return false;
+} // iEtsSegmentData
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+static int iEtsSegmentIndex (const CStr& a_packName, int a_spIdx,
+                             bool a_nextSegment)
+{
+  if (a_packName == ARR_ETS_PXDP)
+  {
+    static int fg_segmentPxdp = 0;
+    static int fg_lastSpIdxPxdp = -1;
+    if (a_spIdx != fg_lastSpIdxPxdp)
+    {
+      fg_lastSpIdxPxdp = a_spIdx;
+      fg_segmentPxdp = 0;
+    }
+    else if (a_nextSegment)
+    {
+      ++fg_segmentPxdp;
+    }
+    return fg_segmentPxdp;
+  }
+  else // if (a_packName == ARR_ETS_PETM)
+  {
+    static int fg_segmentPetm = 0;
+    static int fg_lastSpIdxPetm = -1;
+    if (a_spIdx != fg_lastSpIdxPetm)
+    {
+      fg_lastSpIdxPetm = a_spIdx;
+      fg_segmentPetm = 0;
+    }
+    else if (a_nextSegment)
+    {
+      ++fg_segmentPetm;
+    }
+    return fg_segmentPetm;
+  }
+} // iEtsSegmentIndex
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
 static bool iUzfPackData (const CStr& a_)
 {
   if (   a_.Find("UZF/") != -1
@@ -340,6 +387,8 @@ void H5ArrayWriter::impl::SetH5DimensionsForWriting (H5DataSetWriter& a_h)
     start[0] = (hsize_t)(iPackNameToArrayIndex(packName));
     if (!iRchEtEtsLayerData(path))
     {
+      if (iEtsSegmentData(packName))
+        start[0] = iEtsSegmentIndex(packName, spIdx, true);
       start[2] = (hsize_t)spIdx;
       n2write[1] = (hsize_t)m_nVal;
     }
@@ -640,8 +689,12 @@ int H5ArrayWriter::impl::GetMultiplierIdx0 ()
   {
     int spIdx(m_pack->GetGlobal()->GetCurrentPeriod()-1);
     CStr packName(m_pack->GetPackage()->PackageName());
-    if (iRchEtEtsLayerData(path)) rval = spIdx;
-    else                          rval = iPackNameToArrayIndex(packName);
+    if (iEtsSegmentData(packName))
+      rval = iEtsSegmentIndex(packName, spIdx, false);
+    else if (iRchEtEtsLayerData(path))
+      rval = spIdx;
+    else
+      rval = iPackNameToArrayIndex(packName);
   }
   else if (iUzfPackData(path))
   {
