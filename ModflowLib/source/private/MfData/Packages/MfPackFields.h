@@ -590,6 +590,7 @@ namespace MfData
       const char * const NSETS2 = "NSETS2";
       const char * const NUZGAG = "NUZGAG";
       const char * const SURFDEP = "SURFDEP";
+      const char * const NOSURFLEAK = "NOSURFLEAK";
       const char * const IUZLIST = "IUZLIST";
       const char * const NUZF1 = "NUZF1";
       const char * const NUZF2 = "NUZF2";

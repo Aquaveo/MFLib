@@ -459,7 +459,8 @@ namespace MfData
                 int *NTRAIL2,
                 int *NSETS2,
                 int *NUZGAG,
-                Real *SURFDEP);
+                Real *SURFDEP,
+                int *NOSURFLEAK);
   bool UZFLine8(int *IUZLIST);
   bool UZFStressPeriod(int *NUZF1,
                        int *NUZF2,

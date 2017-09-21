@@ -2423,7 +2423,8 @@ bool MfData::Packages::UZFPackageLine1 (const int *NUZTOP,
                                         const int *NTRAIL2,
                                         const int *NSETS2,
                                         const int *NUZGAG,
-                                        const Real *SURFDEP)
+                                        const Real *SURFDEP,
+                                        const int *NOSURFLEAK)
 {
   using namespace MfData::Packages;
   MfPackage pack(UZFLine1);
@@ -2442,6 +2443,7 @@ bool MfData::Packages::UZFPackageLine1 (const int *NUZTOP,
   p->SetField(UZFpack::NSETS2, NSETS2);
   p->SetField(UZFpack::NUZGAG, NUZGAG);
   p->SetField(UZFpack::SURFDEP, SURFDEP);
+  p->SetField(UZFpack::NOSURFLEAK, NOSURFLEAK);
   if (!exists)
     MfData::Get().AddPackage(p);
   MfData::Get().Export(p->PackageName());

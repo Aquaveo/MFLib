@@ -1342,10 +1342,11 @@ DLLEXPORT void MFLIBEXP_UZFLINE1 (int *NUZTOP,
                                   int *NTRAIL2,
                                   int *NSETS2,
                                   int *NUZGAG,
-                                  Real *SURFDEP)
+                                  Real *SURFDEP,
+                                  int *NOSURFLEAK)
 {
   MfData::UZFLine1(NUZTOP,IUZFOPT,IRUNFLG,IETFLG,IUZFCB1,IUZFCB2,NTRAIL2,NSETS2,
-                   NUZGAG,SURFDEP);
+                   NUZGAG,SURFDEP,NOSURFLEAK);
 } // MFLIBEXP_UZFLINE1
 //------------------------------------------------------------------------------
 /// \brief 

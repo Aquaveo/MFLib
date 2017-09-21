@@ -1829,7 +1829,8 @@ bool MfData::UZFLine1(int *NUZTOP,
                       int *NTRAIL2,
                       int *NSETS2,
                       int *NUZGAG,
-                      Real *SURFDEP)
+                      Real *SURFDEP,
+                      int *NOSURFLEAK)
 {
   if (!NUZTOP ||
       !IUZFOPT ||
@@ -1840,13 +1841,15 @@ bool MfData::UZFLine1(int *NUZTOP,
       !NTRAIL2 ||
       !NSETS2 ||
       !NUZGAG ||
-      !SURFDEP)
+      !SURFDEP ||
+      !NOSURFLEAK)
   {
     util::NullFuncArg(__FILE__, __LINE__);
     return false;
   }
   MfData::Packages::UZFPackageLine1(NUZTOP,IUZFOPT,IRUNFLG,IETFLG,IUZFCB1,
-                                    IUZFCB2,NTRAIL2,NSETS2,NUZGAG,SURFDEP);
+                                    IUZFCB2,NTRAIL2,NSETS2,NUZGAG,SURFDEP,
+                                    NOSURFLEAK);
   return true;
 } // MfData::UZFLine1
 //------------------------------------------------------------------------------

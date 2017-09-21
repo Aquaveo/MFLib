@@ -853,7 +853,7 @@ module module_exportData
         END SUBROUTINE mfLibExp_HufPar
 !     ------------------------------------------------------------------
 !      Declare the C function
-        SUBROUTINE mfLibExp_UZFLine1(NUZTOP,IUZFOPT,IRUNFLG,IETFLG,IUZFCB1,IUZFCB2,NTRAIL2,NSETS2,NUZGAG,SURFDEP)
+        SUBROUTINE mfLibExp_UZFLine1(NUZTOP,IUZFOPT,IRUNFLG,IETFLG,IUZFCB1,IUZFCB2,NTRAIL2,NSETS2,NUZGAG,SURFDEP,NOSURFLEAK)
           INTEGER  NUZTOP [REFERENCE]
           INTEGER  IUZFOPT [REFERENCE]
           INTEGER  IRUNFLG [REFERENCE]
@@ -864,6 +864,7 @@ module module_exportData
           INTEGER  NSETS2 [REFERENCE]
           INTEGER  NUZGAG [REFERENCE]
           REAL     SURFDEP [REFERENCE]
+          INTEGER  NOSURFLEAK [REFERENCE]
         END SUBROUTINE mfLibExp_UZFLine1
 !     ------------------------------------------------------------------
 !      Declare the C function
@@ -2832,14 +2833,14 @@ module module_exportData
   !-----------------------------------------------------------------------------
   ! BRIEF:  
   !-----------------------------------------------------------------------------
-  subroutine exp_UZF_Line1 (NUZTOP,IUZFOPT,IRUNFLG,IETFLG,IUZFCB1,IUZFCB2,NTRAIL2,NSETS2,NUZGAG,SURFDEP)
+  subroutine exp_UZF_Line1 (NUZTOP,IUZFOPT,IRUNFLG,IETFLG,IUZFCB1,IUZFCB2,NTRAIL2,NSETS2,NUZGAG,SURFDEP,NOSURFLEAK)
     implicit none
     integer, intent(in) ::NUZTOP,IUZFOPT,IRUNFLG,IETFLG,IUZFCB1,IUZFCB2
-    integer, intent(in) ::NTRAIL2,NSETS2,NUZGAG
+    integer, intent(in) ::NTRAIL2,NSETS2,NUZGAG,NOSURFLEAK
     real, intent(in)    ::SURFDEP
 
     if (NOT(ed_getExportData())) return
-    call mfLibExp_UZFLine1(NUZTOP,IUZFOPT,IRUNFLG,IETFLG,IUZFCB1,IUZFCB2,NTRAIL2,NSETS2,NUZGAG,SURFDEP)
+    call mfLibExp_UZFLine1(NUZTOP,IUZFOPT,IRUNFLG,IETFLG,IUZFCB1,IUZFCB2,NTRAIL2,NSETS2,NUZGAG,SURFDEP,NOSURFLEAK)
   end subroutine exp_UZF_Line1
 
   !-----------------------------------------------------------------------------

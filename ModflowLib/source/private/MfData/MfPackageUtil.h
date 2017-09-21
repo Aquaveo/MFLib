@@ -474,7 +474,8 @@ namespace MfData
                           const int *NTRAIL2,
                           const int *NSETS2,
                           const int *NUZGAG,
-                          const Real *SURFDEP);
+                          const Real *SURFDEP,
+                          const int *NOSURFLEAK);
     bool UZFPackageSP (const int *NUZF1,
                        const int *NUZF2,
                        const int *NUZF3,

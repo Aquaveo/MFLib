@@ -572,7 +572,8 @@ DLLEXPORT void MFLIBEXP_UZFLINE1(int *NUZTOP,
                                  int *NTRAIL2,
                                  int *NSETS2,
                                  int *NUZGAG,
-                                 Real *SURFDEP);
+                                 Real *SURFDEP,
+                                 int *NOSURFLEAK);
 DLLEXPORT void MFLIBEXP_UZFLINE8(int *IUZLIST);
 DLLEXPORT void MFLIBEXP_UZFSTRESSPERIOD(int *NUZF1,
                                         int *NUZF2,

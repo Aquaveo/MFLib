@@ -52,7 +52,7 @@ void NativeExpUzf::Line1 ()
 {
   using namespace MfData::Packages;
   const int *nuztop, *iuzfopt, *irunflg, *ietflg, *iuzfcb1, *iuzfcb2, *ntrail2,
-            *nsets2, *nuzgag;
+            *nsets2, *nuzgag, *nosurfleak;
   const Real *surfdep;
   MfPackage* a_p=GetPackage();
   if (a_p->GetField(UZFpack::NUZTOP, &nuztop) && nuztop &&
@@ -64,8 +64,26 @@ void NativeExpUzf::Line1 ()
       a_p->GetField(UZFpack::NTRAIL2, &ntrail2) && ntrail2 &&
       a_p->GetField(UZFpack::NSETS2, &nsets2) && nsets2 &&
       a_p->GetField(UZFpack::NUZGAG, &nuzgag) && nuzgag &&
-      a_p->GetField(UZFpack::SURFDEP, &surfdep) && surfdep)
+      a_p->GetField(UZFpack::SURFDEP, &surfdep) && surfdep &&
+      a_p->GetField(UZFpack::NOSURFLEAK, &nosurfleak) && nosurfleak)
   {
+    if (*nosurfleak)
+    {
+      if (GetGlobal()->ModelType() == MfData::MFNWT)
+      {
+        CStr desc = "1a. [SPECIFYTHTR] [SPECIFYTHTI] [NOSURFLEAK] [SPECIFYSURFK] [REJECTSURFK] [SEEPSURFK] "
+          "[ETSQUARE smoothfact] [NETFLUX unitrech unitdis]";
+        CStr line = "OPTIONS\nNOSURFLEAK\nEND";
+        AddToStoredLinesDesc(line, desc);
+      }
+      else
+      {
+        CStr desc = "1a. [SPECIFYTHTR] [SPECIFYTHTI] [NOSURFLEAK] [SPECIFYSURFK] [REJECTSURFK] [SEEPSURFK] "
+          "[ETSQUARE smoothfact] [NETFLUX unitrech unitdis]";
+        CStr line = "NOSURFLEAK";
+        AddToStoredLinesDesc(line, desc);
+      }
+    }
     GetGlobal()->SetIntVar(UZFpack::IUZFOPT, *iuzfopt);
     GetGlobal()->SetIntVar(UZFpack::IRUNFLG, *irunflg);
     GetGlobal()->SetIntVar(UZFpack::IETFLG, *ietflg);
