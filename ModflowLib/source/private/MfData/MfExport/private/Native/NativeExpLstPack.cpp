@@ -270,7 +270,7 @@ void NativeExpLstPack::Line5 ()
   stress.Format("          Stress Period %3d", GetGlobal()->GetCurrentPeriod());
   const int* itmpcln(0);
   GetPackage()->GetField(Packages::ListPack::ITMPCLN , &itmpcln);
-  if (itmpcln && 0 < *itmpcln)
+  if (itmpcln)
   {
     desc += " ITMPCLN";
     int h5ClnCreated(0);
@@ -293,7 +293,7 @@ void NativeExpLstPack::Line5 ()
   if (m_sqList) m_sqList->AddItmp(GetGlobal()->GetCurrentPeriod(), *itmp);
 
   int tmpItmp(*itmp), tmpNp(*np), tmpItmpCln(0);
-  if (itmpcln && 0 < *itmpcln) tmpItmpCln = *itmpcln;
+  if (itmpcln) tmpItmpCln = *itmpcln;
   if (GetH5Flag())
   {
     if (!m_h5Bc) m_h5Bc = new H5BcList(this);
@@ -301,12 +301,17 @@ void NativeExpLstPack::Line5 ()
     tmpNp = 0;
     if (itmpcln && 0 < *itmpcln)
     {
+      // get output lines for CLN wells to later write with line 6c
       m_h5BcStrClnWell = m_h5Bc->ClnWel(tmpItmpCln);
+    }
+    else
+    {
+      m_h5BcStrClnWell = "";
     }
   }
   CStr ln;
   ln.Format("%5d %5d", tmpItmp, tmpNp);
-  if (itmpcln && 0 < *itmpcln)
+  if (itmpcln)
   {
     CStr ln1; ln1.Format(" %5d", tmpItmpCln);
     ln += ln1;
