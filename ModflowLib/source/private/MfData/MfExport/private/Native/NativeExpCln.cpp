@@ -371,18 +371,27 @@ void NativeExpCln::Line10 ()
   MfPackage* pLine10 = GetPackage();
   MfPackage *pLine1 = GetGlobal()->GetPackage(MfData::Packages::CLNLines0And1);
   const Real *aclncond(0);
+  const double *aclncondDbl(0);
   const int *nconduityp(0);
 
-  if (pLine10->GetField(Cln::ACLNCOND, &aclncond) && aclncond &&
+  pLine10->GetField(Cln::ACLNCOND, &aclncond);
+  pLine10->GetField(Cln::ACLNCOND, &aclncondDbl);
+  if ( (aclncond || aclncondDbl) &&
       pLine1->GetField(Cln::NCONDUITYP, &nconduityp) && nconduityp) {
     int n = *nconduityp;
     CStr aStr;
     CStr desc = Desc("10");
     for (int i = 1; i <= n; ++i) {
-      aStr.Format("%s %s %s",
-                  STR(ForElement(aclncond, i, 1, n), 0),
-                  STR(ForElement(aclncond, i, 2, n)),
-                  STR(ForElement(aclncond, i, 3, n)));
+      if (aclncond)
+        aStr.Format("%s %s %s",
+                    STR(ForElement(aclncond, i, 1, n), 0),
+                    STR(ForElement(aclncond, i, 2, n)),
+                    STR(ForElement(aclncond, i, 3, n)));
+      else
+        aStr.Format("%s %s %s",
+                    STR(ForElement(aclncondDbl, i, 1, n), 0),
+                    STR(ForElement(aclncondDbl, i, 2, n)),
+                    STR(ForElement(aclncondDbl, i, 3, n)));
       AddToStoredLinesDesc(aStr, (i == 1 ? desc : ""));
     }
   }
