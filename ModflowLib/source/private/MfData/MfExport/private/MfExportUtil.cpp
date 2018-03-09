@@ -157,39 +157,6 @@ std::set<CStr> MfExportUtil::LpfParamTypes ()
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-int MfExportUtil::CountLpfParams (ParamList* a_list,
-                                  bool a_checkClusters)
-{
-  Param          p;
-  CStr           pType;
-  std::set<CStr> lpfParTypes = LpfParamTypes();
-
-  int npar = 0;
-  for (size_t i=0; i<a_list->Size(); i++)
-  {
-    a_list->At(i, &p);
-    pType = p.m_type;
-    pType.ToLower();
-    if (lpfParTypes.find(pType) != lpfParTypes.end())
-    {
-      if (!a_checkClusters)
-      {
-        if (p.m_pilotPoints)
-        {
-          std::vector<double> vals;
-          a_list->GetPilotPtValues(p.m_scatIndex, vals);
-          npar += (int)vals.size();
-        }
-        else npar++;
-      }
-      else if (!p.m_clust.empty()) npar++;
-    }
-  }
-  return npar;
-} // MfExportUtil::CountLpfParams
-//------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
 std::set<CStr> MfExportUtil::HufParamTypes ()
 {
   std::set<CStr> a_types;

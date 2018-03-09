@@ -24,6 +24,34 @@ using namespace MfData::Export;
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
+static int iCountLpfParams (ParamList* a_list, bool a_checkClusters)
+{
+  Param          p;
+  CStr           pType;
+  std::set<CStr> lpfParTypes = MfExportUtil::LpfParamTypes();
+
+  int npar = 0;
+  for (size_t i=0; i<a_list->Size(); i++)
+  {
+    a_list->At(i, &p);
+    pType = p.m_type;
+    pType.ToLower();
+    if (lpfParTypes.find(pType) != lpfParTypes.end())
+    {
+      if (!a_checkClusters && p.m_pilotPoints)
+      {
+        std::vector<double> vals;
+        a_list->GetPilotPtValues(p.m_scatIndex, vals);
+        npar += (int)vals.size();
+      }
+      else if (!p.m_clust.empty()) npar++;
+    }
+  }
+  return npar;
+} // iCountLpfParams
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
 NativeExpLpf::NativeExpLpf () :
   m_nLay(0)
 , m_nPar(0)
@@ -96,7 +124,7 @@ void NativeExpLpf::OnSetData ()
   Parameters::GetParameterList(&list);
   bool flag(false);
   if (GetH5Flag()) flag = true;
-  m_nPar = MfExportUtil::CountLpfParams(list, flag);
+  m_nPar = iCountLpfParams(list, flag);
 } // MfNativeExpLpf::Export
 //------------------------------------------------------------------------------
 /// \brief
@@ -373,7 +401,7 @@ void NativeExpLpf::WriteLpfParams ()
       {
         WriteLpfPilotPar(list, &p);
       }
-      else
+      else if (!p.m_clust.empty())
       {
         AddToStoredLinesDesc(Line8(&p), Desc(8));
         for (size_t j=0; j < p.m_clust.size(); j++)

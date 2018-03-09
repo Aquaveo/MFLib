@@ -23,8 +23,6 @@ namespace MfData
                               std::map<CStr, CStr>& a_map);
       static bool Is1dArray(const CStr &a_name);
       static bool IsSolver(const CStr& a_name);
-      static int  CountLpfParams(ParamList* a_list,
-                                 bool a_checkClusters);
       static std::set<CStr> LpfParamTypes();
       static void InsertSingleQuotesInName(CStr& a_name);
       static std::set<CStr> HufParamTypes();
