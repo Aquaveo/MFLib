@@ -38,14 +38,14 @@ namespace MfData
       MfGlobal*      GetGlobal();
       const MfGlobal* GetGlobal() const;
       MfPackage*     GetPackage();
+      void           AddToStoredLinesDesc(const std::vector<CStr>& a_line,
+                                          const std::vector<CStr>& a_desc);
+      bool           WriteStoredLines();
     protected:
       bool           GetH5Flag();
       virtual void   AddToStoredLinesDesc(const char* a_line,
                                           const char* a_desc);
-      void           AddToStoredLinesDesc(const std::vector<CStr>& a_line,
-                                          const std::vector<CStr>& a_desc);
       bool           WriteComments();
-      bool           WriteStoredLines();
       bool           SkipPar_Pval_Sen(const CStr& a_name);
       virtual void   LastChanceBeforeWriting();
       bool           ClearFile();

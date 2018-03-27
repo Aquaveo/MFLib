@@ -14,6 +14,8 @@
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\TxtExporter.h>
 #include <private\MfData\MfExport\private\MfExporterImpl.h>
+#include <private\MfData\MfExport\private\Native\NativeExpMf6Disu.h>
+#include <private\MfData\MfExport\private\Native\NativeExpMf6Tdis.h>
 #include <private\MfData\MfExport\private\Sqlite\SqDisu.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
@@ -51,6 +53,16 @@ void NativeExpDisu::OnSetData ()
 //------------------------------------------------------------------------------
 bool NativeExpDisu::Export ()
 {
+  Mf2kNative* n = GetNative();
+  if (n && n->GetExportMf6())
+  {
+    //ExportMf6Disu();
+    NativeExpMf6Disu disu(this);
+    disu.Export();
+    NativeExpMf6Tdis tdis(this);
+    tdis.Export();
+    return true;
+  }
   AddToStoredLinesDesc(Line1(), Desc("1"));
   AddToStoredLinesDesc(Line2(), Desc("2"));
   Line3();

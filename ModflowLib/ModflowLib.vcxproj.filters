@@ -349,6 +349,15 @@
     <ClCompile Include="source\private\MfData\MfExport\private\Sqlite\SqExporter.cpp">
       <Filter>source\private\MfData\MfExport\private\Sqlite</Filter>
     </ClCompile>
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Tdis.cpp">
+      <Filter>source\private\MfData\MfExport\private\Native</Filter>
+    </ClCompile>
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Dis.cpp">
+      <Filter>source\private\MfData\MfExport\private\Native</Filter>
+    </ClCompile>
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Disu.cpp">
+      <Filter>source\private\MfData\MfExport\private\Native</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Export.h">
@@ -956,6 +965,15 @@
     </ClInclude>
     <ClInclude Include="source\private\MfData\MfExport\private\Sqlite\SqExporter.h">
       <Filter>source\private\MfData\MfExport\private\Sqlite</Filter>
+    </ClInclude>
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Tdis.h">
+      <Filter>source\private\MfData\MfExport\private\Native</Filter>
+    </ClInclude>
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Dis.h">
+      <Filter>source\private\MfData\MfExport\private\Native</Filter>
+    </ClInclude>
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Disu.h">
+      <Filter>source\private\MfData\MfExport\private\Native</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

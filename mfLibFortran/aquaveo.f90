@@ -147,6 +147,7 @@ module module_aquaveo
         if (arg1.eq.'-exportSQLite') flag=1
         if (arg1.eq.'-exportGmsH5') flag=2
         if (arg1.eq.'-exportGmsCompressedH5') flag=2
+        if (arg1.eq.'-exportMf6') flag=3
         if (flag.gt.0.and.flag.lt.4) then
           call ed_SetPromptForArray(.true., .true.)
           call getarg(3, arg2)

@@ -54,6 +54,10 @@ MfExporterImpl* MfExportUtil::CreateExporter (const char *a_type)
       n->SetArraysInternal(false);
       n->SetArraysInFolder(true);
     }
+    else if ("-exportMf6" == type )
+    {
+      n->SetExportMf6(true);
+    }
     else if ("-exportgmssqlite" == type)           n->SetUseSQLite(true);
     else if ("-exporttext" == type)                n->SetArraysInternal(false);
     else if ("-exporttext_arraysinternal" == type) {}

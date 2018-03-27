@@ -28,6 +28,8 @@ namespace MfData
       bool GetUseH5() const { return m_h5; }
       void SetUseSQLite(bool a_) { m_sqlite = a_; }
       bool GetUseSQLite() const { return m_sqlite; }
+      void SetExportMf6(bool a_) { m_exportMf6 = a_; }
+      bool GetExportMf6() const { return m_exportMf6; }
 
     private:
       Mf2kNative(const Mf2kNative &rhs);
@@ -37,6 +39,7 @@ namespace MfData
       bool m_arraysInternal;
       bool m_h5;
       bool m_sqlite;
+      bool m_exportMf6;
     };
   }
 }

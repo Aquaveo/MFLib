@@ -938,6 +938,9 @@ build_test_runner.bat
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpDisu.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpGnc.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpLgr.cpp" />
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Dis.cpp" />
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Disu.cpp" />
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Tdis.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpVsc.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpSwi.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpVdf.cpp" />
@@ -1078,6 +1081,9 @@ build_test_runner.bat
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpGnc.t.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpLgr.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpLgr.t.h" />
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Dis.h" />
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Disu.h" />
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Tdis.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpSwi.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpSwi.t.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpVdf.h" />

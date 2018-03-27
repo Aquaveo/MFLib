@@ -12,8 +12,9 @@
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
+#include <private\MfData\MfExport\private\Native\NativeExpMf6Dis.h>
+#include <private\MfData\MfExport\private\Native\NativeExpMf6Tdis.h>
 #include <private\MfData\MfExport\private\TxtExporter.h>
-#include <private\MfData\MfExport\private\MfExporterImpl.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
 
@@ -45,6 +46,16 @@ void NativeExpDis::OnSetData ()
 //------------------------------------------------------------------------------
 bool NativeExpDis::Export ()
 {
+  Mf2kNative* n = GetNative();
+  if (n && n->GetExportMf6())
+  {
+    NativeExpMf6Dis dis(this);
+    dis.Export();
+    NativeExpMf6Tdis tdis(this);
+    tdis.Export();
+    return true;
+  }
+
   AddToStoredLinesDesc(Line1(), Desc(1));
   AddToStoredLinesDesc(Line2(), Desc(2));
   Line3();
@@ -263,7 +274,6 @@ std::vector<CStr> NativeExpDis::Line7 ()
   }
   return rval;;
 } // NativeExpDis::Line7
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // TESTS
