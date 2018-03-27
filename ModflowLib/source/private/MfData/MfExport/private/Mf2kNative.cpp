@@ -29,6 +29,7 @@ Mf2kNative::Mf2kNative () :
 , m_arraysInternal(true)
 , m_h5(false)
 , m_sqlite(false)
+, m_exportMf6(false)
 {
 } // Mf2kNative::Mf2kNative
 //------------------------------------------------------------------------------
