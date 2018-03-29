@@ -65,7 +65,9 @@ bool NativeExpCln::Export ()
     if (!line0.empty()) {
       AddToStoredLinesDesc(line0, Desc("0"));
     }
-    AddToStoredLinesDesc(Line1(), Desc("1"));
+    // comment on line 1 is causing problems with modflow
+    //AddToStoredLinesDesc(Line1(), Desc("1"));
+    AddToStoredLinesDesc(Line1(), "");
     WriteCommentsCln();
   }
   else if (nm == MfData::Packages::CLNLine2) {
@@ -152,12 +154,13 @@ CStr NativeExpCln::Line0 ()
       if (*iclntib) {
         aStr += " TRANSIENT";
       }
-      if (*iclnpcb) {
-        aStr += " PROCESSCCF ";
-        CStr aUnitStr;
-        aUnitStr.Format("%d", *iclngwcb);
-        aStr += aUnitStr;
-      }
+      // newest version of MODFLOW doesn't like this
+      //if (*iclnpcb) {
+      //  aStr += " PROCESSCCF ";
+      //  CStr aUnitStr;
+      //  aUnitStr.Format("%d", *iclngwcb);
+      //  aStr += aUnitStr;
+      //}
     }
   }
 
