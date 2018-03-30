@@ -440,7 +440,7 @@ CStr NativeExpLstPack::IjkToStr (int a_i)
   }
   else
   {
-    if (!m_unstructured || !m_mf6)
+    if (!m_unstructured && !m_mf6)
     { // calculate i, j, k from cell id
       int id = (int)m_data[a_i*(*m_nDataFields)+0];
       int i  = ( (id-1)/m_nJ ) % m_nI + 1;
