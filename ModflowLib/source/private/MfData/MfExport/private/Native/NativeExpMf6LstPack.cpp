@@ -50,7 +50,11 @@ bool NativeExpMf6LstPack::Export ()
 
     lines.push_back("BEGIN OPTIONS");
     lines.push_back(GetAuxLine());
-    if (CbFieldExists()) lines.push_back("  SAVE_FLOWS");
+    if (CbFieldExists())
+    {
+      g->SetIntVar("MF6_SAVE_FLOWS", 1);
+      lines.push_back("  SAVE_FLOWS");
+    }
     lines.push_back("END OPTIONS");
     lines.push_back("");
 
@@ -123,7 +127,7 @@ CStr NativeExpMf6LstPack::GetMaxBoundLine ()
     maxNumBc = *maxBc;
   }
   std::stringstream ss;
-  ss << "  " << maxNumBc;
+  ss << "  MAXBOUND " << maxNumBc;
   return ss.str();
 } // NativeExpMf6LstPack::GetMaxBoundLine
 //------------------------------------------------------------------------------

@@ -10,6 +10,7 @@
 #include <private\MfData\MfExport\private\H5\H5UseLastWriter.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
+#include <private\MfData\MfExport\private\Native\NativeExpMf6Evt.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
@@ -38,6 +39,14 @@ NativeExpEvt::~NativeExpEvt ()
 //------------------------------------------------------------------------------
 bool NativeExpEvt::Export ()
 {
+  Mf2kNative* n1 = GetNative();
+  if (n1 && n1->GetExportMf6())
+  {    
+    NativeExpMf6Evt evt(this);
+    evt.Export();   
+    return true;
+  }
+
   if (GetGlobal()->GetCurrentPeriod() == 1)
   {
     m_par.Line1();

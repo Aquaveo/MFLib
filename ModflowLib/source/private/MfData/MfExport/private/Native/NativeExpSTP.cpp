@@ -84,6 +84,7 @@ bool NativeExpSTP::Export ()
   ForcePackageWrite(MfData::Packages::LAK);
   ForcePackageWrite(MfData::Packages::MNW);
   ForcePackageWrite(MfData::Packages::LGR);
+  ForcePackageWrite(MfData::Packages::OCT);
   // write the oc file
   MfPackage* oc = GetGlobal()->GetPackage(MfData::Packages::OC);
   if (oc)

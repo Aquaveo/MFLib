@@ -23,6 +23,8 @@ namespace MfData
       NativeExpOc(const NativeExpOc& rhs);
       const NativeExpOc& operator=(const NativeExpOc& rhs);
 
+      virtual void LastChanceBeforeWriting();
+
       std::vector<CStr> Line1();
       std::vector<CStr> Desc1();
       CStr              Line2();

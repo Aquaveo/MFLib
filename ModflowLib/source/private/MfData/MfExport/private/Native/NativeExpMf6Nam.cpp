@@ -14,6 +14,7 @@
 #include <private\MfData\MfExport\private\MfExporterImpl.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\MfData\MfExport\private\Native\NativePackExp.h>
+#include <private\MfData\MfExport\private\TxtExporter.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
 #include <private\MfData\Packages\MfPackStrings.h>
@@ -56,8 +57,10 @@ bool NativeExpMf6Nam::Export ()
   lines.push_back("BEGIN OPTIONS");
   lines.push_back("  LIST " + baseName + ".out");
   lines.push_back("  PRINT_INPUT");
-  lines.push_back("  PRINT_FLOWS");  
-  lines.push_back("  SAVE_FLOWS");
+  lines.push_back("  PRINT_FLOWS");
+  int saveFlows(0);
+  g->GetIntVar("MF6_SAVE_FLOWS", saveFlows);
+  if (saveFlows) lines.push_back("  SAVE_FLOWS");
   //If the NWT Solver or the SMS Solver with the NWT option is being used
   if (DoNewton()) lines.push_back("  NEWTON UNDER_RELAXATION"); 
   lines.push_back("END OPTIONS");
@@ -83,9 +86,12 @@ bool NativeExpMf6Nam::Export ()
   {
     if (!ValidPackage(ftype[i])) continue;
 
-    lines.push_back("  " + ftype[i] + "  " + fname[i]);
+    lines.push_back("  " + ftype[i] + "6  " + fname[i]);
   }
-  lines.push_back("  IC " + baseName + ".ic");
+  lines.push_back("  NPF6 " + baseName + ".npf");
+  if (n->GetExp()->AtLeastOneTransientSPExists())
+    lines.push_back("  STO6 " + baseName + ".sto");
+  lines.push_back("  IC6 " + baseName + ".ic");
   lines.push_back("END PACKAGES");
   comments.assign(lines.size(), ""); 
   m_pack->AddToStoredLinesDesc(lines, comments);

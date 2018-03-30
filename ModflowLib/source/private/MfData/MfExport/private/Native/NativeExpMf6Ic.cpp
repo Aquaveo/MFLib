@@ -49,7 +49,7 @@ bool NativeExpMf6Ic::Export ()
   lines.push_back(MfExportUtil::GetMf6CommentHeader());
 
   lines.push_back("BEGIN GRIDDATA");
-  lines.push_back("  START LAYERED"); 
+  lines.push_back("  STRT LAYERED"); 
   lines.push_back(MfExportUtil::GetMf6ArrayString(g, ARR_BAS_SHEAD));
   lines.push_back("END GRIDDATA"); 
 

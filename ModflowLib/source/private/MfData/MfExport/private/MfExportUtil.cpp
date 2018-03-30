@@ -250,6 +250,7 @@ CStr MfExportUtil::GetMf6ArrayString (MfData::MfGlobal* a_g, CStr a_packName)
   if (1 == lines.size())
   {
     rval = pad + lines.front();
+    lines.clear();
     return rval;
   }
 

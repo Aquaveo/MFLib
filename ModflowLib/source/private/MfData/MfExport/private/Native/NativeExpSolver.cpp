@@ -965,7 +965,7 @@ void NativeExpSolver::Export_IMS ()
  else
  {
    AddToStoredLinesDesc("BEGIN OPTIONS","");
-   AddToStoredLinesDesc(" PRINT OPTION SUMMARY","");
+   AddToStoredLinesDesc(" PRINT_OPTION SUMMARY","");
    AddToStoredLinesDesc(" COMPLEXITY MODERATE","");
    AddToStoredLinesDesc("END OPTIONS","");
  }  
@@ -981,10 +981,10 @@ CStr NativeExpSolver::GetPrintOption()
   MfPackage* p = GetPackage();
   if (p->GetField(SmsPack::IPRSMS, &IPRSMS) && IPRSMS)
   {
-    ss << "  PRINT OPTION";
-    if(*IPRSMS==0)      ss << " NONE\n";
-    else if(*IPRSMS==1) ss << " SUMMARY\n";
-    else                ss << " ALL\n";
+    ss << "  PRINT_OPTION";
+    if(*IPRSMS==0)      ss << " NONE";
+    else if(*IPRSMS==1) ss << " SUMMARY";
+    else                ss << " ALL";
   }
   return ss.str();
 } //NativeExpSolver::GetPrintOption
@@ -1002,9 +1002,9 @@ CStr NativeExpSolver::GetImsNonlinearLine ()
       p->GetField(SmsPack::MXITER, &MXITER) && MXITER &&     
       p->GetField(SmsPack::NONLINMETH, &NONLINMETH) && NONLINMETH)
   {
-    ss << "  OUTER_HCLOSE" << STR(*HCLOSE) << "\n";
-    ss << "  OUTER_MAXIMUM" << *MXITER << "\n";
-    ss << "  UNDER_RELAXATION";
+    ss << "  OUTER_HCLOSE " << STR(*HCLOSE) << "\n";
+    ss << "  OUTER_MAXIMUM " << *MXITER << "\n";
+    ss << "  UNDER_RELAXATION ";
     if(*NONLINMETH == 1) ss << " DBD\n";
     else                 ss << " Cooley\n";
   }
@@ -1022,7 +1022,7 @@ CStr NativeExpSolver::GetImsNonlinearLine ()
   if (p->GetField(NWTpack::amomentdum, &amomentdum) && amomentdum)
     ss << "  UNDER_RELAXATION_MOMENTUM " << STR(*amomentdum) << "\n";
   if (p->GetField(SmsPack::NUMTRACK, &NUMTRACK) && NUMTRACK)
-    ss << "  BACKTRACKING_NUMBER " << NUMTRACK << "\n";
+    ss << "  BACKTRACKING_NUMBER " << *NUMTRACK << "\n";
   if (p->GetField(NWTpack::Btoldum, &Btoldum) && Btoldum)
     ss << "  BACKTRACKING_TOLERANCE " << STR(*Btoldum) << "\n";
   if (p->GetField(NWTpack::Breducdum, &Breducdum) && Breducdum)
@@ -1047,9 +1047,9 @@ CStr NativeExpSolver::GetImsLinearLine ()
   if (p->GetField(SmsPack::ITER1, &ITER1) && ITER1)
     ss << "  INNER_MAXIMUM " << *ITER1 << "\n";
   if (p->GetField(SmsPack::HICLOSE, &HICLOSE) && HICLOSE)
-    ss << "  INNER_HCLOSE" << STR(*HICLOSE) << "\n";
+    ss << "  INNER_HCLOSE " << STR(*HICLOSE) << "\n";
   if (p->GetField(SmsPack::RCLOSEPCGU, &RCLOSEPCGU) && RCLOSEPCGU)
-    ss << "  INNER_RCLOSE" << STR(*RCLOSEPCGU) << "\n";
+    ss << "  INNER_RCLOSE " << STR(*RCLOSEPCGU) << "\n";
 
   CStr strCLIN("CG");
   if (p->GetField(SmsPack::IFLAG, &ICLIN) && CLIN)

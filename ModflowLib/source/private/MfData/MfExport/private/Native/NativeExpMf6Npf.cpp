@@ -78,7 +78,11 @@ bool NativeExpMf6Npf::Export ()
   lines.push_back(MfExportUtil::GetMf6CommentHeader());
 
   lines.push_back("BEGIN OPTIONS");
-  if (SaveFlows()) lines.push_back("  SAVE_FLOWS");
+  if (SaveFlows())
+  {
+    g->SetIntVar("MF6_SAVE_FLOWS", 1);
+    lines.push_back("  SAVE_FLOWS");
+  }
   lines.push_back(GetAlternativeCellAveragingLine());
   if (!GetThickStrtLine().empty()) lines.push_back(GetThickStrtLine());
   if (!GetVariableCvLine().empty()) lines.push_back(GetVariableCvLine());
@@ -90,7 +94,7 @@ bool NativeExpMf6Npf::Export ()
 
 
   lines.push_back("BEGIN GRIDDATA"); 
-  lines.push_back("  ICELLTYPE LAYERED");
+  lines.push_back("  ICELLTYPE");
   lines.push_back("    CONSTANT -1");
   lines.push_back("  K LAYERED");
   lines.push_back(MfExportUtil::GetMf6ArrayString(g, ARR_LPF_HK));

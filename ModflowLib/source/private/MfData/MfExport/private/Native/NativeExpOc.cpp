@@ -7,8 +7,10 @@
 //------------------------------------------------------------------------------
 #include <private\MfData\MfExport\private\Native\NativeExpOc.h>
 
-#include <private\MfData\MfExport\private\Native\NativeUtil.h>
 #include <private\MfData\MfGlobal.h>
+#include <private\MfData\MfExport\private\Mf2kNative.h>
+#include <private\MfData\MfExport\private\Native\NativeUtil.h>
+#include <private\MfData\MfExport\private\Native\NativeExpMf6Oc.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
 #include <private\MfData\Packages\MfPackStrings.h>
@@ -31,6 +33,14 @@ NativeExpOc::~NativeExpOc ()
 //------------------------------------------------------------------------------
 bool NativeExpOc::Export ()
 {
+  Mf2kNative* n1 = GetNative();
+  if (n1 && n1->GetExportMf6())
+  {    
+    NativeExpMf6Oc evt(this);
+    evt.Export();   
+    return true;
+  }
+
   if (GetPackage()->PackageName() == Packages::OC)
   {
     AddToStoredLinesDesc(Line1(), Desc1());
@@ -206,6 +216,18 @@ std::vector<CStr> NativeExpOc::Desc3 ()
   std::vector<CStr> rval(l.size(), s);
   return rval;
 } // NativeExpOc::Desc3
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void NativeExpOc::LastChanceBeforeWriting ()
+{
+  Mf2kNative* n1 = GetNative();
+  if (n1 && n1->GetExportMf6())
+  {    
+    NativeExpMf6Oc oc(this);
+    oc.WriteFinal();
+  }
+} // NativeExpOc::LastChanceBeforeWriting
 
 
 ///////////////////////////////////////////////////////////////////////////////

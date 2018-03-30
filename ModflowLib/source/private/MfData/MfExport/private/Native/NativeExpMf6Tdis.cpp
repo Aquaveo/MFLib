@@ -54,9 +54,13 @@ bool NativeExpMf6Tdis::Export ()
   lines.push_back("BEGIN OPTIONS");
   {
     int timeUnit = g->TimeUnit();
+    CStr units[6] = { "unknown", "seconds", "minutes", "hours", "days", "years" };
     std::stringstream ss;
-    ss << " TIME_UNITS " << timeUnit;
-    lines.push_back(ss.str());
+    if (timeUnit > -1 && timeUnit < 6)
+    {
+      ss << " TIME_UNITS " << units[timeUnit];
+      lines.push_back(ss.str());
+    }
   }
   lines.push_back("END OPTIONS");
   lines.push_back("");

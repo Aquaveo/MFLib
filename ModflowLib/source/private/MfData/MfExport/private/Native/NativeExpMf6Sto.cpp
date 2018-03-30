@@ -48,7 +48,11 @@ bool NativeExpMf6Sto::Export ()
   lines.push_back(MfExportUtil::GetMf6CommentHeader());
 
   lines.push_back("BEGIN OPTIONS");
-  if (SaveFlows()) lines.push_back("  SAVE_FLOWS"); 
+  if (SaveFlows())
+  {
+    g->SetIntVar("MF6_SAVE_FLOWS", 1);
+    lines.push_back("  SAVE_FLOWS"); 
+  }
   lines.push_back("END OPTIONS"); 
   lines.push_back("");
 
