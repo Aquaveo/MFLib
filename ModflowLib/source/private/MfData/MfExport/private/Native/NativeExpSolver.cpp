@@ -921,18 +921,18 @@ CStr NativeExpSolver::Line4_SMS ()
   const int* IPC(0),* ISCL(0),* IORD(0), * IFLAG(0);
 
   MfPackage* p = GetPackage();
+  p->GetField(SmsPack::RELAXPCGU, &RELAXPCGU);
   if (p->GetField(SmsPack::IPC, &IPC) && IPC &&
       p->GetField(SmsPack::ISCL, &ISCL) && ISCL &&
       p->GetField(SmsPack::IORD, &IORD) && IORD &&
       p->GetField(SmsPack::IFLAG, &IFLAG) && IFLAG &&
-      p->GetField(SmsPack::RCLOSEPCGU, &RCLOSEPCGU) && RCLOSEPCGU &&
-      p->GetField(SmsPack::RELAXPCGU, &RELAXPCGU) && RELAXPCGU)
+      p->GetField(SmsPack::RCLOSEPCGU, &RCLOSEPCGU) && RCLOSEPCGU)
   {
     if (1 == *IFLAG) flag = "CG ";
     else if (2 == *IFLAG)
     {
       flag = "BCGS ";
-      strRELAXPCGU = STR(*RELAXPCGU);
+      if (RELAXPCGU) strRELAXPCGU = STR(*RELAXPCGU);
     }
     rval.Format("%s%d %d %d %s %s",
                 flag, *IPC, *ISCL, *IORD, STR(*RCLOSEPCGU), strRELAXPCGU);
