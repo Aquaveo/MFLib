@@ -14,9 +14,11 @@ namespace MfData
     class NeLstPar;
     class H5BcList;
     class SqBcList;
+    class NativeExpMf6LstPack;
 
     class NativeExpLstPack : public NativePackExp
     {
+      friend NativeExpMf6LstPack;
       friend NativeExpLstPackT;
       friend NeLstPar;
       friend SqBcList;
@@ -89,7 +91,7 @@ namespace MfData
       void Line7(FILE* a_fp, int a_sp);
       void BufferTheLineForComments(CStr& a_line);
 
-      bool                m_usg, m_unstructured;
+      bool                m_usg, m_unstructured, m_mf6;
       const int          *m_nBcs, *m_nAux, *m_nDataFields;
       int                 m_nFields, m_nI, m_nJ, m_nK, m_nodeOffset;
       const Real         *m_data;

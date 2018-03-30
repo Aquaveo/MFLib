@@ -940,6 +940,13 @@ build_test_runner.bat
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpLgr.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Dis.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Disu.cpp" />
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Nam.cpp" />
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Ic.cpp" />
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpMf6LstPack.cpp" />
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Mfsim.cpp" />
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Npf.cpp" />
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Rch.cpp" />
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Sto.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Tdis.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpVsc.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpSwi.cpp" />
@@ -1083,6 +1090,13 @@ build_test_runner.bat
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpLgr.t.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Dis.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Disu.h" />
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Nam.h" />
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Ic.h" />
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpMf6LstPack.h" />
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Mfsim.h" />
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Npf.h" />
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Rch.h" />
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Sto.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Tdis.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpSwi.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpSwi.t.h" />

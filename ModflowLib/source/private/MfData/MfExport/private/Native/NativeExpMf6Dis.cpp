@@ -10,67 +10,13 @@
 #include <sstream>
 
 #include <private\MfData\MfGlobal.h>
+#include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\MfData\MfExport\private\Native\NativePackExp.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
 
-
 using namespace MfData;
 using namespace MfData::Export;
-
-namespace 
-{
-//------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
-CStr iGetMf6ArrayString (MfData::MfGlobal* a_g, CStr a_packName)
-{
-  CStr rval = "";
-  MfPackage* p = a_g->GetPackage(a_packName);
-  if (!p)
-  {
-    ASSERT(0);
-  }
-  std::vector<CStr>& lines(p->StringsToWrite());
-  ASSERT(!lines.empty());
-  if (lines.empty()) return rval;
-
-  CStr pad("    ");
-
-  if (1 == lines.size())
-  {
-    rval = pad + lines.front();
-    return rval;
-  }
-
-  CStr pad2(pad + "  ");
-  for (size_t i=0; i<lines.size(); ++i)
-  {
-    CStr factor;
-    CStr l = lines[i];
-    if (l.Find("INTERNAL") != -1)
-    {
-      std::stringstream ss, ss1;
-      ss << l;
-      ss >> l >> factor;
-      ss1 << pad << "INTERNAL FACTOR " << factor << "\n";
-      rval += ss1.str();
-      i++;
-      CStr l2 = lines[i];
-      l2.Replace("\n", "\n"+pad2);
-      rval += pad2;
-      rval += l2;
-    }
-    else
-    {
-      rval += pad;
-      rval += lines[i];
-    }
-    if (i+1 < lines.size()) rval += "\n";
-  }
-  return rval;
-} // iGetMf6ArrayString
-} // unnamed namespace
 
 //------------------------------------------------------------------------------
 /// \brief
@@ -122,9 +68,7 @@ bool NativeExpMf6Dis::Export ()
   if (!g)
     return false;
   // comments
-  lines.push_back("# Exported by MODFLOW Exporter created by Aquaveo.");
-  lines.push_back("# Creators of GMS. www.aquaveo.com\\gms");
-  lines.push_back("");
+  lines.push_back(MfExportUtil::GetMf6CommentHeader());
 
   lines.push_back("BEGIN OPTIONS");
   CStr lengthString("");
@@ -162,15 +106,16 @@ bool NativeExpMf6Dis::Export ()
 
   lines.push_back("BEGIN GRIDDATA");
   lines.push_back("  DELR");
-  lines.push_back(iGetMf6ArrayString(g, "DELR"));
+  lines.push_back(MfExportUtil::GetMf6ArrayString(g, "DELR"));
   lines.push_back("  DELC");
-  lines.push_back(iGetMf6ArrayString(g, "DELC"));
+  lines.push_back(MfExportUtil::GetMf6ArrayString(g, "DELC"));
   lines.push_back("  TOP LAYERED");
-  lines.push_back(iGetMf6ArrayString(g, "TOP ELEVATION OF LAYER 1"));
+  lines.push_back(MfExportUtil::GetMf6ArrayString(g, "TOP ELEVATION OF LAYER 1"));
   lines.push_back("  BOTM LAYERED");
-  lines.push_back(iGetMf6ArrayString(g, "MODEL LAYER BOTTOM EL."));
+  lines.push_back(MfExportUtil::GetMf6ArrayString(g, "MODEL LAYER BOTTOM EL."));
   lines.push_back("END GRIDDATA");
-  desc.assign(lines.size(), "");
+
+  desc.assign(lines.size(), "");
   m_pack->AddToStoredLinesDesc(lines, desc);
   m_pack->WriteStoredLines();
   return true;

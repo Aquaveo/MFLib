@@ -318,6 +318,9 @@ bool NativeExpArr2d::GetData ()
     m_dataD = const_cast<double*>(dataConstDbl);
   }
   if (m_name == ARR_BAS_IBND) SaveIbound();
+  else if (m_name == ARR_LPF_HK || m_name == ARR_LPF_HANI ||
+           m_name == ARR_LPF_VK || m_name == ARR_LPF_VANI)
+    SaveRealArray(m_name);
   return true;
 } // NativeExpArr2d::GetData
 //------------------------------------------------------------------------------
@@ -335,6 +338,34 @@ void NativeExpArr2d::SaveIbound ()
     ibnd[*m_lay-1][i] = m_iData[i];
   }
 } // NativeExpArr2d::SaveIbound
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void NativeExpArr2d::SaveRealArray (const CStr& a_name)
+{
+  std::map<CStr, std::vector< std::vector<Real> > >& mymap(GetNative()->SavedRealArrays());
+  std::map<CStr, std::vector<Real> >& mymapMult(GetNative()->SavedRealArraysMult());
+
+  CStr name = a_name;
+  if (name == ARR_LPF_VANI) name = ARR_LPF_VK;
+
+  if (mymap.end() == mymap.find(name))
+  {
+    mymap.insert(std::make_pair(name, std::vector< std::vector<Real> >()));
+    mymapMult.insert(std::make_pair(name, std::vector<Real>()));
+  }
+  std::vector< std::vector<Real> >& rArray2d(mymap[name]);
+  int numCellsInLayer = m_nrow*m_ncol;
+  std::vector<Real> myVec(numCellsInLayer, 0);
+  rArray2d.push_back(myVec);
+
+  for (int i=0; i<numCellsInLayer; ++i)
+  {
+    rArray2d[*m_lay-1][i] = m_data[i];
+  }
+  std::vector<Real>& rMult(mymapMult[name]);
+  rMult.push_back(*m_mult);
+} // NativeExpArr2d::SaveHk
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------

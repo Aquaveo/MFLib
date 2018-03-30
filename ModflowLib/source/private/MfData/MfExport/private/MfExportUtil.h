@@ -9,6 +9,7 @@ class ParamList;
 class Param;
 namespace MfData
 {
+  class MfGlobal;
   namespace Export
   {
     class MfExporterImpl;
@@ -29,6 +30,8 @@ namespace MfData
       static std::vector<Param> GetParamsOfType(const char* const a_type);
       static bool ArrayWriteNextLineInternal(Mf2kNative* a_native,
                                              const CStr& a_line);
+      static CStr GetMf6ArrayString(MfGlobal* a_g, CStr a_packName);
+      static CStr GetMf6CommentHeader();
 
     private:
     };

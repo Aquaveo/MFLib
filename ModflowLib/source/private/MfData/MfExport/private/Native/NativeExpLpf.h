@@ -46,7 +46,7 @@ namespace MfData
       int m_nPar;
       int m_ikcflag;
       bool m_usg, m_unstructured, m_anyChaniNotOne, m_stacked,
-        m_useStorageCoefficent;
+        m_useStorageCoefficent, m_mf6;
     };
 
   }

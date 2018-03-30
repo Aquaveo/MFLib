@@ -10,6 +10,8 @@
 #include <sstream>
 
 #include <private\MfData\MfGlobal.h>
+#include <private\MfData\MfExport\private\Mf2kNative.h>
+#include <private\MfData\MfExport\private\Native\NativePackExp.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
 #include <private\MfData\Packages\MfPackStrings.h>
@@ -34,8 +36,15 @@ NativeExpSolver::~NativeExpSolver ()
 bool NativeExpSolver::Export ()
 {
   CStr name = GetPackage()->PackageName();
+  bool mf6 = GetNative() && GetNative()->GetExportMf6();
 
-  if (Packages::SIP == name)           Export_SIP();
+  TmpPackageNameChanger* tmp(nullptr);
+  if (mf6)
+  {
+    Export_IMS();
+    tmp = new TmpPackageNameChanger(GetPackage(), "IMS");
+  }
+  else if (Packages::SIP == name)      Export_SIP();
   else if (Packages::DE4Line2 == name) Export_DE4();
   else if (Packages::SOR == name)      Export_SOR();
   else if (Packages::PCG == name)      Export_PCG();
@@ -45,8 +54,10 @@ bool NativeExpSolver::Export ()
   else if (Packages::NWT == name)      Export_NWT();
   else if (Packages::SMS == name)      Export_SMS();
 
+
   WriteComments();
   WriteStoredLines();
+  if (tmp) delete(tmp);
   return true;
 } // MfNativeExpSolver::Export
 //------------------------------------------------------------------------------
@@ -905,8 +916,8 @@ CStr NativeExpSolver::Line3_SMS ()
 //------------------------------------------------------------------------------
 CStr NativeExpSolver::Line4_SMS ()
 {
-  CStr rval, flag;
-  const Real* RCLOSEPCGU(0);
+  CStr rval, flag, strRELAXPCGU;
+  const Real* RCLOSEPCGU(0),* RELAXPCGU(0);
   const int* IPC(0),* ISCL(0),* IORD(0), * IFLAG(0);
 
   MfPackage* p = GetPackage();
@@ -914,15 +925,155 @@ CStr NativeExpSolver::Line4_SMS ()
       p->GetField(SmsPack::ISCL, &ISCL) && ISCL &&
       p->GetField(SmsPack::IORD, &IORD) && IORD &&
       p->GetField(SmsPack::IFLAG, &IFLAG) && IFLAG &&
-      p->GetField(SmsPack::RCLOSEPCGU, &RCLOSEPCGU) && RCLOSEPCGU)
+      p->GetField(SmsPack::RCLOSEPCGU, &RCLOSEPCGU) && RCLOSEPCGU &&
+      p->GetField(SmsPack::RELAXPCGU, &RELAXPCGU) && RELAXPCGU)
   {
     if (1 == *IFLAG) flag = "CG ";
-    else if (2 == *IFLAG) flag = "BCGS ";
-    rval.Format("%s%d %d %d %s ",
-                flag, *IPC, *ISCL, *IORD, STR(*RCLOSEPCGU));
+    else if (2 == *IFLAG)
+    {
+      flag = "BCGS ";
+      strRELAXPCGU = STR(*RELAXPCGU);
+    }
+    rval.Format("%s%d %d %d %s %s",
+                flag, *IPC, *ISCL, *IORD, STR(*RCLOSEPCGU), strRELAXPCGU);
   }
   return rval;
 } // NativeExpSolver::Line4_SMS
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void NativeExpSolver::Export_IMS ()
+{
+ if (GetPackage()->PackageName() == "SMS")
+ {
+   AddToStoredLinesDesc("BEGIN OPTIONS","");
+   AddToStoredLinesDesc(GetPrintOption(),"");
+   CStr complexity = Line1a_SMS();
+   if (!complexity.empty()) AddToStoredLinesDesc("  COMPLEXITY " + complexity,"");
+   AddToStoredLinesDesc("END OPTIONS","");
+   AddToStoredLinesDesc("","");
+
+   AddToStoredLinesDesc("BEGIN NONLINEAR","");
+   AddToStoredLinesDesc(GetImsNonlinearLine(),"");
+   AddToStoredLinesDesc("END NONLINEAR","");
+   AddToStoredLinesDesc("","");
+
+   AddToStoredLinesDesc("BEGIN LINEAR","");
+   AddToStoredLinesDesc(GetImsLinearLine(),"");
+   AddToStoredLinesDesc("END LINEAR","");
+ }
+ else
+ {
+   AddToStoredLinesDesc("BEGIN OPTIONS","");
+   AddToStoredLinesDesc(" PRINT OPTION SUMMARY","");
+   AddToStoredLinesDesc(" COMPLEXITY MODERATE","");
+   AddToStoredLinesDesc("END OPTIONS","");
+ }  
+ 
+} // NativeExpSolver::Export_IMS
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+CStr NativeExpSolver::GetPrintOption()
+{ 
+  std::stringstream ss;
+  const int* IPRSMS(0);
+  MfPackage* p = GetPackage();
+  if (p->GetField(SmsPack::IPRSMS, &IPRSMS) && IPRSMS)
+  {
+    ss << "  PRINT OPTION";
+    if(*IPRSMS==0)      ss << " NONE\n";
+    else if(*IPRSMS==1) ss << " SUMMARY\n";
+    else                ss << " ALL\n";
+  }
+  return ss.str();
+} //NativeExpSolver::GetPrintOption
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+CStr NativeExpSolver::GetImsNonlinearLine ()
+{
+  std::stringstream ss;
+  const double* HCLOSE(0);
+  const int* MXITER(0),* NONLINMETH(0);
+
+  MfPackage* p = GetPackage();
+  if (p->GetField(SmsPack::HCLOSE, &HCLOSE) && HCLOSE &&    
+      p->GetField(SmsPack::MXITER, &MXITER) && MXITER &&     
+      p->GetField(SmsPack::NONLINMETH, &NONLINMETH) && NONLINMETH)
+  {
+    ss << "  OUTER_HCLOSE" << STR(*HCLOSE) << "\n";
+    ss << "  OUTER_MAXIMUM" << *MXITER << "\n";
+    ss << "  UNDER_RELAXATION";
+    if(*NONLINMETH == 1) ss << " DBD\n";
+    else                 ss << " Cooley\n";
+  }
+
+  const double*  RESLIM(0);
+  const int* NUMTRACK(0);
+  const Real* thetadum(0),* akappadum(0),* gammadum(0),* amomentdum(0),* Btoldum(0),
+            * Breducdum(0);
+  if (p->GetField(NWTpack::thetadum, &thetadum) && thetadum)
+    ss << "  UNDER_RELAXATION_THETA " << STR(*thetadum) <<  "\n";
+  if (p->GetField(NWTpack::akappadum, &akappadum) && akappadum)
+    ss << "  UNDER_RELAXATION_KAPPA " << STR(*akappadum) <<  "\n";
+  if (p->GetField(NWTpack::gammadum, &gammadum) && gammadum)
+    ss << "  UNDER_RELAXATION_GAMMA " << STR(*gammadum) <<  "\n";
+  if (p->GetField(NWTpack::amomentdum, &amomentdum) && amomentdum)
+    ss << "  UNDER_RELAXATION_MOMENTUM " << STR(*amomentdum) << "\n";
+  if (p->GetField(SmsPack::NUMTRACK, &NUMTRACK) && NUMTRACK)
+    ss << "  BACKTRACKING_NUMBER " << NUMTRACK << "\n";
+  if (p->GetField(NWTpack::Btoldum, &Btoldum) && Btoldum)
+    ss << "  BACKTRACKING_TOLERANCE " << STR(*Btoldum) << "\n";
+  if (p->GetField(NWTpack::Breducdum, &Breducdum) && Breducdum)
+    ss << "  BACKTRACKING_REDUCTION_FACTOR " << STR(*Breducdum) << "\n";
+  if (p->GetField(SmsPack::RESLIM, &RESLIM) && RESLIM)
+    ss << "  BACKTRACKING_RESIDUAL_LIMIT " << STR(*RESLIM) << "\n";
+  return ss.str();
+}//NativeExpSolver::GetImsNonlinearLine
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+CStr NativeExpSolver::GetImsLinearLine ()
+{
+  std::stringstream ss;
+  const double* HICLOSE(0);
+  const int* ITER1(0),* ICLIN(0);
+  const int* ISCL(0),* IORD(0),* LEVEL(0),* NORTH(0);
+  const Real* RCLOSEPCGU(0),* CLIN(0),* RELAXPCGU(0);
+  const double* EPSRN(0);
+
+  MfPackage* p = GetPackage();
+  if (p->GetField(SmsPack::ITER1, &ITER1) && ITER1)
+    ss << "  INNER_MAXIMUM " << *ITER1 << "\n";
+  if (p->GetField(SmsPack::HICLOSE, &HICLOSE) && HICLOSE)
+    ss << "  INNER_HCLOSE" << STR(*HICLOSE) << "\n";
+  if (p->GetField(SmsPack::RCLOSEPCGU, &RCLOSEPCGU) && RCLOSEPCGU)
+    ss << "  INNER_RCLOSE" << STR(*RCLOSEPCGU) << "\n";
+
+  CStr strCLIN("CG");
+  if (p->GetField(SmsPack::IFLAG, &ICLIN) && CLIN)
+  {
+    ss << "  LINEAR_ACCELERATION ";
+    if (1 == *CLIN) strCLIN = "CG";
+    else if (2 == *CLIN) strCLIN = "BICGSTAB";
+  }
+  ss << "  LINEAR_ACCELERATION " << strCLIN << "\n";
+
+  if (p->GetField(SmsPack::RELAXPCGU, &RELAXPCGU) && RELAXPCGU)
+    ss << "  RELAXATION_FACTOR " << STR(*RELAXPCGU) << "\n";
+  if (p->GetField(SmsPack::LEVEL, &LEVEL) && LEVEL)
+    ss << "  PRECONDITIONER_LEVELS " << *LEVEL << "\n";
+  if (p->GetField(SmsPack::EPSRN, &EPSRN) && EPSRN)
+    ss << "  PRECONDITIONER_DROP_TOLERANCE " << STR(*EPSRN) << "\n";
+  if (p->GetField(SmsPack::NORTH, &NORTH) && NORTH)
+    ss << "  NUMBER_ORTHOGONALIZATIONS " << *NORTH << "\n";
+  if (p->GetField(SmsPack::ISCL, &ISCL) && ISCL)
+    ss << "  SCALAING_METHOD " << *ISCL << "\n";
+  if (p->GetField(SmsPack::IORD, &IORD) && IORD)
+    ss << "  REORDERING_METHOD " << *IORD << "\n";
+  return ss.str();
+} // NativeExpSolver::GetImsLinearLine
 
 
 ///////////////////////////////////////////////////////////////////////////////

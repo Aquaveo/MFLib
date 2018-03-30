@@ -10,6 +10,7 @@
 #include <sstream>
 
 #include <private\MfData\MfGlobal.h>
+#include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\MfData\MfExport\private\Native\NativePackExp.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
@@ -94,11 +95,9 @@ bool NativeExpMf6Disu::Export ()
   if (!g)
     return false;
   // comments
-  lines.push_back("# Exported by MODFLOW Exporter created by Aquaveo.");
-  lines.push_back("# Creators of GMS. www.aquaveo.com\\gms");
-  lines.push_back("");
+  lines.push_back(MfExportUtil::GetMf6CommentHeader());
 
-  desc.assign(lines.size(), "");
+  desc.assign(lines.size(), "");
   m_pack->AddToStoredLinesDesc(lines, desc);
   m_pack->WriteStoredLines();
   return true;

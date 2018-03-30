@@ -7,8 +7,12 @@
 //------------------------------------------------------------------------------
 #include <private\MfData\MfExport\private\MfExportUtil.h>
 
+#include <sstream>
+
 #include <private\util\util.h>
+#include <private\MfData\MfGlobal.h>
 #include <private\MfData\MfExport\MfExporter.h>
+#include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackStrings.h>
 #include <private\MfData\Packages\MfPackFields.h>
 #include <private\MfData\MfExport\private\ExpGeoDb.h>
@@ -226,6 +230,67 @@ bool MfExportUtil::ArrayWriteNextLineInternal (
   }
   return false;
 } // bool MfExportUtil::ArrayWriteNextLineInternal
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+CStr MfExportUtil::GetMf6ArrayString (MfData::MfGlobal* a_g, CStr a_packName)
+{
+  CStr rval = "";
+  MfData::MfPackage* p = a_g->GetPackage(a_packName);
+  if (!p)
+  {
+    ASSERT(0);
+  }
+  std::vector<CStr>& lines(p->StringsToWrite());
+  ASSERT(!lines.empty());
+  if (lines.empty()) return rval;
+
+  CStr pad("    ");
+
+  if (1 == lines.size())
+  {
+    rval = pad + lines.front();
+    return rval;
+  }
+
+  CStr pad2(pad + "  ");
+  for (size_t i=0; i<lines.size(); ++i)
+  {
+    CStr factor;
+    CStr l = lines[i];
+    if (l.Find("INTERNAL") != -1)
+    {
+      std::stringstream ss, ss1;
+      ss << l;
+      ss >> l >> factor;
+      ss1 << pad << "INTERNAL FACTOR " << factor << "\n";
+      rval += ss1.str();
+      i++;
+      CStr l2 = lines[i];
+      l2.Replace("\n", "\n"+pad2);
+      rval += pad2;
+      rval += l2;
+    }
+    else
+    {
+      rval += pad;
+      rval += lines[i];
+    }
+    if (i+1 < lines.size()) rval += "\n";
+  }
+  lines.clear();
+  return rval;
+} // MfExportUtil::GetMf6ArrayString
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+CStr MfExportUtil::GetMf6CommentHeader ()
+{
+  CStr rval = "# Exported by MODFLOW Exporter from Aquaveo, the GMS developers.\n"
+              "# www.aquaveo.com\\gms\n"
+              "\n";
+  return rval;
+} // MfExportUtil::GetMf6CommentHeader
 
 ///////////////////////////////////////////////////////////////////////////////
 // TESTS

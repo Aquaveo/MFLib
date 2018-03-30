@@ -30,6 +30,7 @@ namespace MfData
       CStr ArrayName();
       bool GetData();
       void SaveIbound();
+      void SaveRealArray(const CStr& a_name);
       CStr GetArrayFileName(const CStr& a_name);
       bool CanDoConstant();
       bool WriteInternalArray();

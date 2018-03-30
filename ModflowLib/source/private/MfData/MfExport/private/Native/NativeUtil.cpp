@@ -98,6 +98,7 @@ bool Array2d (const CStr& a_type,
               Mf2kNative* a_native)
 {
   if (MfExportUtil::IsDataArray(a_type, a_native->GetMapArrays())) return true;
+  else if ("K22" == a_type || "K33" == a_type) return true;
   return false;
 } // Array2d
 //------------------------------------------------------------------------------

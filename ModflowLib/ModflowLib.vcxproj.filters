@@ -358,6 +358,27 @@
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Disu.cpp">
       <Filter>source\private\MfData\MfExport\private\Native</Filter>
     </ClCompile>
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpMf6LstPack.cpp">
+      <Filter>source\private\MfData\MfExport\private\Native</Filter>
+    </ClCompile>
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Npf.cpp">
+      <Filter>source\private\MfData\MfExport\private\Native</Filter>
+    </ClCompile>
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Sto.cpp">
+      <Filter>source\private\MfData\MfExport\private\Native</Filter>
+    </ClCompile>
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Ic.cpp">
+      <Filter>source\private\MfData\MfExport\private\Native</Filter>
+    </ClCompile>
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Mfsim.cpp">
+      <Filter>source\private\MfData\MfExport\private\Native</Filter>
+    </ClCompile>
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Nam.cpp">
+      <Filter>source\private\MfData\MfExport\private\Native</Filter>
+    </ClCompile>
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Rch.cpp">
+      <Filter>source\private\MfData\MfExport\private\Native</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Export.h">
@@ -973,6 +994,27 @@
       <Filter>source\private\MfData\MfExport\private\Native</Filter>
     </ClInclude>
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Disu.h">
+      <Filter>source\private\MfData\MfExport\private\Native</Filter>
+    </ClInclude>
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpMf6LstPack.h">
+      <Filter>source\private\MfData\MfExport\private\Native</Filter>
+    </ClInclude>
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Npf.h">
+      <Filter>source\private\MfData\MfExport\private\Native</Filter>
+    </ClInclude>
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Sto.h">
+      <Filter>source\private\MfData\MfExport\private\Native</Filter>
+    </ClInclude>
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Ic.h">
+      <Filter>source\private\MfData\MfExport\private\Native</Filter>
+    </ClInclude>
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Mfsim.h">
+      <Filter>source\private\MfData\MfExport\private\Native</Filter>
+    </ClInclude>
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Nam.h">
+      <Filter>source\private\MfData\MfExport\private\Native</Filter>
+    </ClInclude>
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpMf6Rch.h">
       <Filter>source\private\MfData\MfExport\private\Native</Filter>
     </ClInclude>
   </ItemGroup>

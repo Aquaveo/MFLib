@@ -63,14 +63,14 @@ public:
   void GetCellIds (MfData::Export::NativePackExp* a_package,
                    int a_size, int a_layer,
                    std::vector<int>& a_cellIds);
-  void WriteArraySetup(MfData::Export::NativePackExp* a_package,
+  void WriteArraySetup1(MfData::Export::NativePackExp* a_package,
                        const std::string& a_arrayName,
                        int a_size, int a_iprn,
                        Real a_mult, int a_layer,
                        CppSQLite3DB** a_db,
                        sqlite_int64& a_arrayOid,
                        std::vector<int>& cellIds);
-  void WriteArraySetup (MfData::Export::NativePackExp* a_package,
+  void WriteArraySetup2 (MfData::Export::NativePackExp* a_package,
                                        const std::string& a_arrayName,
                                         int a_size, int a_iprn,
                                         Real a_mult, int a_layer,
@@ -185,7 +185,7 @@ void SqArrayWriter::AddSqComment ()
 //------------------------------------------------------------------------------
 /// \brief \see SqArrayWriter::impl::WriteArraySetup.
 //------------------------------------------------------------------------------
-void SqArrayWriter::WriteArraySetup (MfData::Export::NativePackExp* a_package,
+void SqArrayWriter::WriteArraySetup1 (MfData::Export::NativePackExp* a_package,
                                      const std::string& a_arrayName,
                                     int a_size, int a_iprn,
                                     Real a_mult, int a_layer,
@@ -193,13 +193,13 @@ void SqArrayWriter::WriteArraySetup (MfData::Export::NativePackExp* a_package,
                                     sqlite_int64& a_arrayOid,
                                     std::vector<int>& cellIds)
 {
-  m_p->WriteArraySetup(a_package, a_arrayName, a_size, a_iprn, a_mult, a_layer,
+  m_p->WriteArraySetup1(a_package, a_arrayName, a_size, a_iprn, a_mult, a_layer,
                        a_db, a_arrayOid, cellIds);
 } // SqArrayWriter::WriteArraySetup
 //----- OVERLOAD ---------------------------------------------------------------
 /// \see SqArrayWriter::impl::WriteArraySetup.
 //----- OVERLOAD ---------------------------------------------------------------
-void SqArrayWriter::WriteArraySetup (
+void SqArrayWriter::WriteArraySetup2 (
                                        MfData::Export::NativePackExp* a_package,
                                        const std::string& a_arrayName,
                                         int a_size, int a_iprn,
@@ -210,7 +210,7 @@ void SqArrayWriter::WriteArraySetup (
                                         std::string& a_table,
                                         std::string& a_field)
 {
-  m_p->WriteArraySetup(a_package, a_arrayName, a_size, a_iprn, a_mult, a_layer,
+  m_p->WriteArraySetup2(a_package, a_arrayName, a_size, a_iprn, a_mult, a_layer,
                        a_db, a_arrayOid, a_cellIds, a_table, a_field);
 } // SqArrayWriter::WriteArraySetup
 //------------------------------------------------------------------------------
@@ -238,8 +238,8 @@ void SqArrayWriter::WriteArrayToField(
     sqlite_int64 arrayOid;
     std::vector<int> cellIds;
     std::string table, field;
-    WriteArraySetup(a_package, a_arrayName, a_size, a_mult, a_iprn, a_layer,
-                    &db, arrayOid, cellIds, table, field);
+    WriteArraySetup2(a_package, a_arrayName, a_size, a_iprn, a_mult, a_layer,
+                     &db, arrayOid, cellIds, table, field);
     AddToTable(cellIds, a_array, a_size, table, field, db);
   }
   catch (std::exception&) {
@@ -533,7 +533,7 @@ void SqArrayWriter::impl::GetCellIds (MfData::Export::NativePackExp* a_package,
 /// \param[out] a_cellIds:  Values to write to CellId field (which for some
 ///                         arrays may not actually correspond to cells).
 //------------------------------------------------------------------------------
-void SqArrayWriter::impl::WriteArraySetup (
+void SqArrayWriter::impl::WriteArraySetup1 (
                                        MfData::Export::NativePackExp* a_package,
                                        const std::string& a_arrayName,
                                         int a_size, int a_iprn,
@@ -573,7 +573,7 @@ void SqArrayWriter::impl::WriteArraySetup (
 /// \param[out] a_cellIds:  Values to write to CellId field (which for some
 ///                         arrays may not actually correspond to cells).
 //----- OVERLOAD ---------------------------------------------------------------
-void SqArrayWriter::impl::WriteArraySetup (
+void SqArrayWriter::impl::WriteArraySetup2 (
                                        MfData::Export::NativePackExp* a_package,
                                        const std::string& a_arrayName,
                                         int a_size, int a_iprn,
@@ -584,7 +584,7 @@ void SqArrayWriter::impl::WriteArraySetup (
                                         std::string& a_table,
                                         std::string& a_field)
 {
-  WriteArraySetup(a_package, a_arrayName, a_size, a_iprn, a_mult, a_layer,
+  WriteArraySetup1(a_package, a_arrayName, a_size, a_iprn, a_mult, a_layer,
                   a_db, a_arrayOid, a_cellIds);
   sqTableAndFieldFromArray(a_arrayName, a_table, a_field);
 } // SqArrayWriter::impl::WriteArraySetup
@@ -630,7 +630,7 @@ void SqArrayWriter::impl::WriteArray(MfData::Export::NativePackExp* a_package,
     CppSQLite3DB* db;
     sqlite_int64 arrayOid;
     std::vector<int> cellIds;
-    WriteArraySetup(a_package, a_arrayName, a_size, a_mult, a_iprn, a_layer,
+    WriteArraySetup1(a_package, a_arrayName, a_size, a_iprn, a_mult, a_layer,
                     &db, arrayOid, cellIds);
     AddToIntArray(arrayOid, cellIds, a_array, a_size);
   }
@@ -658,7 +658,7 @@ void SqArrayWriter::impl::WriteArrayToField(
     sqlite_int64 arrayOid;
     std::vector<int> cellIds;
     std::string table, field;
-    WriteArraySetup(a_package, a_arrayName, a_size, a_mult, a_iprn, a_layer,
+    WriteArraySetup2(a_package, a_arrayName, a_size, a_iprn, a_mult, a_layer,
                     &db, arrayOid, cellIds, table, field);
     AddToTable(cellIds, a_array, a_size, table, field, db);
   }

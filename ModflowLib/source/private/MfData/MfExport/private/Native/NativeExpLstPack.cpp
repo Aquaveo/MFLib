@@ -13,6 +13,7 @@
 #include <private\MfData\MfExport\private\H5\H5Util.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
+#include <private\MfData\MfExport\private\Native\NativeExpMf6LstPack.h>
 #include <private\MfData\MfExport\private\Sqlite\SqBcList.h>
 #include <private\MfData\MfExport\private\TxtExporter.h>
 #include <private\MfData\MfGlobal.h>
@@ -33,6 +34,7 @@ const char * const CLN_CREATED = "H5 CLN Created";
 NativeExpLstPack::NativeExpLstPack ()
 : m_usg(false)
 , m_unstructured(false)
+, m_mf6(false)
 , m_nBcs(0)
 , m_nAux(0)
 , m_nDataFields(0)
@@ -58,6 +60,7 @@ NativeExpLstPack::NativeExpLstPack ()
     m_nJ = MfData::MfGlobal::Get().NumCol();
     m_unstructured = MfData::MfGlobal::Get().Unstructured() ? 1 : 0;
   }
+
 } // MfNativeExpLstPack::MfNativeExpLstPack
 //------------------------------------------------------------------------------
 /// \brief
@@ -81,6 +84,12 @@ void NativeExpLstPack::OnSetData ()
   {
     m_returnFlow = true;
   }
+
+  Mf2kNative* n = GetNative();
+  if (n && n->GetExportMf6())
+  {
+    m_mf6 = true;
+  }
 } // NativeExpLstPack::OnSetData
 //------------------------------------------------------------------------------
 /// \brief
@@ -98,6 +107,13 @@ void NativeExpLstPack::LastChanceBeforeWriting ()
 //------------------------------------------------------------------------------
 bool NativeExpLstPack::Export ()
 {
+  if (m_mf6)
+  {
+    NativeExpMf6LstPack lst(this);
+    lst.Export();
+    return true;
+  }
+
   if (!m_sqList && GetNative()->GetUseSQLite()) m_sqList = new SqBcList(this);
 
   if (1 == GetGlobal()->GetCurrentPeriod())
@@ -405,15 +421,26 @@ void NativeExpLstPack::Line6 ()
 CStr NativeExpLstPack::IjkToStr (int a_i)
 {
   CStr ln;
+
   if (!m_usg)
   {
-    ln.Format("%5d %5d %5d ", (int)m_data[a_i*(*m_nDataFields)+0],
-                              (int)m_data[a_i*(*m_nDataFields)+1],
-                              (int)m_data[a_i*(*m_nDataFields)+2]);
+    int i = (int)m_data[a_i*(*m_nDataFields)+0];
+    int j = (int)m_data[a_i*(*m_nDataFields)+1];
+    int k = (int)m_data[a_i*(*m_nDataFields)+2];
+
+    if (!m_mf6)
+    {
+      ln.Format("%5d %5d %5d ", i, j, k);
+    }
+    else
+    {
+      int id = j + ( (i-1) * m_nJ ) + ( (k-1) * m_nI * m_nJ );
+      ln.Format("%5d ", id);
+    }
   }
   else
   {
-    if (!m_unstructured)
+    if (!m_unstructured || !m_mf6)
     { // calculate i, j, k from cell id
       int id = (int)m_data[a_i*(*m_nDataFields)+0];
       int i  = ( (id-1)/m_nJ ) % m_nI + 1;

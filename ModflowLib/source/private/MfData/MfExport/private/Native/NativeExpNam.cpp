@@ -11,6 +11,8 @@
 //
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\TxtExporter.h>
+#include <private\MfData\MfExport\private\Native\NativeExpMf6Mfsim.h>
+#include <private\MfData\MfExport\private\Native\NativeExpMf6Nam.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\MfPackageUtil.h>
 #include <private\MfData\Packages\MfPackage.h>
@@ -70,7 +72,6 @@ bool NativeExpNam::Export ()
     ASSERT(0);
     return false;
   }
-
   CStr type = t;
   if (type.CompareNoCase("BCF6") == 0)
   {
@@ -96,7 +97,17 @@ bool NativeExpNam::Export ()
 //------------------------------------------------------------------------------
 void NativeExpNam::WriteFileStp ()
 {
-  // read the ftype and unit numbers
+   // read the ftype and unit numbers 
+  Mf2kNative* n1 = GetNative();
+  if (n1 && n1->GetExportMf6())
+  {    
+    NativeExpMf6Nam gwfmn(this);
+    gwfmn.Export();
+    NativeExpMf6Mfsim mfsim(this);
+    mfsim.Export();
+    return;
+  }
+
   std::vector<CStr>& lines(GetPackage()->StringsToWrite()), linesSwn;
   std::vector<CStr>& desc(GetPackage()->StringDescriptions()), descSwn;
   std::vector<CStr> ftype(lines.size(), ""), fname(lines.size(), "");

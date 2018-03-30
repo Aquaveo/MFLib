@@ -75,6 +75,10 @@ namespace MfData
       CStr Line3_SMS();
       CStr Line4_SMS();
 
+      void Export_IMS();
+      CStr GetPrintOption();
+      CStr GetImsNonlinearLine();
+      CStr GetImsLinearLine();
     };
 
   }

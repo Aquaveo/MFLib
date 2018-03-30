@@ -22,12 +22,12 @@ public:
   void EndWriteFile();
   void AddSqComment();
   sqlite_int64 AddToArrayInfo();
-  void WriteArraySetup (MfData::Export::NativePackExp* a_package,
+  void WriteArraySetup1 (MfData::Export::NativePackExp* a_package,
                         const std::string& a_arrayName,
                         int a_size, int a_iprn, Real a_mult, int a_layer,
                         CppSQLite3DB** a_db, sqlite_int64& a_arrayOid,
                         std::vector<int>& cellIds);
-  void WriteArraySetup (MfData::Export::NativePackExp* a_package,
+  void WriteArraySetup2 (MfData::Export::NativePackExp* a_package,
                         const std::string& a_arrayName,
                         int a_size, int a_iprn, Real a_mult, int a_layer,
                         CppSQLite3DB** a_db, sqlite_int64& a_arrayOid,

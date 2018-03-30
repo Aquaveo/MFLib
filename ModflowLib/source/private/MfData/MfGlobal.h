@@ -49,9 +49,6 @@ namespace MfData
     size_t CurModIdx();
     MfData::Export::SqArrayWriter* GetSqArrayWriter();
 
-    void SetVector(const char* a_NAME, std::vector<int>& a_vec);
-    void GetVector(const char* a_NAME, std::vector<int>& a_vec);
-
     void SetIntVar(const char* a_NAME,
                    int a_var);
     bool GetIntVar(const char* a_NAME,

@@ -116,7 +116,9 @@ namespace MfData
       CStr ParamTypeFromArrayName(CStr a_name);
       CStr VarNameFromArrayName(CStr a_name);
       const CStr &FileName() { return m_fileName; }
-      std::vector< std::vector<int> >& Ibound() {return m_ibound;}
+      std::vector< std::vector<int> >& Ibound() { return m_ibound; }
+      std::map<CStr, std::vector< std::vector<Real> > >& SavedRealArrays() { return m_rArrays; }
+      std::map<CStr, std::vector<Real> >& SavedRealArraysMult() { return m_rArraysMult; }
       void BuildUniqueName(const CStr& a_baseName,
                            const CStr& a_extension,
                            int a_unitNumber,
@@ -140,6 +142,8 @@ namespace MfData
       TxtExporter* m_exp;
       bool m_compressH5;
       std::vector< std::vector<int> > m_ibound;
+      std::map<CStr, std::vector< std::vector<Real> > > m_rArrays;
+      std::map<CStr, std::vector<Real> > m_rArraysMult;
       std::map<CStr, CStr> m_map;
 
     };

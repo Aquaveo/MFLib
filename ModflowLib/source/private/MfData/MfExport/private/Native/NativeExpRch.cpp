@@ -12,6 +12,7 @@
 #include <private\MfData\MfExport\private\H5\H5UseLastWriter.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
+#include <private\MfData\MfExport\private\Native\NativeExpMf6Rch.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
@@ -43,6 +44,14 @@ NativeExpRch::~NativeExpRch ()
 //------------------------------------------------------------------------------
 bool NativeExpRch::Export ()
 {
+  Mf2kNative* n1 = GetNative();
+  if (n1 && n1->GetExportMf6())
+  {    
+    NativeExpMf6Rch rch(this);
+    rch.Export();   
+    return true;
+  }
+  
   if (GetGlobal()->GetCurrentPeriod() == 1)
   {
     m_par.Line1();

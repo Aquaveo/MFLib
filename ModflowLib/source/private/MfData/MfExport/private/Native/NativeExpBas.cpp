@@ -13,6 +13,7 @@
 #include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\MfExport\private\MfExporterImpl.h>
+#include <private\MfData\MfExport\private\Native\NativeExpMf6Ic.h>
 #include <private\MfData\MfPackageUtil.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
@@ -46,6 +47,13 @@ void NativeExpBas::OnSetData ()
 //------------------------------------------------------------------------------
 bool NativeExpBas::Export ()
 {
+  Mf2kNative* n = GetNative();
+  if (n && n->GetExportMf6())
+  {
+    NativeExpMf6Ic ic(this);
+    ic.Export();    
+    return true;
+  }
   AddToStoredLinesDesc(Line1(), Desc(1));
   Line2();
   AddToStoredLinesDesc(Line3(), Desc(3));

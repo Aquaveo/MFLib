@@ -12,6 +12,9 @@
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
+#include <private\MfData\MfExport\private\Native\NativeExpMf6Sto.h>
+#include <private\MfData\MfExport\private\Native\NativeExpMf6Npf.h>
+#include <private\MfData\MfExport\private\Native\NativeExpMf6Ic.h>
 #include <private\MfData\MfExport\private\TxtExporter.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
@@ -61,6 +64,7 @@ NativeExpLpf::NativeExpLpf () :
 , m_stacked(0)
 , m_anyChaniNotOne(0)
 , m_useStorageCoefficent(false)
+, m_mf6(false)
 {
   m_usg = MfData::MfGlobal::Get().ModelType() == MfData::USG;
   if (m_usg)
@@ -86,10 +90,21 @@ NativeExpLpf::~NativeExpLpf ()
 //------------------------------------------------------------------------------
 bool NativeExpLpf::Export ()
 {
+
   if ("L98" == GetPackage()->PackageName())
   {
     SetData(GetNative(), GetGlobal(), GetGlobal()->GetPackage(Packages::LPF));
   }
+
+  if (m_mf6)
+  {
+    NativeExpMf6Npf npf(this);
+    npf.Export();
+    NativeExpMf6Sto sto(this);
+    sto.Export();   
+    return true;
+  }
+
   AddToStoredLinesDesc(Line1(), Desc(1));
   AddToStoredLinesDesc(Line2to6(2), Desc(2));
   AddToStoredLinesDesc(Line2to6(3), Desc(3));
@@ -125,6 +140,11 @@ void NativeExpLpf::OnSetData ()
   bool flag(false);
   if (GetH5Flag()) flag = true;
   m_nPar = iCountLpfParams(list, flag);
+  Mf2kNative* n = GetNative();
+  if (n && n->GetExportMf6())
+  {
+    m_mf6 = true;
+  }
 } // MfNativeExpLpf::Export
 //------------------------------------------------------------------------------
 /// \brief
