@@ -5,7 +5,7 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
-#include <private\MfData\MfExport\private\Native\NativeExpMf6Tdis.h>
+#include <private\MfData\MfExport\private\Native\mf6\NativeExpMf6Tdis.h>
 
 #include <sstream>
 

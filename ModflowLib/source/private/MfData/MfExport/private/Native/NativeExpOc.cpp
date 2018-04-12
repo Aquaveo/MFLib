@@ -9,8 +9,8 @@
 
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
+#include <private\MfData\MfExport\private\Native\mf6\NativeExpMf6Oc.h>
 #include <private\MfData\MfExport\private\Native\NativeUtil.h>
-#include <private\MfData\MfExport\private\Native\NativeExpMf6Oc.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
 #include <private\MfData\Packages\MfPackStrings.h>

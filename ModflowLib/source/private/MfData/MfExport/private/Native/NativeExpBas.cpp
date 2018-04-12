@@ -13,7 +13,7 @@
 #include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\MfExport\private\MfExporterImpl.h>
-#include <private\MfData\MfExport\private\Native\NativeExpMf6Ic.h>
+#include <private\MfData\MfExport\private\Native\mf6\NativeExpMf6Ic.h>
 #include <private\MfData\MfPackageUtil.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>

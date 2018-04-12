@@ -12,9 +12,9 @@
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
-#include <private\MfData\MfExport\private\Native\NativeExpMf6Sto.h>
-#include <private\MfData\MfExport\private\Native\NativeExpMf6Npf.h>
-#include <private\MfData\MfExport\private\Native\NativeExpMf6Ic.h>
+#include <private\MfData\MfExport\private\Native\mf6\NativeExpMf6Ic.h>
+#include <private\MfData\MfExport\private\Native\mf6\NativeExpMf6Sto.h>
+#include <private\MfData\MfExport\private\Native\mf6\NativeExpMf6Npf.h>
 #include <private\MfData\MfExport\private\TxtExporter.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>

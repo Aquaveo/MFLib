@@ -1,11 +1,11 @@
 //------------------------------------------------------------------------------
-// FILE      MfNativeExpMf6Rch.cpp
+// FILE      MfNativeExpMf6Evt.cpp
 // PURPOSE   
 //  (C) Copyright Aquaveo 2014. Distributed under the ModflowLib
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
-#include <private\MfData\MfExport\private\Native\NativeExpMf6Rch.h>
+#include <private\MfData\MfExport\private\Native\mf6\NativeExpMf6Evt.h>
 
 #include <sstream>
 
@@ -25,37 +25,36 @@ using namespace MfData::Export;
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-NativeExpMf6Rch::NativeExpMf6Rch (NativePackExp* a_) :
+NativeExpMf6Evt::NativeExpMf6Evt (NativePackExp* a_) :
 m_pack(a_)
 {
-} // MfNativeExpMf6Rch::MfNativeExpMf6Rch
+} // MfNativeExpMf6Evt::MfNativeExpMf6Evt
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-NativeExpMf6Rch::~NativeExpMf6Rch ()
+NativeExpMf6Evt::~NativeExpMf6Evt ()
 {
-} // MfNativeExpMf6Rch::~MfNativeExpMf6Rch
+} // MfNativeExpMf6Evt::~MfNativeExpMf6Evt
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-bool NativeExpMf6Rch::Export ()
+bool NativeExpMf6Evt::Export ()
 {
   if (!m_pack) return false;
-
   std::vector<CStr> lines, comments; 
   MfGlobal *g = m_pack->GetGlobal();
   if (!g) return false;
   Mf2kNative* nat = m_pack->GetNative();
   if (!nat) return false;
-
-  // INRECH and INIRCH
-  const int* INRECH(0),* INIRCH(0),* NRCHOP(0),* IRCHCB(0);
+  const int *NEVTOP(0), *INSURF(0), *INEVTR(0), *INEXDP(0), *INIEVT(0),* IEVTCB(0);
   MfPackage* p = m_pack->GetPackage();
-  if (!p ||
-      !p->GetField(Packages::RCHpack::NRCHOP, &NRCHOP) || !NRCHOP ||
-      !p->GetField(Packages::RCHpack::INIRCH, &IRCHCB) || !IRCHCB ||
-      !p->GetField(Packages::RCHpack::INIRCH, &INIRCH) || !INIRCH ||
-      !p->GetField(Packages::RCHpack::INRECH, &INRECH) || !INRECH) return false;
+  if (!p->GetField(Packages::EVTpack::NEVTOP, &NEVTOP) || !NEVTOP ||
+      !p->GetField(Packages::EVTpack::INSURF, &INSURF) || !INSURF ||
+      !p->GetField(Packages::EVTpack::INEVTR, &INEVTR) || !INEVTR ||
+      !p->GetField(Packages::EVTpack::INEXDP, &INEXDP) || !INEXDP ||
+      !p->GetField(Packages::EVTpack::INIEVT, &INIEVT) || !INIEVT ||
+      !p->GetField("IEVTCB", &IEVTCB) || !IEVTCB)
+    return false;
 
   if (1 == g->GetCurrentPeriod())
   {
@@ -64,45 +63,53 @@ bool NativeExpMf6Rch::Export ()
 
     lines.push_back("BEGIN OPTIONS");
     lines.push_back("  READASARRAYS");
-    if (3 != *NRCHOP) lines.push_back("  FIXED_CELL");
-    if (*IRCHCB > 0)
+    if (3 != *NEVTOP) lines.push_back("  FIXED_CELL");
+    if (*IEVTCB > 0)
     {
       g->SetIntVar("MF6_SAVE_FLOWS", 1);
       lines.push_back("  SAVE_FLOWS");
     }
     lines.push_back("END OPTIONS");
     lines.push_back("");
+
+    lines.push_back("");
   }
 
   bool writeLayer(false);
-  if (2 == *NRCHOP && *INIRCH > -1) writeLayer = true;
+  if (3 == *NEVTOP && *INIEVT > -1) writeLayer = true;
 
-  // if both are < 0 then do nothing
-  if (*INRECH < 0 && !writeLayer) return false;
+  if (!writeLayer && *INSURF < 0 && *INEVTR < 0 && *INEXDP < 0) return false;
 
   std::stringstream ss; 
   ss << "BEGIN PERIOD " << g->GetCurrentPeriod();
   lines.push_back(ss.str());
-  // print array for stress period
   if (writeLayer)
   {
-    lines.push_back("  IRCH LAYERED");
-    lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, ARR_RCH_LAY));
+    lines.push_back("  IEVT LAYERED");
+    lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, ARR_EVT_LAY));
   }
-  if (*INRECH > -1)
+  if (*INSURF > -1)
   {
-    lines.push_back("  RECHARGE LAYERED");
-    lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, ARR_RCH_RCH));
+    lines.push_back("  SURFACE LAYERED");
+    lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, ARR_EVT_SURF));
   }
-
+  if (*INEVTR > -1)
+  {
+    lines.push_back("  RATE LAYERED");
+    lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, ARR_EVT_RATE));
+  }
+  if (*INEXDP > -1)
+  {
+    lines.push_back("  DEPTH LAYERED");
+    lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, ARR_EVT_EXT));
+  }
   lines.push_back("END PERIOD");
   lines.push_back("");
-  comments.assign(lines.size(), "");
-  //TmpPackageNameChanger tmp(m_pack->GetPackage(), "rch");
+  comments.assign(lines.size(), ""); 
   m_pack->AddToStoredLinesDesc(lines, comments);
   m_pack->WriteStoredLines();
   return true;
-} // NativeExpMf6Rch::ExportMf6Rch
+} // NativeExpMf6Evt::Export
 
 ///////////////////////////////////////////////////////////////////////////////
 // TESTS

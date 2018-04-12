@@ -12,8 +12,8 @@
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
-#include <private\MfData\MfExport\private\Native\NativeExpMf6Dis.h>
-#include <private\MfData\MfExport\private\Native\NativeExpMf6Tdis.h>
+#include <private\MfData\MfExport\private\Native\mf6\NativeExpMf6Dis.h>
+#include <private\MfData\MfExport\private\Native\mf6\NativeExpMf6Tdis.h>
 #include <private\MfData\MfExport\private\TxtExporter.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>

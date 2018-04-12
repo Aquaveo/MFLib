@@ -11,8 +11,8 @@
 //
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\TxtExporter.h>
-#include <private\MfData\MfExport\private\Native\NativeExpMf6Mfsim.h>
-#include <private\MfData\MfExport\private\Native\NativeExpMf6Nam.h>
+#include <private\MfData\MfExport\private\Native\mf6\NativeExpMf6Mfsim.h>
+#include <private\MfData\MfExport\private\Native\mf6\NativeExpMf6Nam.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\MfPackageUtil.h>
 #include <private\MfData\Packages\MfPackage.h>

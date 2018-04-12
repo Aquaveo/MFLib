@@ -13,7 +13,7 @@
 #include <private\MfData\MfExport\private\H5\H5Util.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
-#include <private\MfData\MfExport\private\Native\NativeExpMf6LstPack.h>
+#include <private\MfData\MfExport\private\Native\mf6\NativeExpMf6LstPack.h>
 #include <private\MfData\MfExport\private\Sqlite\SqBcList.h>
 #include <private\MfData\MfExport\private\TxtExporter.h>
 #include <private\MfData\MfGlobal.h>
