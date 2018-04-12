@@ -44,13 +44,21 @@ bool NativeExpMf6Ic::Export ()
   // get the time units
   MfGlobal *g = m_pack->GetGlobal();
   if (!g) return false;
-   
+  Mf2kNative* nat = m_pack->GetNative();
+  if (!nat) return false;
+
   // comments
   lines.push_back(MfExportUtil::GetMf6CommentHeader());
 
+  bool layered = g->GetPackage(Packages::DIS) ? 1 : 0;
+
+  std::string str;
+
   lines.push_back("BEGIN GRIDDATA");
-  lines.push_back("  STRT LAYERED"); 
-  lines.push_back(MfExportUtil::GetMf6ArrayString(g, ARR_BAS_SHEAD));
+  str = "  STRT"; 
+  if (layered) str += " LAYERED";
+  lines.push_back(str);
+  lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, ARR_BAS_SHEAD));
   lines.push_back("END GRIDDATA"); 
 
   comments.assign(lines.size(), "");

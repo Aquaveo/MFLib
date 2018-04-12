@@ -4,6 +4,9 @@
 #ifndef NATIVEEXPMF6DISU_H
 #define NATIVEEXPMF6DISU_H
 
+#include <vector>
+#include <private\util\util.h>
+
 namespace MfData
 {
   namespace Export
@@ -19,6 +22,11 @@ namespace MfData
     private:
       NativeExpMf6Disu(const NativeExpMf6Disu& rhs);
       const NativeExpMf6Disu& operator=(const NativeExpMf6Disu& rhs);
+
+      void WriteOptions(std::vector<CStr>& a_lines);
+      void WriteDimensions(std::vector<CStr>& a_lines);
+      void WriteGridData(std::vector<CStr>& a_lines);
+      void WriteConnections(std::vector<CStr>& a_lines);
 
       NativePackExp* m_pack;
     };

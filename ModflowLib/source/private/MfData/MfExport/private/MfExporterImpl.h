@@ -119,6 +119,7 @@ namespace MfData
       std::vector< std::vector<int> >& Ibound() { return m_ibound; }
       std::map<CStr, std::vector< std::vector<Real> > >& SavedRealArrays() { return m_rArrays; }
       std::map<CStr, std::vector<Real> >& SavedRealArraysMult() { return m_rArraysMult; }
+      std::map<CStr, std::vector<int> >& SavedRealArraysJj() { return m_rArraysJj; }
       void BuildUniqueName(const CStr& a_baseName,
                            const CStr& a_extension,
                            int a_unitNumber,
@@ -144,6 +145,7 @@ namespace MfData
       std::vector< std::vector<int> > m_ibound;
       std::map<CStr, std::vector< std::vector<Real> > > m_rArrays;
       std::map<CStr, std::vector<Real> > m_rArraysMult;
+      std::map<CStr, std::vector<int> > m_rArraysJj;
       std::map<CStr, CStr> m_map;
 
     };

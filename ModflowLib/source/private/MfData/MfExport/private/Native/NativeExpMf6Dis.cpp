@@ -10,10 +10,13 @@
 #include <sstream>
 
 #include <private\MfData\MfGlobal.h>
+#include <private\MfData\MfExport\private\MfExporterImpl.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\MfData\MfExport\private\Native\NativePackExp.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
+#include <private\MfData\Packages\MfPackStrings.h>
+
 
 using namespace MfData;
 using namespace MfData::Export;
@@ -65,8 +68,11 @@ bool NativeExpMf6Dis::Export ()
   std::vector<CStr> lines, desc;
   // get the time units
   MfGlobal *g = m_pack->GetGlobal();
-  if (!g)
-    return false;
+  ASSERT(g);
+  if (!g) return false;
+  Mf2kNative *nat = m_pack->GetNative();
+  ASSERT(nat);
+  if (!nat) return false;
   // comments
   lines.push_back(MfExportUtil::GetMf6CommentHeader());
 
@@ -106,13 +112,24 @@ bool NativeExpMf6Dis::Export ()
 
   lines.push_back("BEGIN GRIDDATA");
   lines.push_back("  DELR");
-  lines.push_back(MfExportUtil::GetMf6ArrayString(g, "DELR"));
+  lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, "DELR"));
   lines.push_back("  DELC");
-  lines.push_back(MfExportUtil::GetMf6ArrayString(g, "DELC"));
-  lines.push_back("  TOP LAYERED");
-  lines.push_back(MfExportUtil::GetMf6ArrayString(g, "TOP ELEVATION OF LAYER 1"));
-  lines.push_back("  BOTM LAYERED");
-  lines.push_back(MfExportUtil::GetMf6ArrayString(g, "MODEL LAYER BOTTOM EL."));
+  lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, "DELC"));
+
+  bool layered = g->GetPackage(Packages::DIS) ? 1 : 0;
+  std::string str = "  TOP";
+  if (layered) str += " LAYERED";
+  lines.push_back(str);
+  lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, "TOP ELEVATION OF LAYER 1"));
+  
+  str = "  BOTM";
+  if (layered) str += " LAYERED";
+  lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, "MODEL LAYER BOTTOM EL."));
+  lines.push_back("END GRIDDATA");
+
+  str = "  IDOMAIN";
+  if (layered) str += " LAYERED";
+  lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, ARR_BAS_IBND));
   lines.push_back("END GRIDDATA");
 
   desc.assign(lines.size(), "");

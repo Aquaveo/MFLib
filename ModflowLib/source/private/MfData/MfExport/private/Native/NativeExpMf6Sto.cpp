@@ -43,7 +43,9 @@ bool NativeExpMf6Sto::Export ()
   // get the time units
   MfGlobal *g = m_pack->GetGlobal();
   if (!g) return false;
-   
+  Mf2kNative* nat = m_pack->GetNative();
+  if (!nat) return false;
+
   // comments
   lines.push_back(MfExportUtil::GetMf6CommentHeader());
 
@@ -60,21 +62,34 @@ bool NativeExpMf6Sto::Export ()
   lines.push_back("  ICONVERT LAYERED");
   lines.push_back(GetIconvertLine(g->NumLay()));
 
-  // Storage and yield coefficient code goes here
-  lines.push_back("  SS LAYERED");
-  lines.push_back(MfExportUtil::GetMf6ArrayString(g, ARR_LPF_SS));
+  bool layered = g->GetPackage(Packages::DIS) ? 1 : 0;
 
-  lines.push_back("  SY LAYERED");
-  lines.push_back(MfExportUtil::GetMf6ArrayString(g, ARR_LPF_SY));  
+  std::string str;
+  // Storage and yield coefficient code goes here
+  str = "  SS";
+  if (layered) str += " LAYERED";
+  lines.push_back(str);
+  lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, ARR_LPF_SS));
+
+  str = "  SY";
+  if (layered) str += " LAYERED";
+  lines.push_back(str);
+  lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, ARR_LPF_SY));  
 
   lines.push_back("END GIDDATA");
   lines.push_back("");
 
+  CStr field = MfData::Packages::DisPack::ISSFLG;
   MfPackage* disPack = g->GetPackage(Packages::DIS);
+  if (!disPack)
+  {
+    disPack = g->GetPackage(Packages::DISU);
+    field = MfData::Packages::Disu::ISSFLG;
+  }
   ASSERT(disPack);
   if (!disPack) return false;
   const int* issFlag(0);
-  disPack->GetField(MfData::Packages::DisPack::ISSFLG, &issFlag);
+  disPack->GetField(field, &issFlag);
   ASSERT(issFlag);
   if (!issFlag) return false;
 

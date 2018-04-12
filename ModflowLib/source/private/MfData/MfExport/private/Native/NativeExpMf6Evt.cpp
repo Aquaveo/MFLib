@@ -44,6 +44,8 @@ bool NativeExpMf6Evt::Export ()
   std::vector<CStr> lines, comments; 
   MfGlobal *g = m_pack->GetGlobal();
   if (!g) return false;
+  Mf2kNative* nat = m_pack->GetNative();
+  if (!nat) return false;
   const int *NEVTOP(0), *INSURF(0), *INEVTR(0), *INEXDP(0), *INIEVT(0),* IEVTCB(0);
   MfPackage* p = m_pack->GetPackage();
   if (!p->GetField(Packages::EVTpack::NEVTOP, &NEVTOP) || !NEVTOP ||
@@ -84,22 +86,22 @@ bool NativeExpMf6Evt::Export ()
   if (writeLayer)
   {
     lines.push_back("  IEVT LAYERED");
-    lines.push_back(MfExportUtil::GetMf6ArrayString(g, ARR_EVT_LAY));
+    lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, ARR_EVT_LAY));
   }
   if (*INSURF > -1)
   {
     lines.push_back("  SURFACE LAYERED");
-    lines.push_back(MfExportUtil::GetMf6ArrayString(g, ARR_EVT_SURF));
+    lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, ARR_EVT_SURF));
   }
   if (*INEVTR > -1)
   {
     lines.push_back("  RATE LAYERED");
-    lines.push_back(MfExportUtil::GetMf6ArrayString(g, ARR_EVT_RATE));
+    lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, ARR_EVT_RATE));
   }
   if (*INEXDP > -1)
   {
     lines.push_back("  DEPTH LAYERED");
-    lines.push_back(MfExportUtil::GetMf6ArrayString(g, ARR_EVT_EXT));
+    lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, ARR_EVT_EXT));
   }
   lines.push_back("END PERIOD");
   lines.push_back("");

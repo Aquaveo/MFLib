@@ -29,6 +29,7 @@ namespace MfData
       CStr GetThickStrtLine();
       CStr GetVariableCvLine();
       CStr GetPerchedLine();
+
       void GenerateK22K33();
 
       NativePackExp* m_pack;

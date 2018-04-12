@@ -58,7 +58,7 @@ MfExporterImpl* MfExportUtil::CreateExporter (const char *a_type)
       n->SetArraysInternal(false);
       n->SetArraysInFolder(true);
     }
-    else if ("-exportMf6" == type )
+    else if ("-exportmf6" == type )
     {
       n->SetExportMf6(true);
     }
@@ -231,9 +231,68 @@ bool MfExportUtil::ArrayWriteNextLineInternal (
   return false;
 } // bool MfExportUtil::ArrayWriteNextLineInternal
 //------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+static void iConvertToOneLayerArray (
+  std::vector<std::vector<Real>>& a_array,
+  std::vector<Real>& a_arrayMult)
+{
+  size_t nVals(0);
+  for (size_t i=0; i<a_array.size(); ++i) nVals += a_array[i].size();
+  std::vector<Real> vals(nVals, 0);
+  int cnt(0);
+  for (size_t i=0; i<a_array.size(); ++i)
+  {
+    for (size_t j=0; j<a_array[i].size(); ++j)
+    {
+      vals[cnt] = a_arrayMult[i] * a_array[i][j];
+      cnt++;
+    }
+  }
+  a_array.assign(1, vals);
+  a_arrayMult.assign(1, 1);
+} // iConvertToOneLayerArray
+//------------------------------------------------------------------------------
 /// \brief 
 //------------------------------------------------------------------------------
-CStr MfExportUtil::GetMf6ArrayString (MfData::MfGlobal* a_g, CStr a_packName)
+static void iModifyArrayForDisu (MfData::MfGlobal* a_g,
+  MfData::Export::Mf2kNative* a_native, MfData::MfPackage* a_p, CStr a_packName)
+{
+  std::map<CStr, std::vector< std::vector<Real> > >& mymap(a_native->SavedRealArrays());
+  std::map<CStr, std::vector<Real> >& mymapMult(a_native->SavedRealArraysMult());
+  std::map<CStr, std::vector<int> >& mymapJj(a_native->SavedRealArraysJj());
+
+  if (mymap.find(a_packName) == mymap.end()) return;
+
+  a_g->SetIntVar("SAVE_REAL_ARRAYS", 0);
+  std::vector< std::vector<Real> > myVec2d(mymap[a_packName]);
+  std::vector<Real> myMult(mymapMult[a_packName]);
+  std::vector<int> myJj(mymapJj[a_packName]);
+
+  iConvertToOneLayerArray(myVec2d, myMult);
+
+  int IPRN = -1;
+  int JJ = (int)myVec2d[0].size();
+  int LAYER = 1;
+  Real rArrayMult = 1;
+  std::vector<Real> tmpRealArray = myVec2d[0];
+  a_p->StringsToWrite().clear();
+  a_p->StringDescriptions().clear();
+  a_p->SetField("JJ", &JJ);
+  a_p->SetField(MfData::Packages::Array::LAYER, &LAYER);
+  a_p->SetField("K", &LAYER);
+  a_p->SetField(MfData::Packages::Array::IPRN, &IPRN);
+  a_p->SetField(MfData::Packages::Array::MULT, &rArrayMult);
+  a_p->SetField(MfData::Packages::Array::ARRAY, &tmpRealArray[0]);
+  a_p->SetField("ARR", &tmpRealArray[0]);
+  MfData::Get().Export(a_packName);
+  a_g->SetIntVar("SAVE_REAL_ARRAYS", 1);
+} // iModifyArrayForDisu
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+CStr MfExportUtil::GetMf6ArrayString (MfData::MfGlobal* a_g,
+  MfData::Export::Mf2kNative* a_native, CStr a_packName)
 {
   CStr rval = "";
   MfData::MfPackage* p = a_g->GetPackage(a_packName);
@@ -244,6 +303,12 @@ CStr MfExportUtil::GetMf6ArrayString (MfData::MfGlobal* a_g, CStr a_packName)
   std::vector<CStr>& lines(p->StringsToWrite());
   ASSERT(!lines.empty());
   if (lines.empty()) return rval;
+
+  bool layered = a_g->GetPackage(Packages::DIS) ? 1 : 0;
+  if (!layered)
+  {
+    iModifyArrayForDisu(a_g, a_native, p, a_packName);
+  }
 
   CStr pad("    ");
 
@@ -288,7 +353,7 @@ CStr MfExportUtil::GetMf6ArrayString (MfData::MfGlobal* a_g, CStr a_packName)
 CStr MfExportUtil::GetMf6CommentHeader ()
 {
   CStr rval = "# Exported by MODFLOW Exporter from Aquaveo, the GMS developers.\n"
-              "# www.aquaveo.com\\gms\n"
+              "# www.aquaveo.com/gms\n"
               "\n";
   return rval;
 } // MfExportUtil::GetMf6CommentHeader

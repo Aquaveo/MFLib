@@ -317,9 +317,17 @@ bool NativeExpArr2d::GetData ()
   if (!m_data && dataConstDbl) {
     m_dataD = const_cast<double*>(dataConstDbl);
   }
-  if (m_name == ARR_BAS_IBND) SaveIbound();
+
+  if (m_name == ARR_BAS_IBND)
+    SaveIbound();
   else if (m_name == ARR_LPF_HK || m_name == ARR_LPF_HANI ||
-           m_name == ARR_LPF_VK || m_name == ARR_LPF_VANI)
+           m_name == ARR_LPF_VK || m_name == ARR_LPF_VANI ||
+           m_name == ARR_LPF_WET || m_name == ARR_LPF_SS ||
+           m_name == ARR_LPF_SY || m_name == ARR_BAS_SHEAD ||
+           m_name == "K22" || m_name == "K33" || 
+           m_name == MfData::Packages::Disu::TOP ||
+           m_name == MfData::Packages::Disu::BOT ||
+           m_name == MfData::Packages::Disu::AREA)
     SaveRealArray(m_name);
   return true;
 } // NativeExpArr2d::GetData
@@ -343,8 +351,12 @@ void NativeExpArr2d::SaveIbound ()
 //------------------------------------------------------------------------------
 void NativeExpArr2d::SaveRealArray (const CStr& a_name)
 {
+  int val = 1;
+  GetGlobal()->GetIntVar("SAVE_REAL_ARRAYS", val);
+  if (0 == val) return;
   std::map<CStr, std::vector< std::vector<Real> > >& mymap(GetNative()->SavedRealArrays());
   std::map<CStr, std::vector<Real> >& mymapMult(GetNative()->SavedRealArraysMult());
+  std::map<CStr, std::vector<int> >& myMapJj(GetNative()->SavedRealArraysJj());
 
   CStr name = a_name;
   if (name == ARR_LPF_VANI) name = ARR_LPF_VK;
@@ -365,6 +377,8 @@ void NativeExpArr2d::SaveRealArray (const CStr& a_name)
   }
   std::vector<Real>& rMult(mymapMult[name]);
   rMult.push_back(*m_mult);
+  std::vector<int>& arrJj(myMapJj[name]);
+  arrJj.push_back(m_ncol);
 } // NativeExpArr2d::SaveHk
 //------------------------------------------------------------------------------
 /// \brief

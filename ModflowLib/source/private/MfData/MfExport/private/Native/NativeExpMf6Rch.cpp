@@ -45,6 +45,8 @@ bool NativeExpMf6Rch::Export ()
   std::vector<CStr> lines, comments; 
   MfGlobal *g = m_pack->GetGlobal();
   if (!g) return false;
+  Mf2kNative* nat = m_pack->GetNative();
+  if (!nat) return false;
 
   // INRECH and INIRCH
   const int* INRECH(0),* INIRCH(0),* NRCHOP(0),* IRCHCB(0);
@@ -85,12 +87,12 @@ bool NativeExpMf6Rch::Export ()
   if (writeLayer)
   {
     lines.push_back("  IRCH LAYERED");
-    lines.push_back(MfExportUtil::GetMf6ArrayString(g, ARR_RCH_LAY));
+    lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, ARR_RCH_LAY));
   }
   if (*INRECH > -1)
   {
     lines.push_back("  RECHARGE LAYERED");
-    lines.push_back(MfExportUtil::GetMf6ArrayString(g, ARR_RCH_RCH));
+    lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, ARR_RCH_RCH));
   }
 
   lines.push_back("END PERIOD");
