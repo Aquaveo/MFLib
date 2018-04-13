@@ -23,12 +23,21 @@ namespace MfData
       NativeExpMf6Disu(const NativeExpMf6Disu& rhs);
       const NativeExpMf6Disu& operator=(const NativeExpMf6Disu& rhs);
 
-      void WriteOptions(std::vector<CStr>& a_lines);
-      void WriteDimensions(std::vector<CStr>& a_lines);
-      void WriteGridData(std::vector<CStr>& a_lines);
-      void WriteConnections(std::vector<CStr>& a_lines);
+      bool WriteDisv();
+
+      void DisuWriteOptions(std::vector<CStr>& a_lines);
+      void DisuWriteDimensions(std::vector<CStr>& a_lines);
+      void DisuWriteGridData(std::vector<CStr>& a_lines);
+      void DisuWriteConnections(std::vector<CStr>& a_lines);
+
+      void DisvWriteDimensions(std::vector<CStr>& a_lines);
+      void DisvWriteGridData(std::vector<CStr>& a_lines);
+      void DisvWriteVerts(std::vector<CStr>& a_lines);
+      void DisvWriteCell2d(std::vector<CStr>& a_lines);
 
       NativePackExp* m_pack;
+      class impl;
+      impl *m_p;
     };
 
   }

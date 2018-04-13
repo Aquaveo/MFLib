@@ -299,16 +299,21 @@ CStr MfExportUtil::GetMf6ArrayString (MfData::MfGlobal* a_g,
   if (!p)
   {
     ASSERT(0);
+    return rval;
   }
   std::vector<CStr>& lines(p->StringsToWrite());
   ASSERT(!lines.empty());
   if (lines.empty()) return rval;
 
-  bool layered = a_g->GetPackage(Packages::DIS) ? 1 : 0;
+  int layered(true);
+  a_g->GetIntVar("ARRAYS_LAYERED", layered);
   if (!layered)
   {
     iModifyArrayForDisu(a_g, a_native, p, a_packName);
   }
+
+  bool onlyOneLayer(false);
+  if (a_packName == MfData::Packages::Disu::TOP) onlyOneLayer = true;
 
   CStr pad("    ");
 
@@ -342,6 +347,9 @@ CStr MfExportUtil::GetMf6ArrayString (MfData::MfGlobal* a_g,
       rval += pad;
       rval += lines[i];
     }
+
+    if (onlyOneLayer) break;
+
     if (i+1 < lines.size()) rval += "\n";
   }
   lines.clear();

@@ -13,7 +13,9 @@
 #include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\MfExport\private\MfExporterImpl.h>
+#include <private\MfData\MfExport\private\Native\mf6\NativeExpMf6Disu.h>
 #include <private\MfData\MfExport\private\Native\mf6\NativeExpMf6Ic.h>
+#include <private\MfData\MfExport\private\Native\NativeExpDisu.h>
 #include <private\MfData\MfPackageUtil.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
@@ -50,8 +52,17 @@ bool NativeExpBas::Export ()
   Mf2kNative* n = GetNative();
   if (n && n->GetExportMf6())
   {
+    MfPackage* p = GetGlobal()->GetPackage(MfData::Packages::DISU);
+    if (p)
+    {
+      NativeExpDisu du;
+      du.SetData(GetNative(), GetGlobal(), p);
+      NativeExpMf6Disu disu(&du);
+      disu.Export();
+    }
+
     NativeExpMf6Ic ic(this);
-    ic.Export();    
+    ic.Export();
     return true;
   }
   AddToStoredLinesDesc(Line1(), Desc(1));

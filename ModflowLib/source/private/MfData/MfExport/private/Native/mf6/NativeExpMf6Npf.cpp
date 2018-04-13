@@ -100,7 +100,8 @@ bool NativeExpMf6Npf::Export ()
   lines.push_back("    CONSTANT -1");
 
   GenerateK22K33();
-  bool layered = g->GetPackage(Packages::DIS) ? 1 : 0;
+  int layered(true);
+  g->GetIntVar("ARRAYS_LAYERED", layered);
 
   std::string str;
 
@@ -297,7 +298,8 @@ void NativeExpMf6Npf::GenerateK22K33 ()
   MfGlobal* g = m_pack->GetGlobal();
   if (!g) return;
   int nLay = g->NumLay();
-  bool layered = g->GetPackage(Packages::DIS) ? 1 : 0;
+  int layered(true);
+  g->GetIntVar("ARRAYS_LAYERED", layered);
 
   std::map<CStr, std::vector< std::vector<Real> > >& mymap(nat->SavedRealArrays());
   std::map<CStr, std::vector<Real> >& mymapMult(nat->SavedRealArraysMult());

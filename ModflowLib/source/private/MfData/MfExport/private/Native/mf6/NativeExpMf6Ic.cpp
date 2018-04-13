@@ -50,7 +50,8 @@ bool NativeExpMf6Ic::Export ()
   // comments
   lines.push_back(MfExportUtil::GetMf6CommentHeader());
 
-  bool layered = g->GetPackage(Packages::DIS) ? 1 : 0;
+  int layered(true);
+  g->GetIntVar("ARRAYS_LAYERED", layered);
 
   std::string str;
 

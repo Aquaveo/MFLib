@@ -115,20 +115,11 @@ bool NativeExpMf6Dis::Export ()
   lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, "DELR"));
   lines.push_back("  DELC");
   lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, "DELC"));
-
-  bool layered = g->GetPackage(Packages::DIS) ? 1 : 0;
-  std::string str = "  TOP";
-  if (layered) str += " LAYERED";
-  lines.push_back(str);
+  lines.push_back("  TOP LAYERED");
   lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, "TOP ELEVATION OF LAYER 1"));
-  
-  str = "  BOTM";
-  if (layered) str += " LAYERED";
+  lines.push_back("  BOTM LAYERED");
   lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, "MODEL LAYER BOTTOM EL."));
-  lines.push_back("END GRIDDATA");
-
-  str = "  IDOMAIN";
-  if (layered) str += " LAYERED";
+  lines.push_back("  IDOMAIN LAYERED");
   lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, ARR_BAS_IBND));
   lines.push_back("END GRIDDATA");
 

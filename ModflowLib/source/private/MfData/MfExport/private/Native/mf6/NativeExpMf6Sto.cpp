@@ -62,7 +62,8 @@ bool NativeExpMf6Sto::Export ()
   lines.push_back("  ICONVERT LAYERED");
   lines.push_back(GetIconvertLine(g->NumLay()));
 
-  bool layered = g->GetPackage(Packages::DIS) ? 1 : 0;
+  int layered(true);
+  g->GetIntVar("ARRAYS_LAYERED", layered);
 
   std::string str;
   // Storage and yield coefficient code goes here
