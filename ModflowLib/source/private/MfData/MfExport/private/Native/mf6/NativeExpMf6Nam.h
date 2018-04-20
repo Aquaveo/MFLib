@@ -24,6 +24,8 @@ namespace MfData
       bool DoNewton();
       bool ValidPackage(const CStr& a_ftype);
 
+      void WriteChdFile();
+
       NativePackExp* m_pack;
     };
 

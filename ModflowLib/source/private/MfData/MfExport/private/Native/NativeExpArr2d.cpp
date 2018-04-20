@@ -329,6 +329,8 @@ bool NativeExpArr2d::GetData ()
            m_name == MfData::Packages::Disu::BOT ||
            m_name == MfData::Packages::Disu::AREA)
     SaveRealArray(m_name);
+
+  IboundToChdForMf6();
   return true;
 } // NativeExpArr2d::GetData
 //------------------------------------------------------------------------------
@@ -341,10 +343,14 @@ void NativeExpArr2d::SaveIbound ()
   std::vector<int> myVec(numCellsInLayer, 0);
   ibnd.push_back(myVec);
 
+  bool ibndSpecHead(false);
   for (int i=0; i<numCellsInLayer; ++i)
   {
     ibnd[*m_lay-1][i] = m_iData[i];
+    if (m_iData[i] < 0)
+      ibndSpecHead = true;
   }
+  GetGlobal()->SetIntVar("IBOUND_SPEC_HEAD_EXISTS", 1);
 } // NativeExpArr2d::SaveIbound
 //------------------------------------------------------------------------------
 /// \brief
@@ -379,7 +385,7 @@ void NativeExpArr2d::SaveRealArray (const CStr& a_name)
   rMult.push_back(*m_mult);
   std::vector<int>& arrJj(myMapJj[name]);
   arrJj.push_back(m_ncol);
-} // NativeExpArr2d::SaveHk
+} // NativeExpArr2d::SaveRealArray
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
@@ -1119,4 +1125,57 @@ void NativeExpArr2d::AddToStoredLinesDesc (const char* a_line,
     p->StringsToWrite().push_back(a_line);
   }
 } // NativeExpArr2d::AddToStoredLinesDesc
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void NativeExpArr2d::IboundToChdForMf6 ()
+{
+  if (!GetNative()->GetExportMf6()) return;
+  if (m_name != ARR_BAS_SHEAD) return;
+  if (!m_lay || *m_lay != GetGlobal()->NumLay()) return;
+  int ibndSpecHead(0);
+  GetGlobal()->GetIntVar("IBOUND_SPEC_HEAD_EXISTS", ibndSpecHead);
+  if (!ibndSpecHead) return;
+
+  std::vector<int> cellid;
+  std::vector<Real> head;
+
+  Mf2kNative* nat = GetNative();
+  // get ibound
+  std::vector<std::vector<int>> &ibnd(nat->Ibound());
+  // get starting heads
+  std::map<CStr, std::vector< std::vector<Real> > >& mymap(nat->SavedRealArrays());
+  std::map<CStr, std::vector<Real> >& mymapMult(nat->SavedRealArraysMult());
+
+  std::vector<std::vector<Real>> shead(mymap[ARR_BAS_SHEAD]);
+  std::vector<Real> sheadMult(mymapMult[ARR_BAS_SHEAD]);
+
+  // create list of cell id and head values
+  int startId = 1;
+  for (size_t k=0; k<ibnd.size(); ++k)
+  {
+    // update the starting cell id for the layer
+    if (k > 0) startId += static_cast<int>(ibnd[k-1].size());
+
+    for (size_t i=0; i<ibnd[k].size(); ++i)
+    {
+      if (ibnd[k][i] < 0)
+      {
+        cellid.push_back(startId + i);
+        head.push_back(shead[k][i] * sheadMult[k]);
+      }
+    }
+  }
+
+  // store string with ibound -> CHD heads
+  std::stringstream ss;
+  for (size_t i=0; i<cellid.size(); ++i)
+  {
+    ss << cellid[i] << " " << STR(head[i]) << "\n";
+  }
+
+  CStr str = ss.str();
+  GetGlobal()->SetStrVar("IBOUND_TO_CHD", str);
+
+} // NativeExpArr2d::IboundToChdForMf6
 

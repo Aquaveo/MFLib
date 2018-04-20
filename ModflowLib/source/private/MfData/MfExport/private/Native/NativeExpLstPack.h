@@ -91,7 +91,7 @@ namespace MfData
       void Line7(FILE* a_fp, int a_sp);
       void BufferTheLineForComments(CStr& a_line);
 
-      bool                m_usg, m_unstructured, m_mf6;
+      bool                m_usg, m_unstructured, m_mf6, m_disv;
       const int          *m_nBcs, *m_nAux, *m_nDataFields;
       int                 m_nFields, m_nI, m_nJ, m_nK, m_nodeOffset;
       const Real         *m_data;
@@ -100,6 +100,7 @@ namespace MfData
       int                 m_NP, m_MXL;
       std::map<CStr, std::vector<int> > m_mapParSp;
       std::vector< std::vector<CStr> > m_parSp;
+      std::vector<int>    m_NODLAY;
 
       NeLstPar *m_par;
       H5BcList *m_h5Bc;

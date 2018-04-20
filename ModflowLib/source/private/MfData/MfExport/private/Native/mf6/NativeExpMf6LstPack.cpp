@@ -10,19 +10,76 @@
 #include <sstream>
 
 #include <private\MfData\MfGlobal.h>
+#include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\MfData\MfExport\private\Native\NativeExpLstPack.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
+#include <private\MfData\Packages\MfPackStrings.h>
 
 
 using namespace MfData::Export;
 
+class NativeExpMf6LstPack::impl
+{
+public:
+  impl() : m_nChds(0) {}
+
+  void ReadIboundChds (NativeExpLstPack* a_pack)
+  {
+    m_chdStr = "";
+    m_nChds = 0;
+    CStr nm = a_pack->GetPackage()->PackageName();
+    if (MfData::Packages::CHD == nm)
+    {
+      CStr str;
+      a_pack->GetGlobal()->GetStrVar("IBOUND_TO_CHD", str);
+      if (!str.empty())
+      {
+        int w = util::RealWidth();
+
+        std::stringstream ss, ss1;
+        ss << str;
+        int cellid;
+        Real head;
+        ss >> cellid >> head;
+        while (!ss.eof())
+        {
+          m_nChds++;
+          CStr cellidStr;
+          cellidStr.Format("%5d", cellid);
+          CStr headStr = STR(head, -1, w, STR_FULLWIDTH);
+          ss1 << "\n  " << cellidStr << " " << headStr << " " << headStr;
+          head = 0;
+          headStr = STR(head, -1, w, STR_FULLWIDTH);
+          for (size_t i=5; i<a_pack->m_fieldStrings.size(); ++i)
+          {
+            if (a_pack->m_fieldStrings[i].CompareNoCase("cellgrp") == 0)
+            {
+              cellidStr.Format("%5d", -1);
+              ss1 << " " << cellidStr;
+            }
+            else
+            {
+              ss1 << " " << headStr;
+            }
+          }
+          ss >> cellid >> head;
+        }
+        m_chdStr = ss1.str();
+      }
+    }
+  } // ReadIboundChds
+
+  CStr m_chdStr;
+  int m_nChds;
+};
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
 NativeExpMf6LstPack::NativeExpMf6LstPack (NativeExpLstPack* a_) :
 m_pack(a_)
+, m_p(new impl())
 {
 } // MfNativeExpMf6LstPack::MfNativeExpMf6LstPack
 //------------------------------------------------------------------------------
@@ -30,6 +87,8 @@ m_pack(a_)
 //------------------------------------------------------------------------------
 NativeExpMf6LstPack::~NativeExpMf6LstPack ()
 {
+  if (m_p) delete(m_p);
+  m_p = nullptr;
 } // MfNativeExpMf6LstPack::~MfNativeExpMf6LstPack
 //------------------------------------------------------------------------------
 /// \brief
@@ -42,6 +101,8 @@ bool NativeExpMf6LstPack::Export ()
   // get the time units
   MfGlobal *g = m_pack->GetGlobal();
   if (!g) return false;
+
+  m_p->ReadIboundChds(m_pack);
 
   if (1 == g->GetCurrentPeriod())
   {
@@ -126,6 +187,8 @@ CStr NativeExpMf6LstPack::GetMaxBoundLine ()
   {
     maxNumBc = *maxBc;
   }
+  if (m_p->m_nChds > 0)
+    maxNumBc += m_p->m_nChds;
   std::stringstream ss;
   ss << "  MAXBOUND " << maxNumBc;
   return ss.str();
@@ -146,6 +209,10 @@ CStr NativeExpMf6LstPack::GetStressPeriodLine (int itmp)
     }
     if (i+1 < itmp) rval += "\n";
   }
+
+  if (!m_p->m_chdStr.empty())
+    rval += m_p->m_chdStr;
+
   return rval;
 } // NativeExpMf6LstPack::GetStressPeriodLine
 

@@ -49,13 +49,26 @@ bool NativeExpMf6Rch::Export ()
   if (!nat) return false;
 
   // INRECH and INIRCH
-  const int* INRECH(0),* INIRCH(0),* NRCHOP(0),* IRCHCB(0);
+  const int* INRECH(0),* INIRCH(0),* NRCHOP(0),* IRCHCB(0),* MXNDRCH(0);
   MfPackage* p = m_pack->GetPackage();
   if (!p ||
       !p->GetField(Packages::RCHpack::NRCHOP, &NRCHOP) || !NRCHOP ||
       !p->GetField(Packages::RCHpack::INIRCH, &IRCHCB) || !IRCHCB ||
       !p->GetField(Packages::RCHpack::INIRCH, &INIRCH) || !INIRCH ||
       !p->GetField(Packages::RCHpack::INRECH, &INRECH) || !INRECH) return false;
+  p->GetField(Packages::RCHpack::MXNDRCH, &MXNDRCH);
+
+  // need number of cells in layer 1
+  MfPackage* p1 = g->GetPackage(Packages::DISU);
+  const int* NODLAY(0);
+  p1->GetField(Packages::Disu::NODLAY, &NODLAY);
+
+  int MAXBOUND = g->NumCol() * g->NumRow();
+  if (NODLAY) MAXBOUND = NODLAY[0];
+  if (MXNDRCH) MAXBOUND = *MXNDRCH; 
+
+  int layers(1);
+  g->GetIntVar("ARRAYS_LAYERED", layers);
 
   if (1 == g->GetCurrentPeriod())
   {
@@ -63,8 +76,11 @@ bool NativeExpMf6Rch::Export ()
     lines.push_back(MfExportUtil::GetMf6CommentHeader());
 
     lines.push_back("BEGIN OPTIONS");
-    lines.push_back("  READASARRAYS");
-    if (3 != *NRCHOP) lines.push_back("  FIXED_CELL");
+    if (layers)
+    {
+      lines.push_back("  READASARRAYS");
+      if (3 != *NRCHOP) lines.push_back("  FIXED_CELL");
+    }
     if (*IRCHCB > 0)
     {
       g->SetIntVar("MF6_SAVE_FLOWS", 1);
@@ -72,6 +88,16 @@ bool NativeExpMf6Rch::Export ()
     }
     lines.push_back("END OPTIONS");
     lines.push_back("");
+
+    if (!layers)
+    {
+      lines.push_back("BEGIN DIMENSIONS");
+      std::stringstream ss;
+      ss << "  MAXBOUND " << MAXBOUND;
+      lines.push_back(ss.str());
+      lines.push_back("END DIMENSIONS");
+      lines.push_back("");
+    }
   }
 
   bool writeLayer(false);
@@ -83,26 +109,71 @@ bool NativeExpMf6Rch::Export ()
   std::stringstream ss; 
   ss << "BEGIN PERIOD " << g->GetCurrentPeriod();
   lines.push_back(ss.str());
+
   // print array for stress period
+  CStr layStr, rateStr;
   if (writeLayer)
   {
-    lines.push_back("  IRCH LAYERED");
-    lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, ARR_RCH_LAY));
+    layStr = MfExportUtil::GetMf6ArrayString(g, nat, ARR_RCH_LAY);
+    g->SetStrVar(ARR_RCH_LAY, layStr);
+    if (layers)
+    {
+      lines.push_back("  IRCH LAYERED");
+      lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, ARR_RCH_LAY));
+    }
   }
+
   if (*INRECH > -1)
   {
-    lines.push_back("  RECHARGE LAYERED");
-    lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, ARR_RCH_RCH));
+    rateStr = MfExportUtil::GetMf6ArrayString(g, nat, ARR_RCH_RCH);
+    g->SetStrVar(ARR_RCH_RCH, rateStr);
+    if (layers)
+    {
+      lines.push_back("RECHARGE LAYERED");
+      lines.push_back(rateStr);
+    }
+  }
+
+  if (!layers)
+  {
+    std::vector<int> cellids;
+    std::vector<Real> rate;
+
+    g->GetStrVar(ARR_RCH_LAY, layStr);
+    g->GetStrVar(ARR_RCH_RCH, rateStr);
+    if (!layStr.empty())
+      MfExportUtil::Mf6StringToArray(layStr, cellids, MAXBOUND);
+    MfExportUtil::Mf6StringToArray(rateStr, rate, MAXBOUND);
+
+    if (cellids.empty())
+    {
+      cellids.reserve(rate.size());
+      for (size_t i=0; i<rate.size(); ++i)
+        cellids.push_back((int)i+1);
+    }
+
+    int w = util::RealWidth();
+    CStr str;
+    std::stringstream ss;
+    for (size_t i=0; i<cellids.size(); ++i)
+    {
+      str.Format("%10d", cellids[i]);
+      ss << "  " << str << " "
+        << STR(rate[i], -1, w, STR_FULLWIDTH);
+      if (i+1 < cellids.size()) ss << "\n";
+    }
+    lines.push_back(ss.str());
   }
 
   lines.push_back("END PERIOD");
   lines.push_back("");
   comments.assign(lines.size(), "");
-  //TmpPackageNameChanger tmp(m_pack->GetPackage(), "rch");
   m_pack->AddToStoredLinesDesc(lines, comments);
   m_pack->WriteStoredLines();
   return true;
 } // NativeExpMf6Rch::ExportMf6Rch
+
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // TESTS

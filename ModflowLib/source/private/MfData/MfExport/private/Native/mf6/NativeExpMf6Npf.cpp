@@ -311,7 +311,15 @@ void NativeExpMf6Npf::GenerateK22K33 ()
 
   int IPRN(-1), LAYER, JJ;
   Real rArrayMult(1);
-  std::vector<Real> tmpRealArray(hk.front().size(), 0);
+  size_t maxSize = hk.front().size();
+  for (size_t i=0; i<hk.size(); ++i)
+  {
+    if (hk[i].size() > maxSize)
+      maxSize = hk[i].size();
+  }
+  std::vector<Real> tmpRealArray(maxSize, 0);
+
+  int nVals;
 
   // get HANI values
   std::vector< std::vector<Real> > hani(mymap[ARR_LPF_HANI]);
@@ -339,18 +347,22 @@ void NativeExpMf6Npf::GenerateK22K33 ()
     for (int i=0; i<nLay; ++i)
     {
       JJ = hkJj[i];
+      if (g->Unstructured())
+        nVals = JJ;
+      else
+        nVals = g->NumCol() * g->NumRow();
       LAYER = i + 1;
       if (chani[i] <= 0)
       {
         rArrayMult = 1.0;
         Real r = fabs(chani[i]);
-        for (size_t j=0; j<tmpRealArray.size(); ++j)
+        for (int j=0; j<nVals; ++j)
           tmpRealArray[j] = r;
       }
       else
       {
         rArrayMult = hkMult[i] * haniMult[i];
-        for (size_t j=0; j<tmpRealArray.size(); ++j)
+        for (int j=0; j<nVals; ++j)
         {
           tmpRealArray[j] = hk[i][j] * hani[i][j];
         }
@@ -383,11 +395,16 @@ void NativeExpMf6Npf::GenerateK22K33 ()
     for (int i=0; i<nLay; ++i)
     {
       JJ = hkJj[i];
+      if (g->Unstructured())
+        nVals = JJ;
+      else
+        nVals = g->NumCol() * g->NumRow();
+
       LAYER = i + 1;
       if (0 == layvka[i]) // vertical K
       {
         rArrayMult = vkMult[i];
-        for (size_t j=0; j<tmpRealArray.size(); ++j)
+        for (int j=0; j<nVals; ++j)
         {
           tmpRealArray[j] = vk[i][j];
         }
@@ -395,7 +412,7 @@ void NativeExpMf6Npf::GenerateK22K33 ()
       else
       { // vertical anisotropy
         rArrayMult = hkMult[i] * vkMult[i];
-        for (size_t j=0; j<tmpRealArray.size(); ++j)
+        for (int j=0; j<nVals; ++j)
         {
           tmpRealArray[j] = hk[i][j] / vk[i][j];
         }
@@ -412,83 +429,6 @@ void NativeExpMf6Npf::GenerateK22K33 ()
     mymapMult[ARR_LPF_HANI] = haniMult;
     mymap[ARR_LPF_VK] = vk;
     mymapMult[ARR_LPF_VK] = vkMult;
-#if 0
-    g->SetIntVar("SAVE_REAL_ARRAYS", 0);
-    MfPackage* p = g->GetPackage(ARR_LPF_HK);
-    iConvertToOneLayerArray(hk, hkMult);
-    JJ = (int)hk[0].size();
-    LAYER = 1;
-    rArrayMult = 1;
-    tmpRealArray = hk[0];
-
-    p->StringsToWrite().clear();
-    p->StringDescriptions().clear();
-    p->SetField("JJ", &JJ);
-    p->SetField(MfData::Packages::Array::LAYER, &LAYER);
-    p->SetField("K", &LAYER);
-    p->SetField(MfData::Packages::Array::IPRN, &IPRN);
-    p->SetField(MfData::Packages::Array::MULT, &rArrayMult);
-    p->SetField(MfData::Packages::Array::ARRAY, &tmpRealArray[0]);
-    p->SetField("ARR", &tmpRealArray[0]);
-    MfData::Get().Export(ARR_LPF_HK);
-
-    p = g->GetPackage("K22");
-    if (p)
-    {
-      iConvertToOneLayerArray(hani, haniMult);
-      tmpRealArray = hani[0];
-
-      p->StringsToWrite().clear();
-      p->StringDescriptions().clear();
-      p->SetField("JJ", &JJ);
-      p->SetField(MfData::Packages::Array::LAYER, &LAYER);
-      p->SetField("K", &LAYER);
-      p->SetField(MfData::Packages::Array::IPRN, &IPRN);
-      p->SetField(MfData::Packages::Array::MULT, &rArrayMult);
-      p->SetField(MfData::Packages::Array::ARRAY, &tmpRealArray[0]);
-      p->SetField("ARR", &tmpRealArray[0]);
-      MfData::Get().Export("K22");
-    }
-
-    p = g->GetPackage("K33");
-    if (p)
-    {
-      iConvertToOneLayerArray(vk, vkMult);
-      tmpRealArray = vk[0];
-
-      p->StringsToWrite().clear();
-      p->StringDescriptions().clear();
-      p->SetField("JJ", &JJ);
-      p->SetField(MfData::Packages::Array::LAYER, &LAYER);
-      p->SetField("K", &LAYER);
-      p->SetField(MfData::Packages::Array::IPRN, &IPRN);
-      p->SetField(MfData::Packages::Array::MULT, &rArrayMult);
-      p->SetField(MfData::Packages::Array::ARRAY, &tmpRealArray[0]);
-      p->SetField("ARR", &tmpRealArray[0]);
-      MfData::Get().Export("K33");
-    }
-
-    p = g->GetPackage(ARR_LPF_WET);
-    if (p)
-    {
-      std::vector< std::vector<Real> > wet(mymap[ARR_LPF_WET]);
-      std::vector<Real> wetMult(mymapMult[ARR_LPF_WET]);
-      iConvertToOneLayerArray(wet, wetMult);
-      tmpRealArray = wet[0];
-
-      p->StringsToWrite().clear();
-      p->StringDescriptions().clear();
-      p->SetField("JJ", &JJ);
-      p->SetField(MfData::Packages::Array::LAYER, &LAYER);
-      p->SetField("K", &LAYER);
-      p->SetField(MfData::Packages::Array::IPRN, &IPRN);
-      p->SetField(MfData::Packages::Array::MULT, &rArrayMult);
-      p->SetField(MfData::Packages::Array::ARRAY, &tmpRealArray[0]);
-      p->SetField("ARR", &tmpRealArray[0]);
-      MfData::Get().Export(ARR_LPF_WET);
-    }
-    g->SetIntVar("SAVE_REAL_ARRAYS", 1);
-#endif
   }
 } // NativeExpMf6Npf::GenerateK22K33
 

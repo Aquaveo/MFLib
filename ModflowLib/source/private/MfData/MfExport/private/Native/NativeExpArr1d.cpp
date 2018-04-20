@@ -65,6 +65,32 @@ bool NativeExpArr1d::Export ()
     K = &k;
   }
 
+  CStr pname = p->PackageName();
+  if (MfData::Packages::Disu::TOP == pname ||
+      MfData::Packages::Disu::BOT == pname ||
+      MfData::Packages::Disu::AREA == pname)
+  {
+    std::map<CStr, std::vector< std::vector<Real> > >& mymap(GetNative()->SavedRealArrays());
+    std::map<CStr, std::vector<Real> >& mymapMult(GetNative()->SavedRealArraysMult());
+    std::map<CStr, std::vector<int> >& myMapJj(GetNative()->SavedRealArraysJj());
+
+    std::vector< std::vector<Real> >& rArray2d(mymap[pname]);
+    std::vector<Real> tmpArr(*JJ, 0);
+    if (ARR)
+    {
+      for (int i=0; i<*JJ; ++i) tmpArr[i] = (Real)ARR[i];
+    }
+    else if (ARRdbl)
+    {
+      for (int i=0; i<*JJ; ++i) tmpArr[i] = (Real)ARRdbl[i];
+    }
+    rArray2d.push_back(tmpArr);
+    std::vector<Real>& rMult(mymapMult[pname]);
+    rMult.push_back(*MULT);
+    std::vector<int>& arrJj(myMapJj[pname]);
+    arrJj.push_back(*JJ);
+  }
+
   // Because ARR can be Real, double or int, we do everything in templates
   bool rv;
   if (ARR) {

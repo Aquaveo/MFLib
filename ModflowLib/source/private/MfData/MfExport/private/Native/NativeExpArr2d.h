@@ -61,6 +61,7 @@ namespace MfData
       void EtsSegnumber(CStr& a_layStr, CStr& a_name);
       bool StressPeriodPar(const CStr& a_type);
       void CreateFolderIfNeeded();
+      void IboundToChdForMf6();
 
       CStr        m_name;
       const int*  m_lay, *m_iData, *m_iMult, *m_iPRN;

@@ -35,6 +35,7 @@ NativeExpLstPack::NativeExpLstPack ()
 : m_usg(false)
 , m_unstructured(false)
 , m_mf6(false)
+, m_disv(false)
 , m_nBcs(0)
 , m_nAux(0)
 , m_nDataFields(0)
@@ -59,6 +60,19 @@ NativeExpLstPack::NativeExpLstPack ()
     m_nI = MfData::MfGlobal::Get().NumRow();
     m_nJ = MfData::MfGlobal::Get().NumCol();
     m_unstructured = MfData::MfGlobal::Get().Unstructured() ? 1 : 0;
+    if (m_unstructured)
+    {
+      int layers(1);
+      MfData::MfGlobal::Get().GetIntVar("ARRAYS_LAYERED", layers);
+      if (layers) m_disv = true;
+      MfPackage* p = MfData::MfGlobal::Get().GetPackage(Packages::DISU);
+      if (p)
+      {
+        const int* NODLAY(0);
+        p->GetField(Packages::Disu::NODLAY, &NODLAY);
+        for (int i=0; i<m_nK; ++i) m_NODLAY.push_back(NODLAY[i]);
+      }
+    }
   }
 
 } // MfNativeExpLstPack::MfNativeExpLstPack
@@ -428,31 +442,54 @@ CStr NativeExpLstPack::IjkToStr (int a_i)
     int j = (int)m_data[a_i*(*m_nDataFields)+1];
     int k = (int)m_data[a_i*(*m_nDataFields)+2];
 
-    if (!m_mf6)
+    if (!m_unstructured)
     {
       ln.Format("%5d %5d %5d ", i, j, k);
     }
     else
     {
       int id = j + ( (i-1) * m_nJ ) + ( (k-1) * m_nI * m_nJ );
-      ln.Format("%5d ", id);
+      int idInLay = i * j;
+      if (m_disv)
+        ln.Format("%5d %5d ", k, idInLay);
+      else
+        ln.Format("%5d ", id);
     }
   }
   else
   {
-    if (!m_unstructured && !m_mf6)
+    if (!m_unstructured)
     { // calculate i, j, k from cell id
       int id = (int)m_data[a_i*(*m_nDataFields)+0];
+      int k  = (id-1) / (m_nI*m_nJ) + 1;
       int i  = ( (id-1)/m_nJ ) % m_nI + 1;
       int j  = (id-1) % m_nJ + 1;
-      int k  = (id-1) / (m_nI*m_nJ) + 1;
       ln.Format("%5d %5d %5d ", k, i, j);
     }
     else
     {
       int nodeid = (int)m_data[a_i*(*m_nDataFields)+0];
-      if (-1 != m_nodeOffset) nodeid -= m_nodeOffset;
-      ln.Format("%5d ", nodeid);
+      if (m_disv)
+      {
+        int beginId(0), endId(0), lay(-1), idInLay(-1);
+        for (size_t q=0; q<m_NODLAY.size(); ++q)
+        {
+          endId += m_NODLAY[q];
+          if (nodeid < endId)
+          {
+            lay = q + 1;
+            idInLay = nodeid - beginId;
+            break;
+          }
+          beginId += m_NODLAY[q];
+        }
+        ln.Format("%5d %5d", lay, idInLay);
+      }
+      else
+      {
+        if (-1 != m_nodeOffset) nodeid -= m_nodeOffset;
+        ln.Format("%5d ", nodeid);
+      }
     }
   }
   return ln;

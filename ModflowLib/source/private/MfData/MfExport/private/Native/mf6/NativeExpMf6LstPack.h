@@ -28,6 +28,8 @@ namespace MfData
       CStr GetStressPeriodLine(int itmp);
 
       NativeExpLstPack* m_pack;
+      class impl;
+      impl *m_p;
     };
 
   }

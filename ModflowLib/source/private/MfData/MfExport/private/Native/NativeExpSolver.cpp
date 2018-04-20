@@ -1068,10 +1068,16 @@ CStr NativeExpSolver::GetImsLinearLine ()
     ss << "  PRECONDITIONER_DROP_TOLERANCE " << STR(*EPSRN) << "\n";
   if (p->GetField(SmsPack::NORTH, &NORTH) && NORTH)
     ss << "  NUMBER_ORTHOGONALIZATIONS " << *NORTH << "\n";
-  if (p->GetField(SmsPack::ISCL, &ISCL) && ISCL)
-    ss << "  SCALAING_METHOD " << *ISCL << "\n";
-  if (p->GetField(SmsPack::IORD, &IORD) && IORD)
-    ss << "  REORDERING_METHOD " << *IORD << "\n";
+  if (p->GetField(SmsPack::ISCL, &ISCL) && ISCL && *ISCL > -1 && *ISCL < 3)
+  {
+    CStr strs[3] = {"NONE", "DIAGONAL", "L2NORM"};
+    ss << "  SCALING_METHOD " << strs[*ISCL] << "\n";
+  }
+  if (p->GetField(SmsPack::IORD, &IORD) && IORD && *IORD > -1 && *IORD < 3)
+  {
+    CStr strs[3] = {"NONE", "RCM", "MD"};
+    ss << "  REORDERING_METHOD " << strs[*IORD] << "\n";
+  }
   return ss.str();
 } // NativeExpSolver::GetImsLinearLine
 

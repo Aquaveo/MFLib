@@ -10,6 +10,7 @@
 #include <sstream>
 
 #include <private\MfData\MfGlobal.h>
+#include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExporterImpl.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\MfData\MfExport\private\Native\NativePackExp.h>
@@ -88,6 +89,7 @@ bool NativeExpMf6Dis::Export ()
     ss << " LENGTH_UNITS " << lengthString;
     lines.push_back(ss.str());
   }
+  lines.push_back("  NOGRB");
   lines.push_back("END OPTIONS");
   lines.push_back("");
 
@@ -119,6 +121,7 @@ bool NativeExpMf6Dis::Export ()
   lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, "TOP ELEVATION OF LAYER 1"));
   lines.push_back("  BOTM LAYERED");
   lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, "MODEL LAYER BOTTOM EL."));
+  MfExportUtil::Mf6IboundToIdomain(g, nat);
   lines.push_back("  IDOMAIN LAYERED");
   lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, ARR_BAS_IBND));
   lines.push_back("END GRIDDATA");
@@ -128,8 +131,6 @@ bool NativeExpMf6Dis::Export ()
   m_pack->WriteStoredLines();
   return true;
 } // NativeExpMf6Dis::ExportMf6Dis
-
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // TESTS

@@ -49,8 +49,9 @@ bool NativeExpDis::Export ()
   Mf2kNative* n = GetNative();
   if (n && n->GetExportMf6())
   {
-    NativeExpMf6Dis dis(this);
-    dis.Export();
+    // have to export when we have the IBOUND from BAS package
+    //NativeExpMf6Dis dis(this);
+    //dis.Export();
     NativeExpMf6Tdis tdis(this);
     tdis.Export();  
     return true;

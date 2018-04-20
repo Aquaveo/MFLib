@@ -13,8 +13,10 @@
 #include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\MfExport\private\MfExporterImpl.h>
+#include <private\MfData\MfExport\private\Native\mf6\NativeExpMf6Dis.h>
 #include <private\MfData\MfExport\private\Native\mf6\NativeExpMf6Disu.h>
 #include <private\MfData\MfExport\private\Native\mf6\NativeExpMf6Ic.h>
+#include <private\MfData\MfExport\private\Native\NativeExpDis.h>
 #include <private\MfData\MfExport\private\Native\NativeExpDisu.h>
 #include <private\MfData\MfPackageUtil.h>
 #include <private\MfData\Packages\MfPackage.h>
@@ -52,13 +54,28 @@ bool NativeExpBas::Export ()
   Mf2kNative* n = GetNative();
   if (n && n->GetExportMf6())
   {
-    MfPackage* p = GetGlobal()->GetPackage(MfData::Packages::DISU);
-    if (p)
+    MfGlobal* g = GetGlobal();
+    if (!g->Unstructured())
     {
-      NativeExpDisu du;
-      du.SetData(GetNative(), GetGlobal(), p);
-      NativeExpMf6Disu disu(&du);
-      disu.Export();
+      MfPackage* p = GetGlobal()->GetPackage(MfData::Packages::DIS);
+      if (p)
+      {
+        NativeExpDis di;
+        di.SetData(GetNative(), GetGlobal(), p);
+        NativeExpMf6Dis dis(&di);
+        dis.Export();
+      }
+    }
+    else
+    {
+      MfPackage* p = GetGlobal()->GetPackage(MfData::Packages::DISU);
+      if (p)
+      {
+        NativeExpDisu du;
+        du.SetData(GetNative(), GetGlobal(), p);
+        NativeExpMf6Disu disu(&du);
+        disu.Export();
+      }
     }
 
     NativeExpMf6Ic ic(this);

@@ -24,6 +24,36 @@
 using namespace MfData::Export;
 
 //------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+template <class T>
+static void iStringToArray (const CStr& a_str, std::vector<T>& a_vec, int a_size)
+{
+  CStr str;
+  std::stringstream ss;
+  ss << a_str;
+  if (a_str.Find("CONSTANT") != -1)
+  {
+    T constVal(0);
+    ss >> str;
+    if (str == "CONSTANT") ss >> constVal;
+    a_vec.assign(a_size, constVal);
+  }
+  else
+  {
+    a_vec.reserve(a_size);
+    T mult, val;
+    //   INTERNAL  FACTOR   val
+    ss >> str >>   str >>   mult;
+    ss >> val;
+    while (!ss.eof())
+    {
+      a_vec.push_back(val * mult);
+      ss >> val;
+    }
+  }
+} // iStringToArray
+//------------------------------------------------------------------------------
 /// \brief returns the right type of MfExporter.
 //------------------------------------------------------------------------------
 MfExporterImpl* MfExportUtil::CreateExporter (const char *a_type)
@@ -358,6 +388,22 @@ CStr MfExportUtil::GetMf6ArrayString (MfData::MfGlobal* a_g,
 //------------------------------------------------------------------------------
 /// \brief 
 //------------------------------------------------------------------------------
+void MfExportUtil::Mf6StringToArray (const CStr& a_str,
+  std::vector<Real>& a_array, int a_nVals)
+{
+  iStringToArray(a_str, a_array, a_nVals);
+} // MfExportUtil::Mf6StringToArray
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+void MfExportUtil::Mf6StringToArray (const CStr& a_str,
+  std::vector<int>& a_array, int a_nVals)
+{
+  iStringToArray(a_str, a_array, a_nVals);
+} // MfExportUtil::Mf6StringToArray
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
 CStr MfExportUtil::GetMf6CommentHeader ()
 {
   CStr rval = "# Exported by MODFLOW Exporter from Aquaveo, the GMS developers.\n"
@@ -365,6 +411,32 @@ CStr MfExportUtil::GetMf6CommentHeader ()
               "\n";
   return rval;
 } // MfExportUtil::GetMf6CommentHeader
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+void MfExportUtil::Mf6IboundToIdomain (MfData::MfGlobal* a_g,
+  Mf2kNative* a_native)
+{
+  std::vector<std::vector<int>> ibound = a_native->Ibound();
+
+  for (size_t i=0; i<ibound.size(); ++i)
+  {
+    for (size_t j=0; j<ibound[i].size(); ++j)
+      ibound[i][j] = abs(ibound[i][j]);
+  }
+
+  // re-export ibound
+  MfPackage* p = a_g->GetPackage(ARR_BAS_IBND);
+  p->StringsToWrite().clear();
+  p->StringDescriptions().clear();
+  for (int i=0; i<a_g->NumLay(); ++i)
+  {
+    p->SetField(MfData::Packages::Array::ARRAY, &ibound[i][0]);
+    p->SetField("ARR", &ibound[i][0]);
+    a_g->Export(ARR_BAS_IBND);
+  }
+
+} // MfExportUtil::Mf6IboundToIdomain
 
 ///////////////////////////////////////////////////////////////////////////////
 // TESTS

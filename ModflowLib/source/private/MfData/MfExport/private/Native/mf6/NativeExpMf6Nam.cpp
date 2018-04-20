@@ -82,16 +82,40 @@ bool NativeExpMf6Nam::Export ()
     ss << lines1[i];
     ss >> ftype[i] >> unit[i] >> fname[i];    
   }
+
+  int arraysLayered(1);
+  m_pack->GetGlobal()->GetIntVar("ARRAYS_LAYERED", arraysLayered);
+
+  bool chdExists = false;
   for (size_t i=0; i<fname.size(); ++i)
   {
-    if (!ValidPackage(ftype[i])) continue;
+    CStr ft = ftype[i];
+    CStr fn = fname[i];
+    if (!ValidPackage(ft)) continue;
 
-    lines.push_back("  " + ftype[i] + "6  " + fname[i]);
+    if (ft == "DISU" && arraysLayered)
+    {
+      ft = "DISV";
+      util::StripExtensionFromFilename(fn, fn);
+      fn += ".disv";
+    }
+    if (ft == "CHD") chdExists = true;
+
+    lines.push_back("  " + ft + "6  " + fn);
   }
   lines.push_back("  NPF6 " + baseName + ".npf");
   if (n->GetExp()->AtLeastOneTransientSPExists())
     lines.push_back("  STO6 " + baseName + ".sto");
   lines.push_back("  IC6 " + baseName + ".ic");
+
+  CStr chdStr;
+  g->GetStrVar("IBOUND_TO_CHD", chdStr);
+  if (!chdExists && !chdStr.empty())
+  {
+    lines.push_back("  CHD6 " + baseName + ".chd");
+    WriteChdFile();
+  }
+
   lines.push_back("END PACKAGES");
   comments.assign(lines.size(), ""); 
   m_pack->AddToStoredLinesDesc(lines, comments);
@@ -141,6 +165,110 @@ bool NativeExpMf6Nam::ValidPackage (const CStr& a_ftype)
   }
   return false;
 } // NativeExpMf6Nam::ValidPackage
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void NativeExpMf6Nam::WriteChdFile ()
+{
+  MfGlobal *g = m_pack->GetGlobal();
+  if (!g) return;
+  Mf2kNative* n = m_pack->GetNative();
+  if (!n) return;
+  CStr baseName = n->FileName();
+  util::StripExtensionFromFilename(baseName, baseName);
+  baseName += ".chd";
+
+  std::vector<int> vCellid;
+  std::vector<Real> vHead;
+  CStr chdStr;
+  g->GetStrVar("IBOUND_TO_CHD", chdStr);
+  std::stringstream ss;
+  ss << chdStr;
+  int id;
+  Real head;
+  ss >> id >> head;
+  while (!ss.eof())
+  {
+    vCellid.push_back(id);
+    vHead.push_back(head);
+    ss >> id >> head;
+  }
+
+  std::vector<CStr> lines;
+
+  lines.push_back(MfExportUtil::GetMf6CommentHeader());
+  lines.push_back("BEGIN OPTIONS");
+  int saveFlows(0);
+  if (g->GetIntVar("MF6_SAVE_FLOWS", saveFlows) && saveFlows)
+  {
+    lines.push_back("  SAVE_FLOWS");
+  }
+  lines.push_back("END OPTIONS");
+  lines.push_back("");
+
+  lines.push_back("BEGIN DIMENSIONS");
+  CStr dimStr;
+  dimStr.Format("  MAXBOUND %d", vCellid.size());
+  lines.push_back(dimStr);
+  lines.push_back("END DIMENSIONS");
+  lines.push_back("");
+
+
+  int nI = g->NumRow();
+  int nJ = g->NumCol();
+  int layers;
+  g->GetIntVar("ARRAYS_LAYERED", layers);
+  const int* NODLAY(0);
+  MfPackage* pd = g->GetPackage(Packages::DISU);
+  if (pd) pd->GetField(Packages::Disu::NODLAY, &NODLAY);
+  
+  lines.push_back("BEGIN PERIOD 1");
+  int w = util::RealWidth();
+  for (size_t i=0; i<vCellid.size(); ++i)
+  {
+    CStr myLine;
+    CStr headStr = STR(vHead[i], -1, w, STR_FULLWIDTH);
+    CStr cellStr;
+    cellStr.Format("%5d", vCellid[i]);
+    if (!g->Unstructured())
+    {
+      id = vCellid[i];
+      int i1  = ( (id-1)/nJ ) % nI + 1;
+      int j  = (id-1) % nJ + 1;
+      int k  = (id-1) / (nI*nJ) + 1;
+      cellStr.Format("%5d %5d %5d ", k, i1, j);
+    }
+    else if (layers && NODLAY) // doing DISV
+    {
+      int begId(0), endId(0), idInLay, layId;
+      for (int q=0; q<g->NumLay(); ++q)
+      {
+        endId += NODLAY[q];
+        if (vCellid[i] < endId)
+        {
+          idInLay = vCellid[i] - begId;
+          layId = q + 1;
+          break;
+        }
+        begId += NODLAY[q];
+      }
+      cellStr.Format("%5d %5d", layId, idInLay);
+    }
+    myLine.Format("  %s %s %s", cellStr, headStr, headStr);
+    lines.push_back(myLine);
+  }
+  lines.push_back("END PERIOD 1");
+
+  FILE *fp = fopen(baseName.c_str(), "w");
+  if (fp)
+  {
+    for (size_t i=0; i<lines.size(); ++i)
+    {
+      fprintf(fp, "%s\n", lines[i].c_str());
+    }
+    fclose(fp);
+  }
+} // NativeExpMf6Nam::WriteChdFile
 
 ///////////////////////////////////////////////////////////////////////////////
 // TESTS
