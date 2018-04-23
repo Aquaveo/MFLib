@@ -32,42 +32,8 @@ public:
     CStr nm = a_pack->GetPackage()->PackageName();
     if (MfData::Packages::CHD == nm)
     {
-      CStr str;
-      a_pack->GetGlobal()->GetStrVar("IBOUND_TO_CHD", str);
-      if (!str.empty())
-      {
-        int w = util::RealWidth();
-
-        std::stringstream ss, ss1;
-        ss << str;
-        int cellid;
-        Real head;
-        ss >> cellid >> head;
-        while (!ss.eof())
-        {
-          m_nChds++;
-          CStr cellidStr;
-          cellidStr.Format("%5d", cellid);
-          CStr headStr = STR(head, -1, w, STR_FULLWIDTH);
-          ss1 << "\n  " << cellidStr << " " << headStr << " " << headStr;
-          head = 0;
-          headStr = STR(head, -1, w, STR_FULLWIDTH);
-          for (size_t i=5; i<a_pack->m_fieldStrings.size(); ++i)
-          {
-            if (a_pack->m_fieldStrings[i].CompareNoCase("cellgrp") == 0)
-            {
-              cellidStr.Format("%5d", -1);
-              ss1 << " " << cellidStr;
-            }
-            else
-            {
-              ss1 << " " << headStr;
-            }
-          }
-          ss >> cellid >> head;
-        }
-        m_chdStr = ss1.str();
-      }
+      m_chdStr = MfExportUtil::Mf6IboundToChd(a_pack->GetGlobal(), m_nChds,
+        a_pack->m_fieldStrings);
     }
   } // ReadIboundChds
 
@@ -211,7 +177,7 @@ CStr NativeExpMf6LstPack::GetStressPeriodLine (int itmp)
   }
 
   if (!m_p->m_chdStr.empty())
-    rval += m_p->m_chdStr;
+    rval += ("\n" + m_p->m_chdStr);
 
   return rval;
 } // NativeExpMf6LstPack::GetStressPeriodLine

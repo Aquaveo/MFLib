@@ -29,11 +29,14 @@ struct point
 class NativeExpMf6Disu::impl
 {
 public:
-  impl(NativePackExp* a_) : m_pack(a_) {}
+  impl(NativePackExp* a_) : m_pack(a_), m_NODES(-1) {}
   bool ReadGsf();
   void SortJa(NativePackExp* a_pack, CStr iacStr);
 
   NativePackExp* m_pack;
+  int m_NODES;
+  std::vector<Real> m_tops;
+  std::vector<Real> m_bots;
   std::vector<point> m_pts;
   std::vector<point> m_cellCenters;
   std::vector<std::vector<int>> m_cellVerts;
@@ -125,12 +128,14 @@ bool NativeExpMf6Disu::Export ()
   if (!disv)
   {
     g->SetIntVar("ARRAYS_LAYERED", false);
+    g->SetStrVar("DIS_PACKAGE_TYPE", "DISU");
     DisuWriteDimensions(lines);
     DisuWriteGridData(lines);
     DisuWriteConnections(lines);
   }
   else
   {
+    g->SetStrVar("DIS_PACKAGE_TYPE", "DISV");
     DisvWriteDimensions(lines);
     DisvWriteGridData(lines);
     DisvWriteVerts(lines);
@@ -202,6 +207,7 @@ void NativeExpMf6Disu::DisuWriteDimensions (std::vector<CStr>& a_lines)
       std::stringstream ss;
       ss << "  NODES " << *NODES;
       a_lines.push_back(ss.str());
+      m_p->m_NODES = *NODES;
     }
     {
       std::stringstream ss;
@@ -226,9 +232,13 @@ void NativeExpMf6Disu::DisuWriteGridData (std::vector<CStr>& a_lines)
 
   using namespace MfData::Packages::Disu;
   a_lines.push_back("  TOP");
-  a_lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, TOP));
+  CStr topStr = MfExportUtil::GetMf6ArrayString(g, nat, TOP);
+  MfExportUtil::Mf6StringToArray(topStr, m_p->m_tops, m_p->m_NODES);
+  a_lines.push_back(topStr);
   a_lines.push_back("  BOT");
-  a_lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, BOT));
+  CStr botStr = MfExportUtil::GetMf6ArrayString(g, nat, BOT);
+  MfExportUtil::Mf6StringToArray(botStr, m_p->m_bots, m_p->m_NODES);
+  a_lines.push_back(botStr);
   a_lines.push_back("  AREA");
   a_lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, AREA));
   a_lines.push_back("END GRIDDATA");
@@ -515,6 +525,7 @@ void NativeExpMf6Disu::impl::SortJa (NativePackExp* a_pack, CStr iacStr)
         anglex[q+j] = tmpAnglex[idx];
     }
 
+    int q2 = q;
     int q1 = q + nCon;
 
     if (ivcStr.empty())
@@ -531,24 +542,45 @@ void NativeExpMf6Disu::impl::SortJa (NativePackExp* a_pack, CStr iacStr)
       }
     }
 
+    // have to adjust the values in hwva (Thank the USGS again for another
+    // arbitrary change to the DISU package)
+    q = q2;
+    {
+      int startCell = abs(ja[q]);
+      double thick1 = m_tops[startCell-1] - m_bots[startCell-1];
+      q++;
+      for (int j=1; j<nCon; ++j, ++q)
+      {
+        if (0 == ivc[q]) continue; // vertical connection so skip
+        int id = ja[q];
+        double thick2 = m_tops[id-1] - m_bots[id-1];
+        double ave = (thick1 + thick2) / 2;
+        hwva[q] = (Real)(hwva[q] / ave);
+      }
+    }
+
     q = q1;
   }
 
+  Real MULT(1);
   const int* tJJ(0);
   MfPackage* p1 = g->GetPackage(Disu::JA);
   p1->GetField("JJ", &tJJ);
   p1->SetField(MfData::Packages::Array::ARRAY, &ja[0]);
   p1->SetField("ARR", &ja[0]);
+  p1->SetField(MfData::Packages::Array::MULT, &MULT);
   g->Export(Disu::JA);
 
   p1 = g->GetPackage(Disu::CL12);
   p1->SetField(MfData::Packages::Array::ARRAY, &cl12[0]);
   p1->SetField("ARR", &cl12[0]);
+  p1->SetField(MfData::Packages::Array::MULT, &MULT);
   g->Export(Disu::CL12);
 
   p1 = g->GetPackage(Disu::FAHL);
   p1->SetField(MfData::Packages::Array::ARRAY, &hwva[0]);
   p1->SetField("ARR", &hwva[0]);
+  p1->SetField(MfData::Packages::Array::MULT, &MULT);
   g->Export(Disu::FAHL);
 
   if (!anglexStr.empty())
@@ -556,6 +588,7 @@ void NativeExpMf6Disu::impl::SortJa (NativePackExp* a_pack, CStr iacStr)
     p1 = g->GetPackage("FACE ANGLE");
     p1->SetField(MfData::Packages::Array::ARRAY, &anglex[0]);
     p1->SetField("ARR", &anglex[0]);
+    p1->SetField(MfData::Packages::Array::MULT, &MULT);
     g->Export("FACE ANGLE");
   }
 
@@ -564,12 +597,12 @@ void NativeExpMf6Disu::impl::SortJa (NativePackExp* a_pack, CStr iacStr)
     p1 = g->GetPackage(Disu::IVC);
     p1->SetField(MfData::Packages::Array::ARRAY, &ivc[0]);
     p1->SetField("ARR", &ivc[0]);
+    p1->SetField(MfData::Packages::Array::MULT, &MULT);
     g->Export(Disu::IVC);
   }
   else
   {
     int IPRN(-1), LAYER(1), JJ(*tJJ);
-    Real mult(1);
     MfPackage tmpPack(Disu::IVC);
     g->AddPackage(&tmpPack);
     MfPackage* p = g->GetPackage(Disu::IVC);
@@ -577,7 +610,7 @@ void NativeExpMf6Disu::impl::SortJa (NativePackExp* a_pack, CStr iacStr)
     p->SetField(MfData::Packages::Array::LAYER, &LAYER);
     p->SetField("K", &LAYER);
     p->SetField(MfData::Packages::Array::IPRN, &IPRN);
-    p->SetField(MfData::Packages::Array::MULT, &mult);
+    p->SetField(MfData::Packages::Array::MULT, &MULT);
     p->SetField(MfData::Packages::Array::ARRAY, &ivc[0]);
     p->SetField("ARR", &ivc[0]);
     g->Export(Disu::IVC);

@@ -38,6 +38,8 @@ namespace MfData
         int a_nVals);
       static CStr GetMf6CommentHeader();
       static void Mf6IboundToIdomain(MfGlobal* a_g, Mf2kNative* a_native);
+      static CStr Mf6IboundToChd(MfGlobal* a_g, int& MAXBOUND,
+        const std::vector<CStr>& a_fieldStrings);
 
     private:
     };

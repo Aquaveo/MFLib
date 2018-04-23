@@ -84,7 +84,7 @@ bool NativeExpMf6Sto::Export ()
   lines.push_back(str);
   lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, ARR_LPF_SY));  
 
-  lines.push_back("END GIDDATA");
+  lines.push_back("END GRIDDATA");
   lines.push_back("");
 
   CStr field = MfData::Packages::DisPack::ISSFLG;

@@ -10,6 +10,8 @@
 #include <sstream>
 
 #include <private\MfData\MfGlobal.h>
+#include <private\MfData\MfExport\private\Mf2kNative.h>
+#include <private\MfData\MfExport\private\TxtExporter.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\MfData\MfExport\private\Native\NativePackExp.h>
 #include <private\MfData\Packages\MfPackage.h>
@@ -85,17 +87,23 @@ bool NativeExpMf6Tdis::Export ()
   //END PERIODDATA
   using namespace MfData::Packages;
   const Real *perLen(0), *tsMult(0);
-  const int *nstps(0);
+  const int *nstps(0),* issflg(0);
   if (m_pack->GetPackage()->GetField(DisPack::PERLEN, &perLen) && perLen &&
       m_pack->GetPackage()->GetField(DisPack::NSTP, &nstps) && nstps &&
       m_pack->GetPackage()->GetField(DisPack::TSMULT, &tsMult) && tsMult)
   {
+    m_pack->GetPackage()->GetField(DisPack::ISSFLG, &issflg);
+    if (!issflg) m_pack->GetPackage()->GetField(Disu::ISSFLG, &issflg);
     lines.push_back("BEGIN PERIODDATA");
     for (int i=0; i<nPer; ++i)
     {
       std::stringstream ss;
       ss << "  " << STR(perLen[i]) << " " << nstps[i] << " " << STR(tsMult[i]);
       lines.push_back(ss.str());
+      if (issflg && !issflg[i])
+        m_pack->GetNative()->GetExp()->AtLeastOneTransientSPExists() = true;
+      else
+        m_pack->GetNative()->GetExp()->SetOfSteadyStateStressPeriods().insert(i+1);
     }
     lines.push_back("END PERIODDATA");
   }

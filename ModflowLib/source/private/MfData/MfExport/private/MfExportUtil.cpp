@@ -437,6 +437,93 @@ void MfExportUtil::Mf6IboundToIdomain (MfData::MfGlobal* a_g,
   }
 
 } // MfExportUtil::Mf6IboundToIdomain
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+CStr MfExportUtil::Mf6IboundToChd (MfData::MfGlobal* a_g, int& a_MAXBOUND,
+  const std::vector<CStr>& a_fieldStrings)
+{
+  CStr rval;
+  std::vector<int> vCellid;
+  std::vector<Real> vHead;
+  CStr chdStr;
+  a_g->GetStrVar("IBOUND_TO_CHD", chdStr);
+  std::stringstream ss;
+  ss << chdStr;
+  int id;
+  Real head;
+  ss >> id >> head;
+  while (!ss.eof())
+  {
+    vCellid.push_back(id);
+    vHead.push_back(head);
+    ss >> id >> head;
+  }
+
+  int nI = a_g->NumRow();
+  int nJ = a_g->NumCol();
+  int layers;
+  a_g->GetIntVar("ARRAYS_LAYERED", layers);
+  const int* NODLAY(0);
+  MfPackage* pd = a_g->GetPackage(Packages::DISU);
+  if (pd) pd->GetField(Packages::Disu::NODLAY, &NODLAY);
+
+  int w = util::RealWidth();
+  for (size_t i=0; i<vCellid.size(); ++i)
+  {
+    CStr myLine;
+    CStr headStr = STR(vHead[i], -1, w, STR_FULLWIDTH);
+    CStr cellStr;
+    cellStr.Format("%5d", vCellid[i]);
+    if (!a_g->Unstructured())
+    {
+      id = vCellid[i];
+      int i1  = ( (id-1)/nJ ) % nI + 1;
+      int j  = (id-1) % nJ + 1;
+      int k  = (id-1) / (nI*nJ) + 1;
+      cellStr.Format("%5d %5d %5d ", k, i1, j);
+    }
+    else if (layers && NODLAY) // doing DISV
+    {
+      int begId(0), endId(0), idInLay, layId;
+      for (int q=0; q<a_g->NumLay(); ++q)
+      {
+        endId += NODLAY[q];
+        if (vCellid[i] <= endId)
+        {
+          idInLay = vCellid[i] - begId;
+          layId = q + 1;
+          break;
+        }
+        begId += NODLAY[q];
+      }
+      cellStr.Format("%5d %5d", layId, idInLay);
+    }
+    myLine.Format("  %s%s", cellStr, headStr, headStr);
+    headStr = STR(0.0, -1, w, STR_FULLWIDTH);
+    for (size_t j=5; j<a_fieldStrings.size(); ++j)
+    {
+      if (a_fieldStrings[j].CompareNoCase("cellgrp") == 0)
+      {
+        CStr tmpStr;
+        tmpStr.Format(" %5d", -1);
+        myLine += tmpStr;
+      }
+      else
+      {
+        myLine += " " + headStr;
+      }
+    }
+
+    rval += myLine;
+
+    if (i+1 < vCellid.size())
+      rval += "\n";
+  }
+
+  a_MAXBOUND = (int)vCellid.size();
+  return rval;
+} // MfExportUtil::Mf6IboundToChd
 
 ///////////////////////////////////////////////////////////////////////////////
 // TESTS

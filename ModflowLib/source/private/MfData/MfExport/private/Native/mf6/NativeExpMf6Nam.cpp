@@ -178,21 +178,9 @@ void NativeExpMf6Nam::WriteChdFile ()
   util::StripExtensionFromFilename(baseName, baseName);
   baseName += ".chd";
 
-  std::vector<int> vCellid;
-  std::vector<Real> vHead;
-  CStr chdStr;
-  g->GetStrVar("IBOUND_TO_CHD", chdStr);
-  std::stringstream ss;
-  ss << chdStr;
-  int id;
-  Real head;
-  ss >> id >> head;
-  while (!ss.eof())
-  {
-    vCellid.push_back(id);
-    vHead.push_back(head);
-    ss >> id >> head;
-  }
+  std::vector<CStr> fieldStrings;
+  int MAXBOUND(0);
+  CStr chdStr = MfExportUtil::Mf6IboundToChd(g, MAXBOUND, fieldStrings);
 
   std::vector<CStr> lines;
 
@@ -208,55 +196,13 @@ void NativeExpMf6Nam::WriteChdFile ()
 
   lines.push_back("BEGIN DIMENSIONS");
   CStr dimStr;
-  dimStr.Format("  MAXBOUND %d", vCellid.size());
+  dimStr.Format("  MAXBOUND %d", MAXBOUND);
   lines.push_back(dimStr);
   lines.push_back("END DIMENSIONS");
   lines.push_back("");
 
-
-  int nI = g->NumRow();
-  int nJ = g->NumCol();
-  int layers;
-  g->GetIntVar("ARRAYS_LAYERED", layers);
-  const int* NODLAY(0);
-  MfPackage* pd = g->GetPackage(Packages::DISU);
-  if (pd) pd->GetField(Packages::Disu::NODLAY, &NODLAY);
-  
   lines.push_back("BEGIN PERIOD 1");
-  int w = util::RealWidth();
-  for (size_t i=0; i<vCellid.size(); ++i)
-  {
-    CStr myLine;
-    CStr headStr = STR(vHead[i], -1, w, STR_FULLWIDTH);
-    CStr cellStr;
-    cellStr.Format("%5d", vCellid[i]);
-    if (!g->Unstructured())
-    {
-      id = vCellid[i];
-      int i1  = ( (id-1)/nJ ) % nI + 1;
-      int j  = (id-1) % nJ + 1;
-      int k  = (id-1) / (nI*nJ) + 1;
-      cellStr.Format("%5d %5d %5d ", k, i1, j);
-    }
-    else if (layers && NODLAY) // doing DISV
-    {
-      int begId(0), endId(0), idInLay, layId;
-      for (int q=0; q<g->NumLay(); ++q)
-      {
-        endId += NODLAY[q];
-        if (vCellid[i] < endId)
-        {
-          idInLay = vCellid[i] - begId;
-          layId = q + 1;
-          break;
-        }
-        begId += NODLAY[q];
-      }
-      cellStr.Format("%5d %5d", layId, idInLay);
-    }
-    myLine.Format("  %s %s %s", cellStr, headStr, headStr);
-    lines.push_back(myLine);
-  }
+  lines.push_back(chdStr);
   lines.push_back("END PERIOD 1");
 
   FILE *fp = fopen(baseName.c_str(), "w");

@@ -69,6 +69,8 @@ bool NativeExpMf6Evt::Export ()
 
   int layers(1);
   g->GetIntVar("ARRAYS_LAYERED", layers);
+  // unstructured grid with this option means the cell id is specified
+  if (2 == *NEVTOP && g->Unstructured()) layers = 0;
 
   if (1 == g->GetCurrentPeriod())
   {
@@ -153,6 +155,12 @@ bool NativeExpMf6Evt::Export ()
 
   if (!layers)
   {
+    CStr disPackType;
+    g->GetStrVar("DIS_PACKAGE_TYPE", disPackType);
+    const int* NODLAY(0);
+    MfPackage* p = g->GetPackage(Packages::DISU);
+    p->GetField(Packages::Disu::NODLAY, &NODLAY);
+
     std::vector<int> cellids;
     std::vector<Real> surf, rate, exdp;
 
@@ -180,6 +188,22 @@ bool NativeExpMf6Evt::Export ()
     for (size_t i=0; i<cellids.size(); ++i)
     {
       str.Format("%10d", cellids[i]);
+      if ("DISV" == disPackType && NODLAY)
+      {
+        int begId(0), endId(0), idInLay, layId;
+        for (int k=0; k<g->NumLay(); ++k)
+        {
+          endId += NODLAY[k];
+          if (cellids[i] <= endId)
+          {
+            idInLay = cellids[i] - begId;
+            layId = k + 1;
+            break;
+          }
+          begId += NODLAY[k];
+        }
+        str.Format("%5d %10d", layId, idInLay);
+      }
       ss << "  " << str << " "
           << STR(surf[i], -1, w, STR_FULLWIDTH) << " "
           << STR(rate[i], -1, w, STR_FULLWIDTH) << " "

@@ -450,7 +450,7 @@ CStr NativeExpLstPack::IjkToStr (int a_i)
     {
       int id = j + ( (i-1) * m_nJ ) + ( (k-1) * m_nI * m_nJ );
       int idInLay = i * j;
-      if (m_disv)
+      if (GetNative()->GetExportMf6() && m_disv)
         ln.Format("%5d %5d ", k, idInLay);
       else
         ln.Format("%5d ", id);
@@ -469,7 +469,7 @@ CStr NativeExpLstPack::IjkToStr (int a_i)
     else
     {
       int nodeid = (int)m_data[a_i*(*m_nDataFields)+0];
-      if (m_disv)
+      if (GetNative()->GetExportMf6() && m_disv)
       {
         int beginId(0), endId(0), lay(-1), idInLay(-1);
         for (size_t q=0; q<m_NODLAY.size(); ++q)
@@ -477,7 +477,7 @@ CStr NativeExpLstPack::IjkToStr (int a_i)
           endId += m_NODLAY[q];
           if (nodeid < endId)
           {
-            lay = q + 1;
+            lay = (int)(q + 1);
             idInLay = nodeid - beginId;
             break;
           }
