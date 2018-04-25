@@ -64,7 +64,10 @@ NativeExpLstPack::NativeExpLstPack ()
     {
       int layers(1);
       MfData::MfGlobal::Get().GetIntVar("ARRAYS_LAYERED", layers);
-      if (layers) m_disv = true;
+      CStr disPackType;
+      MfData::MfGlobal::Get().GetStrVar("DIS_PACKAGE_TYPE", disPackType);
+      if (layers && "DISV" == disPackType) m_disv = true;
+
       MfPackage* p = MfData::MfGlobal::Get().GetPackage(Packages::DISU);
       if (p)
       {
@@ -450,7 +453,7 @@ CStr NativeExpLstPack::IjkToStr (int a_i)
     {
       int id = j + ( (i-1) * m_nJ ) + ( (k-1) * m_nI * m_nJ );
       int idInLay = i * j;
-      if (GetNative()->GetExportMf6() && m_disv)
+      if (m_disv)
         ln.Format("%5d %5d ", k, idInLay);
       else
         ln.Format("%5d ", id);
@@ -469,13 +472,13 @@ CStr NativeExpLstPack::IjkToStr (int a_i)
     else
     {
       int nodeid = (int)m_data[a_i*(*m_nDataFields)+0];
-      if (GetNative()->GetExportMf6() && m_disv)
+      if (m_disv)
       {
         int beginId(0), endId(0), lay(-1), idInLay(-1);
         for (size_t q=0; q<m_NODLAY.size(); ++q)
         {
           endId += m_NODLAY[q];
-          if (nodeid < endId)
+          if (nodeid <= endId)
           {
             lay = (int)(q + 1);
             idInLay = nodeid - beginId;

@@ -36,6 +36,10 @@ namespace MfData
         int a_nVals);
       static void Mf6StringToArray(const CStr& a_str, std::vector<int>& a_array,
         int a_nVals);
+      static void Mf6MultiLayerStringToArray(const CStr& a_str,
+        std::vector<int>& a_array, int a_nLay, int a_nValsPerLayer);
+      static void Mf6MultiLayerStringToArray(const CStr& a_str,
+        std::vector<Real>& a_array, int a_nLay, int a_nValsPerLayer);
       static CStr GetMf6CommentHeader();
       static void Mf6IboundToIdomain(MfGlobal* a_g, Mf2kNative* a_native);
       static CStr Mf6IboundToChd(MfGlobal* a_g, int& MAXBOUND,

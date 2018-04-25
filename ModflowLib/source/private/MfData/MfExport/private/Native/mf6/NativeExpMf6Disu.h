@@ -23,8 +23,6 @@ namespace MfData
       NativeExpMf6Disu(const NativeExpMf6Disu& rhs);
       const NativeExpMf6Disu& operator=(const NativeExpMf6Disu& rhs);
 
-      bool WriteDisv();
-
       void DisuWriteOptions(std::vector<CStr>& a_lines);
       void DisuWriteDimensions(std::vector<CStr>& a_lines);
       void DisuWriteGridData(std::vector<CStr>& a_lines);

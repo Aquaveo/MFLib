@@ -29,12 +29,18 @@ struct point
 class NativeExpMf6Disu::impl
 {
 public:
-  impl(NativePackExp* a_) : m_pack(a_), m_NODES(-1) {}
+  impl(NativePackExp* a_)
+    : m_writeDisv(0), m_pack(a_), m_NODES(-1), m_NJAG(-1) {}
+
+  void Setup();
+  bool WriteDisv();
   bool ReadGsf();
   void SortJa(NativePackExp* a_pack, CStr iacStr);
 
+  bool m_writeDisv;
   NativePackExp* m_pack;
-  int m_NODES;
+  int m_NODES, m_NJAG;
+  std::vector<int> m_NODLAY;
   std::vector<Real> m_tops;
   std::vector<Real> m_bots;
   std::vector<point> m_pts;
@@ -118,17 +124,18 @@ bool NativeExpMf6Disu::Export ()
   if (!m_pack) return false;
   MfGlobal *g = m_pack->GetGlobal();
   if (!g) return false;
+  Mf2kNative* nat = m_pack->GetNative();
+  if (!nat) return false;
 
   std::vector<CStr> lines, desc;
   // comments
   lines.push_back(MfExportUtil::GetMf6CommentHeader());
   DisuWriteOptions(lines);
 
-  bool disv = WriteDisv();
-  if (!disv)
+  m_p->Setup();
+
+  if (!m_p->m_writeDisv)
   {
-    g->SetIntVar("ARRAYS_LAYERED", false);
-    g->SetStrVar("DIS_PACKAGE_TYPE", "DISU");
     DisuWriteDimensions(lines);
     DisuWriteGridData(lines);
     DisuWriteConnections(lines);
@@ -144,27 +151,12 @@ bool NativeExpMf6Disu::Export ()
 
   desc.assign(lines.size(), "");
   CStr pname("DISU");
-  if (disv) pname = "DISV";
+  if (m_p->m_writeDisv) pname = "DISV";
   TmpPackageNameChanger tmp(m_pack->GetPackage(), pname.c_str());
   m_pack->AddToStoredLinesDesc(lines, desc);
   m_pack->WriteStoredLines();
   return true;
 } // NativeExpMf6Disu::ExportMf6Dis
-//------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
-bool NativeExpMf6Disu::WriteDisv ()
-{
-  const int* IVSD(0);
-  m_pack->GetPackage()->GetField(MfData::Packages::Disu::IVSD, &IVSD);
-  if (IVSD && *IVSD < 0)
-  {
-    if (!m_p->ReadGsf()) return false;
-    return true;
-  }
-
-  return false;
-} // NativeExpMf6Disu::WriteDisv
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
@@ -195,23 +187,16 @@ void NativeExpMf6Disu::DisuWriteOptions (std::vector<CStr>& a_lines)
 //------------------------------------------------------------------------------
 void NativeExpMf6Disu::DisuWriteDimensions (std::vector<CStr>& a_lines)
 {
-  MfPackage* p = m_pack->GetPackage();
   a_lines.push_back("BEGIN DIMENSIONS");
   {
-    const int* NODES(0), *NJAG(0);
-    p->GetField(MfData::Packages::Disu::NODES, &NODES);
-    p->GetField(MfData::Packages::Disu::NJAG, &NJAG);
-    if (!NODES || !NJAG) return;
-
     {
       std::stringstream ss;
-      ss << "  NODES " << *NODES;
+      ss << "  NODES " << m_p->m_NODES;
       a_lines.push_back(ss.str());
-      m_p->m_NODES = *NODES;
     }
     {
       std::stringstream ss;
-      ss << "  NJA " << *NJAG;
+      ss << "  NJA " << m_p->m_NJAG;
       a_lines.push_back(ss.str());
     }
   }
@@ -232,13 +217,15 @@ void NativeExpMf6Disu::DisuWriteGridData (std::vector<CStr>& a_lines)
 
   using namespace MfData::Packages::Disu;
   a_lines.push_back("  TOP");
-  CStr topStr = MfExportUtil::GetMf6ArrayString(g, nat, TOP);
-  MfExportUtil::Mf6StringToArray(topStr, m_p->m_tops, m_p->m_NODES);
+  CStr topStr;
+  g->GetStrVar("DISU_TOP", topStr);
   a_lines.push_back(topStr);
+
   a_lines.push_back("  BOT");
-  CStr botStr = MfExportUtil::GetMf6ArrayString(g, nat, BOT);
-  MfExportUtil::Mf6StringToArray(botStr, m_p->m_bots, m_p->m_NODES);
+  CStr botStr;
+  g->GetStrVar("DISU_BOT", botStr);
   a_lines.push_back(botStr);
+
   a_lines.push_back("  AREA");
   a_lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, AREA));
   a_lines.push_back("END GRIDDATA");
@@ -256,18 +243,29 @@ void NativeExpMf6Disu::DisuWriteConnections (std::vector<CStr>& a_lines)
   a_lines.push_back("BEGIN CONNECTIONDATA");
   using namespace MfData::Packages::Disu;
   a_lines.push_back("  IAC");
-  CStr iacStr = MfExportUtil::GetMf6ArrayString(g, nat, IA);
+  CStr iacStr;
+  g->GetStrVar("IAC", iacStr);
   a_lines.push_back(iacStr);
-  // create IVC if needed
-  m_p->SortJa(m_pack, iacStr);
+
   a_lines.push_back("  JA");
-  a_lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, JA));
+  CStr jaStr;
+  g->GetStrVar("JA", jaStr);
+  a_lines.push_back(jaStr);
+
   a_lines.push_back("  IHC");
-  a_lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, IVC));
+  CStr ihcStr = MfExportUtil::GetMf6ArrayString(g, nat, IVC);
+  a_lines.push_back(ihcStr);
+
   a_lines.push_back("  CL12");
-  a_lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, CL12));
+  CStr cl12Str;
+  g->GetStrVar("CL12", cl12Str);
+  a_lines.push_back(cl12Str);
+
   a_lines.push_back("  HWVA");
-  a_lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, FAHL));
+  CStr hwvaStr;
+  g->GetStrVar("HWVA", hwvaStr);
+  a_lines.push_back(hwvaStr);
+
   if (g->GetPackage("FACE ANGLE"))
   {
     a_lines.push_back("  ANGLEDEGX LAYERED");
@@ -311,9 +309,13 @@ void NativeExpMf6Disu::DisvWriteGridData (std::vector<CStr>& a_lines)
   using namespace MfData::Packages;
   a_lines.push_back("BEGIN GRIDDATA");
   a_lines.push_back("  TOP");
-  a_lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, Disu::TOP));
+  CStr topStr;
+  g->GetStrVar("DISU_TOP", topStr);
+  a_lines.push_back(topStr);
   a_lines.push_back("  BOTM LAYERED");
-  a_lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, Disu::BOT));
+  CStr botStr;
+  g->GetStrVar("DISU_BOT", botStr);
+  a_lines.push_back(botStr);
   MfExportUtil::Mf6IboundToIdomain(g, nat);
   a_lines.push_back("  IDOMAIN LAYERED");
   a_lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, ARR_BAS_IBND));
@@ -359,7 +361,86 @@ void NativeExpMf6Disu::DisvWriteCell2d (std::vector<CStr>& a_lines)
   a_lines.push_back("");
 } // NativeExpMf6Disu::DisvWriteCell2d
 
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void NativeExpMf6Disu::impl::Setup ()
+{
+  MfGlobal *g = m_pack->GetGlobal();
+  if (!g) return;
+  Mf2kNative* nat = m_pack->GetNative();
+  if (!nat) return;
 
+  g->SetStrVar("DIS_PACKAGE_TYPE", "DISV");
+  m_writeDisv = WriteDisv();
+  if (!m_writeDisv)
+  {
+    g->SetIntVar("ARRAYS_LAYERED", false);
+    g->SetStrVar("DIS_PACKAGE_TYPE", "DISU");
+  }
+
+  const int* NODES(0), *NJAG(0),* NODLAY(0);
+  MfPackage* p = m_pack->GetPackage();
+  p->GetField(MfData::Packages::Disu::NODES, &NODES);
+  p->GetField(MfData::Packages::Disu::NJAG, &NJAG);
+  p->GetField(MfData::Packages::Disu::NODLAY, &NODLAY);
+  if (!NODES || !NJAG || !NODLAY) return;
+  m_NODES = *NODES;
+  m_NJAG = *NJAG;
+  for (int i=0; i<g->NumLay(); ++i)
+    m_NODLAY.push_back(NODLAY[i]);
+
+  CStr topStr = MfExportUtil::GetMf6ArrayString(g, nat, Packages::Disu::TOP);
+  g->SetStrVar("DISU_TOP", topStr);
+  CStr botStr = MfExportUtil::GetMf6ArrayString(g, nat, Packages::Disu::BOT);
+  g->SetStrVar("DISU_BOT", botStr);
+
+  if (!m_writeDisv)
+  {
+    MfExportUtil::Mf6StringToArray(topStr, m_tops, m_NODES);
+    MfExportUtil::Mf6StringToArray(botStr, m_bots, m_NODES);
+  }
+  else
+  {
+    std::vector<Real> top;
+    MfExportUtil::Mf6StringToArray(topStr, top, m_NODLAY[0]);
+    MfExportUtil::Mf6MultiLayerStringToArray(botStr, m_bots, g->NumLay(),
+      m_NODLAY[0]);
+    // copy bottoms into the top array
+    m_tops = top;
+    m_tops.reserve(m_bots.size());
+    for (size_t i=top.size(), j=0; i<m_bots.size(); ++i, ++j)
+    {
+      m_tops.push_back(m_bots[j]);
+    }
+  }
+
+  CStr iacStr = MfExportUtil::GetMf6ArrayString(g, nat, Packages::Disu::IA);
+  g->SetStrVar("IAC", iacStr);
+  // create IVC if needed
+  SortJa(m_pack, iacStr);
+  CStr jaStr = MfExportUtil::GetMf6ArrayString(g, nat, Packages::Disu::JA);
+  g->SetStrVar("JA", jaStr);
+  CStr cl12Str = MfExportUtil::GetMf6ArrayString(g, nat, Packages::Disu::CL12);
+  g->SetStrVar("CL12", cl12Str);
+  CStr hwvaStr = MfExportUtil::GetMf6ArrayString(g, nat, Packages::Disu::FAHL);
+  g->SetStrVar("HWVA", hwvaStr);
+
+} // NativeExpMf6Disu::impl::Setup
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+bool NativeExpMf6Disu::impl::WriteDisv ()
+{
+  const int* IVSD(0);
+  m_pack->GetPackage()->GetField(MfData::Packages::Disu::IVSD, &IVSD);
+  if (IVSD && *IVSD < 0)
+  {
+    if (!ReadGsf()) return false;
+    return true;
+  }
+  return false;
+} // NativeExpMf6Disu::WriteDisv
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
@@ -468,31 +549,27 @@ void NativeExpMf6Disu::impl::SortJa (NativePackExp* a_pack, CStr iacStr)
   Mf2kNative *nat = a_pack->GetNative();
   int numlay = g->NumLay();
   // get the total number of cells and the cells per layer
-  const int* NODES(0),* NODLAY(0),* NJAG(0);
-  a_pack->GetPackage()->GetField(Disu::NODES, &NODES);
-  a_pack->GetPackage()->GetField(Disu::NODLAY, &NODLAY);
-  a_pack->GetPackage()->GetField(Disu::NJAG, &NJAG);
   std::vector<int> iac;
   // parse iacStr into array
-  MfExportUtil::Mf6StringToArray(iacStr, iac, *NODES);
+  MfExportUtil::Mf6StringToArray(iacStr, iac, m_NODES);
 
   std::vector<int> ja, ivc;
   std::vector<Real> cl12, hwva, anglex;
   CStr jaStr, ivcStr, cl12Str, hwvaStr, anglexStr;
   jaStr = MfExportUtil::GetMf6ArrayString(g, nat, Disu::JA);
-  MfExportUtil::Mf6StringToArray(jaStr, ja, *NJAG);
+  MfExportUtil::Mf6StringToArray(jaStr, ja, m_NJAG);
   if (g->GetPackage(Disu::IVC))
     ivcStr = MfExportUtil::GetMf6ArrayString(g, nat, Disu::IVC);
-  MfExportUtil::Mf6StringToArray(ivcStr, ivc, *NJAG);
+  MfExportUtil::Mf6StringToArray(ivcStr, ivc, m_NJAG);
   cl12Str = MfExportUtil::GetMf6ArrayString(g, nat, Disu::CL12);
-  MfExportUtil::Mf6StringToArray(cl12Str, cl12, *NJAG);
+  MfExportUtil::Mf6StringToArray(cl12Str, cl12, m_NJAG);
   hwvaStr = MfExportUtil::GetMf6ArrayString(g, nat, Disu::FAHL);
-  MfExportUtil::Mf6StringToArray(hwvaStr, hwva, *NJAG);
+  MfExportUtil::Mf6StringToArray(hwvaStr, hwva, m_NJAG);
   if (g->GetPackage("FACE ANGLE"))
     anglexStr = MfExportUtil::GetMf6ArrayString(g, nat, "FACE ANGLE");
-  MfExportUtil::Mf6StringToArray(anglexStr, anglex, *NJAG);
+  MfExportUtil::Mf6StringToArray(anglexStr, anglex, m_NJAG);
 
-  if (ivc.empty()) ivc.assign(*NJAG, 1);
+  if (ivc.empty()) ivc.assign(m_NJAG, 1);
   int q(0);
   for (size_t i=0; i<iac.size(); ++i)
   {
@@ -537,7 +614,7 @@ void NativeExpMf6Disu::impl::SortJa (NativePackExp* a_pack, CStr iacStr)
       {
         int id = ja[q];
         ivc[q] = 1;
-        if (!iCellsInSameLayer(startCell, id, NODLAY, numlay))
+        if (!iCellsInSameLayer(startCell, id, &m_NODLAY[0], numlay))
           ivc[q] = 0;
       }
     }
@@ -555,6 +632,7 @@ void NativeExpMf6Disu::impl::SortJa (NativePackExp* a_pack, CStr iacStr)
         int id = ja[q];
         double thick2 = m_tops[id-1] - m_bots[id-1];
         double ave = (thick1 + thick2) / 2;
+        if (0 == ave) ave = 1; // may have zero thick where ibound = 0
         hwva[q] = (Real)(hwva[q] / ave);
       }
     }

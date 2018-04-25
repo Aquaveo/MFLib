@@ -114,9 +114,13 @@ bool NativeExpMf6Dis::Export ()
 
   lines.push_back("BEGIN GRIDDATA");
   lines.push_back("  DELR");
-  lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, "DELR"));
+  CStr delrStr = MfExportUtil::GetMf6ArrayString(g, nat, "DELR");
+  g->SetStrVar("DELR", delrStr);
+  lines.push_back(delrStr);
   lines.push_back("  DELC");
-  lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, "DELC"));
+  CStr delcStr = MfExportUtil::GetMf6ArrayString(g, nat, "DELC");
+  g->SetStrVar("DELC", delcStr);
+  lines.push_back(delcStr);
   lines.push_back("  TOP LAYERED");
   lines.push_back(MfExportUtil::GetMf6ArrayString(g, nat, "TOP ELEVATION OF LAYER 1"));
   lines.push_back("  BOTM LAYERED");

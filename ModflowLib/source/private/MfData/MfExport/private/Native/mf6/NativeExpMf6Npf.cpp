@@ -414,6 +414,9 @@ void NativeExpMf6Npf::GenerateK22K33 ()
         rArrayMult = hkMult[i] * vkMult[i];
         for (int j=0; j<nVals; ++j)
         {
+          // avoid divide by zero
+          if (vk[i][j] == 0) vk[i][j] = 1;
+
           tmpRealArray[j] = hk[i][j] / vk[i][j];
         }
       }

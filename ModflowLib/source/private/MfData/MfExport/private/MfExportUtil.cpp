@@ -54,6 +54,46 @@ static void iStringToArray (const CStr& a_str, std::vector<T>& a_vec, int a_size
   }
 } // iStringToArray
 //------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+template <class T>
+static void iMultiLayerStringToArray (const CStr& a_str,
+  std::vector<T>& a_vec, int a_nLay, int a_nValsPerLayer)
+{
+  a_vec.clear();
+  // find the start of each layer in the string
+  std::vector<int> idxes;
+  int start(0);
+  for (int k=0; k<a_nLay; ++k)
+  {
+    int idxCONSTANT, idxINTERNAL;
+    idxCONSTANT = a_str.Find("CONSTANT", start);
+    idxINTERNAL = a_str.Find("INTERNAL", start);
+    if (idxINTERNAL == -1 || (idxCONSTANT != -1 && idxCONSTANT < idxINTERNAL))
+      idxes.push_back(idxCONSTANT);
+    else
+      idxes.push_back(idxINTERNAL);
+    start = idxes.back() + 1;
+  }
+  idxes.push_back(a_str.length());
+  if ((int)idxes.size() != a_nLay+1)
+  {
+    ASSERT(0);
+    return;
+  }
+  a_vec.reserve(a_nValsPerLayer*a_nLay);
+  // split the string by layer
+  start = 0;
+  for (int k=0; k<a_nLay; ++k)
+  {
+    std::vector<T> tmpVec;
+    CStr str = a_str.substr(idxes[k], idxes[k+1]-idxes[k]);
+    MfExportUtil::Mf6StringToArray(str, tmpVec, a_nValsPerLayer);
+    // copy to a_vec
+    for (size_t i=0; i<tmpVec.size(); ++i) a_vec.push_back(tmpVec[i]);
+  }
+} // iMultiLayerStringToArray
+//------------------------------------------------------------------------------
 /// \brief returns the right type of MfExporter.
 //------------------------------------------------------------------------------
 MfExporterImpl* MfExportUtil::CreateExporter (const char *a_type)
@@ -404,6 +444,22 @@ void MfExportUtil::Mf6StringToArray (const CStr& a_str,
 //------------------------------------------------------------------------------
 /// \brief 
 //------------------------------------------------------------------------------
+void MfExportUtil::Mf6MultiLayerStringToArray (const CStr& a_str,
+  std::vector<int>& a_array, int a_nLay, int a_nValsPerLayer)
+{
+  iMultiLayerStringToArray(a_str, a_array, a_nLay, a_nValsPerLayer);
+} // MfExportUtil::Mf6MultiLayerStringToArray
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
+void MfExportUtil::Mf6MultiLayerStringToArray (const CStr& a_str,
+  std::vector<Real>& a_array, int a_nLay, int a_nValsPerLayer)
+{
+  iMultiLayerStringToArray(a_str, a_array, a_nLay, a_nValsPerLayer);
+} // MfExportUtil::Mf6MultiLayerStringToArray
+//------------------------------------------------------------------------------
+/// \brief 
+//------------------------------------------------------------------------------
 CStr MfExportUtil::GetMf6CommentHeader ()
 {
   CStr rval = "# Exported by MODFLOW Exporter from Aquaveo, the GMS developers.\n"
@@ -425,12 +481,18 @@ void MfExportUtil::Mf6IboundToIdomain (MfData::MfGlobal* a_g,
       ibound[i][j] = abs(ibound[i][j]);
   }
 
+  a_native->Ibound().clear();
   // re-export ibound
   MfPackage* p = a_g->GetPackage(ARR_BAS_IBND);
   p->StringsToWrite().clear();
   p->StringDescriptions().clear();
+  int MULT(1), IPRN(-1), LAYER;
   for (int i=0; i<a_g->NumLay(); ++i)
   {
+    LAYER = i + 1;
+    p->SetField(MfData::Packages::Array::LAYER, &LAYER);
+    p->SetField(MfData::Packages::Array::MULT, &MULT);
+    p->SetField(MfData::Packages::Array::IPRN, &IPRN);
     p->SetField(MfData::Packages::Array::ARRAY, &ibound[i][0]);
     p->SetField("ARR", &ibound[i][0]);
     a_g->Export(ARR_BAS_IBND);

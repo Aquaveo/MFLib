@@ -11,6 +11,7 @@
 
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
+#include <private\MfData\MfExport\private\Native\mf6\NativeExpMf6Lak.h>
 #include <private\MfData\MfExport\private\Native\NativeUtil.h>
 #include <private\MfData\MfExport\private\TxtExporter.h>
 #include <private\MfData\MfGlobal.h>
@@ -36,6 +37,13 @@ NativeExpLak::~NativeExpLak ()
 //------------------------------------------------------------------------------
 bool NativeExpLak::Export ()
 {
+  if (GetNative()->GetExportMf6())
+  {
+    NativeExpMf6Lak lak(this);
+    lak.Export();
+    return true;
+  }
+
   if (GetPackage()->PackageName() == Packages::LAK)
   {
     Line1to2();

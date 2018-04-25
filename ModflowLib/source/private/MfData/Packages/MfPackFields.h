@@ -443,6 +443,7 @@ namespace MfData
       const char * const NSSITR = "NSSITR";
       const char * const SSCNCR = "SSCNCR";
       const char * const ITRSS = "ITRSS";
+      const char * const SURFDEP = "SURFDEP";
     }
     namespace LAKSPpack
     {
