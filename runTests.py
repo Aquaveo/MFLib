@@ -121,10 +121,11 @@ def checkModelOutput (a_oFile, a_oDir):
     # remove the line about how long it took to complete the model
     s0 = "Run end date and time"
     s1 = "Elapsed run time:"
+    s2 = "Run start date and time"
     outF = open(oFile, "w")
     line = ""
     for line in lines:
-        if line.find(s0) == -1 and line.find(s1) == -1:
+        if line.find(s0) == -1 and line.find(s1) == -1 and line.find(s2) == -1:
             outF.write(line)
     outF.close()
 

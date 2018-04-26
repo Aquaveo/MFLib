@@ -135,6 +135,26 @@ bool NativeExpMf6Disu::Export ()
 
   m_p->Setup();
 
+  // we need to check the ibound array if we are writing a DISU file. 
+  // MF6 doesn't allow ibound = 0 when using DISU package
+  if(!m_p->m_writeDisv)
+  {
+    std::vector<std::vector<int>>&ibound = nat->Ibound();
+    for(size_t i=0; i<ibound.size(); ++i)
+    {
+      for(size_t j=0; j<ibound[i].size(); ++j)
+      {
+        if(ibound[i][j] == 0) 
+        {
+          CStr msg = "ERROR: MF6 does not support IBOUND array values equal to" 
+            " 0 (zero) with the DISU package. This model requires the DISU"
+            " package because IVSD is not equal to -1.";
+          printf("%s\n", msg.c_str());
+        }
+      }
+    }
+  }
+
   if (!m_p->m_writeDisv)
   {
     DisuWriteDimensions(lines);
