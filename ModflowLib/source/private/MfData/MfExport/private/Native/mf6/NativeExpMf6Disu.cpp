@@ -11,6 +11,7 @@
 #include <sstream>
 
 #include <private\MfData\MfGlobal.h>
+#include <private\MfData\MfExport\private\CellNumbering.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\MfData\MfExport\private\Native\NativePackExp.h>
@@ -152,9 +153,19 @@ bool NativeExpMf6Disu::Export ()
   desc.assign(lines.size(), "");
   CStr pname("DISU");
   if (m_p->m_writeDisv) pname = "DISV";
-  TmpPackageNameChanger tmp(m_pack->GetPackage(), pname.c_str());
-  m_pack->AddToStoredLinesDesc(lines, desc);
-  m_pack->WriteStoredLines();
+
+  {
+    TmpPackageNameChanger tmp(m_pack->GetPackage(), pname.c_str());
+    m_pack->AddToStoredLinesDesc(lines, desc);
+    m_pack->WriteStoredLines();
+  }
+
+  // create cell numbering class
+  if (!m_pack->GetNative()->GetCellNumbering())
+  {
+    CellNumbering* cn = CellNumbering::New(m_pack->GetGlobal());
+    m_pack->GetNative()->SetCellNumbering(cn);
+  }
   return true;
 } // NativeExpMf6Disu::ExportMf6Dis
 //------------------------------------------------------------------------------

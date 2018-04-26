@@ -12,10 +12,12 @@ namespace MfData
 
   namespace Export
   {
+    class CellNumbering;
     class Mf2kNative : public MfExporterImpl
     {
     public:
       Mf2kNative();
+      ~Mf2kNative();
 
       virtual void SetFileName(const char *a_);
       virtual bool ExportPackage(MfGlobal *a_global,
@@ -31,6 +33,9 @@ namespace MfData
       void SetExportMf6(bool a_) { m_exportMf6 = a_; }
       bool GetExportMf6() const { return m_exportMf6; }
 
+      CellNumbering* GetCellNumbering() { return m_cn; }
+      void SetCellNumbering(CellNumbering* a_) { m_cn = a_; }
+
     private:
       Mf2kNative(const Mf2kNative &rhs);
       const Mf2kNative& operator=(const Mf2kNative &rhs);
@@ -40,6 +45,7 @@ namespace MfData
       bool m_h5;
       bool m_sqlite;
       bool m_exportMf6;
+      CellNumbering* m_cn;
     };
   }
 }

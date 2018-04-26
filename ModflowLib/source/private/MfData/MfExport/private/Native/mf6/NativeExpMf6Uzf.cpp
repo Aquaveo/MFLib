@@ -92,9 +92,9 @@ void NativeExpMf6Uzf::impl::WriteOptions ()
 void NativeExpMf6Uzf::impl::WriteDimensions ()
 {
   using namespace MfData::Packages;
-  MfGlobal *g = m_pack->GetGlobal();
+  //MfGlobal *g = m_pack->GetGlobal();
   m_lines.push_back("BEGIN DIMENSIONS");
-  int nCells = g->NumRow() * g->NumCol();
+  //int nCells = g->NumRow() * g->NumCol();
 
   const int* ntrail2(0),* nsets2(0);
   MfPackage* p= m_pack->GetPackage();

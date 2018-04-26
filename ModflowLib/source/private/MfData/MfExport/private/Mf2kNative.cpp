@@ -11,6 +11,7 @@
 
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\Packages\MfPackage.h>
+#include <private\MfData\MfExport\private\CellNumbering.h>
 #include <private\MfData\MfExport\private\H5\H5Util.h>
 #include <private\MfData\MfExport\private\Native\NativePackExp.h>
 #include <private\MfData\MfExport\private\Native\NativeUtil.h>
@@ -30,8 +31,17 @@ Mf2kNative::Mf2kNative () :
 , m_h5(false)
 , m_sqlite(false)
 , m_exportMf6(false)
+, m_cn(nullptr)
 {
 } // Mf2kNative::Mf2kNative
+//------------------------------------------------------------------------------
+/// \brief constructor
+//------------------------------------------------------------------------------
+Mf2kNative::~Mf2kNative ()
+{
+  if (m_cn) delete(m_cn);
+  m_cn = nullptr;
+} // Mf2kNative::~Mf2kNative
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------

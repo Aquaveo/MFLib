@@ -91,6 +91,7 @@ bool NativeExpMf6Nam::Export ()
   {
     CStr ft = ftype[i];
     CStr fn = fname[i];
+    if (ft == "ETS") ft = "EVT";
     if (!ValidPackage(ft)) continue;
 
     if (ft == "DISU" && arraysLayered)

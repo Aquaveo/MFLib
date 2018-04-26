@@ -75,7 +75,7 @@ static void iMultiLayerStringToArray (const CStr& a_str,
       idxes.push_back(idxINTERNAL);
     start = idxes.back() + 1;
   }
-  idxes.push_back(a_str.length());
+  idxes.push_back((int)a_str.length());
   if ((int)idxes.size() != a_nLay+1)
   {
     ASSERT(0);

@@ -61,7 +61,7 @@ bool NativeExpMf6Rch::Export ()
   // need number of cells in layer 1
   MfPackage* p1 = g->GetPackage(Packages::DISU);
   const int* NODLAY(0);
-  p1->GetField(Packages::Disu::NODLAY, &NODLAY);
+  if (p1) p1->GetField(Packages::Disu::NODLAY, &NODLAY);
 
   int MAXBOUND = g->NumCol() * g->NumRow();
   if (NODLAY) MAXBOUND = NODLAY[0];

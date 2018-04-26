@@ -1161,7 +1161,7 @@ void NativeExpArr2d::IboundToChdForMf6 ()
     {
       if (ibnd[k][i] < 0)
       {
-        cellid.push_back(startId + i);
+        cellid.push_back(startId + (int)i);
         head.push_back(shead[k][i] * sheadMult[k]);
       }
     }

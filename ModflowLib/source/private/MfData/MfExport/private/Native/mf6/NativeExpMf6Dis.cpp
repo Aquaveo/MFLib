@@ -10,6 +10,7 @@
 #include <sstream>
 
 #include <private\MfData\MfGlobal.h>
+#include <private\MfData\MfExport\private\CellNumbering.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExporterImpl.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
@@ -133,6 +134,12 @@ bool NativeExpMf6Dis::Export ()
   desc.assign(lines.size(), "");
   m_pack->AddToStoredLinesDesc(lines, desc);
   m_pack->WriteStoredLines();
+  // create cell numbering class
+  if (!m_pack->GetNative()->GetCellNumbering())
+  {
+    CellNumbering* cn = CellNumbering::New(m_pack->GetGlobal());
+    m_pack->GetNative()->SetCellNumbering(cn);
+  }
   return true;
 } // NativeExpMf6Dis::ExportMf6Dis
 

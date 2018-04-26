@@ -49,19 +49,26 @@ bool NativeExpMf6Evt::Export ()
   const int *NEVTOP(0), *INSURF(0), *INEVTR(0), *INEXDP(0), *INIEVT(0),
     * IEVTCB(0),* MXNDEVT(0);
   MfPackage* p = m_pack->GetPackage();
+  if (!p) return false;
+
+  bool etsPack = p->PackageName() == "ETS";
+
   if (!p->GetField(Packages::EVTpack::NEVTOP, &NEVTOP) || !NEVTOP ||
       !p->GetField(Packages::EVTpack::INSURF, &INSURF) || !INSURF ||
       !p->GetField(Packages::EVTpack::INEVTR, &INEVTR) || !INEVTR ||
       !p->GetField(Packages::EVTpack::INEXDP, &INEXDP) || !INEXDP ||
-      !p->GetField(Packages::EVTpack::INIEVT, &INIEVT) || !INIEVT ||
-      !p->GetField("IEVTCB", &IEVTCB) || !IEVTCB)
+      !p->GetField(Packages::EVTpack::INIEVT, &INIEVT) || !INIEVT)
     return false;
+  if (etsPack) p->GetField("IETSCB", &IEVTCB);
+  else         p->GetField("IEVTCB", &IEVTCB);
+  if (!IEVTCB) return false;
+
   p->GetField(Packages::EVTpack::MXNDEVT, &MXNDEVT);
 
   // need number of cells in layer 1
   MfPackage* p1 = g->GetPackage(Packages::DISU);
   const int* NODLAY(0);
-  p1->GetField(Packages::Disu::NODLAY, &NODLAY);
+  if (p1) p1->GetField(Packages::Disu::NODLAY, &NODLAY);
 
   int MAXBOUND = g->NumCol() * g->NumRow();
   if (NODLAY) MAXBOUND = NODLAY[0];
@@ -71,6 +78,7 @@ bool NativeExpMf6Evt::Export ()
   g->GetIntVar("ARRAYS_LAYERED", layers);
   // unstructured grid with this option means the cell id is specified
   if (2 == *NEVTOP && g->Unstructured()) layers = 0;
+  if (etsPack) layers = 0;
 
   if (1 == g->GetCurrentPeriod())
   {
@@ -111,10 +119,20 @@ bool NativeExpMf6Evt::Export ()
   ss << "BEGIN PERIOD " << g->GetCurrentPeriod();
   lines.push_back(ss.str());
 
+  CStr arrayLay(ARR_EVT_LAY), arraySurf(ARR_EVT_SURF),
+       arrayRate(ARR_EVT_RATE), arrayExdp(ARR_EVT_EXT);
+  if (etsPack)
+  {
+    arrayLay = ARR_ETS_LAY;
+    arraySurf = ARR_ETS_SURF;
+    arrayRate = ARR_ETS_RATE;
+    arrayExdp = ARR_ETS_EXT;
+  }
+
   CStr layStr, surfStr, rateStr, exdpStr;
   if (writeLayer)
   {
-    layStr = MfExportUtil::GetMf6ArrayString(g, nat, ARR_EVT_LAY);
+    layStr = MfExportUtil::GetMf6ArrayString(g, nat, arrayLay);
     g->SetStrVar(ARR_EVT_LAY, layStr);
     if (layers)
     {
@@ -124,7 +142,7 @@ bool NativeExpMf6Evt::Export ()
   }
   if (*INSURF > -1)
   {
-    surfStr = MfExportUtil::GetMf6ArrayString(g, nat, ARR_EVT_SURF);
+    surfStr = MfExportUtil::GetMf6ArrayString(g, nat, arraySurf);
     g->SetStrVar(ARR_EVT_SURF, surfStr);
     if (layers)
     {
@@ -134,7 +152,7 @@ bool NativeExpMf6Evt::Export ()
   }
   if (*INEVTR > -1)
   {
-    rateStr = MfExportUtil::GetMf6ArrayString(g, nat, ARR_EVT_RATE);
+    rateStr = MfExportUtil::GetMf6ArrayString(g, nat, arrayRate);
     g->SetStrVar(ARR_EVT_RATE, rateStr);
     if (layers)
     {
@@ -144,7 +162,7 @@ bool NativeExpMf6Evt::Export ()
   }
   if (*INEXDP > -1)
   {
-    exdpStr = MfExportUtil::GetMf6ArrayString(g, nat, ARR_EVT_EXT);
+    exdpStr = MfExportUtil::GetMf6ArrayString(g, nat, arrayExdp);
     g->SetStrVar(ARR_EVT_EXT, exdpStr);
     if (layers)
     {
@@ -155,11 +173,11 @@ bool NativeExpMf6Evt::Export ()
 
   if (!layers)
   {
-    CStr disPackType;
+    CStr disPackType("DIS");
     g->GetStrVar("DIS_PACKAGE_TYPE", disPackType);
     const int* NODLAY(0);
     MfPackage* p = g->GetPackage(Packages::DISU);
-    p->GetField(Packages::Disu::NODLAY, &NODLAY);
+    if (p) p->GetField(Packages::Disu::NODLAY, &NODLAY);
 
     std::vector<int> cellids;
     std::vector<Real> surf, rate, exdp;
@@ -216,6 +234,7 @@ bool NativeExpMf6Evt::Export ()
   lines.push_back("END PERIOD");
   lines.push_back("");
   comments.assign(lines.size(), ""); 
+  TmpPackageNameChanger tmp(p, "EVT");
   m_pack->AddToStoredLinesDesc(lines, comments);
   m_pack->WriteStoredLines();
   return true;

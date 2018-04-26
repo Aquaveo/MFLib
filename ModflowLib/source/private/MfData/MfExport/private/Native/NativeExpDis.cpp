@@ -10,6 +10,7 @@
 #include <sstream>
 
 #include <private\MfData\MfGlobal.h>
+#include <private\MfData\MfExport\private\CellNumbering.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\MfData\MfExport\private\Native\mf6\NativeExpMf6Dis.h>
@@ -67,6 +68,11 @@ bool NativeExpDis::Export ()
 
   WriteComments();
   WriteStoredLines();
+
+  // create cell numbering class
+  CellNumbering* cn = CellNumbering::New(GetGlobal());
+  GetNative()->SetCellNumbering(cn);
+
   return true;
 } // MfNativeExpDis::Export
 //------------------------------------------------------------------------------
