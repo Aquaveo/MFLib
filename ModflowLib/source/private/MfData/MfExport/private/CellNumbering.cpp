@@ -111,11 +111,11 @@ public:
     {
       int idInLay, lay;
       IdInLayerFromId(idInLay, lay, id);
-      ln.Format("%5d %5d ", lay, idInLay);
+      ln.Format("%5d %10d ", lay, idInLay);
     }
     else
     {
-      ln.Format("%5d ", id);
+      ln.Format("%10d ", id);
     }
     return ln;
   } // CellIdStringFromId
@@ -164,7 +164,7 @@ public:
       for (size_t q=0; q<m_NODLAY.size(); ++q)
       {
         endId += m_NODLAY[q];
-        if (id < endId)
+        if (id <= endId)
         {
           lay = (int)(q + 1);
           idInLay = id - beginId;

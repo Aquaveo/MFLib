@@ -91,7 +91,12 @@ bool NativeExpMf6Nam::Export ()
   {
     CStr ft = ftype[i];
     CStr fn = fname[i];
-    if (ft == "ETS") ft = "EVT";
+    if (ft == "ETS")
+    {
+      ft = "EVT";
+      util::StripExtensionFromFilename(fn, fn);
+      fn += ".evt";
+    }
     if (!ValidPackage(ft)) continue;
 
     if (ft == "DISU" && arraysLayered)
@@ -164,6 +169,9 @@ bool NativeExpMf6Nam::ValidPackage (const CStr& a_ftype)
   {
     return true;
   }
+  CStr msg;
+  msg.Format("WARNING: Package %s is not supported for conversion to MF6.", a_ftype);
+  printf("%s\n", msg.c_str());
   return false;
 } // NativeExpMf6Nam::ValidPackage
 //------------------------------------------------------------------------------

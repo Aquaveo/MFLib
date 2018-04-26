@@ -10,6 +10,7 @@
 #include <sstream>
 
 #include <private\MfData\MfGlobal.h>
+#include <private\MfData\MfExport\private\CellNumbering.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExporterImpl.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
@@ -62,7 +63,9 @@ bool NativeExpMf6Evt::Export ()
   if (etsPack) p->GetField("IETSCB", &IEVTCB);
   else         p->GetField("IEVTCB", &IEVTCB);
   if (!IEVTCB) return false;
-
+  const int* NETSEG(0),* INSGDF;
+  p->GetField(Packages::EVTpack::NETSEG, &NETSEG);
+  p->GetField(Packages::EVTpack::INSGDF, &INSGDF);
   p->GetField(Packages::EVTpack::MXNDEVT, &MXNDEVT);
 
   // need number of cells in layer 1
@@ -105,6 +108,12 @@ bool NativeExpMf6Evt::Export ()
       std::stringstream ss;
       ss << "  MAXBOUND " << MAXBOUND;
       lines.push_back(ss.str());
+      if (NETSEG && *NETSEG > 1)
+      {
+        std::stringstream ss1;
+        ss1 << "  NSEG " << *NETSEG;
+        lines.push_back(ss1.str());
+      }
       lines.push_back("END DIMENSIONS");
       lines.push_back("");
     }
@@ -129,7 +138,7 @@ bool NativeExpMf6Evt::Export ()
     arrayExdp = ARR_ETS_EXT;
   }
 
-  CStr layStr, surfStr, rateStr, exdpStr;
+  CStr layStr, surfStr, rateStr, exdpStr, pxdpStr, petmStr;
   if (writeLayer)
   {
     layStr = MfExportUtil::GetMf6ArrayString(g, nat, arrayLay);
@@ -170,9 +179,18 @@ bool NativeExpMf6Evt::Export ()
       lines.push_back(exdpStr);
     }
   }
+  if (INSGDF && *INSGDF > -1)
+  {
+    pxdpStr = MfExportUtil::GetMf6ArrayString(g, nat, ARR_ETS_PXDP);
+    g->SetStrVar(ARR_ETS_PXDP, pxdpStr);
+    petmStr = MfExportUtil::GetMf6ArrayString(g, nat, ARR_ETS_PETM);
+    g->SetStrVar(ARR_ETS_PETM, petmStr);
+  }
 
   if (!layers)
   {
+    CellNumbering* cn = nat->GetCellNumbering();
+    ASSERT(cn);
     CStr disPackType("DIS");
     g->GetStrVar("DIS_PACKAGE_TYPE", disPackType);
     const int* NODLAY(0);
@@ -180,18 +198,25 @@ bool NativeExpMf6Evt::Export ()
     if (p) p->GetField(Packages::Disu::NODLAY, &NODLAY);
 
     std::vector<int> cellids;
-    std::vector<Real> surf, rate, exdp;
+    std::vector<Real> surf, rate, exdp, pxdp, petm;
 
     g->GetStrVar(ARR_EVT_LAY, layStr);
     g->GetStrVar(ARR_EVT_SURF, surfStr);
     g->GetStrVar(ARR_EVT_RATE, rateStr);
     g->GetStrVar(ARR_EVT_EXT, exdpStr);
+    g->GetStrVar(ARR_ETS_PXDP, pxdpStr);
+    g->GetStrVar(ARR_ETS_PETM, petmStr);
 
     if (!layStr.empty())
       MfExportUtil::Mf6StringToArray(layStr, cellids, MAXBOUND);
     MfExportUtil::Mf6StringToArray(surfStr, surf, MAXBOUND);
     MfExportUtil::Mf6StringToArray(rateStr, rate, MAXBOUND);
     MfExportUtil::Mf6StringToArray(exdpStr, exdp, MAXBOUND);
+    if (!pxdpStr.empty())
+    {
+      MfExportUtil::Mf6MultiLayerStringToArray(pxdpStr, pxdp, *NETSEG-1, MAXBOUND);
+      MfExportUtil::Mf6MultiLayerStringToArray(petmStr, petm, *NETSEG-1, MAXBOUND);
+    }
 
     if (cellids.empty())
     {
@@ -199,33 +224,46 @@ bool NativeExpMf6Evt::Export ()
       for (size_t i=0; i<surf.size(); ++i)
         cellids.push_back((int)i+1);
     }
+    else if ("DIS" == disPackType)
+    { // If the flow package is dis then we are here because this is the ETS
+      // package. ETS is only supported by writing the list format of the evt
+      // file.
+      int cnt(0);
+      // convert from IJK to id
+      for (int i=0; i<g->NumRow(); ++i)
+      {
+        for (int j=0; j<g->NumCol(); ++j)
+        {
+          cellids[cnt] = cn->IdFromIjk(i+1, j+1, cellids[cnt]);
+          cnt++;
+        }
+      }
+    }
 
     int w = util::RealWidth();
     CStr str;
     std::stringstream ss;
     for (size_t i=0; i<cellids.size(); ++i)
     {
-      str.Format("%10d", cellids[i]);
-      if ("DISV" == disPackType && NODLAY)
-      {
-        int begId(0), endId(0), idInLay, layId;
-        for (int k=0; k<g->NumLay(); ++k)
-        {
-          endId += NODLAY[k];
-          if (cellids[i] <= endId)
-          {
-            idInLay = cellids[i] - begId;
-            layId = k + 1;
-            break;
-          }
-          begId += NODLAY[k];
-        }
-        str.Format("%5d %10d", layId, idInLay);
-      }
-      ss << "  " << str << " "
+      str = cn->CellIdStringFromId(cellids[i]);
+      ss << "  " << str
           << STR(surf[i], -1, w, STR_FULLWIDTH) << " "
           << STR(rate[i], -1, w, STR_FULLWIDTH) << " "
           << STR(exdp[i], -1, w, STR_FULLWIDTH);
+      // if ETS write additional data
+      if (!petm.empty())
+      {
+        for (int n=0; n<*NETSEG-1; ++n)
+        {
+          int idx = (int)i + (n * MAXBOUND);
+          ss << " " << STR(pxdp[idx], -1, w, STR_FULLWIDTH);
+        }
+        for (int n=0; n<*NETSEG-1; ++n)
+        {
+          int idx = (int)i + (n * MAXBOUND);
+          ss << " " << STR(petm[idx], -1, w, STR_FULLWIDTH);
+        }
+      }
       if (i+1 < cellids.size()) ss << "\n";
     }
     lines.push_back(ss.str());

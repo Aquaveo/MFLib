@@ -208,7 +208,7 @@ void NativeExpEts::Line9 ()
 /// \brief
 //------------------------------------------------------------------------------
 void NativeExpEts::Line10and11 ()
-{
+{ 
   const int *netseg(0), *insgdf(0);
   MfPackage* a_p = GetPackage();
   if (!a_p->GetField(Packages::EVTpack::NETSEG, &netseg) || !netseg ||

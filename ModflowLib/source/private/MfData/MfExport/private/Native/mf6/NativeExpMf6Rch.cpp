@@ -10,6 +10,7 @@
 #include <sstream>
 
 #include <private\MfData\MfGlobal.h>
+#include <private\MfData\MfExport\private\CellNumbering.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExporterImpl.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
@@ -131,13 +132,15 @@ bool NativeExpMf6Rch::Export ()
     g->SetStrVar(ARR_RCH_RCH, rateStr);
     if (layers)
     {
-      lines.push_back("RECHARGE LAYERED");
+      lines.push_back("  RECHARGE LAYERED");
       lines.push_back(rateStr);
     }
   }
 
   if (!layers)
   {
+    CellNumbering* cn = nat->GetCellNumbering();
+    ASSERT(cn);
     CStr disPackType;
     g->GetStrVar("DIS_PACKAGE_TYPE", disPackType);
     const int* NODLAY(0);
@@ -165,24 +168,8 @@ bool NativeExpMf6Rch::Export ()
     std::stringstream ss;
     for (size_t i=0; i<cellids.size(); ++i)
     {
-      str.Format("%10d", cellids[i]);
-      if ("DISV" == disPackType && NODLAY)
-      {
-        int begId(0), endId(0), idInLay, layId;
-        for (int k=0; k<g->NumLay(); ++k)
-        {
-          endId += NODLAY[k];
-          if (cellids[i] <= endId)
-          {
-            idInLay = cellids[i] - begId;
-            layId = k + 1;
-            break;
-          }
-          begId += NODLAY[k];
-        }
-        str.Format("%5d %10d", layId, idInLay);
-      }
-      ss << "  " << str << " "
+      str = cn->CellIdStringFromId(cellids[i]);
+      ss << "  " << str
         << STR(rate[i], -1, w, STR_FULLWIDTH);
       if (i+1 < cellids.size()) ss << "\n";
     }
