@@ -698,6 +698,7 @@ void H5UtilT::testSupportedPackage ()
   TS_ASSERT(t->IsTypeSupported(BAS6));
   TS_ASSERT(t->IsTypeSupported(BCF));
   TS_ASSERT(t->IsTypeSupported(BCF6));
+  TS_ASSERT(t->IsTypeSupported(BCT));
   TS_ASSERT(t->IsTypeSupported(CHD));
   TS_ASSERT(t->IsTypeSupported(CLN));
   TS_ASSERT(t->IsTypeSupported(DE4));
@@ -744,14 +745,14 @@ void H5UtilT::testSupportedPackage ()
   TS_ASSERT(!t->IsTypeSupported(VSC));
   TS_ASSERT(t->IsTypeSupported(ZON));
 
-  TS_ASSERT_EQUALS(e.GetTypes().size(), 48);
+  TS_ASSERT_EQUALS(e.GetTypes().size(), 49);
 }
 //------------------------------------------------------------------------------
 void H5UtilT::testGetArrayMap ()
 {
   MfData::Export::Mf2kNative ex;
   std::map<CStr, CStr> &m(ex.GetMapArrays());
-  TS_ASSERT_EQUALS(66, m.size());
+  TS_ASSERT_EQUALS(84, m.size());
   TS_ASSERT(m.find("crap") == m.end());
 
   TS_ASSERT(m[ARR_DIS_TOP] == "top");

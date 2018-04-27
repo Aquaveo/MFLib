@@ -13,6 +13,7 @@
 #include <private\MfData\MfExport\private\Native\NativeExpArr2d.h>
 #include <private\MfData\MfExport\private\Native\NativeExpBas.h>
 #include <private\MfData\MfExport\private\Native\NativeExpBcf.h>
+#include <private\MfData\MfExport\private\Native\NativeExpBct.h>
 #include <private\MfData\MfExport\private\Native\NativeExpCln.h>
 #include <private\MfData\MfExport\private\Native\NativeExpDis.h>
 #include <private\MfData\MfExport\private\Native\NativeExpDisu.h>
@@ -228,6 +229,7 @@ NativePackExp* NativeUtil::CreatePackExp (Mf2kNative* a_native,
   else if (Packages::SWI == type)               ret = new NativeExpSwi();
   else if (VdfPack(type))                       ret = new NativeExpVdf();
   else if (VscPack(type))                       ret = new NativeExpVsc();
+  else if (Packages::BCT == type)               ret = new NativeExpBct();
   // leave at end. This is the last "package" processed
   else if ("STP" == type)                       ret = new NativeExpSTP();
   else if (Packages::BIN == type)

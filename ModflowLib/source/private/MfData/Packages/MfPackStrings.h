@@ -13,6 +13,7 @@ namespace MfData
     const char * const BAS6 = "BAS6"; // name file stuff
     const char * const BCF = "BCF";
     const char * const BCF6 = "BCF6"; // name file stuff
+    const char * const BCT = "BCT";
     const char * const BIN = "BIN"; // binary array
     const char * const BTN = "BTN";
     const char * const CHD = "CHD";

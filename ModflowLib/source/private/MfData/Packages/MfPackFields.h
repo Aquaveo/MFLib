@@ -8,6 +8,28 @@ namespace MfData
 {
   namespace Packages
   {
+    namespace Bct
+    {
+      const char * const ITRNSP = "ITRNSP";
+      const char * const IBCTCB = "IBCTCB";
+      const char * const MCOMP = "MCOMP";
+      const char * const ICBNDFLG = "ICBNDFLG";
+      const char * const ITVD = "ITVD";
+      const char * const IADSORB = "IADSORB";
+      const char * const ICT = "ICT";
+      const char * const CINACT = "CINACT";
+      const char * const CICLOSE = "CICLOSE";
+      const char * const IDISP = "IDISP";
+      const char * const IXDISP = "IXDISP";
+      const char * const DIFFNC = "DIFFNC";
+      const char * const IZOD = "IZOD";
+      const char * const IFOD = "IFOD";
+      const char * const IFMBC = "IFMBC";
+      const char * const MBEGWUNF = "MBEGWUNF";
+      const char * const MBEGWUNT = "MBEGWUNT";
+      const char * const MBECLNUNF = "MBECLNUNF";
+      const char * const MBECLNUNT = "MBECLNUNT";
+  }
     namespace Cln
     {
       const char * const ICLNTIB = "ICLNTIB";

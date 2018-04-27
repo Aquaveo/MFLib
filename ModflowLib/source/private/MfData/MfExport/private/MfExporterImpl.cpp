@@ -44,6 +44,26 @@ void ArrayMap (std::map<CStr, ArrayInfo>& a_map)
   a_map[ARR_BCF_SF1] = ArrayInfo(PA::BCF, "SF1_", "", "Sf1");
   a_map[ARR_BCF_SF2] = ArrayInfo(PA::BCF, "SF2_", "", "Sf2");
   a_map[ARR_BCF_WET] = ArrayInfo(PA::BCF, "WET_", "", "WETDRY");
+  // BCT
+  a_map[ARR_BCT_ICBUND] = ArrayInfo(PA::BCT, "", "", "ICBUND");
+  a_map[ARR_BCT_PRSITY] = ArrayInfo(PA::BCT, "", "", "PRSITY");
+  a_map[ARR_BCT_BULKD] = ArrayInfo(PA::BCT, "", "", "BULKD");
+  a_map[ARR_BCT_ANGLEX] = ArrayInfo(PA::BCT, "", "", "ANGLEX");
+  a_map[ARR_BCT_ADSORB] = ArrayInfo(PA::BCT, "", "", "ADSORB");
+  a_map[ARR_BCT_CONC] = ArrayInfo(PA::BCT, "", "", "CONC");
+  a_map[ARR_BCT_DL] = ArrayInfo(PA::BCT, "", "", "DL");
+  a_map[ARR_BCT_DT] = ArrayInfo(PA::BCT, "", "", "DT");
+  a_map[ARR_BCT_DLX] = ArrayInfo(PA::BCT, "", "", "DLX");
+  a_map[ARR_BCT_DLY] = ArrayInfo(PA::BCT, "", "", "DLY");
+  a_map[ARR_BCT_DLZ] = ArrayInfo(PA::BCT, "", "", "DLZ");
+  a_map[ARR_BCT_DTXY] = ArrayInfo(PA::BCT, "", "", "DTXY");
+  a_map[ARR_BCT_DTYZ] = ArrayInfo(PA::BCT, "", "", "DTYZ");
+  a_map[ARR_BCT_DTXZ] = ArrayInfo(PA::BCT, "", "", "DTXZ");
+  a_map[ARR_BCT_FLICH] = ArrayInfo(PA::BCT, "", "", "FLICH");
+  a_map[ARR_BCT_ZODRW] = ArrayInfo(PA::BCT, "", "", "ZODRW");
+  a_map[ARR_BCT_ZODRS] = ArrayInfo(PA::BCT, "", "", "ZODRS");
+  a_map[ARR_BCT_FODRW] = ArrayInfo(PA::BCT, "", "", "FODRW");
+  a_map[ARR_BCT_FODRS] = ArrayInfo(PA::BCT, "", "", "FODRS");
   // HUF
   a_map[ARR_HUF_TOP] = ArrayInfo(PA::HUF, "top", "", "TOP");
   a_map[ARR_HUF_THCK] = ArrayInfo(PA::HUF, "thick", "", "THCK");
@@ -110,14 +130,14 @@ void ArrayMap (std::map<CStr, ArrayInfo>& a_map)
   a_map[ARR_VSC_VSC] = ArrayInfo(PA::VSC, "VSC/07. Property", "", "VISC");
   a_map[ARR_VSC_CONC] = ArrayInfo(PA::VSC, "VSC/07. Property", "", "VCONC");
 } // ArrayMap
-void InitArrayMap (std::map<CStr, CStr>& m_map)
+void InitArrayMap (std::map<CStr, CStr>& a_map)
 {
-  m_map.clear();
+  a_map.clear();
   std::map<CStr, ArrayInfo> theMap;
   ArrayMap(theMap);
   std::map<CStr, ArrayInfo>::iterator it = theMap.begin();
   for (; it != theMap.end(); ++it)
-    m_map.insert(std::make_pair(it->first, it->second.m_H5dataset));
+    a_map.insert(std::make_pair(it->first, it->second.m_H5dataset));
 } // InitArrayMap
 } // unnamed namespace
 //------------------------------------------------------------------------------
@@ -218,6 +238,7 @@ void MfExporterImpl::InitExtensions ()
   m_types.insert(std::make_pair(BAS6, "ba6"));
   m_types.insert(std::make_pair(BCF, "bc6"));
   m_types.insert(std::make_pair(BCF6, "bc6"));
+  m_types.insert(std::make_pair(BCT, "bct"));
   m_types.insert(std::make_pair(CHD, CHD));
   m_types.insert(std::make_pair(CLN, CLN));
   m_types.insert(std::make_pair(DE4, DE4));

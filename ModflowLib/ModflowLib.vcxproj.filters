@@ -394,6 +394,9 @@
     <ClCompile Include="source\private\MfData\MfExport\private\CellNumbering.cpp">
       <Filter>source\private\MfData\MfExport\private</Filter>
     </ClCompile>
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpBct.cpp">
+      <Filter>source\private\MfData\MfExport\private\Native\mf6</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Export.h">
@@ -1046,6 +1049,12 @@
     </ClInclude>
     <ClInclude Include="source\private\MfData\MfExport\private\CellNumbering.h">
       <Filter>source\private\MfData\MfExport\private</Filter>
+    </ClInclude>
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpBct.h">
+      <Filter>source\private\MfData\MfExport\private\Native\mf6</Filter>
+    </ClInclude>
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpBct.t.h">
+      <Filter>source\private\MfData\MfExport\private\Native\mf6</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
