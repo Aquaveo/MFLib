@@ -70,8 +70,11 @@ bool NativeExpDis::Export ()
   WriteStoredLines();
 
   // create cell numbering class
-  CellNumbering* cn = CellNumbering::New(GetGlobal());
-  GetNative()->SetCellNumbering(cn);
+  if (GetNative()->GetExportMf6())
+  {
+    CellNumbering* cn = CellNumbering::New(GetGlobal());
+    GetNative()->SetCellNumbering(cn);
+  }
 
   return true;
 } // MfNativeExpDis::Export

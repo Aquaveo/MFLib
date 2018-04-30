@@ -96,17 +96,29 @@ void NativeExpBct::ExportArray (const CStr& a_array, int a_speciesId)
 
   int startIdx(0);
   std::vector<CStr>& lines(p->StringsToWrite());
-  if (a_speciesId > -1)
+
+  if (ARR_BCT_ANGLEX != a_array)
   {
-    startIdx = (a_speciesId - 1) * GetGlobal()->NumLay();
-  }
-  for (int lay=1, i=0; i<GetGlobal()->NumLay(); ++i, ++lay)
-  {
-    d.Format("%s Layer %d", description, lay);
-    AddToStoredLinesDesc(lines[startIdx + i], d);
-    if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), lines[i + startIdx]))
+    if (a_speciesId > -1)
     {
-      AddToStoredLinesDesc(lines[++i + startIdx], "");
+      startIdx = (a_speciesId - 1) * GetGlobal()->NumLay();
+    }
+    for (int lay=1, i=0; i<GetGlobal()->NumLay(); ++i, ++lay)
+    {
+      d.Format("%s Layer %d", description, lay);
+      AddToStoredLinesDesc(lines[startIdx + i], d);
+      if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), lines[i + startIdx]))
+      {
+        AddToStoredLinesDesc(lines[++i + startIdx], "");
+      }
+    }
+  }
+  else
+  {
+    AddToStoredLinesDesc(lines[0], description);
+    if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), lines[0]))
+    {
+      AddToStoredLinesDesc(lines[1], "");
     }
   }
   lines.clear();
@@ -222,7 +234,7 @@ bool NativeExpBct::Export ()
       a_p->GetField(Packages::Bct::IFOD, &ifod) && ifod)
   {
 
-    if (*icbndflg == 0) // ICBUND documentation says the opposite in some places.
+    if (*icbndflg == 0) // ICBUND doc says the opposite in some places but is wrong.
     {
       ExportArray(ARR_BCT_ICBUND, -1);
     }
@@ -281,6 +293,9 @@ bool NativeExpBct::Export ()
       ExportArray(ARR_BCT_CONC, speciesId);
     }
   }
+
+  WriteComments();
+  WriteStoredLines();
   return true;
 } // MfNativeExpBct::Export
 //------------------------------------------------------------------------------
