@@ -951,6 +951,7 @@ build_test_runner.bat
     <ClCompile Include="source\private\MfData\MfExport\private\Native\Mnw1PropList.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpBct.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpCln.cpp" />
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpDdf.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpDisu.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpGnc.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\NativeExpLgr.cpp" />
@@ -1105,6 +1106,8 @@ build_test_runner.bat
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpBct.t.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpCln.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpCln.t.h" />
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpDdf.h" />
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpDdf.t.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpDisu.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpDisu.t.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\NativeExpGnc.h" />

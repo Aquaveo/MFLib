@@ -241,6 +241,7 @@ void MfExporterImpl::InitExtensions ()
   m_types.insert(std::make_pair(BCT, "bct"));
   m_types.insert(std::make_pair(CHD, CHD));
   m_types.insert(std::make_pair(CLN, CLN));
+  m_types.insert(std::make_pair(DDF, "ddf"));
   m_types.insert(std::make_pair(DE4, DE4));
   m_types.insert(std::make_pair(DIS, DIS));
   m_types.insert(std::make_pair(DISU, DISU));

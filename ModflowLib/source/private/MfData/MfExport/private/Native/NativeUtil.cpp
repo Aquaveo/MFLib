@@ -15,6 +15,7 @@
 #include <private\MfData\MfExport\private\Native\NativeExpBcf.h>
 #include <private\MfData\MfExport\private\Native\NativeExpBct.h>
 #include <private\MfData\MfExport\private\Native\NativeExpCln.h>
+#include <private\MfData\MfExport\private\Native\NativeExpDdf.h>
 #include <private\MfData\MfExport\private\Native\NativeExpDis.h>
 #include <private\MfData\MfExport\private\Native\NativeExpDisu.h>
 #include <private\MfData\MfExport\private\Native\NativeExpEts.h>
@@ -192,6 +193,7 @@ NativePackExp* NativeUtil::CreatePackExp (Mf2kNative* a_native,
   else if (MfExportUtil::IsSolver(type))        ret = new NativeExpSolver();
   else if (Packages::NAM == type)               ret = new NativeExpNam();
   else if (ClnPack(type))                       ret = new NativeExpCln();
+  else if (Packages::DDF == type)               ret = new NativeExpDdf();
   else if (Packages::DIS == type)               ret = new NativeExpDis();
   else if (Packages::DISU == type)              ret = new NativeExpDisu();
   else if (Packages::BAS == type)               ret = new NativeExpBas();

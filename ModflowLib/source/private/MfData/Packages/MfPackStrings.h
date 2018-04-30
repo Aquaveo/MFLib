@@ -27,6 +27,7 @@ namespace MfData
     const char * const CLNLine15 = "CL8"; // USG
     const char * const CLNLine16 = "CL9"; // USG
     const char * const CLNWEL = "CLNWEL"; // USG
+    const char * const DDF = "DDF";
     const char * const DE4 = "DE4";
     const char * const DE4Line1 = "DE4Line1";
     const char * const DE4Line2 = "DE4Line2";

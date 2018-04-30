@@ -701,6 +701,7 @@ void H5UtilT::testSupportedPackage ()
   TS_ASSERT(t->IsTypeSupported(BCT));
   TS_ASSERT(t->IsTypeSupported(CHD));
   TS_ASSERT(t->IsTypeSupported(CLN));
+  TS_ASSERT(t->IsTypeSupported(DDF));
   TS_ASSERT(t->IsTypeSupported(DE4));
   TS_ASSERT(t->IsTypeSupported(DIS));
   TS_ASSERT(t->IsTypeSupported(DRN));
@@ -745,7 +746,7 @@ void H5UtilT::testSupportedPackage ()
   TS_ASSERT(!t->IsTypeSupported(VSC));
   TS_ASSERT(t->IsTypeSupported(ZON));
 
-  TS_ASSERT_EQUALS(e.GetTypes().size(), 49);
+  TS_ASSERT_EQUALS(e.GetTypes().size(), 50);
 }
 //------------------------------------------------------------------------------
 void H5UtilT::testGetArrayMap ()

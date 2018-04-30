@@ -61,6 +61,12 @@ namespace MfData
       const char * const IHEADOPT = "IHEADOPT";
       const char * const HVALUE = "HVALUE";
     }
+    namespace Ddf
+    {
+      const char * const RHOFRESH = "RHOFRESH";
+      const char * const RHOSTD = "RHOSTD";
+      const char * const CSTD = "CSTD";
+    }
     namespace DisPack
     {
       const char * const LAYCBD = "LAYCBD";
