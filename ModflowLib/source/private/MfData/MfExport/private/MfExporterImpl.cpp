@@ -64,6 +64,21 @@ void ArrayMap (std::map<CStr, ArrayInfo>& a_map)
   a_map[ARR_BCT_ZODRS] = ArrayInfo(PA::BCT, "", "", "ZODRS");
   a_map[ARR_BCT_FODRW] = ArrayInfo(PA::BCT, "", "", "FODRW");
   a_map[ARR_BCT_FODRS] = ArrayInfo(PA::BCT, "", "", "FODRS");
+  // DPT
+  a_map[ARR_DPT_ICBUNDIM] = ArrayInfo(PA::DPT, "", "", "ICBUNDIM");
+  a_map[ARR_DPT_PHIF] = ArrayInfo(PA::DPT, "", "", "PHIF");
+  a_map[ARR_DPT_PRSITYIM] = ArrayInfo(PA::DPT, "", "", "PRSITYIM");
+  a_map[ARR_DPT_BULKDIM] = ArrayInfo(PA::DPT, "", "", "BULKDIM");
+  a_map[ARR_DPT_DLIM] = ArrayInfo(PA::DPT, "", "", "DLIM");
+  a_map[ARR_DPT_DDTTR] = ArrayInfo(PA::DPT, "", "", "DDTTR");
+  a_map[ARR_DPT_SIM] = ArrayInfo(PA::DPT, "", "", "SIM");
+  a_map[ARR_DPT_ADSORBIM] = ArrayInfo(PA::DPT, "", "", "ADSORBIM");
+  a_map[ARR_DPT_FLICHIM] = ArrayInfo(PA::DPT, "", "", "FLICHIM");
+  a_map[ARR_DPT_ZODRWIM] = ArrayInfo(PA::DPT, "", "", "ZODRWIM");
+  a_map[ARR_DPT_ZODRSIM] = ArrayInfo(PA::DPT, "", "", "ZODRSIM");
+  a_map[ARR_DPT_FODRWIM] = ArrayInfo(PA::DPT, "", "", "FODRWIM");
+  a_map[ARR_DPT_FODRS] = ArrayInfo(PA::DPT, "", "", "FODRS");
+  a_map[ARR_DPT_CONC] = ArrayInfo(PA::DPT, "", "", "DPT_CONC");
   // HUF
   a_map[ARR_HUF_TOP] = ArrayInfo(PA::HUF, "top", "", "TOP");
   a_map[ARR_HUF_THCK] = ArrayInfo(PA::HUF, "thick", "", "THCK");
@@ -247,6 +262,7 @@ void MfExporterImpl::InitExtensions ()
   m_types.insert(std::make_pair(DISU, DISU));
   m_types.insert(std::make_pair(DRN, DRN));
   m_types.insert(std::make_pair(DRT, DRT));
+  m_types.insert(std::make_pair(DPT, "dpt"));
   m_types.insert(std::make_pair(EVT, EVT));
   m_types.insert(std::make_pair(ETS, ETS));
   m_types.insert(std::make_pair(GAGE, "gag"));

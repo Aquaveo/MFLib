@@ -234,7 +234,7 @@ bool NativeExpBct::Export ()
       a_p->GetField(Packages::Bct::IFOD, &ifod) && ifod)
   {
 
-    if (*icbndflg == 0) // ICBUND doc says the opposite in some places but is wrong.
+    if (*icbndflg == 0) // The doc says the opposite in some places but is wrong.
     {
       ExportArray(ARR_BCT_ICBUND, -1);
     }

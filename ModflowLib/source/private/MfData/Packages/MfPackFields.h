@@ -106,6 +106,18 @@ namespace MfData
       const char * const TSMULT = "TSMULT";
       const char * const ISSFLG = "ISSFLG";
     }
+    namespace Dpt
+    {
+      const char* const IDPTCB = "IDPTCB";
+      const char* const IDPTCON = "IDPTCON";
+      const char* const ICBNDIMFLG = "ICBNDIMFLG";
+      const char* const IADSORBIM = "IADSORBIM";
+      const char* const IDISPIM = "IDISPIM";
+      const char* const IZODIM = "IZODIM";
+      const char* const IFODIM = "IFODIM";
+      const char* const IMSAT = "IMSAT";
+      const char* const IFRAHK = "IFRAHK";
+    }
     namespace ListPack
     {
       const char * const ITMP = "ITMP";

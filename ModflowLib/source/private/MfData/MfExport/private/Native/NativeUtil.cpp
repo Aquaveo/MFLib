@@ -18,6 +18,7 @@
 #include <private\MfData\MfExport\private\Native\NativeExpDdf.h>
 #include <private\MfData\MfExport\private\Native\NativeExpDis.h>
 #include <private\MfData\MfExport\private\Native\NativeExpDisu.h>
+#include <private\MfData\MfExport\private\Native\NativeExpDpt.h>
 #include <private\MfData\MfExport\private\Native\NativeExpEts.h>
 #include <private\MfData\MfExport\private\Native\NativeExpEvt.h>
 #include <private\MfData\MfExport\private\Native\NativeExpGag.h>
@@ -196,6 +197,7 @@ NativePackExp* NativeUtil::CreatePackExp (Mf2kNative* a_native,
   else if (Packages::DDF == type)               ret = new NativeExpDdf();
   else if (Packages::DIS == type)               ret = new NativeExpDis();
   else if (Packages::DISU == type)              ret = new NativeExpDisu();
+  else if (Packages::DPT == type)               ret = new NativeExpDpt();
   else if (Packages::BAS == type)               ret = new NativeExpBas();
   else if (Packages::BCF == type)               ret = new NativeExpBcf();
   else if ("L98" == type)                       ret = new NativeExpLpf();

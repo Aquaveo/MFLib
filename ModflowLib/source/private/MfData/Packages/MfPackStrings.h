@@ -35,6 +35,7 @@ namespace MfData
     const char * const DISU = "DISU";
     const char * const DRN = "DRN";
     const char * const DRT = "DRT";
+    const char * const DPT = "DPT";
     const char * const DSP = "DSP";
     const char * const ETS = "ETS";
     const char * const EVT = "EVT";
