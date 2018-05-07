@@ -107,6 +107,9 @@ bool NativeExpMf6Nam::Export ()
     }
     if (ft == "CHD") chdExists = true;
 
+    util::StripAllButExtension(fn, fn);
+    fn = baseName + "." + fn;
+
     lines.push_back("  " + ft + "6  " + fn);
   }
   lines.push_back("  NPF6 " + baseName + ".npf");

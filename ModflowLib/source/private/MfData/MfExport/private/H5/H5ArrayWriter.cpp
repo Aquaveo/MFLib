@@ -68,8 +68,6 @@ public:
   int  GetMultiplierIdx0();
   int  GetMultiplierIdx1();
 
-  void WriteUzfFirstSp();
-
   void Extend3dDblArray (
     const char* a_path,
     int a_sp,
@@ -566,7 +564,6 @@ int H5ArrayWriter::impl::GetNumDim ()
     if (iUzfStressData(path))
     {
       nDim = 3;
-      WriteUzfFirstSp();
     }
   }
   else if (iSeawatData(path))
@@ -716,24 +713,6 @@ int H5ArrayWriter::impl::GetMultiplierIdx1 ()
   int   rval(m_pack->GetGlobal()->GetCurrentPeriod()-1);
   return rval;
 } // H5ArrayWriter::impl::GetMultiplierIdx1
-//------------------------------------------------------------------------------
-/// \brief
-//------------------------------------------------------------------------------
-void H5ArrayWriter::impl::WriteUzfFirstSp ()
-{
-  int flag(1);
-  if (!m_pack->GetGlobal()->GetIntVar("UZF_ARRAY_FIRST_TIME", flag))
-  {
-    flag = 0;
-    m_pack->GetGlobal()->SetIntVar("UZF_ARRAY_FIRST_TIME", flag);
-    std::vector<hsize_t> tmpDim(3, 1), tmpStart(3, 0);
-    tmpDim[0] = 4;
-    tmpDim[1] = static_cast<hsize_t>(GetNumValsToWrite());
-    tmpDim[2] = static_cast<hsize_t>(m_pack->GetGlobal()->NumPeriods());
-    H5ArrayWriter::WriteDataSetWithZeros(
-      H5Filename().c_str(), H5Path().c_str(), &tmpDim[0], &tmpStart[0]);
-  }
-} // H5ArrayWriter::impl::WriteUzfFirstSp
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
