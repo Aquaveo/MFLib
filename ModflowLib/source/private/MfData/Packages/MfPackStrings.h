@@ -87,6 +87,7 @@ namespace MfData
     const char * const SFRLine2 = "SF2";
     const char * const SFRLine5 = "SF5";
     const char * const SFRLine6 = "SF6";
+    const char * const SFR_MF6 = "SM6";
     const char * const SIP = "SIP";
     const char * const SMS = "SMS"; // USG
     const char * const SOR = "SOR";

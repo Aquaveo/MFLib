@@ -271,6 +271,15 @@ DLLEXPORT void MFLIBEXP_DISPACKAGE1 (const int *a_NLAY,
                     a_LAYCBD, a_IUNSTR);
 } // MFLIBEXP_DISPACKAGE1
 //------------------------------------------------------------------------------
+/// \brief This tells if a MODFLOW-USG grid is stacked.
+/// \param a_IVSD flag from the DISU file
+//------------------------------------------------------------------------------
+DLLEXPORT void MFLIBEXP_IVSD (const int *a_IVSD)
+{
+  if (a_IVSD && *a_IVSD < 0)
+    MfData::MfGlobal::SetStackedGrid(true);
+} // MFLIBEXP_IVSD
+//------------------------------------------------------------------------------
 /// \brief This is the data associated with Discretization package for MODFLOW.
 /// \param a_LAYCBD the array with a flag for each layer to indicate if it has
 ///  a confining layer below it.

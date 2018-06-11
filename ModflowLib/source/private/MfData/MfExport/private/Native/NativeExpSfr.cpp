@@ -13,6 +13,7 @@
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\MfData\MfExport\private\Native\NativeUtil.h>
+#include <private\MfData\MfExport\private\Native\mf6\NativeExpMf6Sfr.h>
 #include <private\MfData\MfExport\private\TxtExporter.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\Packages\MfPackage.h>
@@ -108,15 +109,50 @@ NativeExpSfr::~NativeExpSfr ()
 //------------------------------------------------------------------------------
 bool NativeExpSfr::Export ()
 {
-  GetGlobal()->GetIntVar("SFR_SEG_SIZE", m_sz);
-  MfPackage* p = GetGlobal()->GetPackage(Packages::SFR);
+  using namespace MfData::Packages;
+  MfGlobal* g = GetGlobal();
+  g->GetIntVar("SFR_SEG_SIZE", m_sz);
+  MfPackage* p = g->GetPackage(Packages::SFR);
   if (!p)
   {
     MfPackage p1(Packages::SFR);
-    GetGlobal()->AddPackage(&p1);
+    g->AddPackage(&p1);
   }
 
   CStr nm = GetPackage()->PackageName();
+
+  if (GetNative()->GetExportMf6())
+  {
+    if (Packages::SFRLine2 == nm)
+    {
+      MfPackage* p1 = g->GetPackage(SFRLine1);
+      MfPackage* p2 = g->GetPackage(SFRLine2);
+      // We may need these values for export of MF6 so we save them here
+      // because they become corrupted by the time we try to write MF6
+      if (p1)
+      {
+        const int* nstrm;
+        p1->GetField(SFRpack::NSTRM, &nstrm);
+        if (nstrm) g->SetIntVar(SFRpack::NSTRM, *nstrm);
+      }
+      if (p2)
+      {
+        const int* nistrmd(0),* nstrmd(0);
+        p2->GetField(SFRpack::NISTRMD, &nistrmd);
+        p2->GetField(SFRpack::NSTRMD, &nstrmd);
+        if (nistrmd) g->SetIntVar(SFRpack::NISTRMD, *nistrmd);
+        if (nstrmd) g->SetIntVar(SFRpack::NSTRMD, *nstrmd);
+      }
+    }
+    if (Packages::SFR_MF6 == nm)
+    {
+      NativeExpMf6Sfr sfr(this);
+      sfr.Export();
+    }
+    return true;
+  }
+
+
   if ("SFR_CONDFACT" == nm)
   {
     SaveCondFact();

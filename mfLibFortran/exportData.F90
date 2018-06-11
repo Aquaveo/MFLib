@@ -109,6 +109,11 @@ module module_exportData
         END SUBROUTINE mfLibExp_DisPackage1
 !     ------------------------------------------------------------------
 !      Declare the C function
+        SUBROUTINE MFLIBEXP_IVSD(IVSD)
+          INTEGER IVSD [REFERENCE]
+        END SUBROUTINE MFLIBEXP_IVSD
+!     ------------------------------------------------------------------
+!      Declare the C function
         SUBROUTINE mfLibExp_DisPackage2(DELR,DELC,NBOTM,BOTM,&
                                         PERLEN,NSTP,TSMULT,ISSFLG)
           DIMENSION DELR (*)
@@ -1150,7 +1155,7 @@ module module_exportData
 
      END INTERFACE
 
-  public:: exp_Export, exp_GLO1BAS6DF, exp_GLO1BAS6RP, &
+  public:: exp_Export, exp_GLO1BAS6DF, exp_IVSD, exp_GLO1BAS6RP, &
            exp_DISU1, exp_DISU2, exp_DISU3, &
            exp_ClnLines0And1, exp_ClnLine2, exp_ClnLine3, exp_ClnLine4, &
            exp_ClnLine7a, exp_ClnLine7, & exp_ClnLine8a, exp_ClnLine8, &
@@ -1483,6 +1488,17 @@ module module_exportData
     !if (NOT(ed_getExportData())) return
     call mfLibExp_DisPackage1(NLAY,NROW,NCOL,NPER,ITMUNI,LENUNI,LAYCBD,IUNSTR)
   end subroutine exp_GLO1BAS6DF
+
+  !-----------------------------------------------------------------------------
+  ! BRIEF:  
+  !-----------------------------------------------------------------------------
+  subroutine exp_IVSD (IVSD)
+    implicit none
+    integer, intent(in) :: IVSD
+
+    !if (NOT(ed_getExportData())) return
+    call MFLIBEXP_IVSD(IVSD)
+  end subroutine exp_IVSD
 
   !-----------------------------------------------------------------------------
   ! BRIEF:  

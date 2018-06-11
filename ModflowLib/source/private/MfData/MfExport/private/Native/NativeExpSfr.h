@@ -11,9 +11,11 @@ namespace MfData
 {
   namespace Export
   {
+    class NativeExpMf6Sfr;
     class NativeExpSfr : public NativePackExp
     {
       friend NativeExpSfrT;
+      friend NativeExpMf6Sfr;
     public:
       NativeExpSfr();
       ~NativeExpSfr();

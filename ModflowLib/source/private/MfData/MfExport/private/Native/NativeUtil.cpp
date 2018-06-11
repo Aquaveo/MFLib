@@ -130,7 +130,7 @@ bool SfrPack (const CStr& type)
 {
   if (Packages::SFRLine1 == type || Packages::SFRLine2 == type ||
       Packages::SFRLine5 == type || Packages::SFRLine6 == type ||
-      "SFR_CONDFACT" == type) return true;
+      "SFR_CONDFACT" == type || Packages::SFR_MF6 == type ) return true;
   return false;
 } // SfrPack
 //------------------------------------------------------------------------------

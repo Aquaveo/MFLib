@@ -60,6 +60,7 @@ public:
   size_t CurModIdx() { return m_curModIdx; }
   CStr& LgrName() { return m_LgrName; }
   int& Unstructured () { return m_unstructured; }
+  bool& StackedGrid() { return m_stackedGrid; }
   int NumNodesUnstructured ()
   {
     int rval(-1);
@@ -89,6 +90,7 @@ private:
   size_t m_curModIdx;
   CStr m_LgrName;
   int m_unstructured;
+  bool m_stackedGrid;
   MfData::Export::SqArrayWriter* m_sqArrayWriter;
   void VectorSizes()
   {
@@ -221,6 +223,30 @@ void MfData::MfGlobal::Set (int a_NROW,
   for (int i=0; a_LAYCBD && i<a_NLAY; i++)
     global.m_p->LAYCBD()[i] = a_LAYCBD[i];
 } // MfData::MfGlobal::Set
+//------------------------------------------------------------------------------
+/// \brief Sets the "stackedGrid" variable
+//------------------------------------------------------------------------------
+void MfData::MfGlobal::SetUnstructured (bool a_unstructured)
+{
+  MfGlobal& global = MfData::Get();
+  global.m_p->Unstructured() = a_unstructured ? 1 : 0;
+} // MfData::MfGlobal::SetUnstructured
+//------------------------------------------------------------------------------
+/// \brief Sets the "stackedGrid" variable
+//------------------------------------------------------------------------------
+void MfData::MfGlobal::SetStackedGrid (bool a_stackedGrid)
+{
+  MfGlobal& global = MfData::Get();
+  global.m_p->StackedGrid() = a_stackedGrid;
+} // MfData::MfGlobal::SetStackedGrid
+//------------------------------------------------------------------------------
+/// \brief Sets the "stackedGrid" variablew
+//------------------------------------------------------------------------------
+bool MfData::MfGlobal::GetStackedGrid ()
+{
+  MfGlobal& global = MfData::Get();
+  return global.m_p->StackedGrid();
+} // MfData::MfGlobal::GetStackedGrid
 //------------------------------------------------------------------------------
 /// \brief Constructor.
 //------------------------------------------------------------------------------
@@ -453,13 +479,6 @@ const char* MfGlobal::LgrName ()
   return (LPCTSTR)m_p->LgrName();
 }
 //------------------------------------------------------------------------------
-/// \brief 
-//------------------------------------------------------------------------------
-void MfGlobal::Unstructured (int a_)
-{
-  m_p->Unstructured() = a_;
-}
-//------------------------------------------------------------------------------
 int MfGlobal::Unstructured () const
 {
   return m_p->Unstructured();
@@ -575,6 +594,7 @@ m_nameFile(),
 m_curModIdx(),
 m_LgrName(),
 m_unstructured(0),
+m_stackedGrid(0),
 m_sqArrayWriter(nullptr)
 {
   m_laycbd.push_back(std::vector<int>());
@@ -607,7 +627,8 @@ m_export(),
 m_nameFile(rhs.m_nameFile),
 m_curModIdx(rhs.m_curModIdx),
 m_LgrName(rhs.m_LgrName),
-m_unstructured(rhs.m_unstructured)
+m_unstructured(rhs.m_unstructured),
+m_stackedGrid(rhs.m_stackedGrid)
 {
   for (size_t i=0; i<rhs.m_export.size(); ++i)
   {
@@ -647,6 +668,7 @@ const MfGlobal::impl& MfGlobal::impl::operator= (const MfGlobal::impl &rhs)
     m_curModIdx = rhs.m_curModIdx;
     m_LgrName = rhs.m_LgrName;
     m_unstructured = rhs.m_unstructured;
+    m_stackedGrid = rhs.m_stackedGrid;
   }
   return(*this);
 } // MfGlobal::impl::impl

@@ -72,7 +72,6 @@ namespace MfData
     void LgrName(const char *a_);
     const char* LgrName();
     void ModelType(int a_modelType);
-    void Unstructured(int a);
 
     static MfGlobal& Get();
     static void Init(int a_modelType,
@@ -92,6 +91,9 @@ namespace MfData
                     int a_LENUNI,
                     const int *a_LAYCBD,
                     int a_IUNSTR);
+    void SetUnstructured(bool a_); // used for testing
+    static void SetStackedGrid(bool a_);
+    bool GetStackedGrid();
 
   private:
 

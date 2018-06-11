@@ -179,7 +179,7 @@ bool NativeExpMf6Evt::Export ()
       lines.push_back(exdpStr);
     }
   }
-  if (INSGDF && *INSGDF > -1)
+  if (NETSEG && *NETSEG > 1 && INSGDF && *INSGDF > -1)
   {
     pxdpStr = MfExportUtil::GetMf6ArrayString(g, nat, ARR_ETS_PXDP);
     g->SetStrVar(ARR_ETS_PXDP, pxdpStr);
@@ -219,10 +219,29 @@ bool NativeExpMf6Evt::Export ()
     }
 
     if (cellids.empty())
-    {
+    { // this will only happen with a DIS package, ETS was not supported with USG
       cellids.reserve(surf.size());
       for (size_t i=0; i<surf.size(); ++i)
         cellids.push_back((int)i+1);
+      if (3 == *NEVTOP)
+      {
+        std::vector<std::vector<int>>& ibound(nat->Ibound());
+        for (size_t i=0; i<cellids.size(); ++i)
+        {
+          if (ibound[0][i] != 0) continue;
+          bool done(false);
+          for (int k=1; done && k<g->NumLay(); ++k)
+          {
+            if (ibound[k][i] != 0)
+            {
+              done = true;
+              int ci, cj, ck;
+              cn->IjkFromId(ci, cj, ck, cellids[i]);
+              cellids[i] = cn->IdFromIjk(ci, cj, k+1);
+            }
+          }
+        }
+      }
     }
     else if ("DIS" == disPackType)
     { // If the flow package is dis then we are here because this is the ETS

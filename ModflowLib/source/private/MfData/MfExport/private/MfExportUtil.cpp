@@ -29,6 +29,7 @@ using namespace MfData::Export;
 template <class T>
 static void iStringToArray (const CStr& a_str, std::vector<T>& a_vec, int a_size)
 {
+  a_vec.clear();
   CStr str;
   std::stringstream ss;
   ss << a_str;

@@ -10,6 +10,7 @@
 #include <private\MfData\MfExport\private\H5\H5UseLastWriter.h>
 #include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\MfExportUtil.h>
+#include <private\MfData\MfExport\private\Native\mf6\NativeExpMf6Uzf.h>
 #include <private\MfData\MfExport\private\Native\NativeExpNam.h>
 #include <private\MfData\MfExport\private\Native\NativeUtil.h>
 #include <private\MfData\MfGlobal.h>
@@ -35,6 +36,13 @@ NativeExpUzf::~NativeExpUzf ()
 //------------------------------------------------------------------------------
 bool NativeExpUzf::Export ()
 {
+  if (GetNative()->GetExportMf6())
+  {
+    NativeExpMf6Uzf uzf(this);
+    uzf.Export();
+    return true;
+  }
+
   CStr name = GetPackage()->PackageName();
   if (Packages::UZFLine1 == name) Line1();
   else if (Packages::UZFLine8 == name) Lines2to8();

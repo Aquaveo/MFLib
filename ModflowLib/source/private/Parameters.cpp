@@ -522,6 +522,7 @@ int iGetStart (int a_lay)
   if (p)
   {
     const int* nodlay(0);
+    if (MfData::Get().GetStackedGrid()) return rval;
     p->GetField(MfData::Packages::Disu::NODLAY, &nodlay);
     if (nodlay)
     {
@@ -815,7 +816,7 @@ static void iCopyArray (std::vector<Real>& a_vec,
   if (k < 1) k = 1;
   int start( (k-1) * nCellsLay );
   int nVal( (k) * nCellsLay );
-  if (MfData::Get().Unstructured())
+  if (MfData::Get().Unstructured() && !MfData::Get().GetStackedGrid())
   {
     start = iGetStart(k);
     nVal = iGetNumCellsUnstructured();

@@ -672,7 +672,7 @@ void ProcessorSFR2T::testDoConvertFile () const
 
   TS_ASSERT(SetCurrentDirectory(path));
 
-  MfData::Get().Unstructured(0);
+  MfData::Get().SetUnstructured(0);
   ProcessorSFR2 p(fromFile, tmpFile, 15, 10, false);
   TS_ASSERT(p.DoConvertFile());
 
