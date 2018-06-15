@@ -261,10 +261,10 @@ bool H5Util_CreateDefaultMfH5File (const char *a_,
   }
 
   int    i, j;
-  const int GROUPS = 10;
+  const int GROUPS = 11;
   CStr bcGrp[GROUPS] = { "Drain", "General Head", "River", "Specified Head",
                          "Well", "Stream", "Stream (SFR2)", "Drain Return",
-                         "Multi-Node Well", "MNW2" };
+                         "Multi-Node Well", "MNW2", "PCB" };
 
   const int SW_GROUPS = 2;
   CStr swBcGrp[SW_GROUPS] = { "VDF", "VSC" };
@@ -726,6 +726,7 @@ void H5UtilT::testSupportedPackage ()
   TS_ASSERT(t->IsTypeSupported(NWT));
   TS_ASSERT(t->IsTypeSupported(NAM));
   TS_ASSERT(t->IsTypeSupported(OC));
+  TS_ASSERT(t->IsTypeSupported(PCB));
   TS_ASSERT(t->IsTypeSupported(PCG));
   TS_ASSERT(t->IsTypeSupported(PES));
   TS_ASSERT(t->IsTypeSupported(RCH));
@@ -747,7 +748,7 @@ void H5UtilT::testSupportedPackage ()
   TS_ASSERT(!t->IsTypeSupported(VSC));
   TS_ASSERT(t->IsTypeSupported(ZON));
 
-  TS_ASSERT_EQUALS(e.GetTypes().size(), 51);
+  TS_ASSERT_EQUALS(e.GetTypes().size(), 52);
 }
 //------------------------------------------------------------------------------
 void H5UtilT::testGetArrayMap ()

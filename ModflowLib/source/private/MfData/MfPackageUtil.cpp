@@ -2138,6 +2138,11 @@ bool MfData::Packages::GetBcFieldNames (const char * const a_type,
     bcFieldNames.push_back("j2");
     bcFieldNames.push_back("Hydchr");
   }
+  else if (type == MfData::Packages::PCB)
+  {
+    bcFieldNames.push_back("Species_No");
+    bcFieldNames.push_back("Conc");
+  }
   else
     return false;
   return true;

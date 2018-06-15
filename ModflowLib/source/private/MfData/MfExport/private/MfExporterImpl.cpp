@@ -285,6 +285,7 @@ void MfExporterImpl::InitExtensions ()
   m_types.insert(std::make_pair(NAM, "mfn"));
   m_types.insert(std::make_pair(NWT,NWT));
   m_types.insert(std::make_pair(OC, OC));
+  m_types.insert(std::make_pair(PCB, PCB));
   m_types.insert(std::make_pair(PCG, PCG));
   m_types.insert(std::make_pair(PVAL, "pval"));
   m_types.insert(std::make_pair(PES, PES));

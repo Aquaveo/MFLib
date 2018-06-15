@@ -38,6 +38,7 @@
 #include <private\MfData\MfExport\private\Native\NativeExpNam.h>
 #include <private\MfData\MfExport\private\Native\NativeExpObs.h>
 #include <private\MfData\MfExport\private\Native\NativeExpOc.h>
+#include <private\MfData\MfExport\private\Native\NativeExpPcb.h>
 #include <private\MfData\MfExport\private\Native\NativeExpPes.h>
 #include <private\MfData\MfExport\private\Native\NativeExpPval.h>
 #include <private\MfData\MfExport\private\Native\NativeExpRch.h>
@@ -109,7 +110,8 @@ bool LstPack (const CStr& type)
 {
   if (Packages::DRN == type || Packages::RIV == type ||
       Packages::WEL == type || Packages::GHB == type ||
-      Packages::CHD == type || Packages::DRT == type) return true;
+      Packages::CHD == type || Packages::DRT == type ||
+      Packages::PCB == type) return true;
   return false;
 } // LstPack
 //------------------------------------------------------------------------------

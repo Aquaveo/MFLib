@@ -72,6 +72,7 @@ namespace MfData
     const char * const NWT = "NWT";
     const char * const OC = "OC";
     const char * const OCT = "OCT";
+    const char * const PCB = "PCB";
     const char * const PCG = "PCG";
     const char * const PCGN = "PCN";
     const char * const PES = "PES";

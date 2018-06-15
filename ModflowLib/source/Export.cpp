@@ -322,7 +322,8 @@ DLLEXPORT void MFLIBEXP_LISTPACKAGE (const char *a_type,
       type != "DRT" &&
       type != "GHB" &&
       type != "RIV" &&
-      type != "CHD")
+      type != "CHD" &&
+      type != "PCB")
   {
     ErrorStack::Get().PutError("Invalid type passed to MFLIBEXP_LISTPACKAGE.");
     return;

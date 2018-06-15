@@ -283,6 +283,11 @@ void iSizeBcDataArray (CStr& a_type, int a_maxIdx, CAR_DBL2D& a_bcData)
     a_bcData.SetSize(7, a_maxIdx+1, 0);
     start = 6;
   }
+  else if (a_type == "PCB")
+  { // Species_No, conc
+    a_bcData.SetSize(2, a_maxIdx+1, 0);
+    num = 0;
+  }
   else if (a_type == "Well" ||
            a_type == "WEL (CLN)")
   { // Q, factor, WELDENS
@@ -476,6 +481,7 @@ void H5LstPack::impl::SetType ()
   else if (WEL == m_packName)   m_type = "Well";
   else if (GHB == m_packName)   m_type = "General Head";
   else if (CHD == m_packName)   m_type = "Specified Head";
+  else if (PCB == m_packName)   m_type = "PCB";
   else if (STRSP == m_packName) m_type = "Stream";
   else if (SFR == m_packName)   m_type = "Stream (SFR2)";
   else if (CLNWEL == m_packName) m_type = "WEL (CLN)";

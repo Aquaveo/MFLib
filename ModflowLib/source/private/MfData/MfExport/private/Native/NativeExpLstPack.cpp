@@ -186,6 +186,7 @@ CStr NativeExpLstPack::CbFieldName ()
   else if (Packages::RIV == nm) return "IRIVCB";
   else if (Packages::CHD == nm) return "";
   else if (Packages::DRT == nm) return "IDRTCB";
+  else if (Packages::PCB == nm) return "IPCBCB";
   return "";
 } // NativeExpLstPack::CbFieldName
 //------------------------------------------------------------------------------
@@ -202,6 +203,7 @@ CStr NativeExpLstPack::Desc2 ()
   else if (Packages::RIV == nm) desc += "MXACTR ";
   else if (Packages::CHD == nm) desc += "MXACTC ";
   else if (Packages::DRT == nm) desc += "MXADRT ";
+  else if (Packages::PCB == nm) desc += "MXPCB ";
 
   desc += cbField;
   if (Packages::DRT == nm)
@@ -367,6 +369,7 @@ CStr NativeExpLstPack::Desc6 ()
   else if (Packages::RIV == nm) desc += "Stage Cond Rbot ";
   else if (Packages::CHD == nm) desc += "Shead Ehead ";
   else if (Packages::DRT == nm) desc += "Elevation Cond [LayR RowR ColR Rfprop] ";
+  else if (Packages::PCB == nm) desc += "Species_No Conc ";
   desc += "[xyz]";
   return desc;
 } // NativeExpLstPack::Desc6
@@ -382,8 +385,9 @@ void NativeExpLstPack::Line6 ()
   const int* itmpcln(0);
   GetPackage()->GetField(Packages::ListPack::ITMPCLN , &itmpcln);
 
+  CStr nm = GetPackage()->PackageName();
   CStr ln;
-  if (GetH5Flag())
+  if (GetH5Flag() && Packages::PCB != nm)
   {
     ln = m_h5BcStr;
     if (!ln.empty()) AddToStoredLinesDesc(ln, desc);
@@ -508,7 +512,8 @@ CStr NativeExpLstPack::DataToStr (int a_i, int a_j)
       m_fieldStrings[a_j].CompareNoCase("cellgrp") == 0 ||
       m_fieldStrings[a_j].CompareNoCase("layr") == 0 ||
       m_fieldStrings[a_j].CompareNoCase("rowr") == 0 ||
-      m_fieldStrings[a_j].CompareNoCase("colr") == 0)
+      m_fieldStrings[a_j].CompareNoCase("colr") == 0 ||
+      m_fieldStrings[a_j].CompareNoCase("Species_No") == 0)
   {
     ln1.Format("%5d ", (int)m_data[a_i*(*m_nDataFields)+a_j]);
   }
@@ -527,6 +532,7 @@ CStr NativeExpLstPack::GetParType ()
   else if (Packages::RIV == nm) return "RIV";
   else if (Packages::CHD == nm) return "CHD";
   else if (Packages::DRT == nm) return "DRT";
+  else if (Packages::PCB == nm) return "PCB";
   return "";
 
 } // NativeExpLstPack::GetParType
