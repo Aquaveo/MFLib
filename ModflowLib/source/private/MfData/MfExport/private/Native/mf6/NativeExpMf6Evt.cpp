@@ -230,7 +230,7 @@ bool NativeExpMf6Evt::Export ()
         {
           if (ibound[0][i] != 0) continue;
           bool done(false);
-          for (int k=1; done && k<g->NumLay(); ++k)
+          for (int k=1; !done && k<g->NumLay(); ++k)
           {
             if (ibound[k][i] != 0)
             {
