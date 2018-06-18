@@ -121,7 +121,11 @@ void NativeExpMf6Uzf::impl::WriteOptions ()
       m_lines.push_back(" SIMULATE_ET");
       m_lines.push_back(" LINEAR_GWET");
     }
-    if (*nosurfleak != 0) m_lines.push_back(" SIMULATE_GWSEEP");
+
+    // this has from 2k5. In 2k5 you would turn off surface leakage. Now you
+    // must turn it on. So there is some non-straight-forward logic here.
+    // Look at the file format docs for more clarification.
+    if (*nosurfleak == 0) m_lines.push_back(" SIMULATE_GWSEEP");
 
     m_lines.push_back("END OPTIONS");
     m_lines.push_back("");
@@ -194,6 +198,11 @@ void NativeExpMf6Uzf::impl::WritePackageData ()
   {
     CStr thtsStr = MfExportUtil::GetMf6ArrayString(g, nat, ARR_UZF_THTS);
     MfExportUtil::Mf6StringToArray(thtsStr, thts, nCells);
+    // init THTR and THTI to be 10% of THTS
+    for (size_t i=0; i<thts.size(); ++i)
+    {
+      thtr[i] = thti[i] = 0.1*thts[i];
+    }
   }
   if (g->GetPackage(ARR_UZF_THTR))
   {
@@ -214,7 +223,7 @@ void NativeExpMf6Uzf::impl::WritePackageData ()
   int cnt(1);
   for (size_t i=0; i<cellids.size(); ++i)
   {
-    // skip cells where ibound is zero
+    if (0 == iuzfbnd[i]) continue;
     if (0 == ibound[cellids[i]-1]) continue;
 
     std::stringstream ss;
@@ -263,9 +272,9 @@ void NativeExpMf6Uzf::impl::WriteStressPeriod ()
 
     std::vector<int> iuzfbnd, cellids, ibound;
     GetIuzfbnd(iuzfbnd, cellids, ibound);
-    CStr iuzfbndStr;
-    g->GetStrVar(ARR_UZF_UBND, iuzfbndStr);
-    MfExportUtil::Mf6StringToArray(iuzfbndStr, iuzfbnd, nCells);
+    //CStr iuzfbndStr;
+    //g->GetStrVar(ARR_UZF_UBND, iuzfbndStr);
+    //MfExportUtil::Mf6StringToArray(iuzfbndStr, iuzfbnd, nCells);
 
     int w = util::RealWidth();
 
@@ -306,7 +315,7 @@ void NativeExpMf6Uzf::impl::WriteStressPeriod ()
     int cnt(1);
     for (int i=0; i<nCells; ++i)
     {
-      if (iuzfbnd[i] == 0) continue;
+      if (0 == iuzfbnd[i]) continue;
       if (0 == ibound[cellids[i]-1]) continue;
 
       std::stringstream ss;
@@ -355,11 +364,21 @@ void NativeExpMf6Uzf::impl::GetIuzfbnd (std::vector<int>& a_iuzfbnd,
   p->GetField(UZFpack::NUZTOP, &nuztop);
   p->GetField(UZFpack::SURFDEP, &surfdep);
   if (!nuztop || !surfdep) return;
-  if (g->GetPackage(ARR_UZF_UBND))
+
   {
-    CStr iuzfbndStr = MfExportUtil::GetMf6ArrayString(g, nat, ARR_UZF_UBND);
+    CStr iuzfbndStr;
+    g->GetStrVar(ARR_UZF_UBND, iuzfbndStr);
+    if (iuzfbndStr.empty() && g->GetPackage(ARR_UZF_UBND))
+    {
+      iuzfbndStr = MfExportUtil::GetMf6ArrayString(g, nat, ARR_UZF_UBND);
+      g->SetStrVar(ARR_UZF_UBND, iuzfbndStr);
+    }
+  }
+
+  {
+    CStr iuzfbndStr;
+    g->GetStrVar(ARR_UZF_UBND, iuzfbndStr);
     MfExportUtil::Mf6StringToArray(iuzfbndStr, a_iuzfbnd, nCells);
-    g->SetStrVar(ARR_UZF_UBND, iuzfbndStr);
   }
 
   if (*nuztop == 2 && g->GetPackage(ARR_UZF_UBND))
