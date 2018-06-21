@@ -324,6 +324,7 @@ bool NativeExpArr2d::GetData ()
            m_name == ARR_LPF_VK || m_name == ARR_LPF_VANI ||
            m_name == ARR_LPF_WET || m_name == ARR_LPF_SS ||
            m_name == ARR_LPF_SY || m_name == ARR_BAS_SHEAD ||
+           m_name == ARR_DIS_TOP || m_name == ARR_DIS_BOT ||
            m_name == "K22" || m_name == "K33" || 
            m_name == MfData::Packages::Disu::TOP ||
            m_name == MfData::Packages::Disu::BOT ||
@@ -377,9 +378,11 @@ void NativeExpArr2d::SaveRealArray (const CStr& a_name)
   std::vector<Real> myVec(numCellsInLayer, 0);
   rArray2d.push_back(myVec);
 
+  int layIdx = *m_lay - 1;
+  if (layIdx < 0) layIdx = 0;
   for (int i=0; i<numCellsInLayer; ++i)
   {
-    rArray2d[*m_lay-1][i] = m_data[i];
+    rArray2d[layIdx][i] = m_data[i];
   }
   std::vector<Real>& rMult(mymapMult[name]);
   rMult.push_back(*m_mult);

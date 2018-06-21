@@ -9,7 +9,9 @@
 
 #include <sstream>
 
+#include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\H5\H5BcList.h>
+#include <private\MfData\MfExport\private\Native\mf6\NativeExpMf6Maw.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
@@ -50,6 +52,13 @@ NativeExpMnw2::~NativeExpMnw2 ()
 //------------------------------------------------------------------------------
 bool NativeExpMnw2::Export ()
 {
+  if (GetNative()->GetExportMf6())
+  {
+    NativeExpMf6Maw maw(this);
+    maw.Export();
+    return true;
+  }
+
   CStr ln = GetPackage()->GetLineNumber();
   if ("1" == ln)        Line1();
   else if ("2ab" == ln) Line2ab();

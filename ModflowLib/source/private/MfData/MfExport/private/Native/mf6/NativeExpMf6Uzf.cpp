@@ -201,7 +201,7 @@ void NativeExpMf6Uzf::impl::WritePackageData ()
     // init THTR and THTI to be 10% of THTS
     for (size_t i=0; i<thts.size(); ++i)
     {
-      thtr[i] = thti[i] = 0.1*thts[i];
+      thtr[i] = thti[i] = (Real)0.1*thts[i];
     }
   }
   if (g->GetPackage(ARR_UZF_THTR))

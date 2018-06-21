@@ -406,6 +406,9 @@
     <ClCompile Include="source\private\MfData\MfExport\private\Native\mf6\NativeExpMf6Sfr.cpp">
       <Filter>source\private\MfData\MfExport\private\Native\mf6</Filter>
     </ClCompile>
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\mf6\NativeExpMf6Maw.cpp">
+      <Filter>source\private\MfData\MfExport\private\Native\mf6</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Export.h">
@@ -1078,6 +1081,9 @@
       <Filter>source\private\MfData\MfExport\private\Native</Filter>
     </ClInclude>
     <ClInclude Include="source\private\MfData\MfExport\private\Native\mf6\NativeExpMf6Sfr.h">
+      <Filter>source\private\MfData\MfExport\private\Native\mf6</Filter>
+    </ClInclude>
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\mf6\NativeExpMf6Maw.h">
       <Filter>source\private\MfData\MfExport\private\Native\mf6</Filter>
     </ClInclude>
   </ItemGroup>

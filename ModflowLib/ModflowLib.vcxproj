@@ -940,6 +940,7 @@ build_test_runner.bat
     <ClCompile Include="source\private\MfData\MfExport\private\Native\mf6\NativeExpMf6Ic.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\mf6\NativeExpMf6Lak.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\mf6\NativeExpMf6LstPack.cpp" />
+    <ClCompile Include="source\private\MfData\MfExport\private\Native\mf6\NativeExpMf6Maw.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\mf6\NativeExpMf6Mfsim.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\mf6\NativeExpMf6Nam.cpp" />
     <ClCompile Include="source\private\MfData\MfExport\private\Native\mf6\NativeExpMf6Npf.cpp" />
@@ -1094,6 +1095,7 @@ build_test_runner.bat
     <ClInclude Include="source\private\MfData\MfExport\private\Native\mf6\NativeExpMf6Ic.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\mf6\NativeExpMf6Lak.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\mf6\NativeExpMf6LstPack.h" />
+    <ClInclude Include="source\private\MfData\MfExport\private\Native\mf6\NativeExpMf6Maw.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\mf6\NativeExpMf6Mfsim.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\mf6\NativeExpMf6Nam.h" />
     <ClInclude Include="source\private\MfData\MfExport\private\Native\mf6\NativeExpMf6Npf.h" />

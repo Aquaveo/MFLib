@@ -771,6 +771,9 @@ namespace MfData
       const char* const ITMP = "ITMP";
       const char* const MNW2 = "MNW2";
       const char* const NMNWVL = "NMNWVL";
+      const char* const MNWNOD = "MNWNOD";
+      const char* const MNWNODSZ = "MNWNODSZ";
+      const char* const MNWINT = "MNWINT";
     }
     namespace MNWIpack
     {
