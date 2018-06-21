@@ -380,9 +380,13 @@ void NativeExpArr2d::SaveRealArray (const CStr& a_name)
 
   int layIdx = *m_lay - 1;
   if (layIdx < 0) layIdx = 0;
-  for (int i=0; i<numCellsInLayer; ++i)
+  for (int i=0; i<numCellsInLayer && m_data; ++i)
   {
     rArray2d[layIdx][i] = m_data[i];
+  }
+  for (int i=0; i<numCellsInLayer && m_dataD; ++i)
+  {
+    rArray2d[layIdx][i] = (Real)m_dataD[i];
   }
   std::vector<Real>& rMult(mymapMult[name]);
   rMult.push_back(*m_mult);
