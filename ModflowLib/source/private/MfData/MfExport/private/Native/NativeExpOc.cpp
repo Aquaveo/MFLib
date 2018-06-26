@@ -61,11 +61,11 @@ bool NativeExpOc::Export ()
   {
     CStr options = Options();
     if (!options.empty()) AddToStoredLinesDesc(options, " 1. [OPTIONS]");
-    AddToStoredLinesDesc(Line1(), Desc1());
     if (!m_usgTransportLine2.empty())
     {
       AddToStoredLinesDesc(m_usgTransportLine2, " 2. TIMOT [nptimes]");
     }
+    AddToStoredLinesDesc(Line1(), Desc1());
   }
   if (GetPackage()->PackageName() == Packages::OCT)
   {
@@ -120,8 +120,8 @@ CStr NativeExpOc::Options ()
     if (timot)
     {
       std::stringstream ss;
-      ss << "TIMOT ";
-      for (int i=0; i<*npstps; ++i) ss << STR(timot[i]) << " ";
+      //ss << "TIMOT ";
+      for (int i=0; i<*nptimes; ++i) ss << STR(timot[i]) << " ";
       m_usgTransportLine2 = ss.str();
     }
   }
