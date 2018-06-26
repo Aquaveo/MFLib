@@ -25,12 +25,16 @@ namespace MfData
 
       virtual void LastChanceBeforeWriting();
 
+      CStr              Options();
       std::vector<CStr> Line1();
       std::vector<CStr> Desc1();
       CStr              Line2();
       CStr              Desc2();
       std::vector<CStr> Line3();
       std::vector<CStr> Desc3();
+
+      CStr m_usgTransportLine2;
+      bool m_usgTransport, m_usgTransportAts;
     };
 
   }

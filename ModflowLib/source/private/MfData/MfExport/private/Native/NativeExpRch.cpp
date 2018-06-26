@@ -30,7 +30,7 @@ NativeExpRch::NativeExpRch () :
 , m_usg(false)
 , m_unstructured(false)
 {
-  m_usg = MfData::MfGlobal::Get().ModelType() == MfData::USG;
+  m_usg = MfExportUtil::MfIsUsgModelType();
   if (m_usg) m_unstructured = MfData::MfGlobal::Get().Unstructured() ? 1 : 0;
 } // MfNativeExpRch::MfNativeExpRch
 //------------------------------------------------------------------------------

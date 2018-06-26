@@ -29,7 +29,7 @@ NativeExpHfb::NativeExpHfb ()
 , m_VAL_ROW_SIZE(6)
 , m_HFB_ROW_SIZE(7)
 {
-  m_usg = MfData::MfGlobal::Get().ModelType() == MfData::USG;
+  m_usg = MfExportUtil::MfIsUsgModelType();
   if (m_usg) m_unstructured = MfData::MfGlobal::Get().Unstructured() ? 1 : 0;
   m_nI = MfData::MfGlobal::Get().NumRow();
   m_nJ = MfData::MfGlobal::Get().NumCol();

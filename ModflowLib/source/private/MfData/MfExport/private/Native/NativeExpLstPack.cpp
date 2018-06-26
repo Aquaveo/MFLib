@@ -53,7 +53,7 @@ NativeExpLstPack::NativeExpLstPack ()
 , m_h5Bc(0)
 , m_sqList(0)
 {
-  m_usg = MfData::MfGlobal::Get().ModelType() == MfData::USG;
+  m_usg = MfExportUtil::MfIsUsgModelType();
   if (m_usg)
   {
     m_nK = MfData::MfGlobal::Get().NumLay();
@@ -264,7 +264,7 @@ void NativeExpLstPack::Line2 ()
     ln += " ";
   }
   if (Packages::WEL == GetPackage()->PackageName() &&
-      GetGlobal()->ModelType() == MfData::USG)
+      MfExportUtil::MfIsUsgModelType())
   {
     const int* iwelqv(0), *iafr(0);
     GetPackage()->GetField("IWELQV", &iwelqv);

@@ -35,7 +35,7 @@ NativeExpBcf::NativeExpBcf () :
 , m_unstructured(0)
 , m_anyTRPYnotEqualToOne(0)
 {
-  m_usg = MfData::MfGlobal::Get().ModelType() == MfData::USG;
+  m_usg = MfExportUtil::MfIsUsgModelType();
   if (m_usg) m_unstructured = MfData::MfGlobal::Get().Unstructured() ? 1 : 0;
 } // MfNativeExpBcf::MfNativeExpBcf
 //------------------------------------------------------------------------------

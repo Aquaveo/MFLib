@@ -10,8 +10,9 @@
 #include <fstream>
 #include <sstream>
 
-#include <private\MfData\MfExport\private\Mf2kNative.h>
 #include <private\MfData\MfExport\private\H5\H5ArrayWriter.h>
+#include <private\MfData\MfExport\private\Mf2kNative.h>
+#include <private\MfData\MfExport\private\MfExportUtil.h>
 #include <private\MfData\MfGlobal.h>
 #include <private\MfData\Packages\MfPackage.h>
 #include <private\MfData\Packages\MfPackFields.h>
@@ -205,7 +206,7 @@ NativeExpArr2d::NativeExpArr2d () :
 , m_stacked(0)
 , m_tmp_iMult(1)
 {
-  bool usg = MfData::MfGlobal::Get().ModelType() == MfData::USG;
+  bool usg = MfExportUtil::MfIsUsgModelType();
   if (usg)
   {
     m_unstructured = MfData::MfGlobal::Get().Unstructured() ? 1 : 0;

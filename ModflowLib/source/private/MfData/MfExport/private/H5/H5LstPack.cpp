@@ -131,7 +131,7 @@ public:
       , m_usg(0), m_unstructured(0)
       , m_istrmCellIdIdx(0), m_dataStartIdx(0), m_cellIdOffset(0)
   {
-    m_usg = a_g->ModelType() == MfData::USG;
+    m_usg = MfExportUtil::MfIsUsgModelType();
     m_unstructured = a_g->Unstructured() ? 1 : 0;
   } // impl
   ~impl () {}

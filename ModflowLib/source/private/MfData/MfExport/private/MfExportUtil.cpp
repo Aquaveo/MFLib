@@ -587,6 +587,16 @@ CStr MfExportUtil::Mf6IboundToChd (MfData::MfGlobal* a_g, int& a_MAXBOUND,
   a_MAXBOUND = (int)vCellid.size();
   return rval;
 } // MfExportUtil::Mf6IboundToChd
+//------------------------------------------------------------------------------
+/// \brief returns true if the model is USG or USG_TRANSPORT
+//------------------------------------------------------------------------------
+bool MfExportUtil::MfIsUsgModelType ()
+{
+  bool usg = (MfData::MfGlobal::Get().ModelType() == MfData::USG ||
+              MfData::MfGlobal::Get().ModelType() == MfData::USG_TRANSPORT);
+  return usg;
+} // MfExportUtil::MfIsUsgModelType
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // TESTS

@@ -58,7 +58,7 @@ NativeExpStr::NativeExpStr ()
 , m_nI(0)
 , m_nJ(0)
 {
-  m_usg = MfData::MfGlobal::Get().ModelType() == MfData::USG;
+  m_usg = MfExportUtil::MfIsUsgModelType();
   if (m_usg) m_unstructured = MfData::MfGlobal::Get().Unstructured() ? 1 : 0;
   m_nI = MfData::MfGlobal::Get().NumRow();
   m_nJ = MfData::MfGlobal::Get().NumCol();

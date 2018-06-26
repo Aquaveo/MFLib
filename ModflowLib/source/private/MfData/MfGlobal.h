@@ -18,7 +18,7 @@ namespace MfData
   //namespace Export { class SqArrayWriter; }
   class MfPackage;
   
-  enum enumModelType { MF2K = 0, MF2K5, MFNWT, SEAWAT, LGR, USG };
+  enum enumModelType { MF2K=0, MF2K5, MFNWT, SEAWAT, LGR, USG, USG_TRANSPORT };
 
   class MfGlobal
   {

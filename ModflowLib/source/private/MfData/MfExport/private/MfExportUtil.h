@@ -44,6 +44,7 @@ namespace MfData
       static void Mf6IboundToIdomain(MfGlobal* a_g, Mf2kNative* a_native);
       static CStr Mf6IboundToChd(MfGlobal* a_g, int& MAXBOUND,
         const std::vector<CStr>& a_fieldStrings);
+      static bool MfIsUsgModelType();
 
     private:
     };

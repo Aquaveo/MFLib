@@ -461,6 +461,17 @@ namespace MfData
       const char * const CBOUFM = "CBOUFM";
       const char * const IBOUUN = "IBOUUN";
       const char * const LBBOSV = "LBBOSV";
+      const char * const ISPCFM = "ISPCFM";
+      const char * const CSPCFM = "CSPCFM";
+      const char * const ISPCUN = "ISPCUN";
+      const char * const IATS   = "IATS";
+      const char * const NPTIMES = "NPTIMES";
+      const char * const NPSTPS = "NPSTPS";
+      const char * const IFAST = "IFAST";
+      const char * const ISPFAST = "ISPFAST";
+      const char * const ITSFAST = "ITSFAST";
+      const char * const IUGFAST = "IUGFAST";
+      const char * const TIMOT = "TIMOT";
     }
     namespace OCTpack
     {
@@ -474,6 +485,24 @@ namespace MfData
       const char * const Hdsv = "Hdsv";
       const char * const Ddsv = "Ddsv";
       const char * const Ibsv = "Ibsv";
+      const char * const CONC_PRINT = "CONC_PRINT";
+      const char * const CONC_SAVE = "CONC_SAVE";
+      const char * const DELTAT = "DELTAT";
+      const char * const TMINAT = "TMINAT";
+      const char * const TMAXAT = "TMAXAT";
+      const char * const TADJAT = "TADJAT";
+      const char * const TCUTAT = "TCUTAT";
+      const char * const HCLOSE = "HCLOSE";
+      const char * const BTOL = "BTOL";
+      const char * const MXITER = "MXITER";
+      const char * const r_DELTAT = "r_DELTAT";
+      const char * const r_TMINAT = "r_TMINAT";
+      const char * const r_TMAXAT = "r_TMAXAT";
+      const char * const r_TADJAT = "r_TADJAT";
+      const char * const r_TCUTAT = "r_TCUTAT";
+      const char * const r_HCLOSE = "r_HCLOSE";
+      const char * const r_BTOL = "r_BTOL";
+      const char * const r_MXITER = "r_MXITER";
     }
     namespace LAKpack
     {
