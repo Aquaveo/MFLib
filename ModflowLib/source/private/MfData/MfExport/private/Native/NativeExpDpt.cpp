@@ -92,13 +92,17 @@ void NativeExpDpt::ExportArray (const CStr& a_array, int a_speciesId)
   for (int lay=1, i=0; i<GetGlobal()->NumLay(); ++i, ++lay)
   {
     d.Format("%s Layer %d", description, lay);
+    if (a_speciesId > 0)
+    {
+      d.Format("%s Layer %d Species %d", description, lay, a_speciesId);
+    }
     AddToStoredLinesDesc(lines[startIdx + i], d);
     if (MfExportUtil::ArrayWriteNextLineInternal(GetNative(), lines[i + startIdx]))
     {
       AddToStoredLinesDesc(lines[++i + startIdx], "");
     }
   }
-  lines.clear();
+  //lines.clear();
 } // NativeExpDpt::ExportArray
 //------------------------------------------------------------------------------
 /// \brief

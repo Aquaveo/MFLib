@@ -86,7 +86,7 @@ CStr NativeExpOc::Options ()
   using namespace MfData::Packages;
   MfPackage* p = GetPackage();
   const int* iats(0),* nptimes(0),* npstps(0),* ifast(0),* ispfast(0),
-    * itsfast(0),* iugfast(0);
+    * itsfast(0),* iugfast(0),* nun(0),* ispcunaq(0);
   const double* timot(0);
   p->GetField(OCpack::IATS, &iats);
   p->GetField(OCpack::NPTIMES, &nptimes);
@@ -96,6 +96,8 @@ CStr NativeExpOc::Options ()
   p->GetField(OCpack::ITSFAST, &itsfast);
   p->GetField(OCpack::IUGFAST, &iugfast);
   p->GetField(OCpack::TIMOT, &timot);
+  p->GetField(OCpack::NUN, &nun);
+  p->GetField(OCpack::ISPCUNAQ, &ispcunaq);
 
   CStr rval;
   if (iats && *iats != 0)
@@ -128,8 +130,21 @@ CStr NativeExpOc::Options ()
   if (ifast && *ifast != 0 && ispfast && itsfast && iugfast)
   {
     std::stringstream ss;
-    ss << "FASTFORWARD " << *ispfast << " " << *itsfast << " " << *iugfast;
+    ss << "FASTFORWARD " << *ispfast << " " << *itsfast << " " << *iugfast
+       << " ";
     rval += ss.str();
+  }
+  if (nun && *nun)
+  {
+    std::stringstream ss;
+    ss << "ISPCUNAQ " << *nun << " ";
+    if (ispcunaq)
+    {
+      if (!m_usgTransportLine2.empty()) m_usgTransportLine2 += "\n";
+      std::stringstream ss;
+      for (int i=0; i<*nun; ++i) ss << ispcunaq[i] << " ";
+      m_usgTransportLine2 += ss.str();
+    }
   }
 
   return rval;

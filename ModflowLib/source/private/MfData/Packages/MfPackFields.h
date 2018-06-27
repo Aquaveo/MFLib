@@ -472,6 +472,8 @@ namespace MfData
       const char * const ITSFAST = "ITSFAST";
       const char * const IUGFAST = "IUGFAST";
       const char * const TIMOT = "TIMOT";
+      const char * const NUN = "NUN";
+      const char * const ISPCUNAQ = "ISPCUNAQ";
     }
     namespace OCTpack
     {
