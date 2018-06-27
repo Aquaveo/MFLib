@@ -63,7 +63,11 @@ bool NativeExpOc::Export ()
     if (!options.empty()) AddToStoredLinesDesc(options, " 1. [OPTIONS]");
     if (!m_usgTransportLine2.empty())
     {
-      AddToStoredLinesDesc(m_usgTransportLine2, " 2. TIMOT [nptimes]");
+      AddToStoredLinesDesc(m_usgTransportLine2, m_usgTransportLine2Desc);
+    }
+    if (!m_usgTransportLine3.empty())
+    {
+      AddToStoredLinesDesc(m_usgTransportLine3, m_usgTransportLine3Desc);
     }
     AddToStoredLinesDesc(Line1(), Desc1());
   }
@@ -125,6 +129,7 @@ CStr NativeExpOc::Options ()
       //ss << "TIMOT ";
       for (int i=0; i<*nptimes; ++i) ss << STR(timot[i]) << " ";
       m_usgTransportLine2 = ss.str();
+      m_usgTransportLine2Desc = " 2. TIMOT [nptimes]";
     }
   }
   if (ifast && *ifast != 0 && ispfast && itsfast && iugfast)
@@ -140,10 +145,10 @@ CStr NativeExpOc::Options ()
     ss << "ISPCUNAQ " << *nun << " ";
     if (ispcunaq)
     {
-      if (!m_usgTransportLine2.empty()) m_usgTransportLine2 += "\n";
       std::stringstream ss;
       for (int i=0; i<*nun; ++i) ss << ispcunaq[i] << " ";
-      m_usgTransportLine2 += ss.str();
+      m_usgTransportLine3 += ss.str();
+      m_usgTransportLine3Desc = " 3. ISPCUNAQ [NUN]";
     }
   }
 

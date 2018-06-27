@@ -33,7 +33,8 @@ namespace MfData
       std::vector<CStr> Line3();
       std::vector<CStr> Desc3();
 
-      CStr m_usgTransportLine2;
+      CStr m_usgTransportLine2, m_usgTransportLine2Desc;
+      CStr m_usgTransportLine3, m_usgTransportLine3Desc;
       bool m_usgTransport, m_usgTransportAts;
     };
 
