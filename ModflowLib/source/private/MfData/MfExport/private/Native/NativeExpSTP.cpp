@@ -349,6 +349,9 @@ void NativeExpSTP::ExpSuperFile ()
   case 5: // MODFLOW-USG
     exp->WriteLineToFile("mfs", "MFUSGSUP");
     break;
+  case 6: // MODFLOW-USG-TRANSPORT
+    exp->WriteLineToFile("mfs", "MFUSG_TRANSPORT_SUP");
+    break;
   default:
     ASSERT(0);
     break;
