@@ -130,6 +130,7 @@ public:
       , m_prevSpNumBc(0), m_grid(a_g->NumRow(),a_g->NumCol()), m_istrmSize(5)
       , m_usg(0), m_unstructured(0)
       , m_istrmCellIdIdx(0), m_dataStartIdx(0), m_cellIdOffset(0)
+      , m_gmsH5AuxStartIdx(-1)
   {
     m_usg = MfExportUtil::MfIsUsgModelType();
     m_unstructured = a_g->Unstructured() ? 1 : 0;
@@ -173,6 +174,8 @@ public:
   CStr SfrLn6 (int& a_itmp);
   CStr ClnWel (int& a_itmp);
   void AddToSkippedParameters ();
+  void SizeBcDataArray (CStr& a_type, int a_maxIdx, CAR_DBL2D& a_bcData,
+    int& a_gmsH5AuxStartIdx);
 
   MfData::MfPackage* m_p;
   MfData::MfGlobal*  m_glob;
@@ -181,10 +184,10 @@ public:
 
   CStr                m_type, m_ptype, m_file, m_packName;
   const int          *m_itmp, *m_maxBc, *m_np;
-  std::vector<int>   *m_vCellids, *m_vIface, *m_vCellgrp, m_idxs;
+  std::vector<int>   *m_vCellids, *m_vIface, *m_vCellgrp, m_idxs, m_nonGmsAuxIndexes;
   const int          *m_nBcs, *m_nAux, *m_nDataFields, *m_istrm;
   int                 m_nFields, m_modIdx, m_sp, m_maxIdx, m_minIdx, m_dSize,
-                      m_istrmSize, m_istrmCellIdIdx;
+                      m_istrmSize, m_istrmCellIdIdx, m_gmsH5AuxStartIdx;
   const Real         *m_data, *m_PHIRAMP;
   std::vector<CStr>   m_fieldStrings;
   int                 m_ifaceIdx, m_cellgrpIdx, m_seawatIdx0, m_seawatIdx1,
@@ -252,64 +255,6 @@ int xfpWriteAttributeInt (hid_t a_Loc,
 
   return status;
 } // xfpWriteAttributeInt
-//------------------------------------------------------------------------------
-void iSizeBcDataArray (CStr& a_type, int a_maxIdx, CAR_DBL2D& a_bcData)
-{
-  a_bcData.Clear();
-  int start(0), num(1);
-  if (a_type == "River")
-  { // stage, cond, elev, factor, RBDTHK, RIVDEN
-    a_bcData.SetSize(6, a_maxIdx+1, 0);
-    start = 3;
-  }
-  else if (a_type == "Specified Head")
-  { // startHead, endHead, factor1, factor2, CHDDENSOPT, CHDDEN
-    a_bcData.SetSize(6, a_maxIdx+1, 0);
-    start = 2;
-    num = 2;
-  }
-  else if (a_type == "Drain")
-  { // elev, cond, factor, DRNBELEV
-    a_bcData.SetSize(4, a_maxIdx+1, 0);
-    start = 2;
-  }
-  else if (a_type == "General Head")
-  { // head, cond, factor, GHBELEV, GHBDENS
-    a_bcData.SetSize(5, a_maxIdx+1, 0);
-    start = 2;
-  }
-  else if (a_type == "Drain Return")
-  { // elev, cond, layR, rowR, colR, Rfprop, factor
-    a_bcData.SetSize(7, a_maxIdx+1, 0);
-    start = 6;
-  }
-  else if (a_type == "PCB")
-  { // Species_No, conc
-    a_bcData.SetSize(2, a_maxIdx+1, 0);
-    num = 0;
-  }
-  else if (a_type == "Well" ||
-           a_type == "WEL (CLN)")
-  { // Q, factor, WELDENS
-    a_bcData.SetSize(3, a_maxIdx+1, 0);
-    start = 1;
-  }
-  else if (a_type == "Stream")
-  { // stage, cond, bot. elev., top elev., width, slope, rough, factor
-    a_bcData.SetSize(8, a_maxIdx+1, 0);
-    start = 7;
-  }
-  else if (a_type == "Stream (SFR2)")
-  { // RCHLEN
-    a_bcData.SetSize(1, a_maxIdx+1, 0);
-  }
-
-  for (int i=start; (i-start)<num; i++)
-  { // this initializes the condfact to 1.0 or for CHD the headfact
-    for (int j=0; j<a_bcData.GetSize2(); j++)
-      a_bcData.at(i, j) = 1.0;
-  }
-} // iSizeBcDataArray
 //------------------------------------------------------------------------------
 static std::vector<int>& iBcCellIds (int a_, CStr a_type)
 {
@@ -509,31 +454,40 @@ void H5LstPack::impl::SetParamType ()
 //------------------------------------------------------------------------------
 void H5LstPack::impl::SetAuxFieldIdx ()
 {
+  int modflowAuxStart(-1);
+  if (m_nAux)
+  {
+    modflowAuxStart = (int)m_fieldStrings.size() - (*m_nAux);
+  }
   for (size_t q=0; q<m_fieldStrings.size(); q++)
   {
     // iface can come from AUX fields
     if (m_fieldStrings[q].CompareNoCase("IFACE") == 0)
       m_ifaceIdx = static_cast<int>(q);
-    if (m_fieldStrings[q].CompareNoCase("CELLGRP") == 0)
+    else if (m_fieldStrings[q].CompareNoCase("CELLGRP") == 0)
       m_cellgrpIdx = static_cast<int>(q);
-    if (m_fieldStrings[q].CompareNoCase("CONDFACT") == 0)
+    else if (m_fieldStrings[q].CompareNoCase("CONDFACT") == 0)
       m_condfactIdx = static_cast<int>(q);
-    if (m_fieldStrings[q].CompareNoCase("QFACT") == 0)
+    else if (m_fieldStrings[q].CompareNoCase("QFACT") == 0)
       m_qfactIdx = static_cast<int>(q);
-
     // seawat stuff
-    if (   m_fieldStrings[q].CompareNoCase("RBDTHK") == 0
+    else if (   m_fieldStrings[q].CompareNoCase("RBDTHK") == 0
         || m_fieldStrings[q].CompareNoCase("DRNBELEV") == 0
         || m_fieldStrings[q].CompareNoCase("WELDENS") == 0
         || m_fieldStrings[q].CompareNoCase("GHBELEV") == 0
         || m_fieldStrings[q].CompareNoCase("CHDDENSOPT") == 0
        )
       m_seawatIdx0 = static_cast<int>(q);
-    if (   m_fieldStrings[q].CompareNoCase("RIVDEN") == 0
+    else if (   m_fieldStrings[q].CompareNoCase("RIVDEN") == 0
         || m_fieldStrings[q].CompareNoCase("GHBDENS") == 0
         || m_fieldStrings[q].CompareNoCase("CHDDEN") == 0
        )
       m_seawatIdx1 = static_cast<int>(q);
+    // store the index to user defined AUX variables
+    else if (m_glob->ModelType() == USG_TRANSPORT && (int)q >= modflowAuxStart)
+    {
+      m_nonGmsAuxIndexes.push_back(static_cast<int>(q));
+    }
   }
 } // H5LstPack::impl::SetAuxFieldIdx
 //------------------------------------------------------------------------------
@@ -550,7 +504,7 @@ void H5LstPack::impl::FillBcData ()
   WriteUseLast();
   // size the data array for this stress period
   Set_dSize();
-  iSizeBcDataArray(m_type, m_maxIdx, m_bcData);
+  SizeBcDataArray(m_type, m_maxIdx, m_bcData, m_gmsH5AuxStartIdx);
   // get the bc data for the current stress period if there are parameters
   GetBcDataFromPar();
   HandleUseLast();
@@ -735,7 +689,7 @@ void H5LstPack::impl::GetBcDataFromPar ()
   if (*m_np > 0 && m_prevSpNumBc > 0)
   {
     CAR_DBL2D tmpData;
-    iSizeBcDataArray(m_type, m_prevSpNumBc-1, tmpData);
+    SizeBcDataArray(m_type, m_prevSpNumBc-1, tmpData, m_gmsH5AuxStartIdx);
     CStr path;
     path.Format("%s/%s", m_type, MFBC_DATA);
     std::pair<int, int> p(0,1);
@@ -763,7 +717,7 @@ void H5LstPack::impl::HandleUseLast ()
   if (*m_itmp < 0)
   { // get the previous stress period
     CAR_DBL2D prevData;
-    iSizeBcDataArray(m_type, m_dSize, prevData);
+    SizeBcDataArray(m_type, m_dSize, prevData, m_gmsH5AuxStartIdx);
     CStr path;
     path.Format("%s/%s", m_type, MFBC_DATA);
     std::pair<int, int> p(0,1);
@@ -847,6 +801,14 @@ void H5LstPack::impl::FillData ()
       m_bcData.at(seawatBcIdx1, m_idxs.at(i)) =
         static_cast<double>(m_data[i*(*m_nDataFields)+m_seawatIdx1]);
     }
+    // loop thru user defined AUX variables
+    for (size_t q=0; q<m_nonGmsAuxIndexes.size(); ++q)
+    {
+      int gmsIdx = m_gmsH5AuxStartIdx + (int)q;
+      int modflowIdx = m_nonGmsAuxIndexes[q];
+      m_bcData.at(gmsIdx, m_idxs.at(i)) =
+        static_cast<double>(m_data[i*(*m_nDataFields)+modflowIdx]);
+    }
   }
 } // H5LstPack::impl::FillData
 //------------------------------------------------------------------------------
@@ -925,7 +887,7 @@ void H5LstPack::impl::LstPar ()
   int tmpItmp=1;
   m_itmp = &tmpItmp;
   ExistingBcData(start);
-  iSizeBcDataArray(m_type, m_maxIdx, m_bcData);
+  SizeBcDataArray(m_type, m_maxIdx, m_bcData, m_gmsH5AuxStartIdx);
   int np(1);
   if (!m_np) m_np = &np;
   GetBcDataFromPar();
@@ -1214,6 +1176,80 @@ void H5LstPack::impl::AddToSkippedParameters ()
   parToSkip += name;
   m_glob->SetStrVar("Pars2Skip", parToSkip);
 } // H5LstPack::impl::AddToSkippedParameters
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+void H5LstPack::impl::SizeBcDataArray (CStr& a_type, int a_maxIdx,
+  CAR_DBL2D& a_bcData, int& a_gmsH5AuxStartIdx)
+{
+  a_bcData.Clear();
+  std::vector<int> factorIdxs;
+  int nGmsUserAux(0);
+  if (m_glob->ModelType() == USG_TRANSPORT)
+    nGmsUserAux = 5;
+  if (a_type == "River")
+  { // stage, cond, elev, factor, RBDTHK, RIVDEN
+    //a_bcData.SetSize(6, a_maxIdx+1, 0);
+    a_bcData.SetSize(6+nGmsUserAux, a_maxIdx+1, 0);
+    factorIdxs.push_back(3);
+    a_gmsH5AuxStartIdx = 6;
+  }
+  else if (a_type == "Specified Head")
+  { // startHead, endHead, factor1, factor2, CHDDENSOPT, CHDDEN
+    //a_bcData.SetSize(6, a_maxIdx+1, 0);
+    a_bcData.SetSize(6+nGmsUserAux, a_maxIdx+1, 0);
+    factorIdxs.push_back(2);
+    factorIdxs.push_back(3);
+    a_gmsH5AuxStartIdx = 6;
+  }
+  else if (a_type == "Drain")
+  { // elev, cond, factor, DRNBELEV
+    a_bcData.SetSize(4, a_maxIdx+1, 0);
+    factorIdxs.push_back(2);
+    a_gmsH5AuxStartIdx = 4;
+  }
+  else if (a_type == "General Head")
+  { // head, cond, factor, GHBELEV, GHBDENS
+    a_bcData.SetSize(5+nGmsUserAux, a_maxIdx+1, 0);
+    factorIdxs.push_back(2);
+    a_gmsH5AuxStartIdx = 5;
+  }
+  else if (a_type == "Drain Return")
+  { // elev, cond, layR, rowR, colR, Rfprop, factor
+    a_bcData.SetSize(7, a_maxIdx+1, 0);
+    factorIdxs.push_back(6);
+    a_gmsH5AuxStartIdx = 7;
+  }
+  else if (a_type == "PCB")
+  { // Species_No, conc
+    a_bcData.SetSize(2, a_maxIdx+1, 0);
+  }
+  else if (a_type == "Well" ||
+           a_type == "WEL (CLN)")
+  { // Q, factor, WELDENS
+    a_bcData.SetSize(3+nGmsUserAux, a_maxIdx+1, 0);
+    factorIdxs.push_back(1);
+    a_gmsH5AuxStartIdx = 3;
+  }
+  else if (a_type == "Stream")
+  { // stage, cond, bot. elev., top elev., width, slope, rough, factor
+    a_bcData.SetSize(8, a_maxIdx+1, 0);
+    factorIdxs.push_back(7);
+    a_gmsH5AuxStartIdx = 8;
+  }
+  else if (a_type == "Stream (SFR2)")
+  { // RCHLEN
+    a_bcData.SetSize(1, a_maxIdx+1, 0);
+    a_gmsH5AuxStartIdx = 1;
+  }
+
+  for (size_t i=0; i<factorIdxs.size(); ++i)
+  { // this initializes the condfact to 1.0 or for CHD the headfact
+    for (int j=0; j<a_bcData.GetSize2(); j++)
+      a_bcData.at(factorIdxs[i], j) = 1.0;
+  }
+} // H5LstPack::impl::SizeBcDataArray
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \class H5StrPack
@@ -1227,7 +1263,7 @@ CStr H5StrPack::Write (int& a_itmp)
   if (Init())
   {
     m_p.ExistingBcData(0);
-    iSizeBcDataArray(m_p.m_type, m_p.m_maxIdx, m_p.m_bcData);
+    m_p.SizeBcDataArray(m_p.m_type, m_p.m_maxIdx, m_p.m_bcData, m_p.m_gmsH5AuxStartIdx);
     // size the data array for this stress period
     m_p.Set_dSize();
     m_p.HandleUseLast();
@@ -1497,7 +1533,7 @@ CStr H5SfrPack::Ln2 ()
     if (!m_p.m_glob->Unstructured()) m_p.m_usg = false;
     m_p.ExistingBcData(0);
     if (!m_p.m_glob->Unstructured()) m_p.m_usg = true;
-    iSizeBcDataArray(m_p.m_type, m_p.m_maxIdx, m_p.m_bcData);
+    m_p.SizeBcDataArray(m_p.m_type, m_p.m_maxIdx, m_p.m_bcData, m_p.m_gmsH5AuxStartIdx);
     for (int i = 0; i < m_numReaches; ++i)
     { // fill in the bcData
       m_p.m_bcData.at(0, m_p.m_idxs.at(i)) =

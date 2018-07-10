@@ -424,6 +424,10 @@ bool H5Util_CreateDefaultMfH5File (const char *a_,
     H5DataSetWriterSetup s1(file, MFBC_VERSION, H5T_NATIVE_DOUBLE, 1);
     H5DataSetWriter t1(&s1);
     double tmpd(3.0);
+    if (a_modelType == MfData::USG_TRANSPORT)
+    {
+      tmpd = 4.0;
+    }
     t1.WriteData(&tmpd, 1);
   }
 
