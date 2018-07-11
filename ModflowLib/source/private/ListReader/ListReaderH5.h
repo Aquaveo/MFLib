@@ -41,7 +41,11 @@ private:
   template <class T>
   bool GetCellGroup(T *a_) const;
   template <class T>
+  bool ReadAux (const std::vector<std::pair<int, int> >& a_vIdx, T* a_) const;
+  template <class T>
   bool GetSeawatAux(T *a_) const;
+  template <class T>
+  bool GetUsgTransportAux(T *a_) const;
 
   int  GetNumFactors() const;
   bool GetFactor(std::vector<Real> &a_,
@@ -50,7 +54,9 @@ private:
   bool GetVersion();
   int  GetAuxIdx(const char * a_name) const;
   int  GetSeawatAuxH5Idx(const char * a_name) const;
-  void GetH5IndicesForSeawatAux(const std::vector<CStr> a_auxNames,
+  void GetH5IndicesForSeawatAux(const std::vector<CStr>& a_auxNames,
+                                std::vector<std::pair<int, int> >& a_indices) const;
+  void GetH5IndicesForUsgTransportAux(const std::vector<CStr>& a_auxNames,
                                 std::vector<std::pair<int, int> >& a_indices) const;
 
   int    m_stress, m_nRows, m_nFields, m_ial, m_nAuxFields,

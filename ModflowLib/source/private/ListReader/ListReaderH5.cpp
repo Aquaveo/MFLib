@@ -63,10 +63,16 @@ bool ListReaderH5::FillInData (double *a_)
 {
   return (FillInDataT(a_));
 } // ListReaderH5::FillInData
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
 bool ListReaderH5::FillInData (float *a_)
 {
   return (FillInDataT(a_));
 } // ListReaderH5::FillInData
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
 template <class T>
 bool ListReaderH5::FillInDataT (T *a_)
 {
@@ -107,6 +113,7 @@ bool ListReaderH5::FillInDataT (T *a_)
           return false;
       }
       GetSeawatAux(a_);
+      GetUsgTransportAux(a_);
     }
     ASSERT(_CrtCheckMemory());
   //}
@@ -360,36 +367,15 @@ bool ListReaderH5::GetCellGroup (T *a_) const
 /// \brief
 //------------------------------------------------------------------------------
 template <class T>
-bool ListReaderH5::GetSeawatAux (T* a_) const
+bool ListReaderH5::ReadAux (const std::vector<std::pair<int, int> >& a_vIdx, T* a_) const
 {
-  // the file version must be 3 or greater
-  if (m_fileVersion < 3)
-    return false;
-  // look at the aux names
-  // RBDTHK=4, RIVDEN=5
-  // DRNBELEV=3
-  // GHBELEV=3, GHBDENS=4
-  // CHDDENSOPT=4, CHDDEN=5
-  // WELDENS=2
-
-  std::vector<std::pair<int, int> > vIdx;
-  GetH5IndicesForSeawatAux(m_auxNames, vIdx);
-  if (vIdx.empty() || vIdx.size() > 2) // no seawat data to read or error
-  {
-    if (!vIdx.empty())
-    {
-      ASSERT(0);
-    }
-    return false;
-  }
-
   // set up the indices to read the portion of the boundary conditions that
   // we are going to read
-  for (size_t i=0; i<vIdx.size(); i++)
+  for (size_t i=0; i<a_vIdx.size(); i++)
   {
     std::pair<int, int> myPair(0, 1);
     VEC_INT_PAIR indices(3, myPair);
-    indices.at(0).first = vIdx.at(i).first;;
+    indices.at(0).first = a_vIdx.at(i).first;
     indices.at(0).second = 1;
     indices.at(1).second = m_nRows;
     indices.at(2).first = m_stress - 1;
@@ -408,14 +394,66 @@ bool ListReaderH5::GetSeawatAux (T* a_) const
       return false;
     }
 
-    int index = m_nFields - m_nAuxFields + vIdx.at(i).second;
+    int index = m_nFields - m_nAuxFields + a_vIdx.at(i).second;
     for (size_t j=0; j<vDat.size(); j++)
     {
       a_[j*m_nFields+index] = (T)vDat.at(j);
     }
   }
   return true;
+} // ListReaderH5::ReadAux
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+template <class T>
+bool ListReaderH5::GetSeawatAux (T* a_) const
+{
+  // the file version must be 3 or greater
+  if (m_fileVersion < 3)
+    return false;
+  // look at the aux names
+  // RBDTHK=4, RIVDEN=5
+  // DRNBELEV=3
+  // GHBELEV=3, GHBDENS=4
+  // CHDDENSOPT=4, CHDDEN=5
+  // WELDENS=2
+
+  std::vector<std::pair<int, int> > vIdx; // first: GMS H5 index, second: MODFLOW index
+  GetH5IndicesForSeawatAux(m_auxNames, vIdx);
+  if (vIdx.empty() || vIdx.size() > 2) // no seawat data to read or error
+  {
+    if (!vIdx.empty())
+    {
+      ASSERT(0);
+    }
+    return false;
+  }
+
+  return ReadAux(vIdx, a_);
 } // ListReaderH5::GetSeawatAux
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
+template <class T>
+bool ListReaderH5::GetUsgTransportAux (T* a_) const
+{
+  // the file version must be 4 or greater
+  if (m_fileVersion < 4)
+    return false;
+
+  std::vector<std::pair<int, int> > vIdx; // first: GMS H5 index, second: MODFLOW index
+  GetH5IndicesForUsgTransportAux(m_auxNames, vIdx);
+  if (vIdx.empty() || vIdx.size() > 5) // no aux data to read or error
+  {
+    if (!vIdx.empty())
+    {
+      ASSERT(0);
+    }
+    return false;
+  }
+
+  return ReadAux(vIdx, a_);
+} // ListReaderH5::GetUsgTransportAux
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
@@ -455,6 +493,9 @@ int ListReaderH5::GetAuxIdx (const char *a_name) const
   }
   return -1;
 } // ListReaderH5::GetAuxIdx
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
 static std::map<CStr, int> iSeawatH5Idx()
 {
   // look at the aux names
@@ -478,6 +519,35 @@ static std::map<CStr, int> iSeawatH5Idx()
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
+static std::set<CStr> iGmsAux()
+{
+  // look at the aux names
+  // see enums in gms/source/modflow/bc/mfbc.h
+  // RBDTHK=4, RIVDEN=5
+  // DRNBELEV=3
+  // GHBELEV=3, GHBDENS=4
+  // CHDDENSOPT=4, CHDDEN=5
+  // WELDENS=2
+  static std::set<CStr> m_setGmsAux;
+  m_setGmsAux.insert("rbdthk");
+  m_setGmsAux.insert("rivden");
+  m_setGmsAux.insert("drnbelev");
+  m_setGmsAux.insert("ghbelev");
+  m_setGmsAux.insert("ghbdens");
+  m_setGmsAux.insert("chddensopt");
+  m_setGmsAux.insert("chdden");
+  m_setGmsAux.insert("weldens");
+  m_setGmsAux.insert("iface");
+  m_setGmsAux.insert("condfact");
+  m_setGmsAux.insert("qfact");
+  m_setGmsAux.insert("sheadfact");
+  m_setGmsAux.insert("eheadfact");
+  m_setGmsAux.insert("cellgrp");
+  return m_setGmsAux;
+} // iGmsAux
+//------------------------------------------------------------------------------
+/// \brief
+//------------------------------------------------------------------------------
 int ListReaderH5::GetSeawatAuxH5Idx (const char *a_name) const
 {
   CStr name(a_name);
@@ -492,7 +562,7 @@ int ListReaderH5::GetSeawatAuxH5Idx (const char *a_name) const
 //------------------------------------------------------------------------------
 /// \brief
 //------------------------------------------------------------------------------
-void ListReaderH5::GetH5IndicesForSeawatAux (const std::vector<CStr> a_auxNames,
+void ListReaderH5::GetH5IndicesForSeawatAux (const std::vector<CStr>& a_auxNames,
                                              std::vector<std::pair<int, int> >& a_indices) const
 {
   size_t i;
@@ -504,4 +574,32 @@ void ListReaderH5::GetH5IndicesForSeawatAux (const std::vector<CStr> a_auxNames,
       a_indices.push_back(std::make_pair(idx, (int)i));
   }
 } // ListReaderH5::GetH5IndicesForSeawatAux
+//------------------------------------------------------------------------------
+/// \brief
+/// \param[out] a_indices: Vector of pairs where first = GMS H5 index,
+///                        second = MODFLOW index.
+//------------------------------------------------------------------------------
+void ListReaderH5::GetH5IndicesForUsgTransportAux (const std::vector<CStr>& a_auxNames,
+                                             std::vector<std::pair<int, int> >& a_indices) const
+{
+  int idx = 0;
+  std::set<CStr> setGmsAux(iGmsAux());
+  const int MAX_USER_AUX_COUNT = 5; ///< Max number of user AUX fields (that GMS supports)
+  for (size_t i=0; i<a_auxNames.size(); i++)
+  {
+    CStr name(a_auxNames[i]);
+    name.MakeLower();
+    if (setGmsAux.find(name) != setGmsAux.end())
+    {
+      // This is a GMS hardwired aux variable, not a user aux.
+    }
+    else
+    {
+      // This must be a user aux
+      int h5Idx = m_nFields - MAX_USER_AUX_COUNT + idx;
+      a_indices.push_back(std::make_pair(h5Idx, (int)i));
+      ++idx;
+    }
+  }
+} // ListReaderH5::GetH5IndicesForUsgTransportAux
 
