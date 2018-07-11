@@ -575,13 +575,31 @@ void ListReaderH5::GetH5IndicesForSeawatAux (const std::vector<CStr>& a_auxNames
   }
 } // ListReaderH5::GetH5IndicesForSeawatAux
 //------------------------------------------------------------------------------
-/// \brief
+/// \brief Get a vector of pairs of indices relating H5 aux index to MODFLOW
+///        aux index.
+/// \param[in] a_auxNames: Vector of the aux variable names.
 /// \param[out] a_indices: Vector of pairs where first = GMS H5 index,
 ///                        second = MODFLOW index.
 //------------------------------------------------------------------------------
 void ListReaderH5::GetH5IndicesForUsgTransportAux (const std::vector<CStr>& a_auxNames,
                                              std::vector<std::pair<int, int> >& a_indices) const
 {
+  // get the size of the H5 dataset
+  int h5DatasetPropertyDim0(0);
+  {
+    VEC_INT_PAIR indices;
+    CStr str(m_path);
+    str += "/";
+    str += PROPERTY;
+    H5DataSetReader r(m_file, str, indices);
+    std::vector<hsize_t> dims;
+    r.GetDataSetDimensions(dims);
+    ASSERT(!dims.empty());
+    if (dims.empty())
+      return;
+    h5DatasetPropertyDim0 = static_cast<int>(dims[0]);
+  }
+
   int idx = 0;
   std::set<CStr> setGmsAux(iGmsAux());
   const int MAX_USER_AUX_COUNT = 5; ///< Max number of user AUX fields (that GMS supports)
@@ -596,8 +614,8 @@ void ListReaderH5::GetH5IndicesForUsgTransportAux (const std::vector<CStr>& a_au
     else
     {
       // This must be a user aux
-      int h5Idx = m_nFields - MAX_USER_AUX_COUNT + idx;
-      a_indices.push_back(std::make_pair(h5Idx, (int)i));
+      int h5Idx = h5DatasetPropertyDim0 - MAX_USER_AUX_COUNT + idx;
+      a_indices.push_back(std::make_pair(h5Idx, (int)(i - m_nCbcFields)));
       ++idx;
     }
   }
