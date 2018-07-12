@@ -105,6 +105,8 @@ static void iArealPropFromUseLast (CAR_INT2D& a_flags,
   {
     if (CStr(a_path) == "ETS/")
       dim[0] = 3;
+    if (CStr(a_path) == "UZF/")
+      dim[0] = 4;
     dim[2] = a_flags.GetSize2() - dims[2];
     start[2] = dims[2];
   }
