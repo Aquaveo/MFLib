@@ -13,7 +13,6 @@
 
 #include <private\ArrayReader.h>
 #include <private\CmdLine.h>
-#include <private\CopyProtect.h>
 #include <private\ListReader.h>
 #include <private\ListReaderStr.h>
 #include <private\MfData\MfGlobal.h>
