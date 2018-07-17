@@ -8,16 +8,6 @@ set(PROJECT_NAME ModflowLib)
 set(CMAKE_DEBUG_POSTFIX _d)
 
 
-# Conan
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup(TARGETS)
-set(EXT_INCLUDE_DIRS ${CONAN_INCLUDE_DIRS})
-set(EXT_LIB_DIRS ${CONAN_LIB_DIRS})
-set(EXT_LIBS ${CONAN_LIBS})
-include_directories(${CMAKE_CURRENT_LIST_DIR})
-include_directories(${EXT_INCLUDE_DIRS})
-link_directories(${EXT_LIB_DIRS})
-
 # Output Variables
 set(OUTPUT_DEBUG Debug/bin)
 set(OUTPUT_RELEASE Release/bin)
@@ -31,6 +21,17 @@ SET(USE_DBLPREC_AS_REAL NO CACHE BOOL "Define Fortran real as double")
 #############################################
 
 project(${PROJECT_NAME} CXX)
+
+# Conan
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup(TARGETS)
+set(EXT_INCLUDE_DIRS ${CONAN_INCLUDE_DIRS})
+set(EXT_LIB_DIRS ${CONAN_LIB_DIRS})
+set(EXT_LIBS ${CONAN_LIBS})
+include_directories(${CMAKE_CURRENT_LIST_DIR})
+include_directories("${CMAKE_CURRENT_LIST_DIR}/ModflowLib/source/")
+include_directories(${EXT_INCLUDE_DIRS})
+link_directories(${EXT_LIB_DIRS})
 
 # Define Release by default.
 if(NOT CMAKE_BUILD_TYPE)
@@ -118,7 +119,6 @@ SET(MFLIB_SOURCES
     ModflowLib/source/private/H5DataReader/H5VecCStrReader.cpp
     ModflowLib/source/private/ArrayReader.cpp
     ModflowLib/source/private/MNWReader.cpp
-    ModflowLib/source/private/CopyProtect.cpp
     ModflowLib/source/private/MfData/MfGlobal.cpp
     ModflowLib/source/private/MfData/MfExport/private/MfExportUtil.cpp
     ModflowLib/source/private/MfData/MfExport/private/Native/NativeExpLstObs.cpp
@@ -176,7 +176,6 @@ SET(MFLIB_SOURCES
     ModflowLib/source/private/MfData/MfExport/private/Native/NativeExpUzf.cpp
     ModflowLib/source/private/MfData/MfExport/private/Native/NativeExpHfb.cpp
     ModflowLib/source/private/MfData/MfExport/private/Native/NativeExpNam.cpp
-    ModflowLib/source/private/MfData/MfExport/private/Native/ArrToh5.cpp
     ModflowLib/source/private/MfData/MfExport/private/Native/NeArealPar.cpp
     ModflowLib/source/private/MfData/MfExport/private/Native/NativeExpVdf.cpp
     ModflowLib/source/private/MfData/MfExport/private/Native/NativeExpSolver.cpp
@@ -190,7 +189,6 @@ SET(MFLIB_SOURCES
     ModflowLib/source/private/MfData/MfExport/private/H5/H5ArrayWriter.cpp
     ModflowLib/source/private/MfData/MfExport/private/H5/H5UseLastWriter.cpp
     ModflowLib/source/private/MfData/MfExport/private/H5/H5BcList.cpp
-    ModflowLib/source/private/MfData/MfExport/private/Sqlite/SqPackDbCreator.cpp
     ModflowLib/source/private/MfData/MfExport/private/Sqlite/SqFile.cpp
     ModflowLib/source/private/MfData/MfExport/private/Sqlite/SqArrayWriter.cpp
     ModflowLib/source/private/MfData/MfExport/private/Sqlite/SqDisu.cpp
