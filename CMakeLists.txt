@@ -28,8 +28,7 @@ conan_basic_setup(TARGETS)
 set(EXT_INCLUDE_DIRS ${CONAN_INCLUDE_DIRS})
 set(EXT_LIB_DIRS ${CONAN_LIB_DIRS})
 set(EXT_LIBS ${CONAN_LIBS})
-include_directories(${CMAKE_CURRENT_LIST_DIR})
-include_directories("${CMAKE_CURRENT_LIST_DIR}/ModflowLib/source/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/ModflowLib/source/")
 include_directories(${EXT_INCLUDE_DIRS})
 link_directories(${EXT_LIB_DIRS})
 
@@ -82,7 +81,6 @@ endif(NOT MSVC)
 #######################################
 
 SET(MFLIB_SOURCES
-    ModflowLib/source/private/Parameters/Param.t.cpp
     ModflowLib/source/private/Parameters/MultArray.cpp
     ModflowLib/source/private/Parameters/EReadAsciiFile.cpp
     ModflowLib/source/private/Parameters/ParamFileReader.cpp
@@ -92,14 +90,10 @@ SET(MFLIB_SOURCES
     ModflowLib/source/private/Parameters/SenFileReader.cpp
     ModflowLib/source/private/MfData.cpp
     ModflowLib/source/private/samg/samg.cpp
-    ModflowLib/source/private/ArrayReader/ArrayReaderParser.t.cpp
     ModflowLib/source/private/ArrayReader/ArrayReaderParser.cpp
     ModflowLib/source/private/MfLibAsserts.cpp
-    ModflowLib/source/private/ListReader/CellIdToIJK.t.cpp
-    ModflowLib/source/private/ListReader/ListReaderH5.t.cpp
     ModflowLib/source/private/ListReader/ListReaderH5.cpp
     ModflowLib/source/private/ListReader/ListReaderParser.cpp
-    ModflowLib/source/private/ListReader/ListReaderParser.t.cpp
     ModflowLib/source/private/Parameters.cpp
     ModflowLib/source/private/util/EReadAsciiFile.cpp
     ModflowLib/source/private/util/CToken.cpp
@@ -112,9 +106,7 @@ SET(MFLIB_SOURCES
     ModflowLib/source/private/SQLite/sqlite3.c
     ModflowLib/source/private/CmdLine.cpp
     ModflowLib/source/private/H5DataReader/H5DataSetReader.cpp
-    ModflowLib/source/private/H5DataReader/H5VecCStrReader.t.cpp
     ModflowLib/source/private/H5DataReader/H5DataSetWriter.cpp
-    ModflowLib/source/private/H5DataReader/H5DataSetReader.t.cpp
     ModflowLib/source/private/H5DataReader/H5DataReaderUtil.cpp
     ModflowLib/source/private/H5DataReader/H5VecCStrReader.cpp
     ModflowLib/source/private/ArrayReader.cpp
@@ -216,7 +208,6 @@ SET(MFLIB_SOURCES
     ModflowLib/source/private/Gms2Mf2k/Files/FileProcessor.cpp
     ModflowLib/source/private/Gms2Mf2k/Files/LgrFileReader.cpp
     ModflowLib/source/private/Gms2Mf2k/Files/NameFileReader.cpp
-    ModflowLib/source/private/Gms2Mf2k/Gms2Mf2k.t.cpp
     ModflowLib/source/RunTest.cpp
     ModflowLib/source/Export.cpp
     ModflowLib/source/ModflowLib.cpp
@@ -224,6 +215,17 @@ SET(MFLIB_SOURCES
 
 if(BUILD_TESTING)
     add_definitions(-DCXX_TEST -DCXXTEST4)
+
+    LIST(APPEND MFLIB_SOURCES
+      ModflowLib/source/private/ArrayReader/ArrayReaderParser.t.cpp
+      ModflowLib/source/private/Gms2Mf2k/Gms2Mf2k.t.cpp
+      ModflowLib/source/private/H5DataReader/H5DataSetReader.t.cpp
+      ModflowLib/source/private/H5DataReader/H5VecCStrReader.t.cpp
+      ModflowLib/source/private/ListReader/CellIdToIJK.t.cpp
+      ModflowLib/source/private/ListReader/ListReaderH5.t.cpp
+      ModflowLib/source/private/ListReader/ListReaderParser.t.cpp
+      ModflowLib/source/private/Parameters/Param.t.cpp
+    )
 
     find_package(CxxTest)
     if(CXXTEST_FOUND)
