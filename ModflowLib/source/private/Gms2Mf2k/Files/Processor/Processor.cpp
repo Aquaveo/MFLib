@@ -750,7 +750,7 @@ void ProcessorT::testDoConvertFile ()
   util::GetTempDirectory(outPath);
   util::GetTestFilesDirectory(inPath);
   inPath += "\\mfInputs1";
-  SetCurrentDirectory(inPath);
+  util::SetCurrentDirectory(inPath);
   inFile = inPath + "\\run2.dis";
   outFile = outPath + "\\run2.dis";
 

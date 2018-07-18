@@ -122,7 +122,7 @@ CStr NativeExpArr1d::GetFname (const int* K)
   {
     folderStr = "arrays\\";
     CStr dir = path + "arrays";
-    ::CreateDirectory(dir, NULL);
+    util::CreateDirectory(dir);
   }
   if (*K == 0)
     fname.Format("%s%s%s_array_%s.txt", path, folderStr, fname1, name);

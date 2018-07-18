@@ -15,7 +15,9 @@
 #include <private/MfData/Packages/MfPackage.h>
 #include <private/MfData/Packages/MfPackStrings.h>
 #include <private/MfData/Packages/MfPackFields.h>
+#ifdef _MSC_VER
 #include <private/MfData/MfExport/private/ExpGeoDb.h>
+#endif
 #include <private/MfData/MfExport/private/Mf2kNative.h>
 #include <private/Parameters/Param.h>
 #include <private/Parameters/ParamList.h>
@@ -102,6 +104,7 @@ MfExporterImpl* MfExportUtil::CreateExporter (const char *a_type)
   MfExporterImpl *ret(NULL);
   CStr type(a_type);
   type.ToLower();
+#ifdef _MSC_VER
   if (type == "-exportgeodb")
   {
     ret = new ExpGeoDb;
@@ -113,6 +116,9 @@ MfExporterImpl* MfExportUtil::CreateExporter (const char *a_type)
   else if (type == "-exportsqlite")
   {
     ret = new ExpGeoDbSQLite;
+#else
+  if(0) { // Workaround to add fewer IFDEFS above
+#endif
   }
   else
   {

@@ -11,6 +11,7 @@
 #include <private/MfData/MfExport/private/Native/NativePackExp.h>
 #include <private/MfData/MfExport/private/Sqlite/SqFile.h>
 #include <private/SQLite/CppSQLite3.h>
+#include <private/MfData/MfExport/private/Sqlite/SqArrayWriter.h>
 
 //----- Forward declarations ---------------------------------------------------
 class CppSQLite3DB;
@@ -66,7 +67,7 @@ void sqWriteArrayToField(MfData::Export::NativePackExp* a_package,
                         int a_iprn, const T* a_array, Real a_mult,
                         int a_layer)
 {
-  SqArrayWriter writer;
+  MfData::Export::SqArrayWriter writer;
   writer.WriteArray2(a_package, a_arrayName, a_size, a_iprn, a_array, a_mult,
                      a_layer);
 } // sqWriteArray

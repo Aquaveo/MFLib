@@ -121,13 +121,12 @@ bool Converter::impl::SetUpOutput ()
 
   if (path.IsEmpty())
   {
-    char c[5001];
-    if (!GetCurrentDirectory(5000, &c[0]))
+    if (!util::GetCurrentDirectory())
     {
       ErrorStack::Get().PutError("Unable to get current directory.");
       return false;
     }
-    path = c;
+    path = util::GetCurrentDirectory();
   }
 
   // see if an output file was specified
@@ -168,25 +167,6 @@ bool Converter::impl::SetUpOutput ()
       return false;
   }
 
-
-#if 0
-  // now we allow the user to specify an output file
-  path += "Out_Mf2k";
-  testPath = path;
-  while (::CreateDirectory(testPath, NULL) != 0 &&
-         cnt < 11)
-  {
-    CStr cntStr;
-    cntStr.Format("%2d", cnt++);
-    testPath = path + cntStr;
-  }
-  if (cnt >= 11)
-  {
-    ErrorStack::Get().PutError("Unable to create output directory. Aborting.");
-    return false;
-  }
-#endif
-
   // now set the output name file name
   //util::StripPathFromFilename(m_inputFile, name);
 
@@ -211,7 +191,7 @@ bool Converter::impl::CreateOutDir (CStr a_inPath,
   testPath = path;
   int  cnt(1);
 
-  while (::CreateDirectory(testPath, NULL) == 0 &&
+  while (util::CreateDirectory(testPath) == 0 &&
          cnt < 11)
   {
     CStr cntStr;
@@ -294,7 +274,7 @@ bool Converter::impl::DoLgrConversion (LgrFileReader& a_lgrReader)
     if (paths[i] != "")
     {
       m_outPath = outPath + "\\" + paths[i];
-      if (::CreateDirectory(m_outPath.c_str(), NULL) == 0)
+      if (util::CreateDirectory(m_outPath) == 0)
       {
         ErrorStack::Get().PutError("Unable to create output directory. Aborting.");
         return false;
@@ -323,7 +303,7 @@ bool Converter::impl::DoNameFileConversion (const CStr& a_nameFile,
 
   CStr nameFileDir;
   util::StripFileFromFilename(a_nameFile, nameFileDir);
-  SetCurrentDirectory(nameFileDir);
+  util::SetCurrentDirectory(nameFileDir);
 
   // see if there is a mfs file, if so then copy it to the destination
   // folder
@@ -500,7 +480,7 @@ void ConverterT::testSetUpOutput ()
     path += "out\\";
     outFile = path + "run1.mfn";
     // create the directory
-    TS_ASSERT(::CreateDirectory(path, NULL) != 0);
+    TS_ASSERT(util::CreateDirectory(path) != 0);
 
     Converter c(str, out, outFile);
     TS_ASSERT(c.m_p->SetUpOutput());

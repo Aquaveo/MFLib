@@ -20,7 +20,7 @@ SET(USE_DBLPREC_AS_REAL NO CACHE BOOL "Define Fortran real as double")
 #        The main options of project        #
 #############################################
 
-project(${PROJECT_NAME} CXX)
+project(${PROJECT_NAME})
 
 # Conan
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
@@ -43,9 +43,14 @@ add_definitions(
    -DSTATICLIB 
    -DNDEBUG 
    -D_CONSOLE 
-   -DDBLPREC 
    -D_SECURE_SCL=0 
 )
+
+if(USE_DBLPREC_AS_REAL)
+  add_definitions(
+    -DDBLPREC 
+  )
+endif(USE_DBLPREC_AS_REAL)
 
 ############## Artefacts Output #################
 # Defines outputs , depending Debug or Release. #
@@ -91,7 +96,6 @@ SET(MFLIB_SOURCES
     ModflowLib/source/private/MfData.cpp
     ModflowLib/source/private/samg/samg.cpp
     ModflowLib/source/private/ArrayReader/ArrayReaderParser.cpp
-    ModflowLib/source/private/MfLibAsserts.cpp
     ModflowLib/source/private/ListReader/ListReaderH5.cpp
     ModflowLib/source/private/ListReader/ListReaderParser.cpp
     ModflowLib/source/private/Parameters.cpp
@@ -214,13 +218,12 @@ SET(MFLIB_SOURCES
 )
 
 if(BUILD_TESTING)
-    add_definitions(-DCXX_TEST -DCXXTEST4)
+  add_definitions(-DCXX_TEST -DCXXTEST4 -DCXXTEST_HAVE_EH)
 
     LIST(APPEND MFLIB_SOURCES
+      ModflowLib/source/private/MfLibAsserts.cpp
       ModflowLib/source/private/ArrayReader/ArrayReaderParser.t.cpp
       ModflowLib/source/private/Gms2Mf2k/Gms2Mf2k.t.cpp
-      ModflowLib/source/private/H5DataReader/H5DataSetReader.t.cpp
-      ModflowLib/source/private/H5DataReader/H5VecCStrReader.t.cpp
       ModflowLib/source/private/ListReader/CellIdToIJK.t.cpp
       ModflowLib/source/private/ListReader/ListReaderH5.t.cpp
       ModflowLib/source/private/ListReader/ListReaderParser.t.cpp
@@ -234,10 +237,22 @@ if(BUILD_TESTING)
 
       set(CXXTEST_TESTGEN_ARGS --xunit-printer)
       file(GLOB_RECURSE test_headers ${CMAKE_CURRENT_LIST_DIR}/ModflowLib/*.t.h)
+      if(NOT WIN32)
+        # ExpGeoDb is not enabled on non-windows systems, and thus cannot be tested on non-windows systems
+        list(REMOVE_ITEM test_headers ${CMAKE_CURRENT_LIST_DIR}/ModflowLib/source/private/MfData/MfExport/private/ExpGeoDb.t.h)
+      endif(NOT WIN32)
+      # 
       CXXTEST_ADD_TEST(
         runner runner.cpp ${test_headers}
       )
       target_link_libraries(runner ${PROJECT_NAME})
+      if(NOT WIN32)
+        target_link_libraries(runner dl)
+        find_package(Threads REQUIRED)
+        target_link_libraries(runner
+          ${CMAKE_THREAD_LIBS_INIT}
+        )
+      endif(NOT WIN32)
 
       if(WIN32)
         set(RUNNERNAME "runner.exe")

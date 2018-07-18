@@ -121,7 +121,7 @@ bool iWriteH5::WriteData (H5DataSetWriter::impl &a_impl,
 
   if (H5Dwrite(a_impl.m_dataId, a_impl.m_setup.m_type, a_impl.m_mSpace,
                a_impl.m_fSpace, H5P_DEFAULT, data) < 0)
-    throw std::exception("H5Dwrite failed.");
+    throw std::runtime_error("H5Dwrite failed.");
 
   return true;
 } // iWriteH5:: WriteData
@@ -147,8 +147,10 @@ static hid_t OpenH5ForWriting (const char *a_fname)
   {
     // open the file
     fid = H5Fcreate(file, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-    if (fid < 0)
-      throw std::exception("Unable to open " + file + ".");
+    if (fid < 0) {
+      std::string err = "Unable to open " + file + ".";
+      throw std::runtime_error(err);
+    }
     GetFileMap().insert(std::make_pair(file, fid));
   }
   else
@@ -354,7 +356,7 @@ bool H5DataSetWriter::impl::OpenDatasetAndCreateIfNeeded ()
     return OpenDataset();
   else
     return CreateDataset();
-} // H5DataSetWriter::impl::OpenDatasetAndCreateIfNeeded
+} // H5DataSetWriter::impl::OpenDatasetAndCreateIfNeededfunction
 //------------------------------------------------------------------------------
 /// \brief Opens a data set in preparation for writing
 //------------------------------------------------------------------------------
@@ -499,36 +501,36 @@ bool H5DataSetWriter::impl::CreateDataset ()
     // create the data space
     spaceId = H5Screate_simple(rank, &dim[0], &maxdim[0]);
     if (spaceId < 0)
-      throw std::exception("Unable to create data space in file: " + 
+      throw std::runtime_error("Unable to create data space in file: " +
                            m_setup.m_file);
 
     // setup the dataset creation properties
     paramId = H5Pcreate(H5P_DATASET_CREATE);
     if (paramId < 0)
-      throw std::exception("Unable to create dataset parameters in file: " + 
+      throw std::runtime_error("Unable to create dataset parameters in file: " +
                            m_setup.m_file);
     status = H5Pset_chunk(paramId, rank, &chunk[0]);
     if (status < 0)
-      throw std::exception("Unable to set chunk property in file: " + 
+      throw std::runtime_error("Unable to set chunk property in file: " +
                            m_setup.m_file);
     
     if (m_setup.m_compressed)
     {
       status = H5Pset_deflate(paramId, 1);
       if (status < 0)
-        throw std::exception("Unable to set compression property in file: " + 
+        throw std::runtime_error("Unable to set compression property in file: " +
                              m_setup.m_file);
     }
 
     status = SetFillValue(paramId);
     if (status < 0)
-      throw std::exception("Unable to set fill value property in file: " + 
+      throw std::runtime_error("Unable to set fill value property in file: " +
                            m_setup.m_file);
 
     // create the dataset
     m_dataId = H5Dcreate(m_fid, m_setup.m_path, m_setup.m_type, spaceId, paramId);
     if (m_dataId < 0)
-      throw std::exception("Unable to create dataset in file: " + 
+      throw std::runtime_error("Unable to create dataset in file: " +
                            m_setup.m_file);
 
   }
@@ -598,7 +600,7 @@ bool H5DataSetWriter::impl::DoErrorChecksT (const T *a_, size_t a_num)
   // check if the data that was passed in can be written to this dataset
   if (!m_allowConversions &&
       m_setup.m_type != H5DataReader::Get_H5_nativetype(a_))
-    throw std::exception("Data types do not match.");
+    throw std::runtime_error("Data types do not match.");
 
   // make sure the dataset and the dataspace are open
   if (!OpenFile() ||
@@ -608,18 +610,18 @@ bool H5DataSetWriter::impl::DoErrorChecksT (const T *a_, size_t a_num)
 
   // if we have info for dimensions make sure the arrays are the same size
   if (m_dimInfo.m_startLoc.size() != m_dimInfo.m_nToWrite.size())
-    throw std::exception("Error in dimension information.");
+    throw std::runtime_error("Error in dimension information.");
 
   // see if the number we are writing is consistent with the dimension info
   if (!m_dimInfo.m_nToWrite.empty())
   {
     if (static_cast<size_t>(m_setup.m_nDim) != m_dimInfo.m_nToWrite.size())
-      throw std::exception("Invalid dimensions for dataset.");
+      throw std::runtime_error("Invalid dimensions for dataset.");
     hsize_t num(1);
     for (size_t i=0; i<m_dimInfo.m_nToWrite.size(); i++)
       num *= m_dimInfo.m_nToWrite[i];
     if (num != a_num)
-      throw std::exception("Error in the size of the data to write.");
+      throw std::runtime_error("Error in the size of the data to write.");
   }
 
   return true;
@@ -638,7 +640,7 @@ bool H5DataSetWriter::impl::CheckDimensionsAndExtendDataIfNeeded (size_t a_)
   std::vector<hsize_t> dims(m_setup.m_nDim, 0), maxDims(m_setup.m_nDim, 0);
   stat = H5Sget_simple_extent_dims(m_spaceId, &dims[0], &maxDims[0]);
   if (stat != m_setup.m_nDim)
-    throw std::exception("Invalid dimensions for dataset.");
+    throw std::runtime_error("Invalid dimensions for dataset.");
 
   if (m_dimInfo.m_startLoc.empty() && m_setup.m_nDim == 1)
   {
@@ -646,7 +648,7 @@ bool H5DataSetWriter::impl::CheckDimensionsAndExtendDataIfNeeded (size_t a_)
     m_dimInfo.m_nToWrite.push_back(static_cast<hid_t>(a_));
   }
   else if (m_dimInfo.m_startLoc.empty())
-    throw std::exception("Dimension information must be provided.");
+    throw std::runtime_error("Dimension information must be provided.");
 
   size_t i;
   bool extend(false);
@@ -666,11 +668,11 @@ bool H5DataSetWriter::impl::CheckDimensionsAndExtendDataIfNeeded (size_t a_)
     for (i=0; i<dims.size(); i++)
     {
       if (maxDims[i] < newDims[i])
-        throw std::exception("Max dimensions of dataset are too small.");
+        throw std::runtime_error("Max dimensions of dataset are too small.");
     }
     // extend the dataset
     if (H5Dextend(m_dataId, &newDims[0]) < 0)
-      throw std::exception("Unable to extend dataset: " + m_setup.m_path + ".");
+      throw std::runtime_error("Unable to extend dataset: " + m_setup.m_path + ".");
   }
   return true;
 } // H5DataSetWriter::impl::CheckDimensionsAndExtendDataIfNeeded
@@ -688,11 +690,11 @@ bool H5DataSetWriter::impl::DataClassTypeMatches ()
     // check that the data type matches
     hid_t dataTypeId = H5Dget_type(m_dataId);
     if (dataTypeId < 0)
-      throw std::exception("Unable to get datatype.");
+      throw std::runtime_error("Unable to get datatype.");
     H5T_class_t classType = H5Tget_class(dataTypeId);
     H5Tclose(dataTypeId);
     if (classType != H5DataReader::Get_H5T_class_t(m_setup.m_type))
-      throw std::exception("The data types do not match.");
+      throw std::runtime_error("The data types do not match.");
   }
   catch (std::exception &e)
   {
@@ -723,15 +725,15 @@ bool H5DataSetWriter::impl::CreateFilespaceAndMemoryspace ()
 
   m_fSpace = H5Dget_space(m_dataId);
   if (m_fSpace < 0)
-    throw std::exception("Unable to get file space.");
+    throw std::runtime_error("Unable to get file space.");
 
   m_mSpace = H5Screate_simple(m_setup.m_nDim, &m_dimInfo.m_nToWrite[0], 0);
   if (m_mSpace < 0)
-    throw std::exception("Unable to get memory space.");
+    throw std::runtime_error("Unable to get memory space.");
 
   if (H5Sselect_hyperslab(m_fSpace, H5S_SELECT_SET, &m_dimInfo.m_startLoc[0],
                           0, &m_dimInfo.m_nToWrite[0], 0) < 0)
-    throw std::exception ("Unable to select hyperslab.");
+    throw std::runtime_error("Unable to select hyperslab.");
 
   return true;
 } // H5DataSetWriter::impl::CreateFilespaceAndMemoryspace

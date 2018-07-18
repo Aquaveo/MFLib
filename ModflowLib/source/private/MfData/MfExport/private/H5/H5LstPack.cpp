@@ -14,7 +14,7 @@
 #include <private/MfData/MfExport/private/H5/H5LstPack.h>
 
 // 3. Standard library headers
-#include <hash_map>
+#include <unordered_map>
 
 // 4. External library headers
 
@@ -202,7 +202,7 @@ public:
 
 
 typedef std::vector< std::pair<int, int> > VEC_INT_PAIR;
-typedef stdext::hash_map<int, VEC_INT_PAIR> HMAP;
+typedef std::unordered_map<int, VEC_INT_PAIR> HMAP;
 //------------------------------------------------------------------------------
 namespace
 {

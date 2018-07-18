@@ -340,7 +340,7 @@ void ProcessorMNWT::testDoConvertFile () const
   util::GetTempDirectory(tmpFile);
   tmpFile += "\\tmpMnw.mnw";
 
-  TS_ASSERT(SetCurrentDirectory(path));
+  TS_ASSERT(util::SetCurrentDirectory(path));
 
   ProcessorMNW p(fromFile, tmpFile, 21, 14);
   TS_ASSERT(p.DoConvertFile());

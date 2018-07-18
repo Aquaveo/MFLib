@@ -915,7 +915,9 @@ DLLEXPORT void MFLIB_SETSFRSEGSIZE (int *SZ)
 //------------------------------------------------------------------------------
 DLLEXPORT void MFLIB_SAMG_REL_LIC ()
 {
+#ifdef _MSC_VER
   SamgReleaseLicense();
+#endif
 } // MFLIB_SAMG_REL_LIC
 //------------------------------------------------------------------------------
 /// \brief calls the samg solver
@@ -937,8 +939,10 @@ DLLEXPORT void MFLIB_SAMGUSG (double* A,
                               int*    IERR,
                               int*    aqLicense)
 {
+#ifdef _MSC_VER
   samgUsg(A,RHS,HNEW,IA,JA,NNA,NNU,KPER,KSTP,ncyc,NCYC_DONE,EPSSAMG,IBOUND,
           SAMGLOG,IERR,aqLicense);
+#endif
 } // MFLIB_SAMGUSG
 //------------------------------------------------------------------------------
 /// \brief samg for mf2k
@@ -951,10 +955,12 @@ DLLEXPORT void MFLIB_LMG1ALSAMG (
 {
   CStr log = util::GetStr(samg_logfile, a_samg_logfile_len);
   char mychar[500];
-  strcpy_s(mychar, log.c_str());
+  strcpy(mychar, log.c_str());
+#ifdef _MSC_VER
   samgLMG1ALSAMG(ISUM,ISUMI,LCA,LCIA,LCJA,LCU1,LCFRHS,LCIG,ISIZ1,ISIZ2,ISIZ3,
                  ISIZ4,ICG,NCOL,NROW,NLAY,samg_logio,stor1,stor2,stor3,
                  mychar);
+#endif
 } // MFLIB_LMG1ALSAMG
 //------------------------------------------------------------------------------
 /// \brief samg for mf2k
@@ -967,9 +973,11 @@ DLLEXPORT void MFLIB_LMG1RPSAMG (
 {
   CStr log = util::GetStr(SAMG_LOGFILE, a_SAMG_LOGFILE_len);
   char mychar[500];
-  strcpy_s(mychar, log.c_str());
+  strcpy(mychar, log.c_str());
+#ifdef _MSC_VER
   samgLMG1RPsamg(MXITER,MXCYC,rcloselmg,damplmg,damplmgt,ioutamg,ICG,IADAMPlmg,
                  DUPlmg,DLOWlmg,HCLOSE,CONTROLlmg,samg_logio,mychar);
+#endif
 } // MFLIB_LMG1RPsamg
 //------------------------------------------------------------------------------
 /// \brief samg for mf2k
@@ -986,26 +994,19 @@ DLLEXPORT void MFLIB_LMG1APSAMG (
 {
   CStr log = util::GetStr(samg_logfile, a_samg_logfile_len);
   char mychar[500];
-  strcpy_s(mychar, log.c_str());
+  strcpy(mychar, log.c_str());
+#ifdef _MSC_VER
   samgLMG1APsamg(HNEW,IBOUND,CR,CC,CV,HCOF,RHS,A,IA,JA,U,FRHS,IG,ISIZ1,ISIZ2,
                  ISIZ3,ISIZ4,KITER,BCLOSE,DAMP,ICNVG,KSTP,KPER,MXITER,MXCYC,
                  NCOL,NROW,NLAY,NODES,HNOFLO,IOUTAMG,ICG,IADAMP,DUP,DLOW,
                  samg_logio,IHCOFADD,start_res,end_res,iter_done,setup_done,
                  iLicense, mychar);
+#endif
 } // MFLIB_LMG1APSAMG
 
 ///////////////////////////////////////////////////////////////////////////////
 // TESTS
 ///////////////////////////////////////////////////////////////////////////////
-
-#if CXX_TEST
-int main (int argc, const char **argv)
-{
-  return ProcessCmdLineArgs(argc, argv, std::cout);
-} // main
-#endif
-
-
 #if CXX_TEST
 #include <private/ModflowLib.t.h>
 //------------------------------------------------------------------------------

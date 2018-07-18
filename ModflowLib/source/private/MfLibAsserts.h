@@ -1,16 +1,9 @@
 #pragma once
 
 #include <vector>
-
-//template <typename T>
-//inline void TS_ASSERT_EQUALS2(const T &a, const T &b)
-//{
-//  if (!(a == b)) {
-//    stringstream  s;
-//    s << "Expected: \"" << a << "\" Found: \"" << b << "\"";
-//    TS_FAIL(s.str().c_str());
-//  }
-//}
+#include <string>
+#include <sstream>
+#include <cxxtest/TestSuite.h>
 
 template<class _T, class _U, class _V>
 bool  TS_EQ_TOL(_T A, _U B, _V tolerance) {return (fabs((A) - (B)) <= (tolerance));}

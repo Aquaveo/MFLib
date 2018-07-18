@@ -8,7 +8,7 @@
 
 #include <private/Parameters.h>
 
-#include <hash_map>
+#include <unordered_map>
 #include <map>
 #include <math.h>
 #include <set>
@@ -50,7 +50,7 @@ public:
   std::map<CStr, std::vector<Real> > m_arraysToWrite;
   CStr                               m_fname;
   std::map<CStr, std::set<int> >     m_ArrayNameKeyMap;
-  stdext::hash_map<int, pData>       m_parData;
+  std::unordered_map<int, pData>     m_parData;
 };
 
 ParPub* New_ParPub ()
@@ -92,10 +92,10 @@ static std::map<CStr, std::set<int> >& iGetArrayNameKeyMap ()
 //------------------------------------------------------------------------------
 /// \brief Gets a map with parameter data associated with arrays
 //------------------------------------------------------------------------------
-static stdext::hash_map<int, pData>& GetPData ()
+static std::unordered_map<int, pData>& GetPData ()
 {
   return GetList().m_public->m_parData;
-  //static stdext::hash_map<int, pData> m_parData;
+  //static std::unordered_map<int, pData> m_parData;
   //return m_parData;
 } // GetPData
 //------------------------------------------------------------------------------
@@ -136,12 +136,12 @@ void Parameters::test_ClearParData ()
 /// \brief Fills in a map with parameter data associated with arrays
 //------------------------------------------------------------------------------
 static bool FillInPData (const ParamList &a_l,
-                         stdext::hash_map<int, pData> &a_map)
+                         std::unordered_map<int, pData> &a_map)
 {
   a_map.clear();
 
-  std::pair<stdext::hash_map<int, pData>::iterator, bool> retVal;
-  stdext::hash_map<int, pData>::iterator it;
+  std::pair<std::unordered_map<int, pData>::iterator, bool> retVal;
+  std::unordered_map<int, pData>::iterator it;
   Param p;
   for (size_t i=0; i<a_l.Size(); i++)
   {
@@ -549,7 +549,7 @@ bool SubstituteArrayT (T *a_, size_t a_size, int a_layer, const CStr& a_name)
   {
     FillInPData(GetList(), GetPData());
   }
-  stdext::hash_map<int, pData>::iterator itHash, itHashEnd;
+  std::unordered_map<int, pData>::iterator itHash, itHashEnd;
   itHashEnd = GetPData().end();
 
   int start = iGetStart(a_layer);
@@ -1273,12 +1273,6 @@ void Parameters::ExportParameterArrayToDataSet (CStr& a_NAME,
 //------------------------------------------------------------------------------
 void ParametersT::setUp ()
 {
-  char c[5000];
-  GetModuleFileName(NULL, c, 5000);
-  CStr str(c);
-  // strip off the file name
-  int pos(str.ReverseFind("\\"));
-  CStr exeName = str.Left(str.GetLength() - (str.GetLength() - pos));
   m_file = util::GetTestFilesDirectory() + "\\Parameter\\pest.param";
   m_file1 = util::GetTestFilesDirectory() + "\\Parameter\\pest.snn";
 }

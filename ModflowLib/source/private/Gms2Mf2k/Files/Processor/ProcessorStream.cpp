@@ -320,7 +320,7 @@ void ProcessorStreamT::testDoConvertFile () const
   destFile = path + "\\base.str";
   util::FileCopy(fileToCopy, destFile);
 
-  TS_ASSERT(SetCurrentDirectory(path));
+  TS_ASSERT(util::SetCurrentDirectory(path));
 
   ProcessorStream p(file, outFile, 6, 5, false);
   TS_ASSERT(p.ConvertFile());

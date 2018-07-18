@@ -5,8 +5,8 @@
 #define CONTINUOUSARRAYSdotH
 
 #define NONE -1
-//#define TRUE 1
-//#define FALSE 0
+#define TRUE 1
+#define FALSE 0
 
 typedef unsigned char boolean;
 

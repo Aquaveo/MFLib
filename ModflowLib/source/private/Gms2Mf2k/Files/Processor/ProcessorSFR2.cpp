@@ -670,7 +670,7 @@ void ProcessorSFR2T::testDoConvertFile () const
   util::GetTempDirectory(tmpFile);
   tmpFile += "\\tmpStr.sfr";
 
-  TS_ASSERT(SetCurrentDirectory(path));
+  TS_ASSERT(util::SetCurrentDirectory(path));
 
   MfData::Get().SetUnstructured(0);
   ProcessorSFR2 p(fromFile, tmpFile, 15, 10, false);

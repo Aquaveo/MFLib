@@ -8,6 +8,7 @@
 #include <private/MfData/MfExport/private/Native/mf6/NativeExpMf6Npf.h>
 
 #include <sstream>
+#include <cmath>
 
 #include <private/MfData/MfGlobal.h>
 #include <private/MfData/MfExport/private/Mf2kNative.h>

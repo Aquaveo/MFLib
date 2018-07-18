@@ -4,6 +4,8 @@
 #ifndef NATIVEEXPARR1D_H
 #define NATIVEEXPARR1D_H
 
+#include <fstream>
+
 #include <private/MfData/MfExport/private/Native/NativePackExp.h>
 #include <private/MfData/MfExport/private/Sqlite/SqMfSchema.h>
 

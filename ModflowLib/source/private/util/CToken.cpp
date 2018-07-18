@@ -76,8 +76,8 @@ int CToken::GetAmount (CStr str)
 bool CToken::MoreTokens ()
 {
   if (m_nCurrent < m_nAmount)
-  return TRUE;
-  else return FALSE;
+  return true;
+  else return false;
 } // CToken::MoreTokens
 //-----------------------------------------------------------------------------
 // NOTES:

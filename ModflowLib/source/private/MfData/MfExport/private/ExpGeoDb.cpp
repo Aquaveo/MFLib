@@ -1,3 +1,4 @@
+#ifdef _MSC_VER
 //------------------------------------------------------------------------------
 // FILE      ExpGeoDb.cpp
 // PURPOSE   
@@ -10,10 +11,14 @@
 
 //#include <cmath>  // for lrint, but it's actually in private/util/util.h
 //#include <math.h> // for lrint, but it's actually in private/util/util.h
-#include <hash_map>
+#include <unordered_map>
 #include <map>
 #include <set>
 #include <sys/stat.h>
+
+#ifdef __linux__
+#include <unistd.h>
+#endif
 
 #include <RunTest.h>
 
@@ -142,7 +147,7 @@ static int iGetBcIndex(const CStr &a_type,
 static void iSizeBcDataArray(const CStr &a_type,
                              const int a_maxIdx,
                              CAR_DBL2D &a_data);
-static std::map<CStr, stdext::hash_map<int, VEC_INT_PAIR> > &iGetBcIdxMap();
+static std::map<CStr, std::unordered_map<int, VEC_INT_PAIR> > &iGetBcIdxMap();
 
 //------------------------------------------------------------------------------
 /// \brief File globals
@@ -652,6 +657,7 @@ bool ExpGeoDb::ExportPackage (MfData::MfGlobal* a_global,
 
   return true;
 } // ExpGeoDb::ExportPackage
+
 //------------------------------------------------------------------------------
 /// \brief Exports the name file, file name to the globals table
 //------------------------------------------------------------------------------
@@ -663,9 +669,7 @@ static void ExportNameFileFilename (MfData::MfPackage* a_package)
     return;
 
   // get the current path
-  char buff[2048];
-  GetCurrentDirectory(2048, buff);
-  CStr dir(buff);
+  CStr dir = util::GetCurrentDirectory();
 
   dir += "\\";
   dir += f;
@@ -4661,18 +4665,18 @@ static int iGetBcIndex (const CStr &a_type,
                         std::vector<int> &a_iface,
                         std::vector<int> &a_cellgrp)
 {
-  // there is a hash_map for each type of BC (RIV, DRN...)
-  stdext::hash_map<int, VEC_INT_PAIR> &hMap(iGetBcIdxMap()[a_type]);
-  stdext::hash_map<int, VEC_INT_PAIR>::iterator it;
+  // there is a unordered_map for each type of BC (RIV, DRN...)
+  std::unordered_map<int, VEC_INT_PAIR> &hMap(iGetBcIdxMap()[a_type]);
+  std::unordered_map<int, VEC_INT_PAIR>::iterator it;
 
   size_t i;
   int    idx(-1);
   bool   found(false);
-  // see if this cellid is in the hash_map
+  // see if this cellid is in the unordered_map
   it = hMap.find(a_cellid);
   if (it != hMap.end())
   {
-    // inside the hash_map we have a vector of int pairs
+    // inside the unordered_map we have a vector of int pairs
     // the map has cellid as the key and associated with cellid is a vector
     // of pairs. In the pair the 'first' is the array index (the spot in the
     // data array [this is where we store stage, cond, elev...] associated with
@@ -4793,9 +4797,9 @@ static void iSizeBcDataArray (const CStr &a_type,
 //------------------------------------------------------------------------------
 /// \brief Gets the file global
 //------------------------------------------------------------------------------
-static std::map<CStr, stdext::hash_map<int, VEC_INT_PAIR> > &iGetBcIdxMap ()
+static std::map<CStr, std::unordered_map<int, VEC_INT_PAIR> >&iGetBcIdxMap()
 {
-  static std::map<CStr, stdext::hash_map<int, VEC_INT_PAIR> > m_idx;
+  static std::map<CStr, std::unordered_map<int, VEC_INT_PAIR> > m_idx;
   return m_idx;
 } // iGetBcIdxMap
 
@@ -4803,7 +4807,9 @@ static std::map<CStr, stdext::hash_map<int, VEC_INT_PAIR> > &iGetBcIdxMap ()
 // TESTS
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
+#ifdef _MSC_VER
 #include <io.h>
+#endif
 #include <sstream>
 #include <sys/stat.h>
 #include <private/MfData/MfExport/private/ExpGeoDb.t.h>
@@ -8468,3 +8474,4 @@ void ExpGeoDbT::testExportGAG()
   }
 }
 #endif
+#endif // _MSC_VER

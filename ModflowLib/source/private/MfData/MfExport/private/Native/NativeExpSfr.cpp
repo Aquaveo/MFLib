@@ -7,6 +7,7 @@
 //------------------------------------------------------------------------------
 #include <private/MfData/MfExport/private/Native/NativeExpSfr.h>
 
+#include <fstream>
 #include <sstream>
 
 #include <private/MfData/MfExport/private/H5/H5BcList.h>
@@ -1000,8 +1001,10 @@ CStr NativeExpSfr::CopySfrFile ()
   fname.Replace(".stuff.txt", "");
   CStr tmpFname = fname;
   tmpFname += ".tmp";
-  // copy the sfr file
-  ::CopyFile(fname, tmpFname, false);
+  // copy the sfr fil
+  std::ifstream  src(fname, std::ios::binary);
+  std::ofstream  dst(tmpFname,   std::ios::binary);
+  dst << src.rdbuf();
 
   TmpPackageNameChanger(GetPackage(), "SFR");
   ClearFile();
@@ -1105,7 +1108,7 @@ void NativeExpSfr::WriteLines3and4 (std::vector< std::vector<CStr> >& a_vec)
           parLine = parStr;
           if (nInst > 1) parLine += Line4a(vStress[i]);
           Line4bto4g(lines);
-          WriteStoredLinesSfr();
+          WriteStoredLinesSfr();;
           a_vec[vStress[i]-1].push_back(parLine);
         }
       }

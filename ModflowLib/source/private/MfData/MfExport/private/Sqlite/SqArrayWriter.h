@@ -5,6 +5,7 @@
 #define SQARRAYWRITER_H
 #include <private/util/util.h>
 #include <private/SQLite/CppSQLite3.h>
+#include <sstream>
 
 namespace MfData
 {
@@ -101,53 +102,6 @@ public:
       ASSERT(false);
     }
   } // AddToTable
-  //------------------------------------------------------------------------------
-  /// \brief Write array to SQLite. Template for Real or double arrays.
-  /// \param[in] a_package:   The package.
-  /// \param[in] a_arrayName: Name of the array.
-  /// \param[in] a_size:      Number of values in the array.
-  /// \param[in] a_iprn:      IPRN.
-  /// \param[in] a_mult:      Multiplier.
-  /// \param[in] a_layer:     Layer.
-  //------------------------------------------------------------------------------
-  template <typename T>
-  void WriteArray(MfData::Export::NativePackExp* a_package,
-                  const std::string& a_arrayName, int a_size,
-                  int a_iprn, const T* a_array, Real a_mult,
-                  int a_layer)
-  {
-    try {
-      CppSQLite3DB* db;
-      sqlite_int64 arrayOid;
-      std::vector<int> cellIds;
-      WriteArraySetup(a_package, a_arrayName, a_size, a_mult, a_iprn, a_layer,
-                      &db, arrayOid, cellIds);
-      AddToRealArray(arrayOid, cellIds, a_array, a_size);
-    }
-    catch (std::exception&) {
-      ASSERT(false);
-    }
-  } // WriteArray
-  //------------------------------------------------------------------------------
-  template <typename T>
-  void WriteArrayToField(MfData::Export::NativePackExp* a_package,
-                  const std::string& a_arrayName, int a_size,
-                  int a_iprn, const T* a_array, Real a_mult,
-                  int a_layer)
-  {
-    try {
-      CppSQLite3DB* db;
-      sqlite_int64 arrayOid;
-      std::vector<int> cellIds;
-      std::string table, field;
-      WriteArraySetup(a_package, a_arrayName, a_size, a_mult, a_iprn, a_layer,
-                      &db, arrayOid, cellIds, table, field);
-      AddToTable(cellIds, a_array, a_size, table, field, db);
-    }
-    catch (std::exception&) {
-      ASSERT(false);
-    }
-  } // WriteArrayToField
   void WriteArray2(MfData::Export::NativePackExp* a_package,
                   const std::string& a_arrayName, int a_size,
                   int a_iprn, const float* a_array, Real a_mult,

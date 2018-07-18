@@ -1,6 +1,16 @@
 #ifndef __LATE_LOAD__H__
 #define __LATE_LOAD__H__
 
+#ifndef _MSC_VER
+// If we are not on a Microsoft compiler, we will need to typedef all the
+// special string types we use.
+typedef char* LPSTR;
+typedef const char* LPCSTR;
+typedef wchar_t* LPWSTR;
+typedef const wchar_t* LPCWSTR;
+typedef char* LPTSTR;
+typedef const char* LPCTSTR;
+#else
 #if _MSC_VER > 1000
 #pragma once
 #endif
@@ -103,7 +113,7 @@ enum ImportedProcState
 #  define NO_VTABLE __declspec(novtable)
 # else
 // 2004.Feb.29.JED - Note to self, find out what is appropriate under non-msvc compilers
-//#  define NO_VTABLE
+#  define NO_VTABLE
 # endif //_MSC_VER
 #endif
 
@@ -1036,5 +1046,5 @@ public: \
 //
 #define LATELOAD_END_CLASS()  };
 
-
+#endif //_MSC_VER
 #endif //__LATE_LOAD__H__

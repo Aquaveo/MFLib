@@ -278,7 +278,7 @@ void NativeExpBasT::testCreateClass ()
 void NativeExpBasT::testLine1 ()
 {
   char c[199];
-  strcpy_s(c, "NO options");
+  strcpy(c, "NO options");
   m_p->GetPackage()->SetField(Packages::BASpack::OPT, c);
   CStr base = "FREE";
   CStr str = m_p->Line1();

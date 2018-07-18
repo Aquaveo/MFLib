@@ -8,6 +8,7 @@
 //------------------------------------------------------------------------------
 #include <private/samg/samg.h>
 
+#ifdef _MSC_VER // Only used when compiling with MSVC
 // this is a class that wraps calls to a dll
 LATELOAD_BEGIN_CLASS(BaseDll,SAMG,false,FALSE)
   LATELOAD_FUNC_0_VOID(STDMETHODVCALLTYPE,SAMG_REL_LIC)
@@ -147,3 +148,4 @@ void samgLMG1APsamg (
 } // samgLMG1APsamg
 
 
+#endif // _MSC_VER

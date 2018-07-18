@@ -19,6 +19,7 @@
 #include <map>
 #include <set>
 #include <string>
+#include <cstring>
 #include <hdf5.h>
 #include <private/util/StdString.h>
 #include <private/util/CToken.h>
@@ -67,6 +68,9 @@ namespace util
   void GetTempDirectory(CStr &a_);
   void GetTestFilesDirectory(CStr &a_);
   CStr GetTestFilesDirectory();
+  CStr GetCurrentDirectory();
+  bool SetCurrentDirectory(CStr &a_newDir);
+  bool CreateDirectory(CStr &a_dir);
   void GetTempDirectory(CStr &a_);
   void StripFileFromFilename(const char *a_fWithPath,
                              CStr &a_path);

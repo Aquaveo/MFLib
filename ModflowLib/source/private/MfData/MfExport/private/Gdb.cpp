@@ -1,3 +1,4 @@
+#ifdef _MSC_VER
 //------------------------------------------------------------------------------
 // FILE      Gdb.cpp
 // PURPOSE   
@@ -606,3 +607,4 @@ int Db::impl::AddValues (std::vector<CStr> &a_fields,
 //}
 
 #endif
+#endif // _MSC_VER

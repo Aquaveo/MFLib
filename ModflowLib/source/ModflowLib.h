@@ -19,6 +19,10 @@
 #define DLLEXPORT 
 #endif
 
+#ifndef _MSC_VER
+#define __stdcall
+#endif
+
 extern "C"
 {
 DLLEXPORT void MFLIB_TESTNOARG();

@@ -484,7 +484,8 @@ void NativeExpArr2d::CreateFolderIfNeeded ()
   CStr dir, fname = GetNative()->FileName();
   util::StripFileFromFilename(fname.c_str(), dir);
   dir += "arrays";
-  ::CreateDirectory(dir, NULL);
+  util::CreateDirectory(dir);
+
 } // NativeExpArr2d::CreateFolderIfNeeded
 //------------------------------------------------------------------------------
 /// \brief

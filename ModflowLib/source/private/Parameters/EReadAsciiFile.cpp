@@ -5,6 +5,7 @@
 //------------------------------------------------------------------------------
 
 #include <private/Parameters/EReadAsciiFile.h>
+#include <algorithm>
 
 #define WHITESPACE " ,\t\r\n"
 #define ENDLINE "\r\n"
@@ -717,8 +718,8 @@ bool EReadAsciiFile::ReadData (int a_begpos, int a_endpos, CStr &a_val)
   }
 
     // get start and end positions (end is one past the range)
-  char *chbeg = m_ch + min(a_begpos, a_endpos);
-  char *chend = m_ch + (max(a_begpos, a_endpos) + 1);
+  char *chbeg = m_ch + std::min(a_begpos, a_endpos);
+  char *chend = m_ch + (std::max(a_begpos, a_endpos) + 1);
 
     // copy string
   int size = (int)(chend - chbeg);

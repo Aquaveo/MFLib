@@ -6,7 +6,13 @@
 #include <math.h>
 #include <fstream>
 
-//#include <boost/filesystem.hpp>
+#ifdef __linux__
+#include <libgen.h>
+#include <unistd.h>
+#include <limits.h>
+#define _finite std::isfinite
+#endif
+
 
 #define BIT_TEST(flags, bit) ((((flags) & (bit)) == 0) ? 0 : 1 )
 
@@ -82,11 +88,31 @@ void util::NullFuncArg (const char *a_,
 ///////////////////////////////////////////////////////////////////////////////
 void util::GetBinDirectory (CStr &a_)
 {
+#if __linux__
+  char result[ PATH_MAX ];
+  ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
+  const char *path;
+  if (count != -1) {
+      path = dirname(result);
+  }
+  a_ = path;
+#elif _MSC_VER
   char c[5000];
   GetModuleFileName(NULL, c, 5000);
   CStr str(c);
   int pos(str.ReverseFind("\\"));
   a_ = str.Left(str.GetLength() - (str.GetLength() - pos));
+#else
+  char self[PATH_MAX];
+
+    if (!progname_u8)
+      return nil;
+
+    if (realpath(progname_u8, self))
+      return string_utf8(self);
+
+    return nil;
+#endif
 }
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Fills in the string with the path to the temp files directory
@@ -117,6 +143,46 @@ CStr util::GetTestFilesDirectory ()
   util::GetBinDirectory(d);
   d += "\\..\\TestFiles";
   return d;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+/// \brief Returns the current working directory
+///////////////////////////////////////////////////////////////////////////////
+CStr util::GetCurrentDirectory() {
+  char buff[2048];
+#ifdef _MSC_VER
+  GetCurrentDirectory(2048, buff);
+#else
+  getcwd(buff, 2048) ? std::string( buff ) : std::string("");
+#endif
+  return CStr(buff);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+/// \brief Sets the current working directory
+///////////////////////////////////////////////////////////////////////////////
+bool util::SetCurrentDirectory(CStr &a_newDir) {
+#ifdef _MSC_VER
+  return SetCurrentDirectory(a_newDir);
+#else
+    // chdir returns zero if sucessful, -1 otherwise.
+    // This function, however, should return true (ie. non-zero) on success.
+  return (chdir(a_newDir) ? false : true);
+#endif
+}
+///////////////////////////////////////////////////////////////////////////////
+/// \brief Creates the specified directory in the current working directory
+/// \param a_dir Name of the directory to create
+///////////////////////////////////////////////////////////////////////////////
+bool util::CreateDirectory(CStr &a_dir) {
+#ifdef _MSC_VER
+    return ::CreateDirectory(a_dir, NULL);
+#else
+    // the system call gives us the return code of the command run, which will
+    // be zero if sucessful. This function, however, should return true (ie.
+    // non-zero) on success.
+    return system("mkdir -p " + a_dir) ? false : true;
+#endif
 }
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Strips the file from a file name with path so that you get back
@@ -601,9 +667,9 @@ const int MAX_FORMAT_LENGTH(10);
   if (flags & STR_SCIENTIFIC) {
     int rval;
     if (flags & STR_FLOAT)
-      rval = _snprintf(istring, MAX_STRING_LENGTH, "%1.6e", value);
+      rval = printf(istring, MAX_STRING_LENGTH, "%1.6e", value);
     else
-      rval = _snprintf(istring, MAX_STRING_LENGTH, "%1.15e", value);
+      rval = printf(istring, MAX_STRING_LENGTH, "%1.15e", value);
     ASSERT(rval >= 0);
     strcpy(fstring, istring);
     charptr = strchr(istring, '.');
@@ -636,7 +702,7 @@ const int MAX_FORMAT_LENGTH(10);
         ipart = (long long)i;
           // get a string from the number
 #ifdef _DEBUG
-        int rval(_snprintf(istring, MAX_STRING_LENGTH, "%lld", ipart));
+        int rval(printf(istring, MAX_STRING_LENGTH, "%lld", ipart));
         ASSERT(rval >= 0);
 #endif
         ilength = (short)strlen(istring); // (length doesn't include null terminator)
@@ -659,7 +725,7 @@ const int MAX_FORMAT_LENGTH(10);
         if (i > LLONG_MAX || i < LLONG_MIN)
           throw std::exception();
         ipart = (long long)i;
-        int rval(_snprintf(istring, MAX_STRING_LENGTH, "%lld", ipart));
+        int rval(printf(istring, MAX_STRING_LENGTH, "%lld", ipart));
         ASSERT(rval >= 0);
         // this sometimes results in a bunch of zeros when you don't want them.
         //sprintf(fstring, "%.25lf", f); // get a string from the number
@@ -686,7 +752,7 @@ const int MAX_FORMAT_LENGTH(10);
         if (i > LLONG_MAX || i < LLONG_MIN)
           throw std::exception();
         ipart = (long long)i;
-        int rval(_snprintf(istring, MAX_STRING_LENGTH, "%lld", ipart));
+        int rval(printf(istring, MAX_STRING_LENGTH, "%lld", ipart));
         ASSERT(rval >= 0);
         ilength = (short)strlen(istring);
         if (i < 0) ilength--;
@@ -705,15 +771,15 @@ const int MAX_FORMAT_LENGTH(10);
             ilength = (short)(digits + 2);
           else
             ilength = (short)(digits + 3);
-          rval = _snprintf(format, MAX_FORMAT_LENGTH, "%s%d.%d%s",
+          rval = printf(format, MAX_FORMAT_LENGTH, "%s%d.%d%s",
                   "%", ilength, digits, "f");
         }
         else
-          rval = _snprintf(format, MAX_FORMAT_LENGTH, "%s%d.%d%s",
+          rval = printf(format, MAX_FORMAT_LENGTH, "%s%d.%d%s",
                   "%", ilength, Miabs(maxDigits - ilength), "f");
         ASSERT(rval >= 0);
 
-        rval = _snprintf(fstring, MAX_STRING_LENGTH, format, value);
+        rval = printf(fstring, MAX_STRING_LENGTH, format, value);
         ASSERT(rval >= 0);
 
         charptr = strchr(fstring, '.'); // get rid of the . on right hand side
@@ -880,18 +946,7 @@ CStr STR (double val, int a_n /*=-1*/, int width /*=15*/, int flags /*=0*/)
 
     // check for invalid values
   if (!_finite(val)) {
-    switch(_fpclass(val)) {
-      case _FPCLASS_NINF:
-        str = "-INF";
-        break;
-      case _FPCLASS_PINF:
-        str = "+INF";
-        break;
-      default:
-        str = "NaN";
-        break;
-    }
-    return str;
+    return "NaN";
   }
 
     // if not specifying an exact prec, autocompute
@@ -1057,7 +1112,9 @@ namespace {
   std::set<std::string> iGetDirFiles (const std::string& a_directory)
   {
     std::set<std::string> modelFiles;
-
+#ifndef _MSC_VER
+    throw std::runtime_error("This function is not implemented outside of windows");
+#else
     // loop through the files in directory
     WIN32_FIND_DATA filedata;
     HANDLE h=NULL;
@@ -1089,7 +1146,7 @@ namespace {
 
       // close handle
     FindClose(h);
-
+#endif // _MSC_VER
     return modelFiles;
   } // iGetDirFiles
   //----------------------------------------------------------------------------
