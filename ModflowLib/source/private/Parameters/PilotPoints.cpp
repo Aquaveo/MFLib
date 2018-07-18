@@ -6,14 +6,14 @@
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
 
-#include <private\Parameters\PilotPoints.h>
+#include <private/Parameters/PilotPoints.h>
 
 #include <math.h>
-#include <private\util\util.h>
+#include <private/util/util.h>
 
-#include <private\H5DataReader\H5DataSetReader.h>
-#include <private\MfData\MfPackageUtil.h>
-#include <private\Parameters\Param.h>
+#include <private/H5DataReader/H5DataSetReader.h>
+#include <private/MfData/MfPackageUtil.h>
+#include <private/Parameters/Param.h>
 
 class PilotPointsT;
 
@@ -349,7 +349,7 @@ void PilotPoints::SetUnstructured (std::vector<int>& a_nodes)
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
 
-#include <private\Parameters\PilotPoints.t.h>
+#include <private/Parameters/PilotPoints.t.h>
 
 //------------------------------------------------------------------------------
 void PilotPointsT::setUp ()

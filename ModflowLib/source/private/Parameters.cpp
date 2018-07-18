@@ -6,7 +6,7 @@
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
 
-#include <private\Parameters.h>
+#include <private/Parameters.h>
 
 #include <hash_map>
 #include <map>
@@ -15,22 +15,22 @@
 #include <sstream>
 
 #include <Export.h>
-#include <private\H5DataReader\H5DataReaderUtil.h>
-#include <private\H5DataReader\H5DataSetWriter.h>
-#include <private\H5DataReader\H5DataSetWriterSetup.h>
-#include <private\MfData\MfExport\private\H5\H5Util.h>
-#include <private\MfData\MfExport\private\MfExporterImpl.h>
-#include <private\MfData\MfGlobal.h>
-#include <private\MfData\Packages\MfPackage.h>
-#include <private\MfData\Packages\MfPackStrings.h>
-#include <private\MfData\Packages\MfPackFields.h>
-#include <private\Parameters\MultArray.h>
-#include <private\Parameters\Param.h>
-#include <private\Parameters\ParamList.h>
-#include <private\Parameters\ParamFileReader.h>
-#include <private\Parameters\PilotPoints.h>
-#include <private\Parameters\SenFileReader.h>
-#include <private\util\EReadAsciiFile.h>
+#include <private/H5DataReader/H5DataReaderUtil.h>
+#include <private/H5DataReader/H5DataSetWriter.h>
+#include <private/H5DataReader/H5DataSetWriterSetup.h>
+#include <private/MfData/MfExport/private/H5/H5Util.h>
+#include <private/MfData/MfExport/private/MfExporterImpl.h>
+#include <private/MfData/MfGlobal.h>
+#include <private/MfData/Packages/MfPackage.h>
+#include <private/MfData/Packages/MfPackStrings.h>
+#include <private/MfData/Packages/MfPackFields.h>
+#include <private/Parameters/MultArray.h>
+#include <private/Parameters/Param.h>
+#include <private/Parameters/ParamList.h>
+#include <private/Parameters/ParamFileReader.h>
+#include <private/Parameters/PilotPoints.h>
+#include <private/Parameters/SenFileReader.h>
+#include <private/util/EReadAsciiFile.h>
 
 static ParamList& GetList(void);
 static bool ParametersExist(void);
@@ -1268,7 +1268,7 @@ void Parameters::ExportParameterArrayToDataSet (CStr& a_NAME,
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
 
-#include <private\Parameters.t.h>
+#include <private/Parameters.t.h>
 
 //------------------------------------------------------------------------------
 void ParametersT::setUp ()

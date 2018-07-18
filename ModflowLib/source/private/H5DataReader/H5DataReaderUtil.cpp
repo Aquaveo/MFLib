@@ -6,7 +6,7 @@
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
 
-#include <private\H5DataReader\H5DataReaderUtil.h>
+#include <private/H5DataReader/H5DataReaderUtil.h>
 
 //------------------------------------------------------------------------------
 /// \brief Gets the data set dimensions given a data space

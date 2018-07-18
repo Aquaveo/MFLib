@@ -7,8 +7,8 @@
 class NativeExpRchT;
 class Param;
 
-#include <private\MfData\MfExport\private\Native\NativePackExp.h>
-#include <private\MfData\MfExport\private\Native\NeArealPar.h>
+#include <private/MfData/MfExport/private/Native/NativePackExp.h>
+#include <private/MfData/MfExport/private/Native/NeArealPar.h>
 namespace MfData
 {
   namespace Export

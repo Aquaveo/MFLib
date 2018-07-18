@@ -3,7 +3,7 @@
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 #ifndef SqExporter_H
 #define SqExporter_H
-#include <private\util\util.h>
+#include <private/util/util.h>
 
 namespace MfData {
 

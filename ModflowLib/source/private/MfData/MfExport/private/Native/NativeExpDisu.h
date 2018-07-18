@@ -4,7 +4,7 @@
 #ifndef NATIVEEXPDISU_H
 #define NATIVEEXPDISU_H
 
-#include <private\MfData\MfExport\private\Native\NativePackExp.h>
+#include <private/MfData/MfExport/private/Native/NativePackExp.h>
 
 //----- Forward declarations----------------------------------------------------
 class NativeExpDisuT;

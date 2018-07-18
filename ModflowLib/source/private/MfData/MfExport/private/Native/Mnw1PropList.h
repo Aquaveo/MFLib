@@ -3,7 +3,7 @@
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 #ifndef MNW1PROPLIST_H
 #define MNW1PROPLIST_H
-#include <private\util\util.h>
+#include <private/util/util.h>
 
 namespace MfData
 {

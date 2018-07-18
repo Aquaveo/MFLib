@@ -6,20 +6,20 @@
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
 
-#include <private\MfData\MfPackageUtil.h>
+#include <private/MfData/MfPackageUtil.h>
 
 #include <set>
 #include <sstream>
 
-#include <private\MfData\MfExport\private\Native\NativeExpCln.h>
-#include <private\MfData\MfGlobal.h>
-#include <private\MfData\Packages\MfPackFields.h>
-#include <private\MfData\Packages\MfPackage.h>
-#include <private\MfData\Packages\MfPackStrings.h>
-#include <private\MfData\Packages\ObsHd.h>
-#include <private\Parameters.h>
-#include <private\Parameters\Param.h>
-#include <private\Parameters\ParamList.h>
+#include <private/MfData/MfExport/private/Native/NativeExpCln.h>
+#include <private/MfData/MfGlobal.h>
+#include <private/MfData/Packages/MfPackFields.h>
+#include <private/MfData/Packages/MfPackage.h>
+#include <private/MfData/Packages/MfPackStrings.h>
+#include <private/MfData/Packages/ObsHd.h>
+#include <private/Parameters.h>
+#include <private/Parameters/Param.h>
+#include <private/Parameters/ParamList.h>
 
 //------------------------------------------------------------------------------
 static std::set<int>& GetSuspendedCommentsSet ()
@@ -3248,7 +3248,7 @@ bool MfData::Packages::MNWI_End ()
 
 #include <sstream>
 
-#include <private\MfData\MfPackageUtil.t.h>
+#include <private/MfData/MfPackageUtil.t.h>
 
 #include <private/MfLibAsserts.h>
 

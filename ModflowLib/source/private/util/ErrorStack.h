@@ -6,7 +6,7 @@
 
 #include <iostream>
 #include <vector>
-#include <private\util\StdString.h>
+#include <private/util/StdString.h>
 
 class ErrorStack
 {

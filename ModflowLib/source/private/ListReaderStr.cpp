@@ -6,13 +6,13 @@
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
 
-#include <private\ListReaderStr.h>
+#include <private/ListReaderStr.h>
 
 #include <map>
 
-#include <private\H5DataReader\H5DataSetReader.h>
-#include <private\ListReader\ListReaderParser.h>
-#include <private\MfData\MfGlobal.h>
+#include <private/H5DataReader/H5DataSetReader.h>
+#include <private/ListReader/ListReaderParser.h>
+#include <private/MfData/MfGlobal.h>
 
 #define STRSEGID  "08. Str reach segment ID"
 #define SEGID     "09. Segment ID"
@@ -271,7 +271,7 @@ static bool GetIdivar (const CStr &a_fileName,
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
 
-#include <private\ListReaderStr.t.h>
+#include <private/ListReaderStr.t.h>
 
 //------------------------------------------------------------------------------
 void ListReaderStrT::setUp ()

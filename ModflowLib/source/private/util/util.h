@@ -20,14 +20,14 @@
 #include <set>
 #include <string>
 #include <hdf5.h>
-#include <private\util\StdString.h>
-#include <private\util\CToken.h>
-#include <private\util\dblprec.h>
-#include <private\util\EException.h>
-#include <private\util\ErrorStack.h>
-#include <private\util\H5Initialize.h>
-#include <private\util\ContArray.h>
-#include <private\util\LateLoad.h>
+#include <private/util/StdString.h>
+#include <private/util/CToken.h>
+#include <private/util/dblprec.h>
+#include <private/util/EException.h>
+#include <private/util/ErrorStack.h>
+#include <private/util/H5Initialize.h>
+#include <private/util/ContArray.h>
+#include <private/util/LateLoad.h>
 
 #define CXXDELTA 1e-6
 

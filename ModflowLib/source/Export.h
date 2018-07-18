@@ -4,7 +4,7 @@
 #ifndef EXPORT_H
 #define EXPORT_H
 
-#include <private\util\dblprec.h>
+#include <private/util/dblprec.h>
 
 #if MFLIB_DLL
 #define DLLEXPORT __declspec( dllexport )

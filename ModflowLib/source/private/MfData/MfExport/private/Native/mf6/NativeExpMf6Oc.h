@@ -4,7 +4,7 @@
 #ifndef NATIVEEXPMF6OC_H
 #define NATIVEEXPMF6OC_H
 
-#include <private\util\StdString.h>
+#include <private/util/StdString.h>
 
 namespace MfData
 {

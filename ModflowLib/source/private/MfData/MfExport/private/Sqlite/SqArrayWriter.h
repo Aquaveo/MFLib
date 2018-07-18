@@ -3,8 +3,8 @@
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 #ifndef SQARRAYWRITER_H
 #define SQARRAYWRITER_H
-#include <private\util\util.h>
-#include <private\SQLite\CppSQLite3.h>
+#include <private/util/util.h>
+#include <private/SQLite/CppSQLite3.h>
 
 namespace MfData
 {

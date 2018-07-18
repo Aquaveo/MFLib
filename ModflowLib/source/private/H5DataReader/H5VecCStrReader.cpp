@@ -6,9 +6,9 @@
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
 
-#include <private\H5DataReader\H5VecCStrReader.h>
+#include <private/H5DataReader/H5VecCStrReader.h>
 
-#include <private\H5DataReader\H5DataSetReader.h>
+#include <private/H5DataReader/H5DataSetReader.h>
 
 //------------------------------------------------------------------------------
 /// \brief Constructor.
@@ -59,7 +59,7 @@ bool H5VecCStrReader::FillInStrings (std::vector<CStr> &a_) const
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
 
-#include <private\H5DataReader\H5VecCStrReader.t.h>
+#include <private/H5DataReader/H5VecCStrReader.t.h>
 
 //------------------------------------------------------------------------------
 void H5VecCStrReaderT::setUp ()

@@ -11,7 +11,7 @@
 // 1. Precompiled header
 
 // 2. My own header
-#include <private\MfData\MfExport\private\H5\H5Util.h>
+#include <private/MfData/MfExport/private/H5/H5Util.h>
 
 // 3. Standard library headers
 
@@ -20,11 +20,11 @@
 // 5. Shared code headers
 
 // 6. Non-shared code headers
-#include <private\H5DataReader\H5DataSetWriter.h>
-#include <private\H5DataReader\H5DataSetWriterSetup.h>
-#include <private\MfData\MfExport\private\H5\H5Strings.h>
-#include <private\MfData\MfGlobal.h>
-#include <private\util\util.h>
+#include <private/H5DataReader/H5DataSetWriter.h>
+#include <private/H5DataReader/H5DataSetWriterSetup.h>
+#include <private/MfData/MfExport/private/H5/H5Strings.h>
+#include <private/MfData/MfGlobal.h>
+#include <private/util/util.h>
 
 //----- Forward declarations ---------------------------------------------------
 
@@ -644,14 +644,14 @@ int xfpWriteAttributeDouble (hid_t a_Loc,
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
 
-#include <private\MfData\MfExport\private\H5\H5Util.t.h>
+#include <private/MfData/MfExport/private/H5/H5Util.t.h>
 
-#include <private\H5DataReader\H5DataSetReader.h>
-#include <private\MfData\MfExport\private\Mf2kNative.h>
-#include <private\MfData\MfExport\private\MfExportUtil.h>
-#include <private\MfData\MfExport\private\TxtExporter.h>
-#include <private\MfData\Packages\MfPackStrings.h>
-#include <private\MfLibAsserts.h>
+#include <private/H5DataReader/H5DataSetReader.h>
+#include <private/MfData/MfExport/private/Mf2kNative.h>
+#include <private/MfData/MfExport/private/MfExportUtil.h>
+#include <private/MfData/MfExport/private/TxtExporter.h>
+#include <private/MfData/Packages/MfPackStrings.h>
+#include <private/MfLibAsserts.h>
 
 #define TESTBASE "4814dfa0-51de-11dd-ae16-0800200c9a66"
 

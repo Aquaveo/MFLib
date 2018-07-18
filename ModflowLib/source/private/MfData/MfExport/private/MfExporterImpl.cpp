@@ -6,10 +6,10 @@
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
 
-#include <private\MfData\MfExport\private\MfExporterImpl.h>
+#include <private/MfData/MfExport/private/MfExporterImpl.h>
 
-#include <private\MfData\MfExport\private\TxtExporter.h>
-#include <private\MfData\Packages\MfPackStrings.h>
+#include <private/MfData/MfExport/private/TxtExporter.h>
+#include <private/MfData/Packages/MfPackStrings.h>
 using namespace MfData::Export;
 namespace
 {

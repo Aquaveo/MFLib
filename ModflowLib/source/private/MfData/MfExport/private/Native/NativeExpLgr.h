@@ -6,7 +6,7 @@
 
 class NativeExpLgrT;
 
-#include <private\MfData\MfExport\private\Native\NativePackExp.h>
+#include <private/MfData/MfExport/private/Native/NativePackExp.h>
 namespace MfData
 {
   class MfPackage;

@@ -5,11 +5,11 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
-#include <private\MfData\MfExport\MfExporter.h>
+#include <private/MfData/MfExport/MfExporter.h>
 
-#include <private\MfData\MfGlobal.h>
-#include <private\MfData\MfExport\private\MfExporterImpl.h>
-#include <private\MfData\MfExport\private\MfExportUtil.h>
+#include <private/MfData/MfGlobal.h>
+#include <private/MfData/MfExport/private/MfExporterImpl.h>
+#include <private/MfData/MfExport/private/MfExportUtil.h>
 
 using namespace MfData::Export;
 
@@ -91,7 +91,7 @@ bool MfExporter::CanExportTable (const char *a_)
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
 
-#include <private\MfData\MfExport\MfExporter.t.h>
+#include <private/MfData/MfExport/MfExporter.t.h>
 
 //------------------------------------------------------------------------------
 #endif

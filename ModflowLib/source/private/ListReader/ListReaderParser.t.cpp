@@ -7,9 +7,9 @@
 //------------------------------------------------------------------------------
 #ifdef CXX_TEST
 
-#include <private\ListReader\ListReaderParser.t.h>
+#include <private/ListReader/ListReaderParser.t.h>
 
-#include <private\ListReader\ListReaderParser.h>
+#include <private/ListReader/ListReaderParser.h>
 
 //------------------------------------------------------------------------------
 void ListReaderParserT::testCreateClass ()

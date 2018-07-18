@@ -9,8 +9,8 @@
 
 #include <private/util/util.h>
 #include <private/CmdLine.h>
-#include <private\H5DataReader\H5DataSetReader.h>
-#include <private\Parameters.h>
+#include <private/H5DataReader/H5DataSetReader.h>
+#include <private/Parameters.h>
 
 #ifdef CXX_TEST
 ///////////////////////////////////////////////////////////////////////////////

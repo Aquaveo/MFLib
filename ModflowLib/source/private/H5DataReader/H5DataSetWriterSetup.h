@@ -4,7 +4,7 @@
 #ifndef H5DataSetWriterSetup_H
 #define H5DataSetWriterSetup_H
 
-#include <private\util\util.h>
+#include <private/util/util.h>
 
 // if you are writing a dataset to a multidimesional array then you
 // send in this information before calling the function to write the data

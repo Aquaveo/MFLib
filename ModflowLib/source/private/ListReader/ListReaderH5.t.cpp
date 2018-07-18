@@ -7,11 +7,11 @@
 //------------------------------------------------------------------------------
 #ifdef CXX_TEST
 
-#include <private\ListReader\ListReaderH5.t.h>
+#include <private/ListReader/ListReaderH5.t.h>
 
-#include <private\ListReader.h>
-#include <private\ListReader\ListReaderH5.h>
-#include <private\ListReader\ListReaderParser.h>
+#include <private/ListReader.h>
+#include <private/ListReader/ListReaderH5.h>
+#include <private/ListReader/ListReaderParser.h>
 
 //------------------------------------------------------------------------------
 void ListReaderH5T::setUp ()

@@ -6,12 +6,12 @@
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
 
-#include <private\MfData\Packages\MfPackage.h>
+#include <private/MfData/Packages/MfPackage.h>
 
 #include <map>
 #include <set>
 
-#include <private\util\util.h>
+#include <private/util/util.h>
 
 using namespace MfData;
 
@@ -348,7 +348,7 @@ TmpPackageNameChanger::~TmpPackageNameChanger ()
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
 
-#include <private\MfData\Packages\MfPackage.t.h>
+#include <private/MfData/Packages/MfPackage.t.h>
 
 //------------------------------------------------------------------------------
 void MfPackageT::setUp ()

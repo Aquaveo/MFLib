@@ -4,7 +4,7 @@
 #ifndef DATASETREADER_H
 #define DATASETREADER_H
 
-#include <private\util\util.h>
+#include <private/util/util.h>
 
 class H5DataSetReaderImpl;
 ////////////////////////////////////////////////////////////////////////////////

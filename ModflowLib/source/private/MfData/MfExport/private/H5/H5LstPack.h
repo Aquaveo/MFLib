@@ -3,7 +3,7 @@
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 #ifndef H5LSTPACK_H
 #define H5LSTPACK_H
-#include <private\util\util.h>
+#include <private/util/util.h>
 
 class H5StrPack;
 class H5SfrPack;

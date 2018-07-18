@@ -6,7 +6,7 @@
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
 
-#include <private\util\EReadAsciiFile.h>
+#include <private/util/EReadAsciiFile.h>
 
 #define WHITESPACE " ,\t\r\n"
 #define ENDLINE "\r\n"

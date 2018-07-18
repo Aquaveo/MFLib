@@ -4,7 +4,7 @@
 #ifndef MFEXPORTERIMPL_H
 #define MFEXPORTERIMPL_H
 
-#include <private\util\util.h>
+#include <private/util/util.h>
 
 class TxtExporter;
 const CStr ARR_DIS_TOP   = "TOP ELEVATION OF LAYER 1";

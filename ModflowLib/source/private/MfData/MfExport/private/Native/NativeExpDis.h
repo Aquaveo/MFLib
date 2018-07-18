@@ -4,7 +4,7 @@
 #ifndef NATIVEEXPDIS_H
 #define NATIVEEXPDIS_H
 
-#include <private\MfData\MfExport\private\Native\NativePackExp.h>
+#include <private/MfData/MfExport/private/Native/NativePackExp.h>
 class NativeExpDisT;
 namespace MfData
 {

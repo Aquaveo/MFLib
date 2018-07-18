@@ -9,19 +9,19 @@
 
 #include <ModflowLib.h>
 
-#include <private\util\util.h>
+#include <private/util/util.h>
 
-#include <private\ArrayReader.h>
-#include <private\CmdLine.h>
-#include <private\ListReader.h>
-#include <private\ListReaderStr.h>
-#include <private\MfData\MfGlobal.h>
-#include <private\MNWReader.h>
-#include <private\Parameters.h>
-#include <private\Sfr2Reader.h>
-#include <private\H5DataReader\H5DataSetReader.h>
-#include <private\samg\samg.h>
-#include <private\SQLite\CppSQLite3.h>
+#include <private/ArrayReader.h>
+#include <private/CmdLine.h>
+#include <private/ListReader.h>
+#include <private/ListReaderStr.h>
+#include <private/MfData/MfGlobal.h>
+#include <private/MNWReader.h>
+#include <private/Parameters.h>
+#include <private/Sfr2Reader.h>
+#include <private/H5DataReader/H5DataSetReader.h>
+#include <private/samg/samg.h>
+#include <private/SQLite/CppSQLite3.h>
 
 
 template <class T>
@@ -1007,7 +1007,7 @@ int main (int argc, const char **argv)
 
 
 #if CXX_TEST
-#include <private\ModflowLib.t.h>
+#include <private/ModflowLib.t.h>
 //------------------------------------------------------------------------------
 void ModflowLibT::setUp ()
 {

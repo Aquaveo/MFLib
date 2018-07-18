@@ -6,11 +6,11 @@
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
 
-#include <private\Parameters\SenFileReader.h>
+#include <private/Parameters/SenFileReader.h>
 
-#include <private\Parameters\Param.h>
-#include <private\Parameters\ParamList.h>
-#include <private\util\EReadAsciiFile.h>
+#include <private/Parameters/Param.h>
+#include <private/Parameters/ParamList.h>
+#include <private/util/EReadAsciiFile.h>
 
 
 //------------------------------------------------------------------------------
@@ -120,10 +120,10 @@ bool SenFileReader::FillInStartingVals (ParamList *a_,
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
 
-#include <private\Parameters\SenFileReader.t.h>
+#include <private/Parameters/SenFileReader.t.h>
 
-#include <private\Parameters\ParamFileReader.h>
-#include <private\Parameters\ParamList.h>
+#include <private/Parameters/ParamFileReader.h>
+#include <private/Parameters/ParamList.h>
 
 //------------------------------------------------------------------------------
 void SenFileReaderT::setUp ()

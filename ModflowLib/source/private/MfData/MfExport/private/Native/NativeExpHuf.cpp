@@ -5,21 +5,21 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
-#include <private\MfData\MfExport\private\Native\NativeExpHuf.h>
+#include <private/MfData/MfExport/private/Native/NativeExpHuf.h>
 
 #include <sstream>
 
-#include <private\MfData\MfGlobal.h>
-#include <private\MfData\MfExport\private\Mf2kNative.h>
-#include <private\MfData\MfExport\private\MfExportUtil.h>
-#include <private\MfData\MfExport\private\Native\NativeUtil.h>
-#include <private\MfData\MfPackageUtil.h>
-#include <private\MfData\Packages\MfPackage.h>
-#include <private\MfData\Packages\MfPackFields.h>
-#include <private\MfData\Packages\MfPackStrings.h>
-#include <private\Parameters.h>
-#include <private\Parameters\Param.h>
-#include <private\Parameters\ParamList.h>
+#include <private/MfData/MfGlobal.h>
+#include <private/MfData/MfExport/private/Mf2kNative.h>
+#include <private/MfData/MfExport/private/MfExportUtil.h>
+#include <private/MfData/MfExport/private/Native/NativeUtil.h>
+#include <private/MfData/MfPackageUtil.h>
+#include <private/MfData/Packages/MfPackage.h>
+#include <private/MfData/Packages/MfPackFields.h>
+#include <private/MfData/Packages/MfPackStrings.h>
+#include <private/Parameters.h>
+#include <private/Parameters/Param.h>
+#include <private/Parameters/ParamList.h>
 
 using namespace MfData::Export;
 //------------------------------------------------------------------------------
@@ -581,13 +581,13 @@ void NativeExpHuf::ExportPilotPar (double a_key, const CStr& a_type)
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
 
-#include <private\MfData\MfExport\private\Native\NativeExpHuf.t.h>
+#include <private/MfData/MfExport/private/Native/NativeExpHuf.t.h>
 
-#include <private\MfData\MfExport\private\Mf2kNative.h>
-#include <private\MfData\MfExport\private\Native\NativeUtil.h>
-#include <private\MfData\MfGlobal.h>
-#include <private\MfData\Packages\MfPackage.h>
-#include <private\MfData\Packages\MfPackStrings.h>
+#include <private/MfData/MfExport/private/Mf2kNative.h>
+#include <private/MfData/MfExport/private/Native/NativeUtil.h>
+#include <private/MfData/MfGlobal.h>
+#include <private/MfData/Packages/MfPackage.h>
+#include <private/MfData/Packages/MfPackStrings.h>
 
 using namespace MfData;
 //------------------------------------------------------------------------------

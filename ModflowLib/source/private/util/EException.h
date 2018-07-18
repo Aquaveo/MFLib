@@ -4,7 +4,7 @@
 #ifndef EEXCEPTION_H
 #define EEXCEPTION_H
 
-#include <private\util\StdString.h>
+#include <private/util/StdString.h>
 
 ///////////////////////////////////////////////////////////////////////////////
 // class EException

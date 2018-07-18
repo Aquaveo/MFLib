@@ -4,7 +4,7 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
-#include <private\util\util.h>
+#include <private/util/util.h>
 
 class ParamList;
 class ParPub;

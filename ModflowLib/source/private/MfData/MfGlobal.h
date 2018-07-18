@@ -5,7 +5,7 @@
 #define MFGLOBAL_H
 
 #include <private/util/util.h>
-#include <private\MfData\MfExport\private\Sqlite\SqArrayWriter.h>
+#include <private/MfData/MfExport/private/Sqlite/SqArrayWriter.h>
 
   //----- Forward declarations -------------------------------------------------
 class MfGlobalT;

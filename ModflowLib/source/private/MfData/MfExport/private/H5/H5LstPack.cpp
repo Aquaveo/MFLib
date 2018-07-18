@@ -11,7 +11,7 @@
 // 1. Precompiled header
 
 // 2. My own header
-#include <private\MfData\MfExport\private\H5\H5LstPack.h>
+#include <private/MfData/MfExport/private/H5/H5LstPack.h>
 
 // 3. Standard library headers
 #include <hash_map>

@@ -4,7 +4,7 @@
 #ifndef ARRAYREADERPARSER_H
 #define ARRAYREADERPARSER_H
 
-#include <private\util\util.h>
+#include <private/util/util.h>
 
 class ArrayReaderParser
 {

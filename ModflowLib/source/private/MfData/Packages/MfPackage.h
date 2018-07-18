@@ -6,7 +6,7 @@
 
 //----- Included files ---------------------------------------------------------
 #include <vector>
-#include <private\util\StdString.h>
+#include <private/util/StdString.h>
 
 //----- Forward declarations ---------------------------------------------------
 

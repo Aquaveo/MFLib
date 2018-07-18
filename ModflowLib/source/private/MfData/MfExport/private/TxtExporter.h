@@ -4,7 +4,7 @@
 #ifndef TXTEXPORTER_H
 #define TXTEXPORTER_H
 
-#include <private\util\util.h>
+#include <private/util/util.h>
 
 class TxtExporterT;
 class ExpGmsH5T;

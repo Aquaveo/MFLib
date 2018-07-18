@@ -5,21 +5,21 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
-#include <private\MfData\MfExport\private\MfExportUtil.h>
+#include <private/MfData/MfExport/private/MfExportUtil.h>
 
 #include <sstream>
 
-#include <private\util\util.h>
-#include <private\MfData\MfGlobal.h>
-#include <private\MfData\MfExport\MfExporter.h>
-#include <private\MfData\Packages\MfPackage.h>
-#include <private\MfData\Packages\MfPackStrings.h>
-#include <private\MfData\Packages\MfPackFields.h>
-#include <private\MfData\MfExport\private\ExpGeoDb.h>
-#include <private\MfData\MfExport\private\Mf2kNative.h>
-#include <private\Parameters\Param.h>
-#include <private\Parameters\ParamList.h>
-#include <private\Parameters.h>
+#include <private/util/util.h>
+#include <private/MfData/MfGlobal.h>
+#include <private/MfData/MfExport/MfExporter.h>
+#include <private/MfData/Packages/MfPackage.h>
+#include <private/MfData/Packages/MfPackStrings.h>
+#include <private/MfData/Packages/MfPackFields.h>
+#include <private/MfData/MfExport/private/ExpGeoDb.h>
+#include <private/MfData/MfExport/private/Mf2kNative.h>
+#include <private/Parameters/Param.h>
+#include <private/Parameters/ParamList.h>
+#include <private/Parameters.h>
 
 using namespace MfData::Export;
 
@@ -603,7 +603,7 @@ bool MfExportUtil::MfIsUsgModelType ()
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
 
-#include <private\MfData\MfExport\private\MfExportUtil.t.h>
+#include <private/MfData/MfExport/private/MfExportUtil.t.h>
 
 //------------------------------------------------------------------------------
 void MfExportUtilT::testGetExporter_WrongString ()

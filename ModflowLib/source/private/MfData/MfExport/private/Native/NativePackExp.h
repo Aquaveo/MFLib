@@ -4,7 +4,7 @@
 #ifndef NATIVEPACKEXP_H
 #define NATIVEPACKEXP_H
 
-#include <private\util\util.h>
+#include <private/util/util.h>
 
 namespace MfData
 {

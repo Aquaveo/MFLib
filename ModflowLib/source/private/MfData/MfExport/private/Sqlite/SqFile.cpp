@@ -11,7 +11,7 @@
 // 1. Precompiled header
 
 // 2. My own header
-#include <private\MfData\MfExport\private\Sqlite\SqFile.h>
+#include <private/MfData/MfExport/private/Sqlite/SqFile.h>
 
 // 3. Standard library headers
 #include <map>

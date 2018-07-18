@@ -4,7 +4,7 @@
 #ifndef PARAMFILEREADER_H
 #define PARAMFILEREADER_H
 
-#include <private\util\util.h>
+#include <private/util/util.h>
 
 class ParamList;
 class ParamFileReaderT;

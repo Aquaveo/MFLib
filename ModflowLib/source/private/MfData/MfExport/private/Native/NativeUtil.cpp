@@ -5,57 +5,57 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
-#include <private\MfData\MfExport\private\Native\NativeUtil.h>
+#include <private/MfData/MfExport/private/Native/NativeUtil.h>
 
-#include <private\MfData\MfExport\private\Mf2kNative.h>
-#include <private\MfData\MfExport\private\MfExportUtil.h>
-#include <private\MfData\MfExport\private\Native\NativeExpArr1d.h>
-#include <private\MfData\MfExport\private\Native\NativeExpArr2d.h>
-#include <private\MfData\MfExport\private\Native\NativeExpBas.h>
-#include <private\MfData\MfExport\private\Native\NativeExpBcf.h>
-#include <private\MfData\MfExport\private\Native\NativeExpBct.h>
-#include <private\MfData\MfExport\private\Native\NativeExpCln.h>
-#include <private\MfData\MfExport\private\Native\NativeExpDdf.h>
-#include <private\MfData\MfExport\private\Native\NativeExpDis.h>
-#include <private\MfData\MfExport\private\Native\NativeExpDisu.h>
-#include <private\MfData\MfExport\private\Native\NativeExpDpt.h>
-#include <private\MfData\MfExport\private\Native\NativeExpEts.h>
-#include <private\MfData\MfExport\private\Native\NativeExpEvt.h>
-#include <private\MfData\MfExport\private\Native\NativeExpGag.h>
-#include <private\MfData\MfExport\private\Native\NativeExpGnc.h>
-#include <private\MfData\MfExport\private\Native\NativeExpHfb.h>
-#include <private\MfData\MfExport\private\Native\NativeExpHuf.h>
-#include <private\MfData\MfExport\private\Native\NativeExpLak.h>
-#include <private\MfData\MfExport\private\Native\NativeExpLgr.h>
-#include <private\MfData\MfExport\private\Native\NativeExpLpf.h>
-#include <private\MfData\MfExport\private\Native\NativeExpLstobs.h>
-#include <private\MfData\MfExport\private\Native\NativeExpLstPack.h>
-#include <private\MfData\MfExport\private\Native\NativeExpLstPar.h>
-#include <private\MfData\MfExport\private\Native\NativeExpMlt.h>
-#include <private\MfData\MfExport\private\Native\NativeExpMnw1.h>
-#include <private\MfData\MfExport\private\Native\NativeExpMnw2.h>
-#include <private\MfData\MfExport\private\Native\NativeExpMnwi.h>
-#include <private\MfData\MfExport\private\Native\NativeExpNam.h>
-#include <private\MfData\MfExport\private\Native\NativeExpObs.h>
-#include <private\MfData\MfExport\private\Native\NativeExpOc.h>
-#include <private\MfData\MfExport\private\Native\NativeExpPes.h>
-#include <private\MfData\MfExport\private\Native\NativeExpPval.h>
-#include <private\MfData\MfExport\private\Native\NativeExpRch.h>
-#include <private\MfData\MfExport\private\Native\NativeExpSen.h>
-#include <private\MfData\MfExport\private\Native\NativeExpSfr.h>
-#include <private\MfData\MfExport\private\Native\NativeExpSolver.h>
-#include <private\MfData\MfExport\private\Native\NativeExpSTP.h>
-#include <private\MfData\MfExport\private\Native\NativeExpStr.h>
-#include <private\MfData\MfExport\private\Native\NativeExpSub.h>
-#include <private\MfData\MfExport\private\Native\NativeExpSwi.h>
-#include <private\MfData\MfExport\private\Native\NativeExpUzf.h>
-#include <private\MfData\MfExport\private\Native\NativeExpVdf.h>
-#include <private\MfData\MfExport\private\Native\NativeExpVsc.h>
-#include <private\MfData\MfExport\private\Native\NativeExpZon.h>
-#include <private\MfData\MfGlobal.h>
-#include <private\MfData\Packages\MfPackage.h>
-#include <private\MfData\Packages\MfPackStrings.h>
-#include <private\util\util.h>
+#include <private/MfData/MfExport/private/Mf2kNative.h>
+#include <private/MfData/MfExport/private/MfExportUtil.h>
+#include <private/MfData/MfExport/private/Native/NativeExpArr1d.h>
+#include <private/MfData/MfExport/private/Native/NativeExpArr2d.h>
+#include <private/MfData/MfExport/private/Native/NativeExpBas.h>
+#include <private/MfData/MfExport/private/Native/NativeExpBcf.h>
+#include <private/MfData/MfExport/private/Native/NativeExpBct.h>
+#include <private/MfData/MfExport/private/Native/NativeExpCln.h>
+#include <private/MfData/MfExport/private/Native/NativeExpDdf.h>
+#include <private/MfData/MfExport/private/Native/NativeExpDis.h>
+#include <private/MfData/MfExport/private/Native/NativeExpDisu.h>
+#include <private/MfData/MfExport/private/Native/NativeExpDpt.h>
+#include <private/MfData/MfExport/private/Native/NativeExpEts.h>
+#include <private/MfData/MfExport/private/Native/NativeExpEvt.h>
+#include <private/MfData/MfExport/private/Native/NativeExpGag.h>
+#include <private/MfData/MfExport/private/Native/NativeExpGnc.h>
+#include <private/MfData/MfExport/private/Native/NativeExpHfb.h>
+#include <private/MfData/MfExport/private/Native/NativeExpHuf.h>
+#include <private/MfData/MfExport/private/Native/NativeExpLak.h>
+#include <private/MfData/MfExport/private/Native/NativeExpLgr.h>
+#include <private/MfData/MfExport/private/Native/NativeExpLpf.h>
+#include <private/MfData/MfExport/private/Native/NativeExpLstobs.h>
+#include <private/MfData/MfExport/private/Native/NativeExpLstPack.h>
+#include <private/MfData/MfExport/private/Native/NativeExpLstPar.h>
+#include <private/MfData/MfExport/private/Native/NativeExpMlt.h>
+#include <private/MfData/MfExport/private/Native/NativeExpMnw1.h>
+#include <private/MfData/MfExport/private/Native/NativeExpMnw2.h>
+#include <private/MfData/MfExport/private/Native/NativeExpMnwi.h>
+#include <private/MfData/MfExport/private/Native/NativeExpNam.h>
+#include <private/MfData/MfExport/private/Native/NativeExpObs.h>
+#include <private/MfData/MfExport/private/Native/NativeExpOc.h>
+#include <private/MfData/MfExport/private/Native/NativeExpPes.h>
+#include <private/MfData/MfExport/private/Native/NativeExpPval.h>
+#include <private/MfData/MfExport/private/Native/NativeExpRch.h>
+#include <private/MfData/MfExport/private/Native/NativeExpSen.h>
+#include <private/MfData/MfExport/private/Native/NativeExpSfr.h>
+#include <private/MfData/MfExport/private/Native/NativeExpSolver.h>
+#include <private/MfData/MfExport/private/Native/NativeExpSTP.h>
+#include <private/MfData/MfExport/private/Native/NativeExpStr.h>
+#include <private/MfData/MfExport/private/Native/NativeExpSub.h>
+#include <private/MfData/MfExport/private/Native/NativeExpSwi.h>
+#include <private/MfData/MfExport/private/Native/NativeExpUzf.h>
+#include <private/MfData/MfExport/private/Native/NativeExpVdf.h>
+#include <private/MfData/MfExport/private/Native/NativeExpVsc.h>
+#include <private/MfData/MfExport/private/Native/NativeExpZon.h>
+#include <private/MfData/MfGlobal.h>
+#include <private/MfData/Packages/MfPackage.h>
+#include <private/MfData/Packages/MfPackStrings.h>
+#include <private/util/util.h>
 
 using namespace MfData;
 using namespace MfData::Export;
@@ -259,7 +259,7 @@ NativePackExp* NativeUtil::CreatePackExp (Mf2kNative* a_native,
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
 
-#include <private\MfData\MfExport\private\MfExportUtil.t.h>
+#include <private/MfData/MfExport/private/MfExportUtil.t.h>
 
 //------------------------------------------------------------------------------
 void MfExportUtilT::testGetExporter_WrongString ()

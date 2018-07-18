@@ -5,9 +5,9 @@
 //------------------------------------------------------------------------------
 #ifdef CXX_TEST
 
-#include <private\H5DataReader\H5VecCStrReader.t.h>
+#include <private/H5DataReader/H5VecCStrReader.t.h>
 
-#include <private\H5DataReader\H5VecCStrReader.h>
+#include <private/H5DataReader/H5VecCStrReader.h>
 
 //------------------------------------------------------------------------------
 void H5VecCStrReaderT::setUp ()

@@ -5,8 +5,8 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
-#include <private\MfData\MfExport\private\ExpGeoDb.h>
-#include <private\MfData\MfExport\private\Gdb.h>
+#include <private/MfData/MfExport/private/ExpGeoDb.h>
+#include <private/MfData/MfExport/private/Gdb.h>
 
 //#include <cmath>  // for lrint, but it's actually in private/util/util.h
 //#include <math.h> // for lrint, but it's actually in private/util/util.h
@@ -17,18 +17,18 @@
 
 #include <RunTest.h>
 
-#include <private\ListReader\CellIdToIJK.h>
-#include <private\MfData\MfGlobal.h>
-#include <private\MfData\MfPackageUtil.h>
-#include <private\MfData\Packages\MfPackage.h>
-#include <private\MfData\Packages\MfPackFields.h>
-#include <private\MfData\Packages\MfPackStrings.h>
-#include <private\MfData\Packages\ObsHd.h>
-#include <private\MNWReader.h>
-#include <private\Parameters.h>
-#include <private\Parameters\Param.h>
-#include <private\Parameters\ParamList.h>
-#include <private\util\util.h>
+#include <private/ListReader/CellIdToIJK.h>
+#include <private/MfData/MfGlobal.h>
+#include <private/MfData/MfPackageUtil.h>
+#include <private/MfData/Packages/MfPackage.h>
+#include <private/MfData/Packages/MfPackFields.h>
+#include <private/MfData/Packages/MfPackStrings.h>
+#include <private/MfData/Packages/ObsHd.h>
+#include <private/MNWReader.h>
+#include <private/Parameters.h>
+#include <private/Parameters/Param.h>
+#include <private/Parameters/ParamList.h>
+#include <private/util/util.h>
 
 using namespace MfData::Export;
 
@@ -4806,8 +4806,8 @@ static std::map<CStr, stdext::hash_map<int, VEC_INT_PAIR> > &iGetBcIdxMap ()
 #include <io.h>
 #include <sstream>
 #include <sys/stat.h>
-#include <private\MfData\MfExport\private\ExpGeoDb.t.h>
-#include <private\MfData\Packages\MfPackStrings.h>
+#include <private/MfData/MfExport/private/ExpGeoDb.t.h>
+#include <private/MfData/Packages/MfPackStrings.h>
 #include <private/MfLibAsserts.h>
 
 #define GDBTOL 1e-4

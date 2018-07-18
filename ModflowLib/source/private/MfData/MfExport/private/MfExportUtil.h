@@ -4,7 +4,7 @@
 #ifndef MFEXPORTUTIL_H
 #define MFEXPORTUTIL_H
 
-#include <private\util\util.h>
+#include <private/util/util.h>
 class ParamList;
 class Param;
 namespace MfData

@@ -5,19 +5,19 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
-#include <private\MfData\MfExport\private\Native\NativeExpMnw1.h>
+#include <private/MfData/MfExport/private/Native/NativeExpMnw1.h>
 
-#include <private\ListReader\CellIdToIJK.h>
-#include <private\MfData.h>
-#include <private\MfData\MfExport\private\H5\H5BcList.h>
-#include <private\MfData\MfExport\private\Mf2kNative.h>
-#include <private\MfData\MfExport\private\Native\NativeUtil.h>
+#include <private/ListReader/CellIdToIJK.h>
+#include <private/MfData.h>
+#include <private/MfData/MfExport/private/H5/H5BcList.h>
+#include <private/MfData/MfExport/private/Mf2kNative.h>
+#include <private/MfData/MfExport/private/Native/NativeUtil.h>
 #include <private/MfData/MfExport/private/TxtExporter.h>
-#include <private\MfData\MfGlobal.h>
-#include <private\MfData\Packages\MfPackage.h>
-#include <private\MfData\Packages\MfPackFields.h>
-#include <private\MfData\Packages\MfPackStrings.h>
-#include <private\MNWReader.h>
+#include <private/MfData/MfGlobal.h>
+#include <private/MfData/Packages/MfPackage.h>
+#include <private/MfData/Packages/MfPackFields.h>
+#include <private/MfData/Packages/MfPackStrings.h>
+#include <private/MNWReader.h>
 
 #define MFBC_KSPREF    "21. Stress Period Ref"
 #define MFBC_LOSSTYPE  "22. Loss Type"
@@ -361,7 +361,7 @@ void NativeExpMnw1::AddToStoredLinesDesc (const char* a_line,
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
 
-#include <private\MfData\MfExport\private\Native\NativeExpMnw1.t.h>
+#include <private/MfData/MfExport/private/Native/NativeExpMnw1.t.h>
 
 using namespace MfData;
 //------------------------------------------------------------------------------

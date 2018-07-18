@@ -4,7 +4,7 @@
 #ifndef H5VECCSTRREADER_H
 #define H5VECCSTRREADER_H
 
-#include <private\util\util.h>
+#include <private/util/util.h>
 
 class H5VecCStrReader
 {

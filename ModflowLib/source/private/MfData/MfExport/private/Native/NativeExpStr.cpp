@@ -5,24 +5,24 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
-#include <private\MfData\MfExport\private\Native\NativeExpStr.h>
+#include <private/MfData/MfExport/private/Native/NativeExpStr.h>
 
 #include <sstream>
 
-#include <private\MfData\MfExport\private\H5\H5BcList.h>
-#include <private\MfData\MfExport\private\Mf2kNative.h>
-#include <private\MfData\MfExport\private\MfExportUtil.h>
-#include <private\MfData\MfExport\private\Native\NativeExpNam.h>
-#include <private\MfData\MfExport\private\Native\NativeUtil.h>
-#include <private\MfData\MfExport\private\TxtExporter.h>
-#include <private\MfData\MfGlobal.h>
-#include <private\MfData\Packages\MfPackage.h>
-#include <private\MfData\Packages\MfPackFields.h>
-#include <private\MfData\Packages\MfPackStrings.h>
-#include <private\Parameters.h>
-#include <private\Parameters\Param.h>
-#include <private\Parameters\ParamList.h>
-#include <private\util\EReadAsciiFile.h>
+#include <private/MfData/MfExport/private/H5/H5BcList.h>
+#include <private/MfData/MfExport/private/Mf2kNative.h>
+#include <private/MfData/MfExport/private/MfExportUtil.h>
+#include <private/MfData/MfExport/private/Native/NativeExpNam.h>
+#include <private/MfData/MfExport/private/Native/NativeUtil.h>
+#include <private/MfData/MfExport/private/TxtExporter.h>
+#include <private/MfData/MfGlobal.h>
+#include <private/MfData/Packages/MfPackage.h>
+#include <private/MfData/Packages/MfPackFields.h>
+#include <private/MfData/Packages/MfPackStrings.h>
+#include <private/Parameters.h>
+#include <private/Parameters/Param.h>
+#include <private/Parameters/ParamList.h>
+#include <private/util/EReadAsciiFile.h>
 
 using namespace MfData::Export;
 using util::ForElement;
@@ -956,7 +956,7 @@ void NativeExpStr::Par_SetToSkipExistingStrParams ()
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
 
-#include <private\MfData\MfExport\private\Native\NativeExpStr.t.h>
+#include <private/MfData/MfExport/private/Native/NativeExpStr.t.h>
 
 
 using namespace MfData;

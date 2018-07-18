@@ -28,7 +28,7 @@
 #ifndef CTOKEN_H
 #define CTOKEN_H
 
-#include <private\util\StdString.h>
+#include <private/util/StdString.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \class CToken

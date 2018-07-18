@@ -4,7 +4,7 @@
 #ifndef H5DATAREADERUTIL_H
 #define H5DATAREADERUTIL_H
 
-#include <private\util\util.h>
+#include <private/util/util.h>
 
 namespace H5DataReader
 {

@@ -7,9 +7,9 @@
 //------------------------------------------------------------------------------
 #ifdef CXX_TEST
 
-#include <private\ListReader\CellIdToIJK.t.h>
+#include <private/ListReader/CellIdToIJK.t.h>
 
-#include <private\ListReader\CellIdToIJK.h>
+#include <private/ListReader/CellIdToIJK.h>
 
 //------------------------------------------------------------------------------
 void CellIdToIJKT::testCreateClass ()

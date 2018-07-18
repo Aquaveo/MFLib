@@ -4,7 +4,7 @@
 #ifndef H5DATASETWRITER_H
 #define H5DATASETWRITER_H
 
-#include <private\util\util.h>
+#include <private/util/util.h>
 
 class H5DataSetWriterT;
 class H5DataSetWriterSetup;

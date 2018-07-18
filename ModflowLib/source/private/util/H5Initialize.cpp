@@ -5,9 +5,9 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
-#include <private\util\util.h>
+#include <private/util/util.h>
 
-#include <private\util\H5Initialize.h>
+#include <private/util/H5Initialize.h>
 
 #include <hdf5.h>
 #if _DEBUG

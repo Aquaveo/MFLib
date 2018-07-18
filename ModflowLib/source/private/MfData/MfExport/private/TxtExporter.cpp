@@ -5,16 +5,16 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
-#include <private\MfData\MfExport\private\TxtExporter.h>
+#include <private/MfData/MfExport/private/TxtExporter.h>
 
 #include <map>
 #include <set>
 #include <fstream>
 #include <sstream>
 
-#include <private\MfData\Packages\MfPackFields.h>
-#include <private\MfData\Packages\MfPackStrings.h>
-#include <private\util\util.h>
+#include <private/MfData/Packages/MfPackFields.h>
+#include <private/MfData/Packages/MfPackStrings.h>
+#include <private/util/util.h>
 
 #define TESTBASE "4814dfa0-51de-11dd-ae16-0800200c9a66"
 
@@ -443,7 +443,7 @@ bool TxtExporter::impl::ClearFile (const char* const a_type)
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
 
-#include <private\MfData\MfExport\private\TxtExporter.t.h>
+#include <private/MfData/MfExport/private/TxtExporter.t.h>
 #include <private/MfLibAsserts.h>
 
 //------------------------------------------------------------------------------

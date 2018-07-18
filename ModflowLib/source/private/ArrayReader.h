@@ -4,7 +4,7 @@
 #ifndef ARRAYREADER_H
 #define ARRAYREADER_H
 
-#include <private\util\util.h>
+#include <private/util/util.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \class ArrayReader

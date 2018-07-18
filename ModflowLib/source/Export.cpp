@@ -10,9 +10,9 @@
 #include <map>
 #include <set>
 
-#include <private\MfData.h>
-#include <private\MfData\MfGlobal.h>
-#include <private\util\util.h>
+#include <private/MfData.h>
+#include <private/MfData/MfGlobal.h>
+#include <private/util/util.h>
 
 static std::map<int, CStr> &GetIunitMap();
 static CStr &GetFileName();

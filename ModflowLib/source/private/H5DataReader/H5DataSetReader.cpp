@@ -6,13 +6,13 @@
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
 
-#include <private\H5DataReader\H5DataSetReader.h>
+#include <private/H5DataReader/H5DataSetReader.h>
 
 #include <map>
 
-#include <private\H5DataReader\H5DataReaderUtil.h>
-#include <private\H5DataReader\H5DataSetWriter.h>
-#include <private\util\EReadAsciiFile.h>
+#include <private/H5DataReader/H5DataReaderUtil.h>
+#include <private/H5DataReader/H5DataSetWriter.h>
+#include <private/util/EReadAsciiFile.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \class H5DataSetReaderImpl
@@ -854,11 +854,11 @@ bool H5DataSetReader::GetDataSetDimensions (std::vector<hsize_t> &a_size)
 
 #ifdef CXX_TEST
 
-#include <private\H5DataReader\H5DataSetReader.t.h>
+#include <private/H5DataReader/H5DataSetReader.t.h>
 
-#include <private\H5DataReader\H5DataSetReader.h>
-#include <private\H5DataReader\H5DataReaderUtil.h>
-#include <private\util\util.h>
+#include <private/H5DataReader/H5DataSetReader.h>
+#include <private/H5DataReader/H5DataReaderUtil.h>
+#include <private/util/util.h>
 
 //------------------------------------------------------------------------------
 void H5DataSetReaderT::setUp ()

@@ -5,11 +5,11 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
-#include <private\MfData\MfExport\private\Native\NativeExpGag.h>
+#include <private/MfData/MfExport/private/Native/NativeExpGag.h>
 
-#include <private\MfData\MfExport\private\Native\NativeUtil.h>
-#include <private\MfData\Packages\MfPackage.h>
-#include <private\MfData\Packages\MfPackFields.h>
+#include <private/MfData/MfExport/private/Native/NativeUtil.h>
+#include <private/MfData/Packages/MfPackage.h>
+#include <private/MfData/Packages/MfPackFields.h>
 
 using namespace MfData::Export;
 //------------------------------------------------------------------------------
@@ -102,13 +102,13 @@ void NativeExpGag::Line2 ()
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
 
-#include <private\MfData\MfExport\private\Native\NativeExpGag.t.h>
+#include <private/MfData/MfExport/private/Native/NativeExpGag.t.h>
 
-#include <private\MfData\MfExport\private\Mf2kNative.h>
-#include <private\MfData\MfExport\private\Native\NativeUtil.h>
-#include <private\MfData\MfGlobal.h>
-#include <private\MfData\Packages\MfPackage.h>
-#include <private\MfData\Packages\MfPackStrings.h>
+#include <private/MfData/MfExport/private/Mf2kNative.h>
+#include <private/MfData/MfExport/private/Native/NativeUtil.h>
+#include <private/MfData/MfGlobal.h>
+#include <private/MfData/Packages/MfPackage.h>
+#include <private/MfData/Packages/MfPackStrings.h>
 
 using namespace MfData;
 //------------------------------------------------------------------------------

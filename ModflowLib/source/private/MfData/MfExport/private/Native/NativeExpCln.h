@@ -4,7 +4,7 @@
 #ifndef NATIVEEXPCLN_H
 #define NATIVEEXPCLN_H
 
-#include <private\MfData\MfExport\private\Native\NativePackExp.h>
+#include <private/MfData/MfExport/private/Native/NativePackExp.h>
 class NativeExpClnT;
 namespace MfData
 {

@@ -4,7 +4,7 @@
 #ifndef PILOTPOINTS_H
 #define PILOTPOINTS_H
 
-#include <private\util\util.h>
+#include <private/util/util.h>
 
 class PilotPointsT;
 class Param;

@@ -1,7 +1,7 @@
 #ifndef PARAMUTIL_H
 #define PARAMUTIL_H
 
-#include <private\util\util.h>
+#include <private/util/util.h>
 
 namespace Param
 {

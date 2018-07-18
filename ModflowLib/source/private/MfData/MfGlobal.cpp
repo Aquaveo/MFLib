@@ -6,15 +6,15 @@
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
 
-#include <private\MfData\MfGlobal.h>
+#include <private/MfData/MfGlobal.h>
 
 #include <memory> // for shared_ptr
 
-#include <private\util\util.h>
-#include <private\MfData\MfExport\MfExporter.h>
-#include <private\MfData\Packages\MfPackage.h>
-#include <private\Parameters\ParamList.h>
-#include <private\MfData\MfExport\private\Sqlite\SqArrayWriter.h>
+#include <private/util/util.h>
+#include <private/MfData/MfExport/MfExporter.h>
+#include <private/MfData/Packages/MfPackage.h>
+#include <private/Parameters/ParamList.h>
+#include <private/MfData/MfExport/private/Sqlite/SqArrayWriter.h>
 
 using namespace MfData;
 
@@ -722,8 +722,8 @@ bool MfGlobal::impl::AttachExporter (const char *a_,
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
 
-#include <private\MfData\MfGlobal.t.h>
-#include <private\MfLibAsserts.h>
+#include <private/MfData/MfGlobal.t.h>
+#include <private/MfLibAsserts.h>
 
 //------------------------------------------------------------------------------
 void MfGlobalT::setUp ()

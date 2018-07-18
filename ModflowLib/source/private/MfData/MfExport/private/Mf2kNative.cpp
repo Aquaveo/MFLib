@@ -5,19 +5,19 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
-#include <private\MfData\MfExport\private\Mf2kNative.h>
+#include <private/MfData/MfExport/private/Mf2kNative.h>
 
 #include <RunTest.h>
 
-#include <private\MfData\MfGlobal.h>
-#include <private\MfData\Packages\MfPackage.h>
-#include <private\MfData\MfExport\private\CellNumbering.h>
-#include <private\MfData\MfExport\private\H5\H5Util.h>
-#include <private\MfData\MfExport\private\Native\NativePackExp.h>
-#include <private\MfData\MfExport\private\Native\NativeUtil.h>
-#include <private\MfData\MfExport\private\TxtExporter.h>
+#include <private/MfData/MfGlobal.h>
+#include <private/MfData/Packages/MfPackage.h>
+#include <private/MfData/MfExport/private/CellNumbering.h>
+#include <private/MfData/MfExport/private/H5/H5Util.h>
+#include <private/MfData/MfExport/private/Native/NativePackExp.h>
+#include <private/MfData/MfExport/private/Native/NativeUtil.h>
+#include <private/MfData/MfExport/private/TxtExporter.h>
 
-#include <private\util\util.h>
+#include <private/util/util.h>
 
 using namespace MfData::Export;
 
@@ -118,7 +118,7 @@ void Mf2kNative::SetUseH5 (bool a_, bool a_compress)
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
 
-#include <private\MfData\MfExport\private\Mf2kNative.t.h>
+#include <private/MfData/MfExport/private/Mf2kNative.t.h>
 
 //------------------------------------------------------------------------------
 void Mf2kNativeT::testExportPackage ()

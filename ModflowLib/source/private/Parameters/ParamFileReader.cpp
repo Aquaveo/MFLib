@@ -6,13 +6,13 @@
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
 
-#include <private\Parameters\ParamFileReader.h>
+#include <private/Parameters/ParamFileReader.h>
 
 #include <map>
 
-#include <private\Parameters\Param.h>
-#include <private\Parameters\ParamList.h>
-#include <private\util\EReadAsciiFile.h>
+#include <private/Parameters/Param.h>
+#include <private/Parameters/ParamList.h>
+#include <private/util/EReadAsciiFile.h>
 
 //------------------------------------------------------------------------------
 /// \brief Constructor.
@@ -195,7 +195,7 @@ int ParamFileReader::FileCardToInt (const CStr &a_card)
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
 
-#include <private\Parameters\ParamFileReader.t.h>
+#include <private/Parameters/ParamFileReader.t.h>
 
 //------------------------------------------------------------------------------
 void ParamFileReaderT::setUp ()

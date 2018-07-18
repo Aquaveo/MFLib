@@ -458,7 +458,7 @@ void sfr2::GetSegData (int Nlst,
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
 
-#include <private\Sfr2Reader.t.h>
+#include <private/Sfr2Reader.t.h>
 
 //------------------------------------------------------------------------------
 void Sfr2ReaderT::testiGetReachData ()

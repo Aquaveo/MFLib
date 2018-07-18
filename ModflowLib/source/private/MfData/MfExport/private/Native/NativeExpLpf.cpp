@@ -5,23 +5,23 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
-#include <private\MfData\MfExport\private\Native\NativeExpLpf.h>
+#include <private/MfData/MfExport/private/Native/NativeExpLpf.h>
 
 #include <sstream>
 
-#include <private\MfData\MfGlobal.h>
-#include <private\MfData\MfExport\private\Mf2kNative.h>
-#include <private\MfData\MfExport\private\MfExportUtil.h>
-#include <private\MfData\MfExport\private\Native\mf6\NativeExpMf6Ic.h>
-#include <private\MfData\MfExport\private\Native\mf6\NativeExpMf6Sto.h>
-#include <private\MfData\MfExport\private\Native\mf6\NativeExpMf6Npf.h>
-#include <private\MfData\MfExport\private\TxtExporter.h>
-#include <private\MfData\Packages\MfPackage.h>
-#include <private\MfData\Packages\MfPackFields.h>
-#include <private\MfData\Packages\MfPackStrings.h>
-#include <private\Parameters.h>
-#include <private\Parameters\Param.h>
-#include <private\Parameters\ParamList.h>
+#include <private/MfData/MfGlobal.h>
+#include <private/MfData/MfExport/private/Mf2kNative.h>
+#include <private/MfData/MfExport/private/MfExportUtil.h>
+#include <private/MfData/MfExport/private/Native/mf6/NativeExpMf6Ic.h>
+#include <private/MfData/MfExport/private/Native/mf6/NativeExpMf6Sto.h>
+#include <private/MfData/MfExport/private/Native/mf6/NativeExpMf6Npf.h>
+#include <private/MfData/MfExport/private/TxtExporter.h>
+#include <private/MfData/Packages/MfPackage.h>
+#include <private/MfData/Packages/MfPackFields.h>
+#include <private/MfData/Packages/MfPackStrings.h>
+#include <private/Parameters.h>
+#include <private/Parameters/Param.h>
+#include <private/Parameters/ParamList.h>
 
 using namespace MfData::Export;
 //------------------------------------------------------------------------------
@@ -577,13 +577,13 @@ void NativeExpLpf::Line10Usg ()
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
 
-#include <private\MfData\MfExport\private\Native\NativeExpLpf.t.h>
+#include <private/MfData/MfExport/private/Native/NativeExpLpf.t.h>
 
-#include <private\MfData\MfExport\private\Mf2kNative.h>
-#include <private\MfData\MfExport\private\Native\NativeUtil.h>
-#include <private\MfData\MfGlobal.h>
-#include <private\MfData\Packages\MfPackage.h>
-#include <private\MfData\Packages\MfPackStrings.h>
+#include <private/MfData/MfExport/private/Mf2kNative.h>
+#include <private/MfData/MfExport/private/Native/NativeUtil.h>
+#include <private/MfData/MfGlobal.h>
+#include <private/MfData/Packages/MfPackage.h>
+#include <private/MfData/Packages/MfPackStrings.h>
 #include <private/MfLibAsserts.h>
 
 using namespace MfData;

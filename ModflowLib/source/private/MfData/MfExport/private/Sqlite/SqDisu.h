@@ -4,7 +4,7 @@
 #ifndef SqDisu_H
 #define SqDisu_H
 
-#include <private\util\util.h>
+#include <private/util/util.h>
 #include <private/MfData/MfExport/private/Sqlite/SqExporter.h>
 
 namespace MfData {

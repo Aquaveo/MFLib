@@ -6,7 +6,7 @@
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
 
-#include <private\ListReader\ListReaderParser.h>
+#include <private/ListReader/ListReaderParser.h>
 
 //------------------------------------------------------------------------------
 /// \brief Constructor.

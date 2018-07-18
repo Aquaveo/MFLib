@@ -7,10 +7,10 @@
 //------------------------------------------------------------------------------
 //#pragma warning (disable:4996)
 
-#include <private\ListReader.h>
+#include <private/ListReader.h>
 
-#include <private\ListReader\ListReaderH5.h>
-#include <private\ListReader\ListReaderParser.h>
+#include <private/ListReader/ListReaderH5.h>
+#include <private/ListReader/ListReaderParser.h>
 
 ///////////////////////////////////////////////////////////////////////////////
 // ListReader::impl

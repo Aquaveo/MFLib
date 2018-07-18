@@ -6,14 +6,14 @@
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
 
-#include <private\Parameters\ParamList.h>
+#include <private/Parameters/ParamList.h>
 
 #include <map>
 
-#include <private\Parameters.h>
-#include <private\Parameters\Param.h>
-#include <private\Parameters\MultArray.h>
-#include <private\Parameters\PilotPoints.h>
+#include <private/Parameters.h>
+#include <private/Parameters/Param.h>
+#include <private/Parameters/MultArray.h>
+#include <private/Parameters/PilotPoints.h>
 
 class ParamList::impl
 {
@@ -480,7 +480,7 @@ bool ParamList::ParamOfTypeExists (const char* a_type)
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
 
-#include <private\Parameters\ParamList.t.h>
+#include <private/Parameters/ParamList.t.h>
 
 //------------------------------------------------------------------------------
 void ParamListT::setUp ()

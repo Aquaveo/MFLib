@@ -11,7 +11,7 @@
 // 1. Precompiled header
 
 // 2. My own header
-#include <private\MfData\MfExport\private\Sqlite\SqArrayWriter.h>
+#include <private/MfData/MfExport/private/Sqlite/SqArrayWriter.h>
 
 // 3. Standard library headers
 #include <sstream>
@@ -31,9 +31,9 @@
 #include <private/MfData/Packages/MfPackFields.h>
 #include <private/MfData/Packages/MfPackStrings.h>
 #include <private/SQLite/CppSQLite3.h>
-#include <private\MfData\MfExport\private\Sqlite\SqMfSchema.h>
-#include <private\MfData\MfExport\private\Sqlite\SqExporter.h>
-#include <private\MfData\MfExport\private\Sqlite\SqDisu.h>
+#include <private/MfData/MfExport/private/Sqlite/SqMfSchema.h>
+#include <private/MfData/MfExport/private/Sqlite/SqExporter.h>
+#include <private/MfData/MfExport/private/Sqlite/SqDisu.h>
 
 //----- Forward declarations ---------------------------------------------------
 

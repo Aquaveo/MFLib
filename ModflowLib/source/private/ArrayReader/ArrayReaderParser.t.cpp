@@ -7,9 +7,9 @@
 //------------------------------------------------------------------------------
 #ifdef CXX_TEST
 
-#include <private\ArrayReader\ArrayReaderParser.t.h>
+#include <private/ArrayReader/ArrayReaderParser.t.h>
 
-#include <private\ArrayReader\ArrayReaderParser.h>
+#include <private/ArrayReader/ArrayReaderParser.h>
 
 //------------------------------------------------------------------------------
 void ArrayReaderParserT::testCreateClass ()

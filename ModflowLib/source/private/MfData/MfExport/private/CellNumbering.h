@@ -5,7 +5,7 @@
 #define CELLNUMBERING_H
 
 #include <vector>
-#include <private\util\util.h>
+#include <private/util/util.h>
 
 class CellNumberingImpl;
 namespace MfData

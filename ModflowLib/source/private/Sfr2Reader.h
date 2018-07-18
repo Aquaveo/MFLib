@@ -4,7 +4,7 @@
 #ifndef SFR2READERH5_H
 #define SFR2READERH5_H
 
-#include <private\util\util.h>
+#include <private/util/util.h>
 
 
 namespace sfr2

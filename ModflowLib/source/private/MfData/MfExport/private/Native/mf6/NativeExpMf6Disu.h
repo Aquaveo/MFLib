@@ -5,7 +5,7 @@
 #define NATIVEEXPMF6DISU_H
 
 #include <vector>
-#include <private\util\util.h>
+#include <private/util/util.h>
 
 namespace MfData
 {

@@ -4,7 +4,7 @@
 #ifndef EREADASCIIFILE_H
 #define EREADASCIIFILE_H
 
-#include <private\util\util.h>
+#include <private/util/util.h>
 
 class ioexception : public std::exception {
   public:

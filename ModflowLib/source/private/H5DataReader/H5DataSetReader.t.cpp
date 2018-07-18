@@ -5,10 +5,10 @@
 //------------------------------------------------------------------------------
 #ifdef CXX_TEST
 
-#include <private\H5DataReader\H5DataSetReader.t.h>
+#include <private/H5DataReader/H5DataSetReader.t.h>
 
-#include <private\H5DataReader\H5DataSetReader.h>
-#include <private\H5DataReader\H5DataReaderUtil.h>
+#include <private/H5DataReader/H5DataSetReader.h>
+#include <private/H5DataReader/H5DataReaderUtil.h>
 
 //------------------------------------------------------------------------------
 void H5DataSetReaderT::setUp ()

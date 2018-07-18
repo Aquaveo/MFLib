@@ -4,7 +4,7 @@
 #ifndef LISTREADERPARSER_H
 #define LISTREADERPARSER_H
 
-#include <private\util\util.h>
+#include <private/util/util.h>
 
 class ListReaderParser
 {

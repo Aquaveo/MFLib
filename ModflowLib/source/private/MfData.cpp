@@ -6,12 +6,12 @@
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
 
-#include <private\MfData.h>
+#include <private/MfData.h>
 
-#include <private\MfData\MfExport\MfExporter.h>
-#include <private\MfData\MfGlobal.h>
-#include <private\MfData\MfPackageUtil.h>
-#include <private\util\util.h>
+#include <private/MfData/MfExport/MfExporter.h>
+#include <private/MfData/MfGlobal.h>
+#include <private/MfData/MfPackageUtil.h>
+#include <private/util/util.h>
 
 //------------------------------------------------------------------------------
 /// \brief This gets the current stress period that we are on
@@ -2459,7 +2459,7 @@ bool MfData::MNWI_End ()
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
 
-#include <private\MfData.t.h>
+#include <private/MfData.t.h>
 #include <sstream>
 
 //------------------------------------------------------------------------------

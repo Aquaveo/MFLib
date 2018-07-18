@@ -4,7 +4,7 @@
 #ifndef NATIVEEXPARR1D_H
 #define NATIVEEXPARR1D_H
 
-#include <private\MfData\MfExport\private\Native\NativePackExp.h>
+#include <private/MfData/MfExport/private/Native/NativePackExp.h>
 #include <private/MfData/MfExport/private/Sqlite/SqMfSchema.h>
 
 namespace MfData

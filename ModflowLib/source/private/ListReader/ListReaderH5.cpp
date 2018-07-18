@@ -6,18 +6,18 @@
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
 
-#include <private\ListReader\ListReaderH5.h>
+#include <private/ListReader/ListReaderH5.h>
 
 #include <map>
-#include <private\ListReader.h>
+#include <private/ListReader.h>
 
 #include <Export.h>
-#include <private\H5DataReader\H5DataSetReader.h>
-#include <private\H5DataReader\H5VecCStrReader.h>
-#include <private\ListReader\CellIdToIJK.h>
-#include <private\ListReader\ListReaderParser.h>
-#include <private\MfData\MfGlobal.h>
-#include <private\Parameters.h>
+#include <private/H5DataReader/H5DataSetReader.h>
+#include <private/H5DataReader/H5VecCStrReader.h>
+#include <private/ListReader/CellIdToIJK.h>
+#include <private/ListReader/ListReaderParser.h>
+#include <private/MfData/MfGlobal.h>
+#include <private/Parameters.h>
 
 #define CELLIDS   "02. Cell IDs"
 #define MAPIDSTR  "04. Map ID"

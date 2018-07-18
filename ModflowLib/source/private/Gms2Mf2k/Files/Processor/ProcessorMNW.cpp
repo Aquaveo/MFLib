@@ -307,7 +307,7 @@ bool ProcessorMNW::impl::WriteWellData (FILE *a_fp,
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <private/Gms2Mf2k/Files/Processor/ProcessorMNW.t.h>
-#include <private\H5DataReader\H5DataSetReader.h>
+#include <private/H5DataReader/H5DataSetReader.h>
 #include <private/MfLibAsserts.h>
 
 //------------------------------------------------------------------------------

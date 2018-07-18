@@ -5,16 +5,16 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
-#include <private\MfData\MfExport\private\Native\NativeExpMnw2.h>
+#include <private/MfData/MfExport/private/Native/NativeExpMnw2.h>
 
 #include <sstream>
 
-#include <private\MfData\MfExport\private\Mf2kNative.h>
-#include <private\MfData\MfExport\private\H5\H5BcList.h>
-#include <private\MfData\MfExport\private\Native\mf6\NativeExpMf6Maw.h>
-#include <private\MfData\MfGlobal.h>
-#include <private\MfData\Packages\MfPackage.h>
-#include <private\MfData\Packages\MfPackFields.h>
+#include <private/MfData/MfExport/private/Mf2kNative.h>
+#include <private/MfData/MfExport/private/H5/H5BcList.h>
+#include <private/MfData/MfExport/private/Native/mf6/NativeExpMf6Maw.h>
+#include <private/MfData/MfGlobal.h>
+#include <private/MfData/Packages/MfPackage.h>
+#include <private/MfData/Packages/MfPackFields.h>
 
 using namespace MfData::Export;
 namespace
@@ -587,13 +587,13 @@ void NativeExpMnw2::Lines34 ()
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
 
-#include <private\MfData\MfExport\private\Native\NativeExpMnw2.t.h>
+#include <private/MfData/MfExport/private/Native/NativeExpMnw2.t.h>
 
-#include <private\MfData\MfExport\private\Mf2kNative.h>
-#include <private\MfData\MfExport\private\Native\NativeUtil.h>
-#include <private\MfData\MfGlobal.h>
-#include <private\MfData\Packages\MfPackage.h>
-#include <private\MfData\Packages\MfPackStrings.h>
+#include <private/MfData/MfExport/private/Mf2kNative.h>
+#include <private/MfData/MfExport/private/Native/NativeUtil.h>
+#include <private/MfData/MfGlobal.h>
+#include <private/MfData/Packages/MfPackage.h>
+#include <private/MfData/Packages/MfPackStrings.h>
 
 using namespace MfData;
 //------------------------------------------------------------------------------

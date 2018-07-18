@@ -5,23 +5,23 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
-#include <private\MfData\MfExport\private\Native\NativeExpBas.h>
+#include <private/MfData/MfExport/private/Native/NativeExpBas.h>
 
 #include <sstream>
 
-#include <private\MfData\MfExport\private\Mf2kNative.h>
-#include <private\MfData\MfExport\private\MfExportUtil.h>
-#include <private\MfData\MfGlobal.h>
-#include <private\MfData\MfExport\private\MfExporterImpl.h>
-#include <private\MfData\MfExport\private\Native\mf6\NativeExpMf6Dis.h>
-#include <private\MfData\MfExport\private\Native\mf6\NativeExpMf6Disu.h>
-#include <private\MfData\MfExport\private\Native\mf6\NativeExpMf6Ic.h>
-#include <private\MfData\MfExport\private\Native\NativeExpDis.h>
-#include <private\MfData\MfExport\private\Native\NativeExpDisu.h>
-#include <private\MfData\MfPackageUtil.h>
-#include <private\MfData\Packages\MfPackage.h>
-#include <private\MfData\Packages\MfPackFields.h>
-#include <private\MfData\Packages\MfPackStrings.h>
+#include <private/MfData/MfExport/private/Mf2kNative.h>
+#include <private/MfData/MfExport/private/MfExportUtil.h>
+#include <private/MfData/MfGlobal.h>
+#include <private/MfData/MfExport/private/MfExporterImpl.h>
+#include <private/MfData/MfExport/private/Native/mf6/NativeExpMf6Dis.h>
+#include <private/MfData/MfExport/private/Native/mf6/NativeExpMf6Disu.h>
+#include <private/MfData/MfExport/private/Native/mf6/NativeExpMf6Ic.h>
+#include <private/MfData/MfExport/private/Native/NativeExpDis.h>
+#include <private/MfData/MfExport/private/Native/NativeExpDisu.h>
+#include <private/MfData/MfPackageUtil.h>
+#include <private/MfData/Packages/MfPackage.h>
+#include <private/MfData/Packages/MfPackFields.h>
+#include <private/MfData/Packages/MfPackStrings.h>
 using namespace MfData::Export;
 
 const CStr ARRSTR_STRT=ARR_BAS_SHEAD;
@@ -243,13 +243,13 @@ int NativeExpBas::NumLines (int a_line)
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
 
-#include <private\MfData\MfExport\private\Native\NativeExpBas.t.h>
+#include <private/MfData/MfExport/private/Native/NativeExpBas.t.h>
 
-#include <private\MfData\MfExport\private\Mf2kNative.h>
-#include <private\MfData\MfExport\private\Native\NativeUtil.h>
-#include <private\MfData\MfGlobal.h>
-#include <private\MfData\Packages\MfPackage.h>
-#include <private\MfData\Packages\MfPackStrings.h>
+#include <private/MfData/MfExport/private/Mf2kNative.h>
+#include <private/MfData/MfExport/private/Native/NativeUtil.h>
+#include <private/MfData/MfGlobal.h>
+#include <private/MfData/Packages/MfPackage.h>
+#include <private/MfData/Packages/MfPackStrings.h>
 #include <private/MfLibAsserts.h>
 
 using namespace MfData;

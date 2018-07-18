@@ -7,11 +7,11 @@
 //------------------------------------------------------------------------------
 //#pragma warning (disable:4996)
 
-#include <private\ArrayReader.h>
+#include <private/ArrayReader.h>
 
-#include <private\ArrayReader\ArrayReaderParser.h>
-#include <private\H5DataReader\H5DataSetReader.h>
-#include <private\Parameters.h>
+#include <private/ArrayReader/ArrayReaderParser.h>
+#include <private/H5DataReader/H5DataSetReader.h>
+#include <private/Parameters.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \class ArrayReader::impl
@@ -166,7 +166,7 @@ m_parser(a_)
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
 
-#include <private\ArrayReader.t.h>
+#include <private/ArrayReader.t.h>
 
 //------------------------------------------------------------------------------
 void ArrayReaderT::testCreateClass ()

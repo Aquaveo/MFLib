@@ -4,7 +4,7 @@
 // COPYRIGHT Brigham Young University, EMRL, 2006 All rights reserved.
 //------------------------------------------------------------------------------
 
-#include <private\Parameters\ParamUtil.h>
+#include <private/Parameters/ParamUtil.h>
 
 using namespace Param;
 

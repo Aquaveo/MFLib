@@ -4,7 +4,7 @@
 #ifndef MF2KNATIVE_H
 #define MF2KNATIVE_H
 
-#include <private\MfData\MfExport\private\MfExporterImpl.h>
+#include <private/MfData/MfExport/private/MfExporterImpl.h>
 
 namespace MfData
 {

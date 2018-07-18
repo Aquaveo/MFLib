@@ -5,14 +5,14 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
-#include <private\H5DataReader\H5DataSetWriter.h>
+#include <private/H5DataReader/H5DataSetWriter.h>
 
 #include <map>
 
-#include <private\H5DataReader\H5DataReaderUtil.h>
-#include <private\H5DataReader\H5DataSetWriterSetUp.h>
-#include <private\MfData\MfExport\private\H5\H5Util.h>
-#include <private\util\util.h>
+#include <private/H5DataReader/H5DataReaderUtil.h>
+#include <private/H5DataReader/H5DataSetWriterSetUp.h>
+#include <private/MfData/MfExport/private/H5/H5Util.h>
+#include <private/util/util.h>
 
 class iWriteH5
 {
@@ -864,7 +864,7 @@ bool H5DataSetWriter::impl::CreateGroup (const char *a_)
 
 #ifdef CXX_TEST
 
-#include <private\H5DataReader\H5DataSetWriter.t.h>
+#include <private/H5DataReader/H5DataSetWriter.t.h>
 static H5DataSetWriterSetup GetSetupTester()
 {
   H5DataSetWriterSetup m_setup;

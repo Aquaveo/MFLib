@@ -6,9 +6,9 @@
 //  LICENSE_1_0.txt or copy at http://www.modflow.org/LICENSE_1_0.txt)
 //------------------------------------------------------------------------------
 
-#include <private\Parameters\MultArray.h>
+#include <private/Parameters/MultArray.h>
 
-#include <private\H5DataReader\H5DataSetReader.h>
+#include <private/H5DataReader/H5DataSetReader.h>
 
 class MultArray::impl
 {
@@ -63,7 +63,7 @@ bool MultArray::impl::GetArray (std::vector<Real> &a_)
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
 
-#include <private\Parameters\MultArray.t.h>
+#include <private/Parameters/MultArray.t.h>
 
 //------------------------------------------------------------------------------
 void MultArrayT::testCreateClass ()

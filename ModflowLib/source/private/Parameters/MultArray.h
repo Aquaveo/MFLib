@@ -4,7 +4,7 @@
 #ifndef MULTARRAY_H
 #define MULTARRAY_H
 
-#include <private\util\util.h>
+#include <private/util/util.h>
 
 class MultArray
 {

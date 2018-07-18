@@ -4,7 +4,7 @@
 // COPYRIGHT Aquaveo 2006 All rights reserved.
 //------------------------------------------------------------------------------
 
-#include <private\Parameters\EReadAsciiFile.h>
+#include <private/Parameters/EReadAsciiFile.h>
 
 #define WHITESPACE " ,\t\r\n"
 #define ENDLINE "\r\n"

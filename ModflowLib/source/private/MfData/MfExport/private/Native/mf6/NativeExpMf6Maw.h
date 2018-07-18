@@ -4,7 +4,7 @@
 #ifndef NativeExpMf6Maw_H
 #define NativeExpMf6Maw_H
 
-#include <private\util\StdString.h>
+#include <private/util/StdString.h>
 
 namespace MfData
 {

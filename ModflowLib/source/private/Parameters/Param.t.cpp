@@ -8,8 +8,8 @@
 
 #ifdef CXX_TEST
 
-#include <private\Parameters\Param.t.h>
-#include <private\Parameters\Param.h>
+#include <private/Parameters/Param.t.h>
+#include <private/Parameters/Param.h>
 
 //------------------------------------------------------------------------------
 void ParamT::testCreateClass ()

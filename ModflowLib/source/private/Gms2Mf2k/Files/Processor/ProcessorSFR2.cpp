@@ -636,7 +636,7 @@ bool ProcessorSFR2::impl::WriteStreamData (FILE *a_fp)
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <private/Gms2Mf2k/Files/Processor/ProcessorSFR2.t.h>
-#include <private\H5DataReader\H5DataSetReader.h>
+#include <private/H5DataReader/H5DataSetReader.h>
 #include <private/MfLibAsserts.h>
 #include <private/MfData/MfGlobal.h>
 

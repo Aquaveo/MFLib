@@ -11,7 +11,7 @@
 // 1. Precompiled header
 
 // 2. My own header
-#include <private\MfData\MfExport\private\Native\Mnw1PropList.h>
+#include <private/MfData/MfExport/private/Native/Mnw1PropList.h>
 
 // 3. Standard library headers
 
@@ -303,7 +303,7 @@ void Mnw1PropList::AppendItem (
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef CXX_TEST
 
-#include <private\MfData\MfExport\private\Native\Mnw1PropList.t.h>
+#include <private/MfData/MfExport/private/Native/Mnw1PropList.t.h>
 #include <private/MfLibAsserts.h>
 //------------------------------------------------------------------------------
 void Mnw1PropListT::setUp ()

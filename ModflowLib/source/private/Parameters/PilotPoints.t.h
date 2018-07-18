@@ -4,7 +4,7 @@
 #ifndef PILOTPOINTS_T_H
 #define PILOTPOINTS_T_H
 
-#include <private\util\util.h>
+#include <private/util/util.h>
 #include <cxxtest/TestSuite.h>
 
 class Param;
