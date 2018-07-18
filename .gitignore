@@ -1,2 +1,8 @@
+# User Files
 *.swp
 build/
+build-Debug
+build-Release
+CMakeLists.txt.user
+
+
