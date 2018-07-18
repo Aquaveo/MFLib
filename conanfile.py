@@ -38,7 +38,7 @@ class ModflowLibConan(ConanFile):
     def requirements(self):
         """List all requirements."""
         self.requires("cxxtest/4.4@aquaveo/stable")
-        self.requires("hdf5/1.8.1@aquaveo/stable")
+        self.requires("hdf5/1.8.4@aquaveo/stable")
 
     def build(self):
         """Build the package."""
