@@ -16,7 +16,7 @@ class ModflowLibConan(ConanFile):
     generators = "cmake", "txt"
     build_requires = "cxxtest/4.4@aquaveo/stable"
     exports = "CMakeLists.txt", "CMakeModules/*", "LICENSE"
-    exports_sources = "xmscore/*"
+    exports_sources = "ModflowLib/*", "mfLibFortran/*"
 
     def configure(self):
         """Configure the package."""
@@ -43,12 +43,15 @@ class ModflowLibConan(ConanFile):
     def build(self):
         """Build the package."""
         cmake = CMake(self)
-        cmake.definitions["BUILD_TESTING"] = True
+        cmake.definitions["BUILD_TESTING"] = False
+        cmake.definitions["USE_DBLPREC_AS_REAL"] = True
         cmake.configure(source_folder=".")
         cmake.build()
         print("***********(0.0)*************")
         try:
-            cmake.test()
+            # cmake.test()
+            tests = False
+            print(tests)
         except ConanException:
             raise
         finally:
