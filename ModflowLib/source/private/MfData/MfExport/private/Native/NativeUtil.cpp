@@ -28,7 +28,7 @@
 #include <private/MfData/MfExport/private/Native/NativeExpLak.h>
 #include <private/MfData/MfExport/private/Native/NativeExpLgr.h>
 #include <private/MfData/MfExport/private/Native/NativeExpLpf.h>
-#include <private/MfData/MfExport/private/Native/NativeExpLstobs.h>
+#include <private/MfData/MfExport/private/Native/NativeExpLstObs.h>
 #include <private/MfData/MfExport/private/Native/NativeExpLstPack.h>
 #include <private/MfData/MfExport/private/Native/NativeExpLstPar.h>
 #include <private/MfData/MfExport/private/Native/NativeExpMlt.h>

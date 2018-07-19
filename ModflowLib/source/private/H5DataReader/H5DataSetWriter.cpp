@@ -10,7 +10,7 @@
 #include <map>
 
 #include <private/H5DataReader/H5DataReaderUtil.h>
-#include <private/H5DataReader/H5DataSetWriterSetUp.h>
+#include <private/H5DataReader/H5DataSetWriterSetup.h>
 #include <private/MfData/MfExport/private/H5/H5Util.h>
 #include <private/util/util.h>
 
